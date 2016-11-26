@@ -1,0 +1,13 @@
+## Interface: 60200
+## Title: |cFFCCCCCCCleanUI|r
+## Author: Xiang (Shattered Hand-EU)
+## SavedVariables: CleanUI_DB
+## Notes: Clean and simple UI alternative
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+libs\AceLocale-3.0\AceLocale-3.0.xml
+media\load_media.xml
+locales\load_locales.xml
+load.xml
+modules\load_modules.xml

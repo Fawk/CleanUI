@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="Test" runOnUp="false" category="BINDING_HEADER_CLEANUI" description="Flash Heal">
+    -- Test
+  </Binding>
+</Bindings>

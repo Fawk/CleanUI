@@ -1,0 +1,8 @@
+[ ] Minimap buttons to dropdown
+[ ] Simple units and party & click2heal system
+[ ] Raid
+[ ] Style all remaining blizzard frames
+[ ] Actionbars
+[ ] Chat
+[ ] Quest log
+[ ] Create own damage and healing recorder
