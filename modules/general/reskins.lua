@@ -437,8 +437,8 @@ local function setStyle()
 
 		callbackObj:Func()
 
-		if not IsAddOnLoaded("Blizzard_TimeManager") then
-			LoadAddOn("Blizzard_TimeManager")
+		local function killTimeFrames()
+
 			kill(TimeManagerClockButton)
 			local f = setFont(TimeManagerClockButton, 11)
 			f:SetPoint(E.regions.C, TimeManagerClockButton, E.regions.C, 0, 0)
@@ -466,6 +466,12 @@ local function setStyle()
 			MiniMapMailFrame:SetPoint(E.regions.B, TimeManagerClockButton, E.regions.T, 0, -5)
 
 		end
+
+		if not IsAddOnLoaded("Blizzard_TimeManager") then
+			LoadAddOn("Blizzard_TimeManager")
+		end
+
+		killTimeFrames()
 	end
 
 	--Blizzard windows
