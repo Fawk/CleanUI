@@ -63,7 +63,8 @@ local db = {
     				["Size"] = {
     					["Width"] = 250,
     					["Height"] = 50,
-    				}
+    				},
+    				["Enabled"] = true
     			},
     			["Target"] = {
     				["Position"] = {

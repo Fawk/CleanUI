@@ -7,12 +7,15 @@ local Player = {}
 local frameName = "Player"
  
 function Player:Init()
-    ouF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Player:Setup(frame, A.db["Options"][frameName])
+
+	local db = A["Profile"]["Options"][frameName]
+
+    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
+        Player:Setup(frame, db)
     end)
-    Units:SetActiveStyle(frameName)
+    oUF:SetActiveStyle(frameName)
     Units:AddFrame(Units:GetFrame(frameName) or oUF:Spawn(frameName, frameName))
-    self:Update(Units:GetFrame(frameName), A.db["Options"][frameName])
+    self:Update(Units:GetFrame(frameName), db)
 end
  
 function Player:Setup(frame, db)
@@ -27,8 +30,9 @@ function Player:Setup(frame, db)
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
     Units:SetKeyBindings(frame, bindings)
- 
     Units:UpdateElements(frame, db["Elements"])
+
+    self:CreateFrame(frame, db)
 end
  
 function Player:Update(frame, db)
@@ -38,11 +42,11 @@ function Player:Update(frame, db)
         frame:Enable()
     end
  
-    Units:UpdateElements(frame, db)
+    Units:UpdateElements(frame, db["Elements"])
+    self:UpdateFrame()
 end
 
-function Player:CreateFrame(frame)
-	local db = A.db["Options"]["Player"]
+function Player:CreateFrame(frame, db)
 
 	local size = db.Size
 	local position = db.Position
@@ -141,10 +145,10 @@ function Player:UpdateFrame()
 
 	if InCombatLockdown() then return end
 
-	local db = A.db["Options"]["Player"]
+	local db = A["Profile"]["Options"][frameName]
 	local size = db.Size
 	local position = db.Position
-	local frame = A.frames.player
+	local frame = Units:GetFrame(frameName)
 
 	local unit = frame.unit
 	if not unit then return end

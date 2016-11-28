@@ -202,7 +202,7 @@ function Addon:OnEnable()
 	optionsContainer:CreateOptions(optionsWindow, options)
 
 	for modName, module in pairs(self.modules) do
-		if module.New then module:New() end
+		if module.Init then module:Init() end
 	end
 
 	local drawerWidth = 200

@@ -1,4 +1,5 @@
-local Units, elements, units = {}, {}, {}
+local A, L = unpack(select(2, ...))
+local Units, elements, units, oUF = {}, {}, {}, A.oUF
  
 function Units:GetFrame(unit)
     return units[unit]
@@ -9,15 +10,17 @@ function Units:AddFrame(object)
 end
  
 function Units:UpdateElements(frame, db)
-    for name in next, oUF:GetRegisteredElements() do
-        if db[name] and db[name]["Enabled"] then
-            frame:EnableElement(name)
-            elements[name](frame, db[name])
-        else
-            frame:DisableElement(name)
+    if db then
+        for name in next, oUF:GetRegisteredElements() do
+            if db[name] and db[name]["Enabled"] then
+                frame:EnableElement(name)
+                elements[name](frame, db[name])
+            else
+                frame:DisableElement(name)
+            end
         end
+        frame:UpdateAllElements()
     end
-    frame:UpdateAllElements()
 end
  
 function Units:Translate(frame, relative)
@@ -41,8 +44,10 @@ end
  
 function Units:SetKeyBindings(frame, db)
     frame:RegisterForClicks("AnyUp")
-    for binding in next, db do
-        frame:SetAttribute(binding.type, binding.action)
+    if db then
+        for binding in next, db do
+            frame:SetAttribute(binding.type, binding.action)
+        end
     end
 end
 
