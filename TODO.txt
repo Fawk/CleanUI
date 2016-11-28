@@ -1,4 +1,4 @@
-[ ] Minimap buttons to dropdown
+[ ] Update minimap with grid based layout (Currencies, Item-level, ...)
 [ ] Simple units and party & click2heal system
 [ ] Raid
 [ ] Style all remaining blizzard frames
@@ -6,3 +6,5 @@
 [ ] Chat
 [ ] Quest log
 [ ] Create own damage and healing recorder
+
+
