@@ -121,6 +121,10 @@ function OT:isEmpty()
 	return self:count() == 0
 end
 
+function OT:isSize(size)
+	return self:count() == size
+end
+
 function A:OrderedTable(s)
 
 	local opt = { 
