@@ -1,53 +1,84 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 
+local function getMoneyString()
+	local m = GetMoney()
+	local g, s, c = floor(abs(m / 10000)), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
+	return string.format("%dg %ds %dc", g, s, c)
+end
+
+local function getIlvl()
+	return select(2, GetAverageItemLevel())
+end
+
 local templates = {
-	["Single text"] = function(frame, size, points)
-		local value = frame:CreateFontString(nil, "OVERLAY")
-		value:SetFont(media:Fetch("font", "FrancophilSans"), size, "NONE")
-		if points and type(points) == "table" then
-			if points.lp and points.relative then
-				value:SetPoint(points.lp, points.relative == "parent" and frame or points.relative, points.p and points.p or points.lp, points.x or 0, points.y or 0)
-			else
-				if points.all then
-					value:SetAllPoints(frame)
+	Text = function(frame, options)
+		local ret, prev = {}, nil
+		for text, next in options do
+			local value = frame:CreateFontString(nil, "OVERLAY")
+			value:SetFont(media:Fetch("font", "FrancophilSans"), text.size, "NONE")
+			local points = text.points
+			if points and type(points) == "table" then
+				if points.lp and points.relative then
+					local relative = points.relative
+					if relative == "parent" then
+						relative = frame
+					else if relative == "prev" then
+						if prev == nil then
+							relative = frame
+						else
+							relative = prev
+						end
+					end
+					value:SetPoint(points.lp, relative, points.p and points.p or points.lp, points.x or 0, points.y or 0)
 				else
-					for point, next in points do
-						value:SetPoint(point)
+					if points.all then
+						value:SetAllPoints(frame)
+					else
+						for point, next in points do
+							value:SetPoint(point)
+						end
 					end
 				end
 			end
+			prev = value
+			table.insert(ret, value)
 		end
-		return value
+		return unpack(ret)
 	end,
-	["Double text"] = function(frame, size1, points1, size2, points2)
-		local first = templates["Single text"](frame, size1, points1)
-		if points2.relative and points.relative == "first" then points2.relative = first end
-		local second = templates["Single text"](frame, size2, points2)
-		return first, second
-	end
 }
 
 local presets = {
 	["Item Level"] = {
 		apply = function(frame)
 
+			local function update(f)
+				local value = f.currentPreset.value
+				value:SetText(getIlvl())
+			end
+
 			local preset = frame.currentPreset
 			if preset and preset:GetName() == "Item Level" then
-				presets[preset:GetName()]:update(frame, select(2, GetAverageItemLevel()))
+				update(frame)
 				return
 			end
 
 			local ilvl = CreateFrame("Frame", "Item Level", frame)
 			ilvl:SetAllPoints(frame)
 
-			local desc, value = template["Double text"](
+			local desc, value = templates.Text(
 				ilvl,
-				11, { lp = "CENTER", relative = "parent", y = -10 },
-				14, { lp = "TOP", p = "BOTTOM", relative = "first", y = -3 }
+				{
+					size = 11,
+					points = { lp = "CENTER", relative = "parent", y = -10 } 
+				},
+				{
+					size = 14,
+					points = { lp = "TOP", p = "BOTTOM", relative = "prev", y = -3 } 
+				}
 			)
 			desc:SetText("Item Level")
-			value:SetText(tostring(select(2, GetAverageItemLevel())))
+			value:SetText(getIlvl())
 
 			ilvl.value = value
 			frame.currentPreset = ilvl
@@ -59,7 +90,7 @@ local presets = {
 			ilvl:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
 			ilvl:SetScript("OnEvent", function(self, event, ...)
-				presets[self:GetName()]:update(ilvl:GetParent(), select(2, GetAverageItemLevel()))
+				update(self:GetParent())
 			end)
 		end,
 		update = function(frame, ilvl)
@@ -68,11 +99,49 @@ local presets = {
 		end
 	},
 	["Gold"] = {
-		local money = GetMoney()
-		local gold = floor(abs(money / 10000))
-		local silver = floor(abs(mod(money / 100, 100)))
-		local copper = floor(abs(mod(money, 100)))
-		-- e.g: 12345g 23s 38c
+		apply = function(frame)
+
+			local function update(f)
+				local value = f.currentPreset.value
+				value:SetText(getMoneyString())
+			end
+
+			local preset = frame.currentPreset
+			if preset and preset:GetName() == "Gold" then
+				update(frame)
+				return
+			end
+
+			local gold = CreateFrame("Frame", "Gold", frame)
+			gold:SetAllPoints(frame)
+
+			local desc, value = templates.Text(
+				gold, 
+				{
+					size = 12,
+					points = { lp = "CENTER", relative = "parent" }
+				},
+				{
+					size = 12,
+					points = { lp = "BOTTOM", p = "TOP", relative = "prev", y = -3 }
+				}
+			)
+			desc:SetText("Gold")
+			value:SetText(getMoneyString())
+
+			gold.value = value
+			frame.currentPreset = gold
+
+			gold:RegisterEvent("PLAYER_MONEY")
+			gold:SetScript("OnEvent", function(self, event, ...)
+				update(self:GetParent())
+			end)
+
+		end,
+		update = function(frame)
+			local value = frame.currentPreset.value
+			value:SetText(getMoneyString())
+		end
 	},
 	["Order Resources"] = { -- CurrencyId: 1220
 		local _,amount,texture,_,_,totalMax = GetCurrencyInfo(1120)
@@ -90,6 +159,35 @@ local presets = {
 	},
 	["Seal of Broken Faith"] = { -- Display current amount and limit this week e.g: 5/6 (3/3) - CurrencyId: 1273
 		local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
+		apply = function(frame)
+
+			local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
+
+			local seal = CreateFrame("Frame", "Seal of Broken Faith", frame)
+
+			local desc, value = templates.Text(
+				seal,
+				{
+					size = 12,
+					points = { lp "CENTER", relative = "parent", y = 3 }
+				},
+				{
+					size = 12,
+					points = { lp = "TOP", p = "BOTTOM", relative = "prev", y = -3}
+				}
+			)
+
+			seal:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+			seal:SetScript("OnEvent", function(self, event, ...)
+				update(self:GetParent())
+			end)
+
+		end,
+		update = function(frame)
+			local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
+			local value = frame.currentPreset.value
+			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
+		end
 	}
 }
 
