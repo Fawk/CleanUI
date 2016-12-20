@@ -68,19 +68,28 @@ local presets = {
 		end
 	},
 	["Gold"] = {
-
+		local money = GetMoney()
+		local gold = floor(abs(money / 10000))
+		local silver = floor(abs(mod(money / 100, 100)))
+		local copper = floor(abs(mod(money, 100)))
+		-- e.g: 12345g 23s 38c
 	},
-	["Order Hall Resources"] = {
-
+	["Order Resources"] = { -- CurrencyId: 1220
+		local _,amount,texture,_,_,totalMax = GetCurrencyInfo(1120)
 	},
 	["Artifact Power"] = { -- Display artifact level and min/max and percentage
-
+		--
+		--	 Artifact Level
+		--         28
+		--      573k/889k
+		--        64.4%
+		--
 	},
-	["Artifact Knowledge"] = {
-
+	["Artifact Knowledge"] = { -- CurrencyId: 1171
+		local _,amount,texture = GetCurrencyInfo(1171)
 	},
-	["Seal of Broken Faith"] = { -- Display current amount and limit this week e.g: 5/6 (3/3)
-
+	["Seal of Broken Faith"] = { -- Display current amount and limit this week e.g: 5/6 (3/3) - CurrencyId: 1273
+		local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
 	}
 }
 
