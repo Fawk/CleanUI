@@ -1,5 +1,16 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
+local E = A.enum
+
+local function getMoneyString()
+	local m = GetMoney()
+	local g, s, c = floor(abs(m / 10000)), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
+	return string.format("%dg %ds %dc", g, s, c)
+end
+
+local function getIlvl()
+	return select(2, GetAverageItemLevel())
+end
 
 local function getMoneyString()
 	local m = GetMoney()
@@ -65,6 +76,86 @@ local presets = {
 
 			local ilvl = CreateFrame("Frame", "Item Level", frame)
 			ilvl:SetAllPoints(frame)
+
+			local desc = TextBuilder()
+							:withSize(11)
+							:withLocalPoint("CENTER")
+							:withRelative("parent")
+							:withOffsetY(-10)
+							:build()
+
+			local value = TextBuilder()
+							:withSize(14)
+							:withLocalPoint(E.regions.T)
+							:withPoint(E.regions.B)
+							:withRelative(desc)
+							:withOffsetY(-3)
+							:build()
+
+			local test = TextBuilder(ilvl, 14)
+							:alignTop(true)
+							:alignBottom(true)
+							:relative(desc)
+							:offsetY(-3)
+							:build()
+
+			local function TextBuilder(parent, size)
+				local object = {
+					size = size
+					parent = parent
+				}
+				function object:build()
+					local text = self.parent:CreateFontString(nil, "OVERLAY")
+					text:SetFont(media:Fetch("font", "FrancophilSans"), self.size, "NONE")
+					local lp, p, x, y = 
+						   (self.atTop and E.regions.T 
+						or (self.atBottom and E.regions.B 
+						or (self.atLeft and E.regions.L 
+						or (self.atRight and E.regions.R 
+						or (self.atTopLeft and E.regions.TL
+						or (self.atTopRight and E.regions.TR
+						or (self.atBottomLeft and E.regions.BL
+						or (self.atBottomRight and E.regions.BR)))))))),
+						   (self.againstTop and E.regions.T 
+						or (self.againstBottom and E.regions.B 
+						or (self.againstLeft and E.regions.L 
+						or (self.againstRight and E.regions.R 
+						or (self.againstTopLeft and E.regions.TL
+						or (self.againstTopRight and E.regions.TR
+						or (self.againstBottomLeft and E.regions.BL
+						or (self.againstBottomRight and E.regions.BR)))))))),
+						   self.noOffsets and 0 or (self.x ~= nil and self.x or 0),
+						   self.noOffsets and 0 or (self.y ~= nil and self.y or 0)
+
+					text:SetPoint(lp, p, self.alignWith, x, y)
+					
+					return text
+				end
+				function object:alignWith(relative)
+					object.alignWith = relative
+					return self
+				end
+				function object:atTop(boolean)
+					object.atTop = boolean
+					return self
+				end
+				function object:againstBottom(boolean)
+					object.againstBottom = boolean
+					return self
+				end
+				function object:noOffsets()
+					object.noOffsets = true
+				end
+
+				return object
+			end
+
+			local test2 = TextBuilder(ilvl, 14)
+							:alignWith(desc)
+							:atTop(true)
+							:againstBottom(true)
+							:noOffsets()
+							:build()
 
 			local desc, value = templates.Text(
 				ilvl,
