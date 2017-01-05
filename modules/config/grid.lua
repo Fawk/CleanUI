@@ -452,43 +452,90 @@ local function iterate(rows, parent, created)
 end
 
 local function update(column, parent)
-	local back = CreateFrame("Button", nil, parent)
-	back:SetScript("OnClick", function(self, button down)
-		if button == "LeftButton" and not down then
-			self:update(column, parent)
-		end
-	end)
 	iterate(column.children, parent, self)
 end
 
--- options = { 
---   data = {
---      parent = Frame,
---      rows = {
---	       {
---	          columns = {
---               children = { grid },
---	             data = {
---					apply = function(frame)
---                  	local stuff = CreateFrame("Frame", nil, frame)
---                      -- do stuff
---					end
---               }
---            }
+-- grid = { 
+--     parent = Frame,
+--     previousButton = Button,
+--     rows = {
+--         column = {
+--             rows = { ... },
+--             previousButton = Button,
+--             getView = function() return "Name" end
+--         },
+--         column = {
+--             getView = function() return ... end
 --         }
---      }
---   }
---}
+--     }
+-- }
 -- 
 --
 --
 --
 
-function Grid:Create(options)
-	assert(type(options) == "table")
+function Grid:Build(grid)
+	for row in next, grid.rows do
+		for column in next, row 
+			
+			if not grid.parent then
+				grid.parent = grid.previousButton.previousGrid.parent
+			end
+			
+			local button = CreateButton("Button", nil, grid.parent)
+			
+			if column.rows do
+				button:SetScript("OnClick", function(selfObj, button, down)
+					if button == "LeftButton" and not down then
+						grid.previousButton.previousGrid = grid
+						column.previousButton = grid.previousButton
+						self:Build(column)
+					end
+				end)
+			end
 
-	local data, created = options.data, { update = update }
-	iterate(data.rows, data.parent, created)
+			if grid.singleLevel then
+				button:SetScript("OnClick", function(selfObj, button, down)
+					if button == "RightButton" then
+						-- Display dropdown containing current template options and a list of other possible choices of template
+						-- E.g.
+						--
+						-- [X] Gold
+						-- 
+						-- Custom format: [Textbox]
+						-- Display icons: [Checkbox] 
+						--
+						-- --------------------------------
+						--  
+						-- [ ] Item Level
+						-- [ ] Artifact Power
+						-- [ ] Artifact Knowledge
+						-- [ ] Order Resources
+						-- ...
+					end
+				end)
+			end
+		end
+	end
+end
 
-	return created
+function Grid:GeneratePreviousButton(previousGrid, parent)
+	local back, gridObj = CreateFrame("Button", nil, parent), self
+	back.previousGrid = previousGrid
+	back:SetScript("OnClick", function(selfObj, button, down)
+		if button == "LeftButton" and not down then
+			gridObj:Build(selfObj.previousGrid)
+		end
+	end)
+	return back
+end
+
+function Grid:Create(grid, isSingleLevel)
+	assert(type(grid) == "table")
+	if not isSingleLevel then
+		self.previousButton = self:GeneratePreviousButton(nil, grid.parent)
+	else
+		self.singleLevel = true
+	end
+	return self:Build(grid)
 end
