@@ -2,15 +2,17 @@ local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 
-local function getMoneyString()
-	local m = GetMoney()
-	local g, s, c = floor(abs(m / 10000)), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
-	return string.format("%dg %ds %dc", g, s, c)
+local function isSamePreset(frame, key)
+	if frame and frame.currentPreset then
+		return frame.currentPreset:GetName() == key
+	end
+	return false
 end
 
-local function getIlvl()
-	return select(2, GetAverageItemLevel())
-end
+local Keys = {
+	["Gold"],
+	["Item Level"],
+}
 
 local function getMoneyString()
 	local m = GetMoney()
@@ -138,7 +140,7 @@ local presets = {
 						end
 
 						if lp and p then
-							text:SetPoint(lp, p, self.alignWith, x, y)
+							text:SetPoint(lp, p, self.alignWith or parent, x, y)
 						else
 							if self.top then
 								local x, y = unpack(self.top)
@@ -297,10 +299,8 @@ local presets = {
 			end
 
 			local test2 = TextBuilder(ilvl, 14)
-							:alignWith(desc)
 							:atTop(true)
-							:againstBottom(true)
-							:noOffsets()
+							:y(-5)
 							:build()
 
 			local desc, value = templates.Text(
@@ -336,34 +336,22 @@ local presets = {
 		end
 	},
 	["Gold"] = {
-		apply = function(frame)
+		init = function(frame, key)
 
-			local function update(f)
-				local value = f.currentPreset.value
-				value:SetText(getMoneyString())
-			end
-
-			local preset = frame.currentPreset
-			if preset and preset:GetName() == "Gold" then
-				update(frame)
+			if frame.currentPreset and isSamePreset(frame, key) then
+				frame.currentPreset.value:SetText(getMoneyString())
 				return
+			else
+				frame.currentPreset:Hide()
 			end
 
-			local gold = CreateFrame("Frame", "Gold", frame)
+			local gold = CreateFrame("Frame", key, frame)
 			gold:SetAllPoints(frame)
 
-			local desc, value = templates.Text(
-				gold, 
-				{
-					size = 12,
-					points = { lp = "CENTER", relative = "parent" }
-				},
-				{
-					size = 12,
-					points = { lp = "BOTTOM", p = "TOP", relative = "prev", y = -3 }
-				}
-			)
-			desc:SetText("Gold")
+			local desc = TextBuilder(gold, 12):atTop(true):y(-5):build()
+			local value = TextBuilder(gold, 12):alignWith(desc):atTop(true):againstBottom(true):y(-3):build()
+
+			desc:SetText(L["Gold"])
 			value:SetText(getMoneyString())
 
 			gold.value = value
@@ -371,13 +359,9 @@ local presets = {
 
 			gold:RegisterEvent("PLAYER_MONEY")
 			gold:SetScript("OnEvent", function(self, event, ...)
-				update(self:GetParent())
+				self.value:SetText(getMoneyString())
 			end)
 
-		end,
-		update = function(frame)
-			local value = frame.currentPreset.value
-			value:SetText(getMoneyString())
 		end
 	},
 	["Order Resources"] = { -- CurrencyId: 1220
@@ -439,8 +423,12 @@ local function section(column, parent, grid)
 			end
 		end)
 	end
-	if type(column.data) == "string" and presets[column.data] then
-		presets[column.data]:apply(frame)
+	if type(column.data) == "string" then
+		for key, init in pairs(presets) do
+			if key == column.data then
+				init(frame, )
+			end
+		end
 	else
 		column.data:apply(frame)
 	end
