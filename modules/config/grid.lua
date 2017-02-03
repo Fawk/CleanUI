@@ -1,6 +1,7 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
+local buildText = A.TextBuilder
 
 local function isSamePreset(frame, key)
 	if frame and frame.currentPreset then
@@ -8,11 +9,6 @@ local function isSamePreset(frame, key)
 	end
 	return false
 end
-
-local Keys = {
-	["Gold"],
-	["Item Level"],
-}
 
 local function getMoneyString()
 	local m = GetMoney()
@@ -23,43 +19,6 @@ end
 local function getIlvl()
 	return select(2, GetAverageItemLevel())
 end
-
-local templates = {
-	Text = function(frame, options)
-		local ret, prev = {}, nil
-		for text, next in options do
-			local value = frame:CreateFontString(nil, "OVERLAY")
-			value:SetFont(media:Fetch("font", "FrancophilSans"), text.size, "NONE")
-			local points = text.points
-			if points and type(points) == "table" then
-				if points.lp and points.relative then
-					local relative = points.relative
-					if relative == "parent" then
-						relative = frame
-					else if relative == "prev" then
-						if prev == nil then
-							relative = frame
-						else
-							relative = prev
-						end
-					end
-					value:SetPoint(points.lp, relative, points.p and points.p or points.lp, points.x or 0, points.y or 0)
-				else
-					if points.all then
-						value:SetAllPoints(frame)
-					else
-						for point, next in points do
-							value:SetPoint(point)
-						end
-					end
-				end
-			end
-			prev = value
-			table.insert(ret, value)
-		end
-		return unpack(ret)
-	end,
-}
 
 local presets = {
 	["Item Level"] = {
@@ -79,44 +38,9 @@ local presets = {
 			local ilvl = CreateFrame("Frame", "Item Level", frame)
 			ilvl:SetAllPoints(frame)
 
-			local desc = A:TextBuilder()
-							:withSize(11)
-							:withLocalPoint("CENTER")
-							:withRelative("parent")
-							:withOffsetY(-10)
-							:build()
+			local desc = buildText(ilvl, 14):atTop():y(-5):build()
+			local value = buildText(ilvl, 14):alignWith(desc):atTop():againstBottom():y(-3):build()
 
-			local value = A:TextBuilder()
-							:withSize(14)
-							:withLocalPoint(E.regions.T)
-							:withPoint(E.regions.B)
-							:withRelative(desc)
-							:withOffsetY(-3)
-							:build()
-
-			local test = A:TextBuilder(ilvl, 14)
-							:alignTop()
-							:alignBottom()
-							:relative(desc)
-							:offsetY(-3)
-							:build()
-
-			local test2 = A:TextBuilder(ilvl, 14)
-							:atTop(true)
-							:y(-5)
-							:build()
-
-			local desc, value = templates.Text(
-				ilvl,
-				{
-					size = 11,
-					points = { lp = "CENTER", relative = "parent", y = -10 } 
-				},
-				{
-					size = 14,
-					points = { lp = "TOP", p = "BOTTOM", relative = "prev", y = -3 } 
-				}
-			)
 			desc:SetText("Item Level")
 			value:SetText(getIlvl())
 
@@ -151,8 +75,8 @@ local presets = {
 			local gold = CreateFrame("Frame", key, frame)
 			gold:SetAllPoints(frame)
 
-			local desc = A:TextBuilder(gold, 12):atTop(true):y(-5):build()
-			local value = A:TextBuilder(gold, 12):alignWith(desc):atTop(true):againstBottom(true):y(-3):build()
+			local desc = buildText(gold, 12):atTop():y(-5):build()
+			local value = buildText(gold, 12):alignWith(desc):atTop():againstBottom():y(-3):build()
 
 			desc:SetText(L["Gold"])
 			value:SetText(getMoneyString())
@@ -189,7 +113,8 @@ local presets = {
 
 			local seal = CreateFrame("Frame", "Seal of Broken Faith", frame)
 
-			local desc, value = templates.Text(
+			local desc = buildText(seal, 12):with
+			local value = buildText(seal, )
 				seal,
 				{
 					size = 12,
@@ -236,6 +161,43 @@ local Grid = {}
 --
 --
 
+local function createDropdown(selected, options, grid, column)
+
+	local dropdown = CreateFrame("Frame", nil, UIParent)
+	dropdown:SetFrameLevel("TOOLTIP")
+	dropdown:SetWidth(250)
+
+	local height, cachedPresets = 0, {}
+
+	local activeTitle = buildText(dropdown, 12):atTop():againstTop():y(-3):build()
+	activeTitle:SetText(selected)
+
+	local optionsField = CreateFrame("Frame", nil, dropdown)
+	for option in next, options do
+		-- Add options and height
+	end
+	height = height + optionsField:GetHeight()
+
+	local relative = optionsField
+	for key, preset in next, presets do
+		if key ~= selected then
+			--local button = CreateButton("Button", nil, dropdown) -- TODO: Create buildButton builders as well...
+			local button = buildButton(dropdown):alignWith(relative):atTop():againstBottom():y(-3):onClick(function(self, button, down) 
+				
+				-- Change the content of the column in the grid
+			
+			end):build()
+			
+			local name = buildText(button, 12):atTop():build()
+			name:SetText(key)
+			
+			height = height + 10
+			relative = name
+		end
+	end
+
+end
+
 function Grid:Build(grid)
 	for row in next, grid.rows do
 		for column in next, row 
@@ -274,6 +236,8 @@ function Grid:Build(grid)
 						-- [ ] Artifact Knowledge
 						-- [ ] Order Resources
 						-- ...
+						local name, options, view = column:getView()
+						createDropdown(name, options, grid, column)
 					end
 				end)
 			end

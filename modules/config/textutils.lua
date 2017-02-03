@@ -121,7 +121,7 @@ function TextBuilder(parent, size)
 		return self
 	end
 	function object:atTop()
-		object.atTop = boolean
+		object.atTop = true
 		return self
 	end
 	function object:atBottom()
