@@ -6,6 +6,9 @@ A:Debug("Loading enums")
 local enum = {
     colors = {
         backdrop = { 0.10, 0.10, 0.10, 1 },
+        backdrophalfalpha = { .10, .10, .10, .5 },
+        backdrop75alpha = { .10, .10, .10, .75 },
+        backdrop25alpha = { .10, .10, .10, .25 },
         backdroplight = { 0.13, 0.13, 0.13, 1 },
         backdropborder = { 0.33, 0.33, 0.33, 1 }
     },
@@ -30,10 +33,10 @@ local enum = {
         C = "CENTER"
     },
     backdrops = {
-        editbox = { bgFile = [[Interface\BUTTONS\WHITE8X8]], tile = true, tileSize = 1 },
-        editboxborder = { bgFile = [[Interface\BUTTONS\WHITE8X8]], tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
-        optiongroupborder = { bgFile = [[Interface\BUTTONS\WHITE8X8]], tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = -5, bottom = -5, left = -5, right = -5 } },
-        buttonroundborder = { bgFile = [[Interface\BUTTONS\WHITE8X8]], tile = true, tileSize = 1, edgeFile = media:Fetch("border", "cui-round-border2"), edgeSize = 3, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
+        editbox = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1 },
+        editboxborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
+        optiongroupborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = -5, bottom = -5, left = -5, right = -5 } },
+        buttonroundborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "cui-round-border2"), edgeSize = 3, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
         slider = {},
         dropdown = {}
     },

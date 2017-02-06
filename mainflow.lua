@@ -148,8 +148,6 @@ function Addon:OnEnable()
                       :addChildren(Addon:OrderedTable())
                       :build()
                       
-  Addon:DebugTable(testOption)
-
 	barOptions:add(Options:CreateGroup(O["Player.Position"], "Position", "The position of the player health bar", 1, nil, nil, 
 		Options:PositionOptions({ 
 			O["Player.Position.LocalPoint"],
@@ -196,7 +194,7 @@ function Addon:OnEnable()
 	optionsWindow:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
 	optionsWindow:SetMovable(true)
 
---	optionsWindow:Hide()
+	optionsWindow:Hide()
 
 	local optionsContainer = self.OptionsContainer
 	optionsContainer:CreateOptions(optionsWindow, options)
@@ -279,6 +277,55 @@ function Addon:OnEnable()
 
 	Addon:SetStyle()
 
+	local frame = CreateFrame("Frame", nil, UIParent)
+	frame:SetPoint("CENTER")
+	frame:SetSize(500, 500)
+
+	local grid = {
+	    parent = frame,
+	    previousButton = nil,
+	    rows = {
+	    	{
+		        {
+		            getView = function() 
+		            	return "First", {}, nil
+		            end
+		        },
+		        {
+		            getView = function() 
+		            	return "Second", {}, nil 
+	        		end
+		        },
+		        {
+		            getView = function() return "Third", nil, nil end
+		    	}
+		    },
+		    {
+		        {
+		            getView = function() return "Fourth", nil, nil end
+		        },
+		        {
+		            getView = function() return "Fifth", nil, nil end
+		        },
+		        {
+		            getView = function() return "Sixth", nil, nil end
+		    	}
+		    },
+		    {
+		        {
+		            getView = function() return "Seventh", nil, nil end
+		        },
+		        {
+		            getView = function() return "Eight", nil, nil end
+		        },
+		        {
+		            getView = function() return "Ninth", nil, nil end
+		    	}
+		    }
+	    }
+	}
+
+	self.Grid:Create(grid, true)
 
 end
 

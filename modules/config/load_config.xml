@@ -2,10 +2,10 @@
     
     <Script file="profile.lua"/>
     <Script file="database.lua"/>
-    <Script file="textutils.lua"/>
     <Script file="options.lua"/>
 	<Script file="container.lua"/>
 	<Script file="widget.lua"/>
+	<Script file="grid.lua"/>
 
 	<!-- widgets -->
 	<Include file="widgets\load_widgets.xml"/>
