@@ -281,6 +281,38 @@ function Addon:OnEnable()
 	frame:SetPoint("CENTER")
 	frame:SetSize(500, 500)
 
+	local function constructGridFromDatabase(grid, db)
+		local realGrid = {
+			rows = {},
+			previousButton = nil,
+			Replace = function(self, old, new)
+		    	local store = {
+		    		rows = {}
+		    	}
+		    	for rk, row in next, self.rows do
+		    		local r = {}
+		    		for ck, column in next, row do
+		    			table.insert(r, ck == old and { key = new } or { key = ck })
+		    		end
+		    		table.insert(store.rows, r)
+		    	end
+		    	db = store
+		 	end
+		}
+		for rk, row in next, grid.rows do
+			local crow = {}
+			for ck, column in next, row do
+				table.insert(crow, { 
+					getView = function() 
+						return ck, {}, nil
+					end
+				})
+			end
+			table.insert(realGrid.rows, crow)
+		end
+		return realGrid
+	end
+
 	local grid = {
 	    parent = frame,
 	    previousButton = nil,

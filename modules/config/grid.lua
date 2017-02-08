@@ -194,18 +194,13 @@ local function createDropdown(container, column, grid)
 				print("Change content of column and grid to: ", key)
 
 				container.content:Hide()
-				local newGrid, newColumn = {}, nil
+
 				if presets[key] then
 					presets[key]:getView(container)
 				end
 
-				for rk, row in next, grid.rows do
-					for ck, c in next, row do
-
-					end
-				end
-
 				dropdown:Hide()
+				grid:Replace(name, key)
 			end)
 			
 			local button = relative == optionsField and buttonBuilder:atTop():againstTop():build() or buttonBuilder:atTop():againstBottom():build()
