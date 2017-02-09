@@ -281,10 +281,29 @@ function Addon:OnEnable()
 	frame:SetPoint("CENTER")
 	frame:SetSize(500, 500)
 
+	local buildText = A.TextBuilder
+
+	local function constructControl(type, desc, optionsParent, relative)
+		local control = CreateFrame(type, nil, optionsParent)
+		local builder = buildText(optionsParent, 12):alignWith(relative):atTopLeft()
+
+		if relative == optionsParent then
+			builder:againstTopLeft()
+		else
+			builder:againstBottomLeft()
+		end
+
+		local text = builder:build()
+		text:SetText(desc)
+
+		control:SetPoint(E.regions.T, text, E.regions.B, 0, 0)
+
+		return control
+	end
+
 	local function constructGridFromDatabase(grid, db)
 		local realGrid = {
 			rows = {},
-			previousButton = nil,
 			Replace = function(self, old, new)
 		    	local store = {
 		    		rows = {}
@@ -304,7 +323,14 @@ function Addon:OnEnable()
 			for ck, column in next, row do
 				table.insert(crow, { 
 					getView = function() 
-						return ck, {}, nil
+
+						local options = {
+							controls = {}
+						}
+
+						for _,control in next, 
+
+						return ck, options, nil
 					end
 				})
 			end

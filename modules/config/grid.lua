@@ -202,6 +202,15 @@ local function createDropdown(container, column, grid)
 				dropdown:Hide()
 				grid:Replace(name, key)
 			end)
+
+			buttonBuilder:alignConditional(function(self) 
+				self:atTop()
+				if relative == optionsField then
+					self:againstTop()
+				else
+					self:againstBottom()
+				end
+			end)
 			
 			local button = relative == optionsField and buttonBuilder:atTop():againstTop():build() or buttonBuilder:atTop():againstBottom():build()
 

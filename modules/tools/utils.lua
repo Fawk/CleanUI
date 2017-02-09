@@ -131,6 +131,51 @@ function object:y(offset)
 	self.yo = offset
 	return self
 end
+function object:below(relative)
+	self:alignWith(relative)
+	self:atTop()
+	self:againstBottom()
+	return self
+end
+function object:above(relative)
+	self:alignWith(relative)
+	self:atBottom()
+	self:againstTop()
+	return self
+end
+function object:alignConditional(condition)
+	condition(self)
+	return self
+end
+
+local condition = {}
+
+function condition:if(statement)
+	
+	return self
+end
+function condition:then(action)
+
+	return self
+end
+function condition:or(action)
+
+	return self
+end
+function condition:eval()
+	
+	return self.obj
+end
+
+condition.__index = condition
+
+function object:alignWithCondition()
+	local c = {
+		obj = self
+	}
+	setmetatable(c, condition)
+	return c
+end
 
 object.__index = object
 
@@ -264,5 +309,29 @@ local function ButtonBuilder(parent)
 	return o
 end
 
+local function EditBoxBuilder(parent)
+	local o = {
+		parent = parent
+	}
+
+	setmetatable(o, object)
+	o.textbox = CreateFrame("EditBox", nil, parent)
+
+	function o:build()
+		setPoints(self, self.textbox)
+		return self.textbox
+	end
+
+end
+
+local function mapGrid(grid, parent, func)
+	for rowId, row in next, grid do
+		for columnId, column in next, row do
+
+		end
+	end
+end
+
 A.TextBuilder = TextBuilder
 A.ButtonBuilder = ButtonBuilder
+A.EditBoxBuilder = EditBoxBuilder
