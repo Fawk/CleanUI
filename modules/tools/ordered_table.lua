@@ -1,4 +1,5 @@
 local A, L = unpack(select(2, ...))
+local E = A.enum
 
 local OT = {}
 
@@ -271,4 +272,94 @@ function A:OptionBuilder()
   end
   
   return opt
+end
+
+function A:ColumnBuilder()
+
+  local o = {}
+
+  function o:withView(view)
+    self.view = view
+    return self
+  end
+
+  function o:build()
+    local column = {}
+
+    function column:isFirst()
+      return self.first
+    end
+
+    function column:getView()
+      return o.view
+    end
+
+    return column
+  end
+
+end
+
+function A:RowBuilder()
+
+  local o = {
+    columns = A:OrderedTable(),
+    row = {}
+  }
+
+  function o:addColumn(column)
+    if self.columns:size() == 0 then
+      column.first = true
+      column.relative = self.row
+      function column:getPoints()
+        return E.regions.T, parent, E.regions.T, 0, 0
+      end
+    else
+      column.first = false
+      column.relative = self.columns:last()
+    end
+    self.columns:add(column)
+    return self
+  end
+
+  function o:build()
+    self.row.isFirst = function(self)
+      return self.first
+    end
+
+    return self.row
+  end
+
+end
+
+function A:GridBuilder(parent, isSingleLevel)
+
+  local o = {
+    parent = parent,
+    isSingleLevel = isSingleLevel,
+    rows = A:OrderedTable()
+  }
+
+  function o:addRow(row)
+    if self.rows:size() == 0 then
+      row.first = true
+      row.relative = parent
+      function row:getPoints()
+        return E.regions.T, parent, E.regions.T, 0, 0
+      end
+    else
+      row.first = false
+      row.relative = self.rows:last()
+    end
+    self.rows:add(row)
+    return self
+  end
+
+  function o:build()
+    local grid = {}
+
+
+
+    return grid
+  end
+
 end

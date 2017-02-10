@@ -324,7 +324,7 @@ local function EditBoxBuilder(parent)
 
 end
 
-local function mapGrid(grid, parent, func)
+local function mapGrid(grid, parent, rowFunc, columnFunc)
 	for rowId, row in next, grid do
 		for columnId, column in next, row do
 
