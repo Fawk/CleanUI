@@ -339,52 +339,23 @@ function Addon:OnEnable()
 		return realGrid
 	end
 
-	local grid = {
-	    parent = frame,
-	    previousButton = nil,
-	    rows = {
-	    	{
-		        {
-		            getView = function() 
-		            	return "First", {}, nil
-		            end
-		        },
-		        {
-		            getView = function() 
-		            	return "Second", {}, nil 
-	        		end
-		        },
-		        {
-		            getView = function() return "Third", nil, nil end
-		    	}
-		    },
-		    {
-		        {
-		            getView = function() return "Fourth", nil, nil end
-		        },
-		        {
-		            getView = function() return "Fifth", nil, nil end
-		        },
-		        {
-		            getView = function() return "Sixth", nil, nil end
-		    	}
-		    },
-		    {
-		        {
-		            getView = function() return "Seventh", nil, nil end
-		        },
-		        {
-		            getView = function() return "Eight", nil, nil end
-		        },
-		        {
-		            getView = function() return "Ninth", nil, nil end
-		    	}
-		    }
-	    }
-	}
-
-	self.Grid:Create(grid, true)
-
+	local grid2 = A:GridBuilder(frame, true)
+		:addRow(A:RowBuilder()
+			:addColumn(A:ColumnBuilder():withView(function() return "Test1", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test2", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test3", {}, nil end):build())
+			:build())
+		:addRow(A:RowBuilder()
+			:addColumn(A:ColumnBuilder():withView(function() return "Test4", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test5", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test6", {}, nil end):build())
+			:build())
+		:addRow(A:RowBuilder()
+			:addColumn(A:ColumnBuilder():withView(function() return "Test7", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test8", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test9", {}, nil end):build())
+			:build())
+		:build(self.Grid.Build)
 end
 
 function Addon:Update()

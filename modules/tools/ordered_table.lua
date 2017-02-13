@@ -276,7 +276,9 @@ end
 
 function A:ColumnBuilder()
 
-  local o = {}
+  local o = {
+    column = CreateFrame("Button", nil, UIParent)
+  }
 
   function o:withView(view)
     self.view = view
@@ -284,17 +286,9 @@ function A:ColumnBuilder()
   end
 
   function o:build()
-    local column = {}
-
-    function column:isFirst()
-      return self.first
-    end
-
-    function column:getView()
-      return o.view
-    end
-
-    return column
+    self.column:SetSize(parent:GetWidth(), parent:GetWidth() / self.columns:size())
+    self.column.getView = self.view
+    return self.column
   end
 
 end
@@ -303,29 +297,27 @@ function A:RowBuilder()
 
   local o = {
     columns = A:OrderedTable(),
-    row = {}
+    row = CreateFrame("Frame", nil, UIParent)
   }
 
   function o:addColumn(column)
-    if self.columns:size() == 0 then
+    column:SetParent(self.row)
+    
+    if self.columns:isEmpty() then
       column.first = true
       column.relative = self.row
-      function column:getPoints()
-        return E.regions.T, parent, E.regions.T, 0, 0
-      end
+      column:SetPoint(E.regions.L, column.relative, E.regions.L, 0, 0)
     else
       column.first = false
       column.relative = self.columns:last()
+      column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
     end
     self.columns:add(column)
     return self
   end
 
   function o:build()
-    self.row.isFirst = function(self)
-      return self.first
-    end
-
+    self.row:SetSize(parent:GetWidth(), parent:GetWidth() / self.columns:size())
     return self.row
   end
 
@@ -335,31 +327,29 @@ function A:GridBuilder(parent, isSingleLevel)
 
   local o = {
     parent = parent,
+    previousButton = nil,
     isSingleLevel = isSingleLevel,
     rows = A:OrderedTable()
   }
 
   function o:addRow(row)
-    if self.rows:size() == 0 then
+    row:SetParent(self.parent)
+
+    if self.rows:isEmpty() then
       row.first = true
-      row.relative = parent
-      function row:getPoints()
-        return E.regions.T, parent, E.regions.T, 0, 0
-      end
+      row.relative = self.parent
+      row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
     else
       row.first = false
       row.relative = self.rows:last()
+      row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
     end
     self.rows:add(row)
     return self
   end
 
-  function o:build()
-    local grid = {}
-
-
-
-    return grid
+  function o:build(callback)
+    return callback(self)
   end
 
 end
