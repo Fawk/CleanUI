@@ -341,7 +341,7 @@ function Addon:OnEnable()
 
 	local grid2 = A:GridBuilder(frame, true)
 		:addRow(A:RowBuilder()
-			:addColumn(A:ColumnBuilder():withView(function() return "Test1", {}, nil end):build())
+			:addColumn(A:ColumnBuilder():withView(function() return "Test1", {}, nil end):withReplaceCallback(self.Grid.Build):build())
 			:addColumn(A:ColumnBuilder():withView(function() return "Test2", {}, nil end):build())
 			:addColumn(A:ColumnBuilder():withView(function() return "Test3", {}, nil end):build())
 			:build())

@@ -299,10 +299,10 @@ function Grid:Build(grid)
 						-- [X] Gold
 						-- 
 						-- Custom format: [Textbox]
-						-- Display icons: [Checkbox] 
+						-- Display icons: [Checkbox]
 						--
 						-- --------------------------------
-						--  
+						--
 						-- [ ] Item Level
 						-- [ ] Artifact Power
 						-- [ ] Artifact Knowledge

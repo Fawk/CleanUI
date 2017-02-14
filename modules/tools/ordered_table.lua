@@ -277,17 +277,48 @@ end
 function A:ColumnBuilder()
 
   local o = {
-    column = CreateFrame("Button", nil, UIParent)
+    column = CreateFrame("Button", nil, UIParent),
+    rows = A:OrderedTable()
   }
+
+  function o:addRow(row)
+    if self.rows:isEmpty() then
+      row.first = true
+    else
+      row.first = false
+    end
+    self.rows:add(row)
+    return self
+  end
 
   function o:withView(view)
     self.view = view
     return self
   end
 
+  function o:withReplaceCallback(callback)
+    self.replaceCallback = callback
+    return self
+  end
+
   function o:build()
     self.column:SetSize(parent:GetWidth(), parent:GetWidth() / self.columns:size())
     self.column.getView = self.view
+    self.column.replaceCallback = self.replaceCallback
+    self.column.rows = self.rows
+
+    self.column.alignWith = function(self, parent) 
+      for index, row in next, self.rows do
+        if row.first then
+          row.relative = parent
+          row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
+        else
+          row.relative = self.rows:get(index-1)
+          row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+        end
+      end
+    end
+
     return self.column
   end
 
@@ -312,6 +343,17 @@ function A:RowBuilder()
       column.relative = self.columns:last()
       column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
     end
+
+    if not column.rows:isEmpty() then
+      column:SetScript("OnClick", A.DropdownBuilder)
+    else
+      column:SetScript("OnClick", function(self, b, d)
+        if b == "LeftButton" and not d then
+          self:replaceCallback(self)
+        end
+      end)
+    end
+
     self.columns:add(column)
     return self
   end
