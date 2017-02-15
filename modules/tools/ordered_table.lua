@@ -287,6 +287,7 @@ function A:ColumnBuilder()
     else
       row.first = false
     end
+    row:Hide()
     self.rows:add(row)
     return self
   end
@@ -302,12 +303,11 @@ function A:ColumnBuilder()
   end
 
   function o:build()
-    self.column:SetSize(parent:GetWidth(), parent:GetWidth() / self.columns:size())
     self.column.getView = self.view
     self.column.replaceCallback = self.replaceCallback
     self.column.rows = self.rows
 
-    self.column.alignWith = function(self, parent) 
+    self.column.alignRows = function(self, parent) 
       for index, row in next, self.rows do
         if row.first then
           row.relative = parent
@@ -316,6 +316,7 @@ function A:ColumnBuilder()
           row.relative = self.rows:get(index-1)
           row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
         end
+        row:SetSize(parent:GetWidth(), parent:GetWidth() / self.rows:count())
       end
     end
 
@@ -359,7 +360,6 @@ function A:RowBuilder()
   end
 
   function o:build()
-    self.row:SetSize(parent:GetWidth(), parent:GetWidth() / self.columns:size())
     return self.row
   end
 
@@ -376,6 +376,14 @@ function A:GridBuilder(parent, isSingleLevel)
 
   function o:addRow(row)
     row:SetParent(self.parent)
+    row:SetSize(self.parent:GetWidth(), self.parent:GetWidth() / row.columns:size())
+
+    for _,column in next, row.columns do
+      column:SetSize(row:GetHeight(), row:GetHeight())
+      if column.alignRows then
+        column:alignRows(self.parent)
+      end
+    end
 
     if self.rows:isEmpty() then
       row.first = true
