@@ -291,12 +291,147 @@ local function EditBoxBuilder(parent)
 
 end
 
-local function mapGrid(grid, parent, rowFunc, columnFunc)
-	for rowId, row in next, grid do
-		for columnId, column in next, row do
+function A:ColumnBuilder()
 
-		end
-	end
+  local o = {
+    column = CreateFrame("Button", nil, UIParent),
+    rows = A:OrderedTable()
+  }
+
+  function o:addRow(row)
+    if self.rows:isEmpty() then
+      row.first = true
+    else
+      row.first = false
+    end
+    row:Hide()
+    self.rows:add(row)
+    return self
+  end
+
+  function o:withView(view)
+    self.view = view
+    return self
+  end
+
+  function o:build()
+    self.column.getView = self.view
+    self.column.replaceCallback = self.replaceCallback
+    self.column.rows = self.rows
+
+    self.column.alignRows = function(self, parent) 
+      for index = 1, self.rows:count() do
+        local row, width = self.rows:get(i), parent:GetWidth()
+        if row.first then
+          row.relative = parent
+          row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
+        else
+          row.relative = self.rows:get(index-1)
+          row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+        end
+        row:SetSize(width, width / self.rows:count())
+      end
+    end
+
+    return self.column
+  end
+
+  return o
+
+end
+
+function A:RowBuilder()
+
+  local o = {
+    columns = A:OrderedTable(),
+    row = CreateFrame("Frame", nil, UIParent)
+  }
+
+  function o:addColumn(column)
+    column:SetParent(self.row)
+    
+    if self.columns:isEmpty() then
+      column.first = true
+      column.relative = self.row
+      column:SetPoint(E.regions.L, column.relative, E.regions.L, 0, 0)
+    else
+      column.first = false
+      column.relative = self.columns:last()
+      column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
+    end
+
+    if column.rows:isEmpty() then
+      column:SetScript("OnClick", function(self, b, d)
+        if b == "RightButton" then
+          A:CreateDropdown(self)
+        end
+      end)
+    else
+      column:SetScript("OnClick", function(self, b, d)
+        if b == "LeftButton" and not d then
+          A.Grid:Replace(self)
+        end
+      end)
+    end
+
+    self.columns:add(column)
+    return self
+  end
+
+  function o:build()
+    self.row.columns = self.columns
+
+    return self.row
+  end
+
+  return o
+
+end
+
+function A:GridBuilder(parent, isSingleLevel, dbKey)
+
+  local o = {
+    parent = parent,
+    previousButton = nil,
+    isSingleLevel = isSingleLevel,
+    rows = A:OrderedTable(),
+    dbKey = dbKey
+  }
+
+  function o:addRow(row)
+    row:SetParent(self.parent)
+    local width = self.parent:GetWidth()
+    row:SetSize(width, width / row.columns:count())
+    row.grid = self
+
+    for i = 1, row.columns:count() do
+      local column, height = row.columns:get(i), row:GetHeight()
+      column.grid = self
+      column:SetSize(height, height)
+      if column.alignRows then
+        column:alignRows(self.parent)
+      end
+    end
+
+    if self.rows:isEmpty() then
+      row.first = true
+      row.relative = self.parent
+      row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
+    else
+      row.first = false
+      row.relative = self.rows:last()
+      row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+    end
+    self.rows:add(row)
+    return self
+  end
+
+  function o:build(callback)
+    return callback(self)
+  end
+
+  return o
+
 end
 
 A.TextBuilder = TextBuilder

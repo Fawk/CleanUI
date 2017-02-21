@@ -202,7 +202,11 @@ function A:CreateDropdown(column)
 				end
 
 				dropdown:Hide()
-				grid:Replace(name, key)
+				local updatedGrid = grid:Replace(name, key)
+
+				if grid.dbKey then
+					A["Profile"]["Options"]["Grids"][dbKey] = A.Grid:composeDb(updatedGrid)
+				end
 			end)
 
 			buttonBuilder:atTop()
@@ -244,6 +248,45 @@ function A:CreateDropdown(column)
 	end)
 
 	grid.dropdown = dropdown
+end
+
+function Grid:composeDBGrid(grid)
+	local s = { isSingleLevel = grid.isSingleLevel, rows = {} }
+	for rowId = 1, grid.rows:count() do
+		local row, newRow = grid.rows:get(rowId), { columns = {} }
+		for columnId = 1, row.columns:count() 
+			local column = row.columns:get(columnId)
+			local newColumn = {
+				key = select(1, column:getView()) 
+			}
+			table.insert(newRow.columns, newColumn)
+		end
+		table.insert(s.rows, newRow)
+	end
+	return s
+end
+
+function Grid:parseDBGrid(key, grid, parent)
+	local g = Addon:GridBuilder(parent, grid.isSingleLevel, key)
+	for _,row in next, grid.rows do
+		local rowBuilder = A:RowBuilder()
+		for _,column in next, row.columns do
+			local columnBuilder = A:ColumnBuilder()
+				:withView(
+					presets[column.key] and 
+						(function(container) 
+							return presets[key]:getView(container) 
+						end) 
+						or 
+						(function(container) 
+							return key
+						end)
+					)
+			rowBuilder:addColumn(columnBuilder:build())
+		end
+		g:addRow(rowBuilder:build())
+	end
+	return g:build(function(gg) A.Grid:Build(gg) end)
 end
 
 function Grid:Build(grid)
