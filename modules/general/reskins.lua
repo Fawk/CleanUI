@@ -345,7 +345,7 @@ local function setStyle()
 							for i = 1, minimapButton:GetNumRegions() do
 								local region = select(i, minimapButton:GetRegions())
 								if region:GetObjectType() == "Texture" and region:GetTexture() then
-									if not string.find(region:GetTexture(), "AddOns") then
+									if string.find(region:GetTexture(), "Interface\\Minimap") then
 										region:SetTexture(nil)
 									end
 								end

@@ -248,7 +248,7 @@ function A:OptionBuilder()
     return self
   end
   function opt:withDefaultValue(value)
-    self.defaultValue = value;
+    self.defaultValue = value
     return self
   end
   function opt:withOrder(order)
@@ -308,7 +308,8 @@ function A:ColumnBuilder()
     self.column.rows = self.rows
 
     self.column.alignRows = function(self, parent) 
-      for index, row in next, self.rows do
+      for index = 1, self.rows:count() do
+        local row, width = self.rows:get(i), parent:GetWidth()
         if row.first then
           row.relative = parent
           row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
@@ -316,12 +317,14 @@ function A:ColumnBuilder()
           row.relative = self.rows:get(index-1)
           row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
         end
-        row:SetSize(parent:GetWidth(), parent:GetWidth() / self.rows:count())
+        row:SetSize(width, width / self.rows:count())
       end
     end
 
     return self.column
   end
+
+  return o
 
 end
 
@@ -345,8 +348,12 @@ function A:RowBuilder()
       column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
     end
 
-    if not column.rows:isEmpty() then
-      column:SetScript("OnClick", A.DropdownBuilder)
+    if column.rows:isEmpty() then
+      column:SetScript("OnClick", function(self, b, d)
+        if b == "RightButton" then
+          A:CreateDropdown(self)
+        end
+      end)
     else
       column:SetScript("OnClick", function(self, b, d)
         if b == "LeftButton" and not d then
@@ -360,26 +367,35 @@ function A:RowBuilder()
   end
 
   function o:build()
+    self.row.columns = self.columns
+
     return self.row
   end
 
+  return o
+
 end
 
-function A:GridBuilder(parent, isSingleLevel)
+function A:GridBuilder(parent, isSingleLevel, dbKey)
 
   local o = {
     parent = parent,
     previousButton = nil,
     isSingleLevel = isSingleLevel,
-    rows = A:OrderedTable()
+    rows = A:OrderedTable(),
+    dbKey = dbKey
   }
 
   function o:addRow(row)
     row:SetParent(self.parent)
-    row:SetSize(self.parent:GetWidth(), self.parent:GetWidth() / row.columns:size())
+    local width = self.parent:GetWidth()
+    row:SetSize(width, width / row.columns:count())
+    row.grid = self
 
-    for _,column in next, row.columns do
-      column:SetSize(row:GetHeight(), row:GetHeight())
+    for i = 1, row.columns:count() do
+      local column, height = row.columns:get(i), row:GetHeight()
+      column.grid = self
+      column:SetSize(height, height)
       if column.alignRows then
         column:alignRows(self.parent)
       end
@@ -401,5 +417,7 @@ function A:GridBuilder(parent, isSingleLevel)
   function o:build(callback)
     return callback(self)
   end
+
+  return o
 
 end

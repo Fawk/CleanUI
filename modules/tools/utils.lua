@@ -143,39 +143,6 @@ function object:above(relative)
 	self:againstTop()
 	return self
 end
-function object:alignConditional(condition)
-	condition(self)
-	return self
-end
-
-local condition = {}
-
-function condition:if(statement)
-	
-	return self
-end
-function condition:then(action)
-
-	return self
-end
-function condition:or(action)
-
-	return self
-end
-function condition:eval()
-	
-	return self.obj
-end
-
-condition.__index = condition
-
-function object:alignWithCondition()
-	local c = {
-		obj = self
-	}
-	setmetatable(c, condition)
-	return c
-end
 
 object.__index = object
 

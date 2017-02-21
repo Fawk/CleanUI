@@ -4,7 +4,7 @@ local E = A.enum
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
 
-print("Creating grid")
+A:Debug("Creating grid")
 
 local function isSamePreset(frame, key)
 	if frame and frame.currentPreset then
@@ -153,7 +153,9 @@ local Grid = {}
 --
 --
 
-local function createDropdown(container, column, grid)
+function A:CreateDropdown(column)
+	local grid = column.grid
+
 	if grid == nil or column == nil then return end
 
 	local name, options = column:getView()
@@ -193,26 +195,24 @@ local function createDropdown(container, column, grid)
 				-- Change the content of the column in the grid
 				print("Change content of column and grid to: ", key)
 
-				container.content:Hide()
+				column.content:Hide()
 
 				if presets[key] then
-					presets[key]:getView(container)
+					presets[key]:getView(column)
 				end
 
 				dropdown:Hide()
 				grid:Replace(name, key)
 			end)
 
-			buttonBuilder:alignConditional(function(self) 
-				self:atTop()
-				if relative == optionsField then
-					self:againstTop()
-				else
-					self:againstBottom()
-				end
-			end)
+			buttonBuilder:atTop()
+			if relative == optionsField then
+				buttonBuilder:againstTop()
+			else
+				buttonBuilder:againstBottom()
+			end
 			
-			local button = relative == optionsField and buttonBuilder:atTop():againstTop():build() or buttonBuilder:atTop():againstBottom():build()
+			local button = buttonBuilder:build()
 
 			button:SetSize(dropdown:GetWidth(), 25)
 			button:SetBackdrop(E.backdrops.buttonroundborder)
@@ -248,75 +248,79 @@ end
 
 function Grid:Build(grid)
 
-	local rowAnchor = grid.parent
+	-- local rowAnchor = grid.parent
 
-	for rid, row in next, grid.rows do
+	for rid = 1, grid.rows:count() do
 
-		local width = grid.parent:GetWidth() / #row
+		local row = grid.rows:get(rid)
 
-		local rowFrame = CreateFrame("Frame", nil, grid.parent)
-		rowFrame:SetPoint("TOPLEFT", rowAnchor, rid == 1 and "TOPLEFT" or "BOTTOMLEFT")
-		rowFrame:SetSize(width, width)
+		local width = grid.parent:GetWidth() / row.columns:count()
 
-		local relative = rowFrame
+		-- local rowFrame = CreateFrame("Frame", nil, grid.parent)
+		-- rowFrame:SetPoint("TOPLEFT", rowAnchor, rid == 1 and "TOPLEFT" or "BOTTOMLEFT")
+		-- rowFrame:SetSize(width, width)
 
-		for cid, column in next, row do
+		-- local relative = rowFrame
+
+		for cid = 1, row.columns:count() do
 			
+			local column = row.columns:get(cid)
+
 			if not grid.parent then
 				grid.parent = grid.previousButton.previousGrid.parent
 			end
 			
-			local button = CreateFrame("Button", nil, rowFrame)
-			button:SetPoint("TOPLEFT", relative, cid == 1 and "TOPLEFT" or "TOPRIGHT")
-			button:SetSize(width, width)
-			button:SetBackdrop({ bgFile = E.backdrops.editbox.bgFile, insets = { top = 3, right = 3, bottom = 3, left = 3 }})
-			button:SetBackdropColor(0.05, 0.05, 0.05, 0.8)
-			button:RegisterForClicks("AnyUp")
-			button.content = CreateFrame("Frame", "CONTENT", button)
-			button.content:SetSize(width, width)
-			button.content:SetAllPoints()
+			-- local button = CreateFrame("Button", nil, rowFrame)
+			-- button:SetPoint("TOPLEFT", relative, cid == 1 and "TOPLEFT" or "TOPRIGHT")
+			-- button:SetSize(width, width)
+			
+			column:SetBackdrop({ bgFile = E.backdrops.editbox.bgFile, insets = { top = 3, right = 3, bottom = 3, left = 3 }})
+			column:SetBackdropColor(0.05, 0.05, 0.05, 0.8)
+			column:RegisterForClicks("AnyUp")
+			column.content = CreateFrame("Frame", nil, column)
+			column.content:SetAllPoints()
 
-			if column.rows then
-				button:SetScript("OnClick", function(selfObj, button, down)
-					if button == "LeftButton" and not down then
-						grid.previousButton.previousGrid = grid
-						column.previousButton = grid.previousButton
-						self:Build(column)
-					end
-				end)
-			end
+			-- if column.rows then
+			-- 	column:SetScript("OnClick", function(selfObj, button, down)
+			-- 		if button == "LeftButton" and not down then
+			-- 			grid.previousButton.previousGrid = grid
+			-- 			column.previousButton = grid.previousButton
+			-- 			self:Build(column)
+			-- 		end
+			-- 	end)
+			-- end
 
 			local name, options, view = column:getView()
-			local text = buildText(button.content, 14):alignAll():build()
+			local text = buildText(column.content, 14):alignAll():build()
 			text:SetText(name)
 
-			if grid.singleLevel then
-				button:SetScript("OnClick", function(selfObj, button, down)
-					if button == "RightButton" then
-						-- Display dropdown containing current template options and a list of other possible choices of template
-						-- E.g.
-						--
-						-- [X] Gold
-						-- 
-						-- Custom format: [Textbox]
-						-- Display icons: [Checkbox]
-						--
-						-- --------------------------------
-						--
-						-- [ ] Item Level
-						-- [ ] Artifact Power
-						-- [ ] Artifact Knowledge
-						-- [ ] Order Resources
-						-- ...
-						createDropdown(selfObj, column, grid)
-					end
-				end)
-			end
+			-- if grid.singleLevel then
+			-- 	button:SetScript("OnClick", function(selfObj, button, down)
+			-- 		if button == "RightButton" then
+			-- 			-- Display dropdown containing current template options and a list of other possible choices of template
+			-- 			-- E.g.
+			-- 			--
+			-- 			-- [X] Gold
+			-- 			-- 
+			-- 			-- Custom format: [Textbox]
+			-- 			-- Display icons: [Checkbox]
+			-- 			--
+			-- 			-- --------------------------------
+			-- 			--
+			-- 			-- [ ] Item Level
+			-- 			-- [ ] Artifact Power
+			-- 			-- [ ] Artifact Knowledge
+			-- 			-- [ ] Order Resources
+			-- 			-- ...
+			-- 			createDropdown(selfObj, column, grid)
+			-- 		end
+			-- 	end)
+			-- end
 
-			relative = button
+			-- relative = button
 		end
 
-		rowAnchor = rowFrame
+		-- rowAnchor = rowFrame
 	end
 end
 

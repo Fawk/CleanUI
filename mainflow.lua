@@ -281,7 +281,7 @@ function Addon:OnEnable()
 	frame:SetPoint("CENTER")
 	frame:SetSize(500, 500)
 
-	local buildText = A.TextBuilder
+	local buildText = Addon.TextBuilder
 
 	local function constructControl(type, desc, optionsParent, relative)
 		local control = CreateFrame(type, nil, optionsParent)
@@ -308,9 +308,10 @@ function Addon:OnEnable()
 		    	local store = {
 		    		rows = {}
 		    	}
-		    	for rk, row in next, self.rows do
+		    	for rk = 1, self.rows:count() do
+		    		local row = self.rows:get(rk)
 		    		local r = {}
-		    		for ck, column in next, row do
+		    		for ck = 1, row.columns:count() do
 		    			table.insert(r, ck == old and { key = new } or { key = ck })
 		    		end
 		    		table.insert(store.rows, r)
@@ -328,7 +329,7 @@ function Addon:OnEnable()
 							controls = {}
 						}
 
-						for _,control in next, 
+						--for _,control in next, 
 
 						return ck, options, nil
 					end
@@ -339,23 +340,23 @@ function Addon:OnEnable()
 		return realGrid
 	end
 
-	local grid2 = A:GridBuilder(frame, true)
-		:addRow(A:RowBuilder()
-			:addColumn(A:ColumnBuilder():withView(function() return "Test1", {}, nil end):withReplaceCallback(self.Grid.Build):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test2", {}, nil end):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test3", {}, nil end):build())
+	local grid2 = Addon:GridBuilder(frame, true, "testGrid")
+		:addRow(Addon:RowBuilder()
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 1", {}, nil end):withReplaceCallback(function(grid) Addon.Grid:Build(grid) end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 2", {}, nil end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 3", {}, nil end):build())
 			:build())
-		:addRow(A:RowBuilder()
-			:addColumn(A:ColumnBuilder():withView(function() return "Test4", {}, nil end):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test5", {}, nil end):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test6", {}, nil end):build())
+		:addRow(Addon:RowBuilder()
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 4", {}, nil end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 5", {}, nil end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 6", {}, nil end):build())
 			:build())
-		:addRow(A:RowBuilder()
-			:addColumn(A:ColumnBuilder():withView(function() return "Test7", {}, nil end):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test8", {}, nil end):build())
-			:addColumn(A:ColumnBuilder():withView(function() return "Test9", {}, nil end):build())
+		:addRow(Addon:RowBuilder()
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 7", {}, nil end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 8", {}, nil end):build())
+			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 9", {}, nil end):build())
 			:build())
-		:build(self.Grid.Build)
+		:build(function(grid) Addon.Grid:Build(grid) end)
 end
 
 function Addon:Update()
