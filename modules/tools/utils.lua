@@ -398,6 +398,44 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
     dbKey = dbKey
   }
 
+  function o:getFirstColumnWithKey(key)
+	for rowId = 1, grid.rows:count() do
+		local row = grid.rows:get(rowId)
+		for columnId = 1, row.columns:count() do
+			local column = row.columns:get(columnId)
+			local key = select(1, column:getView())
+			if key == new then
+				return column
+			end
+		end
+	end
+	return nil
+  end
+
+	function o:Replace(new, old)
+		local g = { 
+			isSingleLevel = self.isSingleLevel,
+			parent = self.parent,
+			dbKey = self.dbKey,
+			rows = {} 
+		}
+
+		table.insert(g.rows, self:getFirstColumnWithKey(new))
+
+		for rowId = 1, grid.rows:count() do
+			local row = grid.rows:get(rowId)
+			for columnId = 1, row.columns:count() do
+				local column = row.columns:get(columnId)
+				local key = select(1, column:getView())
+				if key ~= new then
+					table.insert(g.rows, column)
+				end
+			end
+		end
+		
+		return A.Grid:parseDBGrid(g.dbKey, g, g.parent)
+	end
+
   function o:addRow(row)
     row:SetParent(self.parent)
     local width = self.parent:GetWidth()

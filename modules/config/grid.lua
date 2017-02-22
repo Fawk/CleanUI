@@ -134,25 +134,21 @@ local presets = {
 
 local Grid = {}
 
--- grid = { 
---     parent = Frame,
---     previousButton = Button,
---     rows = {
---         column = {
---             rows = { ... },
---             previousButton = Button,
---             getView = function() return "Name" end
---         },
---         column = {
---             getView = function() return ... end
---         }
---     }
--- }
+-- Display dropdown containing current template options and a list of other possible choices of template
+-- E.g.
+--
+-- [X] Gold
 -- 
+-- Custom format: [Textbox]
+-- Display icons: [Checkbox]
 --
+-- --------------------------------
 --
---
-
+-- [ ] Item Level
+-- [ ] Artifact Power
+-- [ ] Artifact Knowledge
+-- [ ] Order Resources
+-- ...
 function A:CreateDropdown(column)
 	local grid = column.grid
 
@@ -290,33 +286,19 @@ function Grid:parseDBGrid(key, grid, parent)
 end
 
 function Grid:Build(grid)
+	for rowId = 1, grid.rows:count() do
 
-	-- local rowAnchor = grid.parent
-
-	for rid = 1, grid.rows:count() do
-
-		local row = grid.rows:get(rid)
-
+		local row = grid.rows:get(rowId)
 		local width = grid.parent:GetWidth() / row.columns:count()
 
-		-- local rowFrame = CreateFrame("Frame", nil, grid.parent)
-		-- rowFrame:SetPoint("TOPLEFT", rowAnchor, rid == 1 and "TOPLEFT" or "BOTTOMLEFT")
-		-- rowFrame:SetSize(width, width)
-
-		-- local relative = rowFrame
-
-		for cid = 1, row.columns:count() do
+		for columnId = 1, row.columns:count() do
 			
-			local column = row.columns:get(cid)
+			local column = row.columns:get(columnId)
 
 			if not grid.parent then
 				grid.parent = grid.previousButton.previousGrid.parent
 			end
-			
-			-- local button = CreateFrame("Button", nil, rowFrame)
-			-- button:SetPoint("TOPLEFT", relative, cid == 1 and "TOPLEFT" or "TOPRIGHT")
-			-- button:SetSize(width, width)
-			
+
 			column:SetBackdrop({ bgFile = E.backdrops.editbox.bgFile, insets = { top = 3, right = 3, bottom = 3, left = 3 }})
 			column:SetBackdropColor(0.05, 0.05, 0.05, 0.8)
 			column:RegisterForClicks("AnyUp")
@@ -336,34 +318,7 @@ function Grid:Build(grid)
 			local name, options, view = column:getView()
 			local text = buildText(column.content, 14):alignAll():build()
 			text:SetText(name)
-
-			-- if grid.singleLevel then
-			-- 	button:SetScript("OnClick", function(selfObj, button, down)
-			-- 		if button == "RightButton" then
-			-- 			-- Display dropdown containing current template options and a list of other possible choices of template
-			-- 			-- E.g.
-			-- 			--
-			-- 			-- [X] Gold
-			-- 			-- 
-			-- 			-- Custom format: [Textbox]
-			-- 			-- Display icons: [Checkbox]
-			-- 			--
-			-- 			-- --------------------------------
-			-- 			--
-			-- 			-- [ ] Item Level
-			-- 			-- [ ] Artifact Power
-			-- 			-- [ ] Artifact Knowledge
-			-- 			-- [ ] Order Resources
-			-- 			-- ...
-			-- 			createDropdown(selfObj, column, grid)
-			-- 		end
-			-- 	end)
-			-- end
-
-			-- relative = button
 		end
-
-		-- rowAnchor = rowFrame
 	end
 end
 

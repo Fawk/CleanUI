@@ -301,45 +301,6 @@ function Addon:OnEnable()
 		return control
 	end
 
-	local function constructGridFromDatabase(grid, db)
-		local realGrid = {
-			rows = {},
-			Replace = function(self, old, new)
-		    	local store = {
-		    		rows = {}
-		    	}
-		    	for rk = 1, self.rows:count() do
-		    		local row = self.rows:get(rk)
-		    		local r = {}
-		    		for ck = 1, row.columns:count() do
-		    			table.insert(r, ck == old and { key = new } or { key = ck })
-		    		end
-		    		table.insert(store.rows, r)
-		    	end
-		    	db = store
-		 	end
-		}
-		for rk, row in next, grid.rows do
-			local crow = {}
-			for ck, column in next, row do
-				table.insert(crow, { 
-					getView = function() 
-
-						local options = {
-							controls = {}
-						}
-
-						--for _,control in next, 
-
-						return ck, options, nil
-					end
-				})
-			end
-			table.insert(realGrid.rows, crow)
-		end
-		return realGrid
-	end
-
 	local grid2 = Addon:GridBuilder(frame, true, "testGrid")
 		:addRow(Addon:RowBuilder()
 			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 1", {}, nil end):build())
