@@ -198,7 +198,7 @@ function A:CreateDropdown(column)
 				end
 
 				dropdown:Hide()
-				local updatedGrid = grid:Replace(name, key)
+				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(function(container) , column.index)
 
 				if grid.dbKey then
 					A["Profile"]["Options"]["Grids"][dbKey] = A.Grid:composeDb(updatedGrid)

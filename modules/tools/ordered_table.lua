@@ -25,6 +25,9 @@ function OT:add(t)
 		return false
 	end
 	self.c = self.c + 1
+  if type(t) == "table" then
+    t.index = self.c
+  end
 	self.e[self.c] = t
 	return true
 end

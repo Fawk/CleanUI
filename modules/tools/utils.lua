@@ -293,51 +293,50 @@ end
 
 function A:ColumnBuilder()
 
-  local o = {
-    column = CreateFrame("Button", nil, UIParent),
-    rows = A:OrderedTable()
-  }
+	local o = {
+		column = CreateFrame("Button", nil, UIParent),
+		rows = A:OrderedTable()
+	}
 
-  function o:addRow(row)
-    if self.rows:isEmpty() then
-      row.first = true
-    else
-      row.first = false
-    end
-    row:Hide()
-    self.rows:add(row)
-    return self
-  end
+	function o:addRow(row)
+		if self.rows:isEmpty() then
+			row.first = true
+		else
+			row.first = false
+		end
+		row:Hide()
+		self.rows:add(row)
+		return self
+	end
 
-  function o:withView(view)
-    self.view = view
-    return self
-  end
+	function o:withView(view)
+		self.view = view
+		return self
+	end
 
-  function o:build()
-    self.column.getView = self.view
-    self.column.replaceCallback = self.replaceCallback
-    self.column.rows = self.rows
+	function o:build()
+	self.column.getView = self.view
+	self.column.replaceCallback = self.replaceCallback
+	self.column.rows = self.rows
 
-    self.column.alignRows = function(self, parent) 
-      for index = 1, self.rows:count() do
-        local row, width = self.rows:get(i), parent:GetWidth()
-        if row.first then
-          row.relative = parent
-          row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
-        else
-          row.relative = self.rows:get(index-1)
-          row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
-        end
-        row:SetSize(width, width / self.rows:count())
-      end
-    end
+	self.column.alignRows = function(self, parent) 
+		for index = 1, self.rows:count() do
+			local row, width = self.rows:get(i), parent:GetWidth()
+			if row.first then
+				row.relative = parent
+				row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
+			else
+				row.relative = self.rows:get(index-1)
+				row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+			end
+			row:SetSize(width, width / self.rows:count())
+		end
+	end
 
-    return self.column
-  end
+	return self.column
+	end
 
-  return o
-
+	return o
 end
 
 function A:RowBuilder()
@@ -369,7 +368,7 @@ function A:RowBuilder()
     else
       column:SetScript("OnClick", function(self, b, d)
         if b == "LeftButton" and not d then
-          A.Grid:Replace(self)
+          self.grid:multiLayerReplace(self)
         end
       end)
     end
@@ -390,29 +389,29 @@ end
 
 function A:GridBuilder(parent, isSingleLevel, dbKey)
 
-  local o = {
-    parent = parent,
-    previousButton = nil,
-    isSingleLevel = isSingleLevel,
-    rows = A:OrderedTable(),
-    dbKey = dbKey
-  }
+	local o = {
+		parent = parent,
+		previousButton = nil,
+		isSingleLevel = isSingleLevel,
+		rows = A:OrderedTable(),
+		dbKey = dbKey
+	}
 
-  function o:getFirstColumnWithKey(key)
-	for rowId = 1, grid.rows:count() do
-		local row = grid.rows:get(rowId)
-		for columnId = 1, row.columns:count() do
-			local column = row.columns:get(columnId)
-			local key = select(1, column:getView())
-			if key == new then
-				return column
+	function o:getFirstColumnWithKey(key)
+		for rowId = 1, grid.rows:count() do
+			local row = grid.rows:get(rowId)
+			for columnId = 1, row.columns:count() do
+				local column = row.columns:get(columnId)
+				local key = select(1, column:getView())
+				if key == new then
+					return column
+				end
 			end
 		end
+		return nil
 	end
-	return nil
-  end
 
-	function o:Replace(new, old)
+	function o:singleLayerReplace(newColumn, oldIndex)
 		local g = { 
 			isSingleLevel = self.isSingleLevel,
 			parent = self.parent,
@@ -420,55 +419,57 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 			rows = {} 
 		}
 
-		table.insert(g.rows, self:getFirstColumnWithKey(new))
-
 		for rowId = 1, grid.rows:count() do
 			local row = grid.rows:get(rowId)
 			for columnId = 1, row.columns:count() do
-				local column = row.columns:get(columnId)
-				local key = select(1, column:getView())
-				if key ~= new then
-					table.insert(g.rows, column)
+				if columnId ~= oldIndex then
+					table.insert(g.rows, row.columns:get(columnId))
+				else
+					table.insert(g.rows, newColumn)
 				end
 			end
 		end
-		
+
 		return A.Grid:parseDBGrid(g.dbKey, g, g.parent)
 	end
 
-  function o:addRow(row)
-    row:SetParent(self.parent)
-    local width = self.parent:GetWidth()
-    row:SetSize(width, width / row.columns:count())
-    row.grid = self
+	function o:multiLayerReplace(grid)
+		-- LOGICS
+	end
 
-    for i = 1, row.columns:count() do
-      local column, height = row.columns:get(i), row:GetHeight()
-      column.grid = self
-      column:SetSize(height, height)
-      if column.alignRows then
-        column:alignRows(self.parent)
-      end
-    end
+	function o:addRow(row)
+		row:SetParent(self.parent)
+		local width = self.parent:GetWidth()
+		row:SetSize(width, width / row.columns:count())
+		row.grid = self
 
-    if self.rows:isEmpty() then
-      row.first = true
-      row.relative = self.parent
-      row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
-    else
-      row.first = false
-      row.relative = self.rows:last()
-      row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
-    end
-    self.rows:add(row)
-    return self
-  end
+		for i = 1, row.columns:count() do
+		  local column, height = row.columns:get(i), row:GetHeight()
+		  column.grid = self
+		  column:SetSize(height, height)
+		  if column.alignRows then
+		    column:alignRows(self.parent)
+		  end
+		end
 
-  function o:build(callback)
-    return callback(self)
-  end
+		if self.rows:isEmpty() then
+		  row.first = true
+		  row.relative = self.parent
+		  row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
+		else
+		  row.first = false
+		  row.relative = self.rows:last()
+		  row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+		end
+		self.rows:add(row)
+		return self
+	end
 
-  return o
+	function o:build(callback)
+		return callback(self)
+	end
+
+	return o
 
 end
 
