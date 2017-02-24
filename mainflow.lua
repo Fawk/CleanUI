@@ -281,6 +281,8 @@ function Addon:OnEnable()
 	frame:SetPoint("CENTER")
 	frame:SetSize(500, 500)
 
+	local grid = Addon.Grid:parseDBGrid("Test", frame)
+
 	local buildText = Addon.TextBuilder
 
 	local function constructControl(type, desc, optionsParent, relative)
@@ -300,24 +302,6 @@ function Addon:OnEnable()
 
 		return control
 	end
-
-	local grid2 = Addon:GridBuilder(frame, true, "testGrid")
-		:addRow(Addon:RowBuilder()
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 1", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 2", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 3", {}, nil end):build())
-			:build())
-		:addRow(Addon:RowBuilder()
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 4", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 5", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 6", {}, nil end):build())
-			:build())
-		:addRow(Addon:RowBuilder()
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 7", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 8", {}, nil end):build())
-			:addColumn(Addon:ColumnBuilder():withView(function() return "Test 9", {}, nil end):build())
-			:build())
-		:build(function(grid) Addon.Grid:Build(grid) end)
 end
 
 function Addon:Update()

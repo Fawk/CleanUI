@@ -135,6 +135,22 @@ local db = {
     					["Relative To"] = "UIParent"
     				}
     			},
+                ["Grids"] = {
+                    ["Test"] = {
+                        ["singleLayer"] = true,
+                        ["rows"] = {
+                            {
+                                ["columns"] = { "Gold", "Gold", "Gold" }
+                            },
+                            {
+                                ["columns"] = { "Gold", "Gold", "Gold" }
+                            },
+                            {
+                                ["columns"] = { "Gold", "Gold", "Gold" }
+                            }
+                        }
+                    }
+                }
     		}
 	    }
 	},

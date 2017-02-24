@@ -11,11 +11,11 @@ end
 
 function Profile:Load()
 	local name = GetUnitName("player", true)
-	if not profiles[name] then
-		profiles[name] = "Default"
+	if not A.db["Characters"][name] then
+		A.db["Characters"][name] = "Default"
 		self:SetActive("Default")
 	else
-		self:SetActive(profiles[name])
+		self:SetActive(A.db["Characters"][name])
 	end
 	self:Update(name)
 end

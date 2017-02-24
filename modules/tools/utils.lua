@@ -315,25 +315,25 @@ function A:ColumnBuilder()
 	end
 
 	function o:build()
-	self.column.getView = self.view
-	self.column.replaceCallback = self.replaceCallback
-	self.column.rows = self.rows
+		self.column.view = self.view
+		self.column.replaceCallback = self.replaceCallback
+		self.column.rows = self.rows
 
-	self.column.alignRows = function(self, parent) 
-		for index = 1, self.rows:count() do
-			local row, width = self.rows:get(i), parent:GetWidth()
-			if row.first then
-				row.relative = parent
-				row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
-			else
-				row.relative = self.rows:get(index-1)
-				row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+		self.column.alignRows = function(self, parent) 
+			for index = 1, self.rows:count() do
+				local row, width = self.rows:get(i), parent:GetWidth()
+				if row.first then
+					row.relative = parent
+					row:SetPoint(E.regions.T, row.relative, E.regions.T, 0, 0)
+				else
+					row.relative = self.rows:get(index-1)
+					row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+				end
+				row:SetSize(width, width / self.rows:count())
 			end
-			row:SetSize(width, width / self.rows:count())
 		end
-	end
 
-	return self.column
+		return self.column
 	end
 
 	return o
@@ -341,49 +341,49 @@ end
 
 function A:RowBuilder()
 
-  local o = {
-    columns = A:OrderedTable(),
-    row = CreateFrame("Frame", nil, UIParent)
-  }
+	local o = {
+		columns = A:OrderedTable(),
+		row = CreateFrame("Frame", nil, UIParent)
+	}
 
-  function o:addColumn(column)
-    column:SetParent(self.row)
-    
-    if self.columns:isEmpty() then
-      column.first = true
-      column.relative = self.row
-      column:SetPoint(E.regions.L, column.relative, E.regions.L, 0, 0)
-    else
-      column.first = false
-      column.relative = self.columns:last()
-      column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
-    end
+	function o:addColumn(column)
+	    column:SetParent(self.row)
+	    
+	    if self.columns:isEmpty() then
+			column.first = true
+			column.relative = self.row
+			column:SetPoint(E.regions.L, column.relative, E.regions.L, 0, 0)
+	    else
+			column.first = false
+			column.relative = self.columns:last()
+			column:SetPoint(E.regions.L, column.relative, E.regions.R, 0, 0)
+	    end
 
-    if column.rows:isEmpty() then
-      column:SetScript("OnClick", function(self, b, d)
-        if b == "RightButton" then
-          A:CreateDropdown(self)
-        end
-      end)
-    else
-      column:SetScript("OnClick", function(self, b, d)
-        if b == "LeftButton" and not d then
-          self.grid:multiLayerReplace(self)
-        end
-      end)
-    end
+	    if column.rows:isEmpty() then
+			column:SetScript("OnClick", function(self, b, d)
+				if b == "RightButton" then
+					A:CreateDropdown(self)
+				end
+			end)
+	    else
+			column:SetScript("OnClick", function(self, b, d)
+				if b == "LeftButton" and not d then
+					self.grid:multiLayerReplace(self)
+				end
+			end)
+	    end
 
-    self.columns:add(column)
-    return self
-  end
+	    self.columns:add(column)
+	    return self
+	end
 
-  function o:build()
-    self.row.columns = self.columns
+	function o:build()
+		self.row.columns = self.columns
 
-    return self.row
-  end
+		return self.row
+	end
 
-  return o
+	return o
 
 end
 
@@ -401,8 +401,12 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 		for rowId = 1, grid.rows:count() do
 			local row = grid.rows:get(rowId)
 			for columnId = 1, row.columns:count() do
-				local column = row.columns:get(columnId)
-				local key = select(1, column:getView())
+				local key, column = nil, row.columns:get(columnId)
+				if type(column) == "table" then
+					key = select(1, column:getView())
+				else
+					key = column.view
+				end
 				if key == new then
 					return column
 				end
@@ -444,22 +448,22 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 		row.grid = self
 
 		for i = 1, row.columns:count() do
-		  local column, height = row.columns:get(i), row:GetHeight()
-		  column.grid = self
-		  column:SetSize(height, height)
-		  if column.alignRows then
-		    column:alignRows(self.parent)
-		  end
+			local column, height = row.columns:get(i), row:GetHeight()
+			column.grid = self
+			column:SetSize(height, height)
+			if column.alignRows then
+				column:alignRows(self.parent)
+			end
 		end
 
 		if self.rows:isEmpty() then
-		  row.first = true
-		  row.relative = self.parent
-		  row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
+			row.first = true
+			row.relative = self.parent
+			row:SetPoint(E.regions.T, self.parent, E.regions.T, 0, 0)
 		else
-		  row.first = false
-		  row.relative = self.rows:last()
-		  row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
+			row.first = false
+			row.relative = self.rows:last()
+			row:SetPoint(E.regions.T, row.relative, E.regions.B, 0, 0)
 		end
 		self.rows:add(row)
 		return self

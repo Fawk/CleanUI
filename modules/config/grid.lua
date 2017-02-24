@@ -154,7 +154,7 @@ function A:CreateDropdown(column)
 
 	if grid == nil or column == nil then return end
 
-	local name, options = column:getView()
+	local name, options = column.view, {}
 
 	if grid.dropdown and grid.dropdown:IsShown() then
 		grid.dropdown:Hide()
@@ -198,7 +198,7 @@ function A:CreateDropdown(column)
 				end
 
 				dropdown:Hide()
-				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(function(container) , column.index)
+				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(key):build(), column.index)
 
 				if grid.dbKey then
 					A["Profile"]["Options"]["Grids"][dbKey] = A.Grid:composeDb(updatedGrid)
@@ -250,7 +250,7 @@ function Grid:composeDBGrid(grid)
 	local s = { isSingleLevel = grid.isSingleLevel, rows = {} }
 	for rowId = 1, grid.rows:count() do
 		local row, newRow = grid.rows:get(rowId), { columns = {} }
-		for columnId = 1, row.columns:count() 
+		for columnId = 1, row.columns:count() do
 			local column = row.columns:get(columnId)
 			local newColumn = {
 				key = select(1, column:getView()) 
@@ -262,23 +262,14 @@ function Grid:composeDBGrid(grid)
 	return s
 end
 
-function Grid:parseDBGrid(key, grid, parent)
-	local g = Addon:GridBuilder(parent, grid.isSingleLevel, key)
+function Grid:parseDBGrid(key, parent)
+	local grid = A["Profile"]["Options"]["Grids"][key]
+	local g = A:GridBuilder(parent, grid.isSingleLevel, key)
 	for _,row in next, grid.rows do
 		local rowBuilder = A:RowBuilder()
-		for _,column in next, row.columns do
-			local columnBuilder = A:ColumnBuilder()
-				:withView(
-					presets[column.key] and 
-						(function(container) 
-							return presets[key]:getView(container) 
-						end) 
-						or 
-						(function(container) 
-							return key
-						end)
-					)
-			rowBuilder:addColumn(columnBuilder:build())
+		for columnKey, column in next, row.columns do
+			rowBuilder:addColumn(A:ColumnBuilder()
+				:withView(type(column) == "function" and (function(container) return column(container) end) or column):build())
 		end
 		g:addRow(rowBuilder:build())
 	end
@@ -315,9 +306,13 @@ function Grid:Build(grid)
 			-- 	end)
 			-- end
 
-			local name, options, view = column:getView()
-			local text = buildText(column.content, 14):alignAll():build()
-			text:SetText(name)
+			if type(column.view) == "function" then
+				local name, options = column:view()
+			else
+				presets[column.view]:getView(column)
+			end
+			-- local text = buildText(column.content, 14):alignAll():build()
+			-- text:SetText(name)
 		end
 	end
 end
