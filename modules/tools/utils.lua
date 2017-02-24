@@ -439,6 +439,8 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 
 	function o:multiLayerReplace(grid)
 		-- LOGICS
+		local previousButton = self:GeneratePreviousButton(nil, grid.parent)
+		
 	end
 
 	function o:addRow(row)

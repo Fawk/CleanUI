@@ -25,13 +25,7 @@ end
 
 local presets = {
 	["Item Level"] = {
-		apply = function(frame)
-
-			local function update(f)
-				local value = f.currentPreset.value
-				value:SetText(getIlvl())
-			end
-
+		getView = function(self, frame)
 			local preset = frame.currentPreset
 			if preset and preset:GetName() == "Item Level" then
 				update(frame)
@@ -57,13 +51,9 @@ local presets = {
 			ilvl:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
 			ilvl:SetScript("OnEvent", function(self, event, ...)
-				update(self:GetParent())
+				
 			end)
 		end,
-		update = function(frame, ilvl)
-			local value = frame.currentPreset.value
-			value:SetText(tostring(ilvl))
-		end
 	},
 	["Gold"] = {
 		getView = function(self, frame)
@@ -86,13 +76,12 @@ local presets = {
 
 			frame.content = gold
 			frame.content:Show()
-
-			return "Gold", {}, nil
 		end
 	},
 	["Order Resources"] = { -- CurrencyId: 1220
-		apply = function(frame)
+		getView = function(self, frame)
 			local _,amount,texture,_,_,totalMax = GetCurrencyInfo(1120)
+
 		end
 	},
 	["Artifact Power"] = { -- Display artifact level and min/max and percentage
@@ -102,14 +91,17 @@ local presets = {
 		--      573k/889k
 		--        64.4%
 		--
+		getView = function(self, frame)
+
+		end
 	},
 	["Artifact Knowledge"] = { -- CurrencyId: 1171
-		apply = function(frame)
+		getView = function(self, frame)
 			local _,amount,texture = GetCurrencyInfo(1171)
 		end
 	},
 	["Seal of Broken Faith"] = { -- Display current amount and limit this week e.g: 5/6 (3/3) - CurrencyId: 1273
-		apply = function(frame)
+		getView = function(self, frame)
 
 			local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
 
@@ -118,16 +110,14 @@ local presets = {
 			local desc = buildText(seal, 12):alignWith(seal):atCenter():y(3):build()
 			local value = buildText(seal, 12):alignWith(desc):atTop():againstBottom():y(-3):build()
 
+			local value = frame.currentPreset.value
+			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
+
 			seal:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 			seal:SetScript("OnEvent", function(self, event, ...)
 				update(self:GetParent())
 			end)
 
-		end,
-		update = function(frame)
-			local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
-			local value = frame.currentPreset.value
-			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
 		end
 	}
 }
@@ -253,7 +243,7 @@ function Grid:composeDBGrid(grid)
 		for columnId = 1, row.columns:count() do
 			local column = row.columns:get(columnId)
 			local newColumn = {
-				key = select(1, column:getView()) 
+				view = type(column.view) == "function" and (function(container) return column:view(container) end) or column.view
 			}
 			table.insert(newRow.columns, newColumn)
 		end
@@ -267,7 +257,7 @@ function Grid:parseDBGrid(key, parent)
 	local g = A:GridBuilder(parent, grid.isSingleLevel, key)
 	for _,row in next, grid.rows do
 		local rowBuilder = A:RowBuilder()
-		for columnKey, column in next, row.columns do
+		for _,column in next, row.columns do
 			rowBuilder:addColumn(A:ColumnBuilder()
 				:withView(type(column) == "function" and (function(container) return column(container) end) or column):build())
 		end
@@ -318,11 +308,11 @@ function Grid:Build(grid)
 end
 
 function Grid:GeneratePreviousButton(previousGrid, parent)
-	local back, gridObj = CreateFrame("Button", nil, parent), self
+	local back, grid = CreateFrame("Button", nil, parent), self
 	back.previousGrid = previousGrid
-	back:SetScript("OnClick", function(selfObj, button, down)
+	back:SetScript("OnClick", function(self, button, down)
 		if button == "LeftButton" and not down then
-			gridObj:Build(selfObj.previousGrid)
+			grid:Build(self.previousGrid)
 		end
 	end)
 	return back
