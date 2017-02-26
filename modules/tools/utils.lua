@@ -237,7 +237,7 @@ local function setPoints(o, frame)
 	end
 end
 
-local function TextBuilder(parent, size)
+local function TextBuilder(parent, sizeInPerc)
 	local o = {
 		size = size,
 		parent = parent
@@ -247,8 +247,44 @@ local function TextBuilder(parent, size)
 
 	function o:build()
 		local text = self.parent:CreateFontString(nil, "OVERLAY")
-		text:SetFont(media:Fetch("font", "FrancophilSans"), self.size, "NONE")
 		setPoints(self, text)
+        text.OldSetText = text.SetText
+        text.SetText = function(self, value)
+            local isSpecial, font, size = false, nil, 10
+            if type(value) == "string" then
+                for i = 1, #value do
+                    local c = value:sub(i,i)
+                    if string.byte(c) > 207 then
+                        isSpecial = true
+                    end
+                end
+            end
+            if isSpecial then
+                font = media:Fetch("font", "Noto")
+                self:SetFont(font, size, "NONE")
+            else
+                font = media:Fetch("font", "Default")
+                self:SetFont(font, size, "NONE")
+            end
+            self:OldSetText(value)
+            
+            if self:GetStringWidth() > parent:GetWidth() then
+                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+                    size = size - 1
+                    self:SetFont(font, size, "NONE")
+                end
+            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
+                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+                    size = size - 1
+                    self:SetFont(font, size, "NONE")
+                end
+            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
+                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
+                    size = size + 1
+                    self:SetFont(font, size, "NONE")
+                end
+            end
+        end
 		return text
 	end
 

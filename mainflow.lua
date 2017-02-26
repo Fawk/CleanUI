@@ -276,18 +276,22 @@ function Addon:OnEnable()
 
 
 	Addon:SetStyle()
+    
+    local minimapConfig = Addon["Profile"]["Options"]["Minimap"]
 
 	local frame = CreateFrame("Frame", nil, UIParent)
-	frame:SetPoint("CENTER")
-	frame:SetSize(500, 500)
+	frame:SetAllPoints(Minimap)
+	frame:SetSize(minimapConfig.Size, minimapConfig.Size)
 
 	local grid = Addon.Grid:parseDBGrid("Test", frame)
+    
+    --frame:Hide()
 
 	local buildText = Addon.TextBuilder
-
+    
 	local function constructControl(type, desc, optionsParent, relative)
 		local control = CreateFrame(type, nil, optionsParent)
-		local builder = buildText(optionsParent, 12):alignWith(relative):atTopLeft()
+		local builder = buildText(optionsParent, 0.3):alignWith(relative):atTopLeft()
 
 		if relative == optionsParent then
 			builder:againstTopLeft()

@@ -6,6 +6,20 @@ local buildButton = A.ButtonBuilder
 
 A:Debug("Creating grid")
 
+local function getValue(v)
+    if v > 1000 then
+        if v > 1000000 then
+            return string.format("%.1f", v/1000000).."M"
+        end
+        return string.format("%.1f", v/1000).."k"
+    end
+    return v
+end
+
+local function getPerc(v)
+    return string.format("%.1f", v*100).."%"
+end
+
 local function isSamePreset(frame, key)
 	if frame and frame.currentPreset then
 		return frame.currentPreset:GetName() == key
@@ -15,8 +29,8 @@ end
 
 local function getMoneyString()
 	local m = GetMoney()
-	local g, s, c = floor(abs(m / 10000)), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
-	return string.format("%dg %ds %dc", g, s, c)
+	local g, s, c = getValue(floor(abs(m / 10000))), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
+	return string.format("%sg %ds %dc", g, s, c)
 end
 
 local function getIlvl()
@@ -35,8 +49,8 @@ local presets = {
 			local ilvl = CreateFrame("Frame", "Item Level", frame)
 			ilvl:SetAllPoints(frame)
 
-			local desc = buildText(ilvl, 30):atTop():y(-5):build()
-			local value = buildText(ilvl, 20):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local desc = buildText(ilvl, 0.8):atTop():y(-5):build()
+			local value = buildText(ilvl, 0.5):alignWith(desc):atTop():againstBottom():y(-3):build()
 
 			desc:SetText("Item Level")
 			value:SetText(getIlvl())
@@ -60,8 +74,8 @@ local presets = {
 			local gold = CreateFrame("Frame", nil, frame)
 			gold:SetAllPoints(frame)
 
-			local desc = buildText(gold, 30):atCenter():y(3):build()
-			local value = buildText(gold, 20):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local desc = buildText(gold, 0.5):atCenter():y(3):build()
+			local value = buildText(gold, 0.9):alignWith(desc):atTop():againstBottom():y(-3):build()
 
 			desc:SetText(L["Gold"])
 			value:SetText(getMoneyString())
@@ -92,7 +106,61 @@ local presets = {
 		--        64.4%
 		--
 		getView = function(self, frame)
+            
+            local function getArtifactInfo()
+                local _,_,_,_,current,rank = C_ArtifactUI.GetEquippedArtifactInfo()
+                if not current or not rank then
+                   return nil
+                end
+                local max = C_ArtifactUI.GetCostForPointAtRank(rank)
+                return current, max, rank
+            end
 
+            local ap = CreateFrame("Frame", nil, frame)
+			ap:SetAllPoints(frame)
+
+			local desc = buildText(ap, 0.8):atTop():y(-10):build()
+            local rankText = buildText(ap, 0.2):below(desc):y(-3):build()
+			local value = buildText(ap, 0.7):below(rankText):y(-3):build()
+            local perc = buildText(ap, 0.5):below(value):y(-3):build()
+
+            local current, max, rank = getArtifactInfo()
+            if current == nil then
+                ap.timer = 0
+                ap:SetScript("OnUpdate", function(self, elapsed)
+                    self.timer = self.timer + elapsed
+                    if self.timer > 1 then
+                        current, max, rank = getArtifactInfo()
+                        rankText:SetText(rank)
+                        value:SetText(getValue(current).."/"..getValue(max))
+                        perc:SetText(getPerc(current/max))
+                        self.timer = 0
+                        self:SetScript("OnUpdate", nil)
+                    end
+                end)
+            else
+            	rankText:SetText(rank)
+                value:SetText(getValue(current).."/"..getValue(max))
+                perc:SetText(getPerc(current/max))
+            end
+
+			desc:SetText(L["Artifact Level"])
+
+			ap.value = value
+			ap.rank = rankText
+			ap.perc = perc
+			frame.currentPreset = ap
+
+			ap:RegisterEvent("ARTIFACT_XP_UPDATE")
+			ap:SetScript("OnEvent", function(self, event, ...)
+                local c, m, r = getArtifactInfo()
+                self.rank:SetText(r)
+                self.value:SetText(getValue(c).."/"..getValue(m))
+                self.perc:SetText(getPerc(c/m))
+			end)
+
+			frame.content = ap
+			frame.content:Show()
 		end
 	},
 	["Artifact Knowledge"] = { -- CurrencyId: 1171
@@ -107,8 +175,8 @@ local presets = {
 
 			local seal = CreateFrame("Frame", "Seal of Broken Faith", frame)
 
-			local desc = buildText(seal, 12):alignWith(seal):atCenter():y(3):build()
-			local value = buildText(seal, 12):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local desc = buildText(seal, 0.3):alignWith(seal):atCenter():y(3):build()
+			local value = buildText(seal, 0.3):alignWith(desc):atTop():againstBottom():y(-3):build()
 
 			local value = frame.currentPreset.value
 			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
@@ -162,7 +230,7 @@ function A:CreateDropdown(column)
 
 	local height, cachedPresets = 25, {}
 
-	local activeTitle = buildText(dropdown, 12):atTop():againstTop():build()
+	local activeTitle = buildText(dropdown, 0.3):atTop():againstTop():build()
 	activeTitle:SetHeight(25)
 	activeTitle:SetText(name)
 
@@ -210,7 +278,7 @@ function A:CreateDropdown(column)
 			button:SetBackdropColor(0.5, 0.5, 0.5, 1)
 			button:SetFrameLevel(3)
 
-			local nameText = buildText(button, 12):alignAll():build()
+			local nameText = buildText(button, 0.3):alignAll():build()
 			nameText:SetText(key)
 			
 			height = height + 25

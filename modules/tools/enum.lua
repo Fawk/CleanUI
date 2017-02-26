@@ -3,6 +3,8 @@ local media = LibStub("LibSharedMedia-3.0")
 
 A:Debug("Loading enums")
 
+local defaultBg = media:Fetch("background", "cui-default-bg")
+
 local enum = {
     colors = {
         backdrop = { 0.10, 0.10, 0.10, 1 },

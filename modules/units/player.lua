@@ -60,7 +60,7 @@ function Player:CreateFrame(frame, db)
 
 	local health = CreateFrame("StatusBar", "Health", frame)
 	health:SetFrameStrata("LOW")
-	health:SetOrientation("VERTICAL")
+	health:SetOrientation("HORIZONTAL")
 	health:SetStatusBarTexture(E.backdrops.editbox.bgFile)
 	health.frequentUpdates = true
 
@@ -116,24 +116,24 @@ function Player:CreateFrame(frame, db)
 	power.bg.multiplier = 0.3
 
 	frame:SetAttribute("unit", "player")
-	frame:SetAttribute("type", "spell")
-	frame:SetAttribute("*helpbutton1", "help1")
-	frame:SetAttribute("*helpbutton2", "help2")
-	frame:SetAttribute("*helpbutton3", "help3")
+	--frame:SetAttribute("type", "spell")
+	--frame:SetAttribute("*helpbutton1", "help1")
+	--frame:SetAttribute("*helpbutton2", "help2")
+	--frame:SetAttribute("*helpbutton3", "help3")
 
-	frame:SetAttribute("spell-help1", "Flash Heal")
-	frame:SetAttribute("shift-spell-help1", "Renew")
-	frame:SetAttribute("ctrl-shift-type", "target")
+	--frame:SetAttribute("spell-help1", "Flash Heal")
+	--frame:SetAttribute("shift-spell-help1", "Renew")
+	--frame:SetAttribute("ctrl-shift-type", "target")
 
-	frame:SetAttribute("spell-help2", "Heal")
+	--frame:SetAttribute("spell-help2", "Heal")
 
-	frame:SetAttribute("spell-help3", "Purify")
-	frame:SetAttribute("shift-spell-help3", "Prayer of Mending")
+	--frame:SetAttribute("spell-help3", "Purify")
+	--frame:SetAttribute("shift-spell-help3", "Prayer of Mending")
 
 
-	--frame:SetAttribute("*type1", "target")
-	--frame:SetAttribute("*type2", "togglemenu")
-	frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
+	frame:SetAttribute("*type1", "target")
+	frame:SetAttribute("*type2", "togglemenu")
+	--frame:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp");
 
 	frame.Health = health
 	frame.Power = power

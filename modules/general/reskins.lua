@@ -39,7 +39,7 @@ local function backdrop(es, ts, t, b, r, l)
 		} 
 	}
 end
-local function font(size, outline) return media:Fetch("font", "FrancophilSans"), size, outline or "NONE" end
+local function font(size, outline) return media:Fetch("font", "Default"), size, outline or "NONE" end
 local function kill(frame) 
 	if not frame.GetNumRegions then return end
 	for i = 1, frame:GetNumRegions() do
