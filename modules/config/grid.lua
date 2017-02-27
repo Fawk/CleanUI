@@ -3,8 +3,27 @@ local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
+local OldCreateFrame = CreateFrame
+local GetEquippedArtifactInfo = _G.C_ArtifactUI.GetEquippedArtifactInfo
+local GetCostForPointAtRank = _G.C_ArtifactUI.GetCostForPointAtRank
 
 A:Debug("Creating grid")
+
+local function CreateFrame(type, name, parent)
+	local frame = OldCreateFrame(type, name, parent)
+	function frame:delayedCall(func, delta)
+		self.timer = 0
+	    self:SetScript("OnUpdate", function(self, elapsed)
+	        self.timer = self.timer + elapsed
+	        if self.timer > delta then
+	        	func()
+	            self.timer = 0
+	            self:SetScript("OnUpdate", nil)
+	        end
+	    end)
+	end
+	return frame
+end
 
 local function getValue(v)
     if v > 1000 then
@@ -13,18 +32,11 @@ local function getValue(v)
         end
         return string.format("%.1f", v/1000).."k"
     end
-    return v
+    return tostring(v)
 end
 
 local function getPerc(v)
     return string.format("%.1f", v*100).."%"
-end
-
-local function isSamePreset(frame, key)
-	if frame and frame.currentPreset then
-		return frame.currentPreset:GetName() == key
-	end
-	return false
 end
 
 local function getMoneyString()
@@ -40,33 +52,28 @@ end
 local presets = {
 	["Item Level"] = {
 		getView = function(self, frame)
-			local preset = frame.currentPreset
-			if preset and preset:GetName() == "Item Level" then
-				update(frame)
-				return
-			end
 
 			local ilvl = CreateFrame("Frame", "Item Level", frame)
 			ilvl:SetAllPoints(frame)
 
 			local desc = buildText(ilvl, 0.8):atTop():y(-5):build()
-			local value = buildText(ilvl, 0.5):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local value = buildText(ilvl, 0.5):below(desc):y(-3):build()
 
 			desc:SetText("Item Level")
 			value:SetText(getIlvl())
 
 			ilvl.value = value
-			frame.currentPreset = ilvl
-
 			ilvl:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 			ilvl:RegisterEvent("PLAYER_ENTERING_WORLD")
 			ilvl:RegisterEvent("ZONE_CHANGED")
 			ilvl:RegisterEvent("ZONE_CHANGED_INDOORS")
 			ilvl:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-
 			ilvl:SetScript("OnEvent", function(self, event, ...)
 				
 			end)
+
+			frame.content = ilvl
+			frame.content:Show()
 		end,
 	},
 	["Gold"] = {
@@ -75,14 +82,12 @@ local presets = {
 			gold:SetAllPoints(frame)
 
 			local desc = buildText(gold, 0.5):atCenter():y(3):build()
-			local value = buildText(gold, 0.9):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local value = buildText(gold, 0.9):below(desc):y(-3):build()
 
 			desc:SetText(L["Gold"])
 			value:SetText(getMoneyString())
 
 			gold.value = value
-			frame.currentPreset = gold
-
 			gold:RegisterEvent("PLAYER_MONEY")
 			gold:SetScript("OnEvent", function(self, event, ...)
 				self.value:SetText(getMoneyString())
@@ -108,11 +113,11 @@ local presets = {
 		getView = function(self, frame)
             
             local function getArtifactInfo()
-                local _,_,_,_,current,rank = C_ArtifactUI.GetEquippedArtifactInfo()
+                local _,_,_,_,current,rank = GetEquippedArtifactInfo()
                 if not current or not rank then
                    return nil
                 end
-                local max = C_ArtifactUI.GetCostForPointAtRank(rank)
+                local max = GetCostForPointAtRank(rank)
                 return current, max, rank
             end
 
@@ -124,33 +129,18 @@ local presets = {
 			local value = buildText(ap, 0.7):below(rankText):y(-3):build()
             local perc = buildText(ap, 0.5):below(value):y(-3):build()
 
-            local current, max, rank = getArtifactInfo()
-            if current == nil then
-                ap.timer = 0
-                ap:SetScript("OnUpdate", function(self, elapsed)
-                    self.timer = self.timer + elapsed
-                    if self.timer > 1 then
-                        current, max, rank = getArtifactInfo()
-                        rankText:SetText(rank)
-                        value:SetText(getValue(current).."/"..getValue(max))
-                        perc:SetText(getPerc(current/max))
-                        self.timer = 0
-                        self:SetScript("OnUpdate", nil)
-                    end
-                end)
-            else
-            	rankText:SetText(rank)
-                value:SetText(getValue(current).."/"..getValue(max))
-                perc:SetText(getPerc(current/max))
-            end
+            ap:delayedCall(function(self)
+                local current, max, rank = getArtifactInfo()
+                self.rank:SetText(rank)
+                self.value:SetText(getValue(current).."/"..getValue(max))
+                self.perc:SetText(getPerc(current/max))
+            end, 1)
 
 			desc:SetText(L["Artifact Level"])
 
 			ap.value = value
 			ap.rank = rankText
 			ap.perc = perc
-			frame.currentPreset = ap
-
 			ap:RegisterEvent("ARTIFACT_XP_UPDATE")
 			ap:SetScript("OnEvent", function(self, event, ...)
                 local c, m, r = getArtifactInfo()
@@ -176,9 +166,8 @@ local presets = {
 			local seal = CreateFrame("Frame", "Seal of Broken Faith", frame)
 
 			local desc = buildText(seal, 0.3):alignWith(seal):atCenter():y(3):build()
-			local value = buildText(seal, 0.3):alignWith(desc):atTop():againstBottom():y(-3):build()
+			local value = buildText(seal, 0.3):below(desc):y(-3):build()
 
-			local value = frame.currentPreset.value
 			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
 
 			seal:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
