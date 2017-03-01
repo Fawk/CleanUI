@@ -6,6 +6,10 @@ local buildButton = A.ButtonBuilder
 local OldCreateFrame = CreateFrame
 local GetEquippedArtifactInfo = _G.C_ArtifactUI.GetEquippedArtifactInfo
 local GetCostForPointAtRank = _G.C_ArtifactUI.GetCostForPointAtRank
+local format = string.format
+local ts = tostring
+local select = select
+local tinsert = table.insert
 
 A:Debug("Creating grid")
 
@@ -28,21 +32,21 @@ end
 local function getValue(v)
     if v > 1000 then
         if v > 1000000 then
-            return string.format("%.1f", v/1000000).."M"
+            return format("%.1f", v/1000000).."M"
         end
-        return string.format("%.1f", v/1000).."k"
+        return format("%.1f", v/1000).."k"
     end
-    return tostring(v)
+    return ts(v)
 end
 
 local function getPerc(v)
-    return string.format("%.1f", v*100).."%"
+    return format("%.1f", v*100).."%"
 end
 
 local function getMoneyString()
 	local m = GetMoney()
 	local g, s, c = getValue(floor(abs(m / 10000))), floor(abs(mod(m / 100, 100))), floor(abs(mod(m, 100)))
-	return string.format("%sg %ds %dc", g, s, c)
+	return format("%sg %ds %dc", g, s, c)
 end
 
 local function getIlvl()
@@ -129,15 +133,6 @@ local presets = {
 			local value = buildText(ap, 0.7):below(rankText):y(-3):build()
             local perc = buildText(ap, 0.5):below(value):y(-3):build()
 
-            ap:delayedCall(function(self)
-                local current, max, rank = getArtifactInfo()
-                self.rank:SetText(rank)
-                self.value:SetText(getValue(current).."/"..getValue(max))
-                self.perc:SetText(getPerc(current/max))
-            end, 1)
-
-			desc:SetText(L["Artifact Level"])
-
 			ap.value = value
 			ap.rank = rankText
 			ap.perc = perc
@@ -148,6 +143,14 @@ local presets = {
                 self.value:SetText(getValue(c).."/"..getValue(m))
                 self.perc:SetText(getPerc(c/m))
 			end)
+			
+			desc:SetText(L["Artifact Level"])
+            ap:delayedCall(function(self)
+                local current, max, rank = getArtifactInfo()
+                self.rank:SetText(rank)
+                self.value:SetText(getValue(current).."/"..getValue(max))
+                self.perc:SetText(getPerc(current/max))
+            end, 1)
 
 			frame.content = ap
 			frame.content:Show()
@@ -168,7 +171,8 @@ local presets = {
 			local desc = buildText(seal, 0.3):alignWith(seal):atCenter():y(3):build()
 			local value = buildText(seal, 0.3):below(desc):y(-3):build()
 
-			value:SetText(string.format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
+			desc:SetText(L["Seals"])
+			value:SetText(format("%d/%d (%d/%d)", amount, totalMax, earned, weeklyMax))
 
 			seal:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
 			seal:SetScript("OnEvent", function(self, event, ...)
@@ -302,9 +306,9 @@ function Grid:composeDBGrid(grid)
 			local newColumn = {
 				view = type(column.view) == "function" and (function(container) return column:view(container) end) or column.view
 			}
-			table.insert(newRow.columns, newColumn)
+			tinsert(newRow.columns, newColumn)
 		end
-		table.insert(s.rows, newRow)
+		tinsert(s.rows, newRow)
 	end
 	return s
 end
