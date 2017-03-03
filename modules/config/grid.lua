@@ -3,7 +3,6 @@ local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
-local OldCreateFrame = CreateFrame
 local GetEquippedArtifactInfo = _G.C_ArtifactUI.GetEquippedArtifactInfo
 local GetCostForPointAtRank = _G.C_ArtifactUI.GetCostForPointAtRank
 local format = string.format
@@ -13,6 +12,7 @@ local tinsert = table.insert
 
 A:Debug("Creating grid")
 
+local OldCreateFrame = CreateFrame
 local function CreateFrame(type, name, parent)
 	local frame = OldCreateFrame(type, name, parent)
 	function frame:delayedCall(func, delta)
@@ -57,7 +57,7 @@ local presets = {
 	["Item Level"] = {
 		getView = function(self, frame)
 
-			local ilvl = CreateFrame("Frame", "Item Level", frame)
+			local ilvl = CreateFrame("Frame", nil, frame)
 			ilvl:SetAllPoints(frame)
 
 			local desc = buildText(ilvl, 0.8):atTop():y(-5):build()
@@ -73,7 +73,7 @@ local presets = {
 			ilvl:RegisterEvent("ZONE_CHANGED_INDOORS")
 			ilvl:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 			ilvl:SetScript("OnEvent", function(self, event, ...)
-				
+				self.value:SetText(getIlvl())
 			end)
 
 			frame.content = ilvl

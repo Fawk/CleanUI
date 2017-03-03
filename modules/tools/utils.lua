@@ -515,6 +515,81 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 
 end
 
+local function DrawerBuilder()
+
+	local drawerWidth = 200
+
+	local test = CreateFrame("Button", "TESTBUTTONWOO", UIParent)
+	test:SetSize(200, 600)
+	test:SetBackdrop(E.backdrops.editbox)
+	test:SetBackdropColor(unpack(E.colors.backdrop))
+	test:SetBackdropBorderColor(unpack(E.colors.backdropborder))
+	test:SetPoint(E.regions.L, UIParent, E.regions.L, -190, 0)
+	test:SetClampedToScreen(false)
+
+	test.ag = test:CreateAnimationGroup()
+	test.isOpen = false
+
+	test.open = test.ag:CreateAnimation("Translation")
+	test.open:SetOffset(200, 0)
+	test.open:SetDuration(0.3)
+	test.open:SetOrder(1)
+	test.open:SetScript("OnFinished", function(self, req)
+		test.isOpen = true
+		test:ClearAllPoints()
+		test:SetPoint(E.regions.L)
+		test.ag:Stop()
+		test.close:SetOrder(1)
+		self:SetOrder(2)
+	end)
+	test.close = test.ag:CreateAnimation("Translation")
+	test.close:SetOffset(-190, 0)
+	test.close:SetDuration(0.3)
+	test.close:SetOrder(2)
+	test.close:SetScript("OnFinished", function(self, req)
+		test.isOpen = false
+		test:ClearAllPoints()
+		test:SetPoint(E.regions.L, UIParent, E.regions.L, -190, 0)
+		test.ag:Stop()
+		test.open:SetOrder(1)
+		self:SetOrder(2)
+	end)
+
+	test.time = 0
+	test:SetScript("OnUpdate", function(self, elapsed)
+		self.time = self.time + elapsed
+		if self.time > 0.3 then
+			if not self.ag:IsPlaying() and self.forceClose and self.isOpen and not self:IsMouseOver() then
+				self.ag:Play()
+			end
+			self.time = 0
+		end
+	end)
+
+	test.ag:SetScript("OnPause", function(self)
+		self:Finish()
+	end)
+
+	test:SetScript("OnLeave", function(self, arg)
+		if arg then
+			if self.isOpen then
+				self.ag:Play()
+			else
+				self.forceClose = true
+			end
+		end
+	end)
+
+	test:SetScript("OnEnter", function(self, arg)
+		if arg then
+			if not self.open:IsPlaying() and not self.isOpen then
+				self.ag:Play()
+			end
+		end
+	end)
+end
+
 A.TextBuilder = TextBuilder
 A.ButtonBuilder = ButtonBuilder
 A.EditBoxBuilder = EditBoxBuilder
+A.DrawerBuilder = DrawerBuilder
