@@ -140,7 +140,7 @@ local db = {
                         ["singleLayer"] = true,
                         ["rows"] = {
                             {
-                                ["columns"] = { "Artifact Power", "Gold", "Gold" }
+                                ["columns"] = { "Artifact Power", "Time", "Gold" }
                             },
                             {
                                 ["columns"] = { "Gold", "Gold", "Gold" }

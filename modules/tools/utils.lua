@@ -272,11 +272,17 @@ local function TextBuilder(parent, sizeInPerc)
                 while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
                     size = size - 1
                     self:SetFont(font, size, "NONE")
+                    if size == 1 then
+                    	return text
+                    end
                 end
             elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
                 while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
                     size = size - 1
                     self:SetFont(font, size, "NONE")
+                    if size == 1 then
+                    	return text
+                    end
                 end
             elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
                 while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do

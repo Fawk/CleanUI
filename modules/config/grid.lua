@@ -145,11 +145,11 @@ local presets = {
 			end)
 			
 			desc:SetText(L["Artifact Level"])
-            ap:delayedCall(function(self)
+            ap:delayedCall(function(frame)
                 local current, max, rank = getArtifactInfo()
-                self.rank:SetText(rank)
-                self.value:SetText(getValue(current).."/"..getValue(max))
-                self.perc:SetText(getPerc(current/max))
+                rankText:SetText(rank)
+                value:SetText(getValue(current).."/"..getValue(max))
+                perc:SetText(getPerc(current/max))
             end, 1)
 
 			frame.content = ap
@@ -166,7 +166,8 @@ local presets = {
 
 			local _,amount,texture,earned,weeklyMax,totalMax = GetCurrencyInfo(1273)
 
-			local seal = CreateFrame("Frame", "Seal of Broken Faith", frame)
+			local seal = CreateFrame("Frame", nil, frame)
+			seal:SetAllPoints(frame)
 
 			local desc = buildText(seal, 0.3):alignWith(seal):atCenter():y(3):build()
 			local value = buildText(seal, 0.3):below(desc):y(-3):build()
@@ -179,6 +180,23 @@ local presets = {
 				update(self:GetParent())
 			end)
 
+			frame.content = seal
+			frame.content:Show()
+		end
+	},
+	["Time"] = {
+		getView = function(self, frame)
+			local time = CreateFrame("Frame", nil, frame)
+			time:SetAllPoints(frame)
+
+			local stamp = buildText(time, 0.6):alignWith(time):atCenter():y(3):build()
+			local day = buildText(time, 0.6):below(stamp):build()
+
+			stamp:SetText("16:00")
+			day:SetText("Monday")
+
+			frame.content = time
+			frame.content:Show()
 		end
 	}
 }
@@ -268,10 +286,10 @@ function A:CreateDropdown(column)
 			button:SetSize(dropdown:GetWidth(), 25)
 			button:SetBackdrop(E.backdrops.buttonroundborder)
 			button:SetBackdropBorderColor(0, 0, 0, 1)
-			button:SetBackdropColor(0.5, 0.5, 0.5, 1)
+			button:SetBackdropColor(0, 0, 0, 0.6)
 			button:SetFrameLevel(3)
 
-			local nameText = buildText(button, 0.3):alignAll():build()
+			local nameText = buildText(button, 0.8):alignAll():build()
 			nameText:SetText(key)
 			
 			height = height + 25
@@ -341,8 +359,8 @@ function Grid:Build(grid)
 				grid.parent = grid.previousButton.previousGrid.parent
 			end
 
-			column:SetBackdrop({ bgFile = E.backdrops.editbox.bgFile, insets = { top = 3, right = 3, bottom = 3, left = 3 }})
-			column:SetBackdropColor(0.05, 0.05, 0.05, 0.8)
+			column:SetBackdrop({ bgFile = E.backdrops.editbox.bgFile, insets = { top = 1, right = 1, bottom = 1, left = 1 }})
+			column:SetBackdropColor(0, 0, 0, 0.6)
 			column:RegisterForClicks("AnyUp")
 			column.content = CreateFrame("Frame", nil, column)
 			column.content:SetAllPoints()
