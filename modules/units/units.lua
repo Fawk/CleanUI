@@ -14,7 +14,7 @@ function Units:UpdateElements(frame, db)
         for name in next, oUF:GetRegisteredElements() do
             if db[name] and db[name]["Enabled"] then
                 frame:EnableElement(name)
-                elements[name](frame, db[name])
+                A["Elements"][name](frame, db[name])
             else
                 frame:DisableElement(name)
             end

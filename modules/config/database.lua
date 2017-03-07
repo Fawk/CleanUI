@@ -27,7 +27,7 @@ local db = {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25,
+    						["Height"] = 25
     					}
     				},
     				["Power"] = {
@@ -43,7 +43,7 @@ local db = {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25,
+    						["Height"] = 25
     					}
     				},
     				["Buffs"] = {
@@ -51,18 +51,18 @@ local db = {
     					["Position"] = "ABOVE",
     					["Relative To"] = "Player",
     					["Offset X"] = 0,
-    					["Offset Y"] = 0,
+    					["Offset Y"] = 0
     				},
     				["Debuffs"] = {
     					["Enabled"] = false,
     					["Position"] = "ABOVE",
     					["Relative To"] = "Buffs",
     					["Offset X"] = 0,
-    					["Offset Y"] = 0,
+    					["Offset Y"] = 0
     				},
     				["Size"] = {
     					["Width"] = 250,
-    					["Height"] = 50,
+    					["Height"] = 50
     				},
     				["Enabled"] = true
     			},
@@ -87,7 +87,7 @@ local db = {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25,
+    						["Height"] = 25
     					}
     				},
     				["Power"] = {
@@ -103,7 +103,7 @@ local db = {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25,
+    						["Height"] = 25
     					}
     				},
     				["Buffs"] = {
@@ -111,18 +111,18 @@ local db = {
     					["Position"] = "ABOVE",
     					["Relative To"] = "Player",
     					["Offset X"] = 0,
-    					["Offset Y"] = 0,
+    					["Offset Y"] = 0
     				},
     				["Debuffs"] = {
     					["Enabled"] = false,
     					["Position"] = "ABOVE",
     					["Relative To"] = "Buffs",
     					["Offset X"] = 0,
-    					["Offset Y"] = 0,
+    					["Offset Y"] = 0
     				},
     				["Size"] = {
     					["Width"] = 250,
-    					["Height"] = 50,
+    					["Height"] = 50
     				}
     			},
     			["Minimap"] = {
@@ -155,7 +155,7 @@ local db = {
 	    }
 	},
 	["Characters"] = {
-        ["Aiwen-ShatteredHand"] = "Default",
+        ["Aiwen-ShatteredHand"] = "Default"
     }
 }
 
@@ -182,7 +182,7 @@ local function merge(t1, t2)
     return t1
 end
 
-function iter(old, new, save)
+local function extract(old, new, save)
     for k,v in pairs(old) do
         if type(v) == "table" then
             save[k] = {}
@@ -197,7 +197,7 @@ end
 
 function Database:Save()
     local save = {}
-    iter(db, A.db, save)
+    extract(db, A.db, save)
     CleanUI_DB = save
 end
 
