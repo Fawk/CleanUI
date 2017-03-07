@@ -159,14 +159,55 @@ local db = {
     }
 }
 
+local function copy(tbl)
+    local new = {}
+    for k,v in pairs(tbl) do
+        new[k] = v
+    end
+    return new
+end
+
+local function merge(t1, t2)
+    for k,v in pairs(t2) do
+        if type(v) == "table" then
+            if type(t1[k] or false) == "table" then
+                tableMerge(t1[k] or {}, t2[k] or {})
+            else
+                t1[k] = v
+            end
+        else
+            t1[k] = v
+        end
+    end
+    return t1
+end
+
+function iter(old, new, save)
+    for k,v in pairs(old) do
+        if type(v) == "table" then
+            save[k] = {}
+            iter(old[k], new[k], save[k])
+        else
+            if new[k] ~= v then
+                save[k] = new[k]
+            end
+        end
+    end
+end
+
+function Database:Save()
+    local save = {}
+    iter(db, A.db, save)
+    CleanUI_DB = save
+end
+
 function Database:CreateDatabase()
 	if CleanUI_DB == nil then 
 		CleanUI_DB = {}
-		for k,v in pairs(db) do
-			CleanUI_DB[k] = v 
-		end
-	end
-	return CleanUI_DB
+        return copy(db)
+	else
+        return merge(copy(db), CleanUI_DB)
+    end
 end
 
 A["Database"] = Database
