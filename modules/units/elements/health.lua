@@ -1,6 +1,9 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
+local CreateFrame = CreateFrame
+local UnitHealth = UnitHealth
+local UnitHealthMax = UnitHealthMax
 local colors = {
 	health = {
 		low = { .54, .16, .11 },
@@ -53,6 +56,10 @@ local function Health(frame, db)
 	health.bg:ClearAllPoints()
 	health.bg:SetAllPoints()
 	health.bg:SetTexture(db["Texture"])
+
+	if frame.PostHealth then
+		frame:PostHealth(health)
+	end
 
 end 
 

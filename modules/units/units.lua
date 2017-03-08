@@ -1,5 +1,5 @@
 local A, L = unpack(select(2, ...))
-local Units, elements, units, oUF = {}, {}, {}, A.oUF
+local Units, units, oUF = {}, {}, A.oUF
  
 function Units:GetFrame(unit)
     return units[unit]
@@ -26,9 +26,9 @@ end
 function Units:Translate(frame, relative)
     if units[relative] then
         return units[relative]
-    elseif elements[relative] then
+    elseif A["Elements"][relative] then
         return frame[relative]
-    elseif elements[frame:GetName()] then
+    elseif A["Elements"][frame:GetName()] then
         A:Debug("Could not find relative frame '", relative, "' for element '", frame:GetName() or "Unknown", "', using parent.")
         return frame:GetParent()
     else
@@ -45,7 +45,7 @@ end
 function Units:SetKeyBindings(frame, db)
     frame:RegisterForClicks("AnyUp")
     if db then
-        for binding in next, db do
+        for _,binding in next, db do
             frame:SetAttribute(binding.type, binding.action)
         end
     end
