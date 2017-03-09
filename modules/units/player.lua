@@ -47,7 +47,7 @@ function Player:Update(frame, db)
 end
 
 function Player:CreateFrame(frame, db)
-
+-- https://jsfiddle.net/859zu65s/
 	local size = db.Size
 	local position = db.Position
 	local hdb = db.Health
@@ -130,6 +130,22 @@ function Player:CreateFrame(frame, db)
 	--frame:SetAttribute("spell-help3", "Purify")
 	--frame:SetAttribute("shift-spell-help3", "Prayer of Mending")
 
+	-- macro
+	-- /cast [@mouseover,harm] Shadow Word: Pain
+	-- /cast [@mouseover,help] Plea
+	-- /cast [@mouseover,help,dead,nocombat] Ressurection
+	-- /
+
+	-- Left Mouse Button:
+	-- 
+	-- [Help] Plea
+	-- [Harm] Shadow Word: Pain
+	-- [Help] [Dead] [Out of Combat] Ressurection
+	-- [Help] [Shift] Shadow Mend
+	-- [Harm] [Shift] Pennance
+	-- [Help] [Ctrl] Dispel
+	-- [Help] [Ctrl] [Shift] Pain Suppressio
+
 
 	frame:SetAttribute("*type1", "target")
 	frame:SetAttribute("*type2", "togglemenu")
@@ -156,28 +172,7 @@ function Player:UpdateFrame()
 	frame:SetSize(size.Width, size.Height)
 	frame:ClearAllPoints()
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
-
-	local hdb = db.Health
-	local health, power = frame.Health, frame.Power
-
-	health:ClearAllPoints()
-	if hdb.Position["Local Point"] == "ALL" then
-		health:SetAllPoints()
-	else
-
-	end
-
-	health.bg:ClearAllPoints()
-	health.bg:SetAllPoints()
-
-	power:SetWidth(5)
-	power:ClearAllPoints()
-	power:SetPoint(E.regions.TL, health, E.regions.TR, 0, 0)
-	power:SetPoint(E.regions.BL, health, E.regions.BR, 0, 0)
-
-	power.bg:ClearAllPoints()
-	power.bg:SetAllPoints()
-
+    Units:UpdateElements(frame, db["Elements"])
 
 end
 
