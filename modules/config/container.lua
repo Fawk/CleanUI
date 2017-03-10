@@ -1,4 +1,4 @@
-local A, L = unpack(select(2, ...))
+local A, L, keys = unpack(select(2, ...))
 local T = A.Tools
 
 A:Debug("Creating options container")
@@ -60,6 +60,10 @@ end
 
 function Container:Update()
 	A:Update()
+end
+
+function Container:GetOption(id)
+	return shortcuts[keys[id]]
 end
 
 A["OptionsContainer"] = Container

@@ -326,6 +326,11 @@ local function EditBoxBuilder(parent)
 	setmetatable(o, object)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
+	function o:withTextChanged(func)
+		self.textbox:SetScript("OnTextChanged", func)
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
 		return self.textbox

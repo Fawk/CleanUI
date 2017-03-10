@@ -1,7 +1,8 @@
 
-local A, L, O = unpack(select(2, ...))
+local A, L = unpack(select(2, ...))
 local _G, E, media = _G, A.enum, LibStub("LibSharedMedia-3.0")
 local iconLib = LibStub("LibDBIcon-1.0", true)
+
 
 local backdrops = { "DropDownList1MenuBackdrop", "DropDownList2MenuBackdrop", "GameTooltip", "GameMenuFrame" }
 local shoppingTexts = {
@@ -246,7 +247,7 @@ local function setStyle()
 			self:SetPoint(db.Position["Local Point"], db.Position["Relative To"], db.Position["Point"], db.Position["Offset X"], db.Position["Offset Y"])
 			MinimapBackdrop:SetSize(db.Size, db.Size)
 		end
-		A.OptionsContainer.shortcuts[O["Minimap"]]:AddSubscriber(Minimap)
+		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
 		--Minimap:ClearAllPoints()
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
@@ -254,6 +255,10 @@ local function setStyle()
 		Minimap:SetPoint(minimapConfig.Position["Local Point"], minimapConfig.Position["Relative To"], minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
 		Minimap:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))
+		Minimap:SetArchBlobRingScalar(0)
+		Minimap:SetArchBlobRingAlpha(0)
+		Minimap:SetQuestBlobRingScalar(0)
+		Minimap:SetQuestBlobRingAlpha(0)
 		MinimapBackdrop:SetSize(minimapConfig.Size, minimapConfig.Size)
 		MinimapBackdrop:SetBackdrop(backdrop(0, 1, 0, 0, 0, 0))
 		MinimapBackdrop:SetBackdropColor(unpack(E.colors.backdrop))
@@ -262,10 +267,6 @@ local function setStyle()
 		MinimapBackdrop:SetFrameLevel(Minimap:GetFrameLevel()-1)
 		MinimapBorder:SetTexture(nil)
 		MinimapBorderTop:SetTexture(nil)
-		Minimap:SetArchBlobRingScalar(0)
-		Minimap:SetArchBlobRingAlpha(0)
-		Minimap:SetQuestBlobRingScalar(0)
-		Minimap:SetQuestBlobRingAlpha(0)
 
 		kill(MinimapZoomOut)		
 		MinimapZoomOut:SetSize(18, 18)
@@ -361,120 +362,6 @@ local function setStyle()
 		iconLib.RegisterCallback(callbackObj, "LibDBIcon_IconCreated", "Func")
 
 		callbackObj:Func()
-		
-		-- Minimap.cuiButtons = {
-		-- 	count = 0,
-		-- 	objects = {},
-		-- 	list = nil
-		-- }
-		-- local callbackObj = {
-		-- 	Func = function()
-		-- 		A:Debug("LibDBIcon callback")
-		-- 		for _, v in pairs({ Minimap:GetChildren() }) do
-		-- 			local childName = v:GetName() or ""
-		-- 			if childName:find("^LibDBIcon10_") then
-		-- 				local libName
-		-- 				string.gsub(childName, "_(%w+)", function(w) libName = w end)
-		-- 				local minimapButton = iconLib.objects[libName]
-		-- 				if minimapButton and not Minimap.cuiButtons.objects[libName] then
-		-- 					if not minimapButton.db.hide then
-		-- 						Minimap.cuiButtons.objects[libName] = true
-		-- 						Minimap.cuiButtons.count = Minimap.cuiButtons.count + 1
-		-- 					end
-		-- 				end
-		-- 				minimapButton:Hide()
-		-- 			end
-		-- 		end
-
-		-- 		if Minimap.cuiButtons.list then
-		-- 			local dropdown = Minimap.cuiButtons.list
-		-- 			dropdown:SetHeight(Minimap.cuiButtons.count * 22)
-
-		-- 			local exists, last = 0, nil 
-		-- 			for k,v in pairs(dropdown.items) do
-		-- 				exists = exists + 1
-		-- 			end
-
-		-- 			local relative = dropdown
-
-		-- 			for name,_ in pairs(Minimap.cuiButtons.objects) do
-		-- 				if dropdown.items[name] then
-		-- 					local button = dropdown.items[name]
-		-- 					button:SetPoint(E.regions.T, relative, (relative.isParent and E.regions.T or E.regions.B), 0, 0)
-		-- 					relative = button
-		-- 				else
-		-- 					local libButton = iconLib.objects[name]
-		-- 					local button = CreateFrame("Button", nil, dropdown)
-
-		-- 					button.name = name
-		-- 					button.dataObject = libButton.dataObject
-		-- 					button:RegisterForClicks("anyUp")
-		-- 					button:SetScript("OnClick", libButton:GetScript("OnClick"))
-		-- 					button:SetScript("OnEnter", libButton:GetScript("OnEnter"))
-		-- 					button:SetScript("OnLeave", libButton:GetScript("OnLeave"))
-		-- 					button:SetSize(150, 22)
-		-- 					button:SetPoint(E.regions.T, relative, (relative.isParent and E.regions.T or E.regions.B), 0, 0)
-
-		-- 					button.icon = button:CreateTexture(nil, "OVERLAY")
-		-- 					button.icon:SetSize(20, 20)
-		-- 					button.icon:SetTexture(libButton.icon:GetTexture())
-		-- 					button.icon:SetPoint(E.regions.L, button, E.regions.L, 2, -1)
-
-		-- 					button.text = button:CreateFontString(nil, "OVERLAY")
-		-- 					button.text:SetSize(130, 20)
-		-- 					button.text:SetFont(font(11))
-		-- 					button.text:SetText(name)
-		-- 					button.text:SetJustifyH(E.regions.L)
-		-- 					button.text:SetPoint(E.regions.L, button.icon, E.regions.R, 5, 0)
-
-		-- 					relative = button
-		-- 					dropdown.items[name] = button
-		-- 				end
-		-- 			end					
-		-- 		else
-		-- 			local dropdownButton = CreateFrame("Button", nil, Minimap)
-		-- 			dropdownButton:SetPoint(E.regions.TL, Minimap, E.regions.TL, 5, -5)
-		-- 			dropdownButton:SetBackdrop(backdrop(3, 1))
-		-- 			dropdownButton:SetBackdropColor(r, g, b, 1)
-		-- 			dropdownButton:SetBackdropBorderColor(unpack(E.colors.backdropborder))
-		-- 			dropdownButton:SetSize(22, 20)
-
-		-- 			dropdownButton.icon = dropdownButton:CreateTexture(nil, "OVERLAY")
-		-- 			dropdownButton.icon:SetTexture(media:Fetch("widget", "cui-minimap-buttons-button"))
-		-- 			dropdownButton.icon:SetPoint(E.regions.C)
-
-		-- 			local dropdown = CreateFrame("Frame", nil, Minimap)
-		-- 			dropdown:SetPoint(E.regions.TR, dropdownButton, E.regions.TL, 0, 0)
-		-- 			dropdown:SetSize(150, Minimap.cuiButtons.count * 16)
-		-- 			dropdown:SetBackdrop(backdrop(3, 1))
-		-- 			dropdown:SetBackdropColor(r, g, b, 1)
-		-- 			dropdown:SetBackdropBorderColor(unpack(E.colors.backdropborder))
-		-- 			dropdown:Hide()
-		-- 			dropdown.hidden = true
-		-- 			dropdown:SetFrameLevel(11)
-		-- 			dropdown.items = {}
-		-- 			dropdown.isParent = true
-
-		-- 			dropdownButton:SetScript("OnClick", function(self, button, down)
-		-- 				if button == "LeftButton" and not down then
-		-- 					if dropdown.hidden then
-		-- 						dropdown:Show()
-		-- 					else
-		-- 						dropdown:Hide()
-		-- 					end
-		-- 					dropdown.hidden = not dropdown.hidden
-		-- 				end
-		-- 			end)
-
-		-- 			dropdown.toggle = dropdownButton
-		-- 			Minimap.cuiButtons.list = dropdown
-		-- 		end
-		-- 	end
-		-- }
-
-		-- iconLib.RegisterCallback(callbackObj, "LibDBIcon_IconCreated", "Func")
-
-		-- callbackObj:Func()
 
 		local function killTimeFrames()
 
