@@ -9,6 +9,7 @@ local cacheInit = false
 
 local find = string.find
 local lower = string.lower
+local length = string.length
 
 local function createCache()
 	for i = 1, GetNumSpellTabs() do
@@ -29,14 +30,16 @@ end
 
 local function search(text)
 	local result = {}
-	for name, obj in next, spells do
-		if find(lower(name), lower(text)) then
-			result[name] = { obj = obj, type = "spell" }
+	if length(text) > 1 then
+		for name, obj in next, spells do
+			if find(lower(name), lower(text)) then
+				result[name] = { obj = obj, type = "spell" }
+			end
 		end
-	end
-	for name, obj in next, items do
-		if find(lower(name), lower(text)) then
-			result[name] = { obj = obj, type = "item" }
+		for name, obj in next, items do
+			if find(lower(name), lower(text)) then
+				result[name] = { obj = obj, type = "item" }
+			end
 		end
 	end
 	return result
@@ -68,6 +71,56 @@ local states = {
 	}
 }
 
+local function createRow(parent, db)
+
+	if db then
+		for _,state in next, db.states do
+			local stateButton = buildButton(parent):onClick(function(self, button, down)
+
+			end):onHover(function(self, motion)
+				if self.hover and not self.oldText then
+					self.oldText = self:GetText()
+				end
+
+				self:SetText(self.hover and L["Remove?"] or self.oldText)
+			end):build()
+		end
+	end
+
+	local addButton = buildButton(parent):onClick(function(self, button, down)
+		if not down and button == "LeftButton" then
+			-- Display dropdown with choices to add, modifiers, 
+		end
+	end):build()
+
+	local editbox = buildEditbox(parent):onTextChanged(function(self, userInput) 
+		if userInput then
+			local searchResult = search(self:GetText())
+			if #searchResult > 1 then
+				-- Display dropdown with searchResult where each result in list is clickable, thus choosing the result
+				-- set self.valid to true when clicking one of the choices
+			end
+		end
+	end):onEnterPressed(function(self)
+		if self.valid then
+			self:SetEnabled(false)
+			--icon:SetTexture(nil)
+		end
+	end):build()
+
+	if db then
+		editbox:SetEnabled(false)
+
+		local icon = parent:CreateTexture(nil, "OVERLAY")
+		icon:SetTexture(db.icon)
+
+		local editButton = buildButton(parent):rightOf(editbox):onClick(function(self, button, down)
+			editbox:SetEnabled(true)
+			icon:SetTexture(nil)
+		end):build()
+	end
+end
+
 local Mouseover = {}
 
 --local function setup(button, )
@@ -94,20 +147,15 @@ function Mouseover:Init(parent, unit, db)
 		cacheInit = true
 	end
 
-	if db then
-
+	for i = 1, parent:GetNumRegions() do
+		select(i, parent:GetRegions()):Hide()
 	end
 
-	local addButton = buildButton(parent):withOnClick(function(self, button, down)
-		if not down and button == "LeftButton" then
-			-- Display dropdown with choices too add, modifiers, 
+	if db then
+		for _,binding in next, db do
+			createRow(parent, binding)
 		end
-	end):build()
+	end
 
-	local editbox = buildEditbox(parent):withTextChanged(function(self, userInput) 
-		if userInput then
-			local searchResult = search(self:GetText())
-			-- Display dropdown with searchresult where each result in list is clickable, thus choosing the result
-		end
-	end):build()
+	createRow(parent, nil)
 end

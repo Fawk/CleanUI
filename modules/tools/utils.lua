@@ -143,6 +143,18 @@ function object:above(relative)
 	self:againstTop()
 	return self
 end
+function object:rightOf(relative)
+	self:alignWith(relative)
+	self:atLeft()
+	self:againstRight()
+	return self
+end
+function object:leftOf(relative)
+	self:alignWith(relative)
+	self:atRight()
+	self:againstLeft()
+	return self
+end
 
 object.__index = object
 
@@ -315,6 +327,21 @@ local function ButtonBuilder(parent)
 		return self
 	end
 
+	function o:onHover(func)
+		self.button:SetScript("OnEnter", function(self, motion)
+			if motion then
+				self.hover = true
+				func(self, motion)
+			end
+		end)
+		self.button:SetScript("OnLeave", function(self, motion)
+			if motion then
+				self.hover = false
+				func(self, motion)
+			end
+		end)
+	end
+
 	return o
 end
 
@@ -326,8 +353,13 @@ local function EditBoxBuilder(parent)
 	setmetatable(o, object)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
-	function o:withTextChanged(func)
+	function o:onTextChanged(func)
 		self.textbox:SetScript("OnTextChanged", func)
+		return self
+	end
+
+	function o:onEnterPressed(func)
+		self.textbox:SetScript("OnEnterPressed", func)
 		return self
 	end
 
