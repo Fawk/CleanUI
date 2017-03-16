@@ -4,6 +4,7 @@ local E = A.enum
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
 local buildEditbox = A.EditBoxBuilder
+local buildDropdown = A.DropdownBuilder
 local spells, items = {}, {}
 local cacheInit = false
 
@@ -73,6 +74,8 @@ local states = {
 
 local function createRow(parent, db)
 
+	local row = CreateFrame("Frame", nil, parent)
+
 	if db then
 		for _,state in next, db.states do
 			local stateButton = buildButton(parent):onClick(function(self, button, down)
@@ -89,7 +92,14 @@ local function createRow(parent, db)
 
 	local addButton = buildButton(parent):onClick(function(self, button, down)
 		if not down and button == "LeftButton" then
-			-- Display dropdown with choices to add, modifiers, 
+			-- Display dropdown with choices to add, modifiers,
+			local dropdownBuilder = buildDropdown(parent):below(self):onItemClick(function(self, itemButton)
+
+			end)
+
+			-- iterate choices and addItem to dropdown
+
+			local dropdown = dropdownBuilder:build()
 		end
 	end):build()
 

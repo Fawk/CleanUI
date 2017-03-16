@@ -309,6 +309,22 @@ local function TextBuilder(parent, sizeInPerc)
 	return o
 end
 
+local function FrameBuilder(parent)
+	local o = {
+		parent = parent
+	}
+
+	setmetatable(o, object)
+	o.frame = CreateFrame("Frame", nil, parent)
+
+	function o:build()
+		setPoints(self, self.frame)
+		return self.frame
+	end
+
+	return o
+end
+
 local function ButtonBuilder(parent)
 	local o = {
 		parent = parent
@@ -368,6 +384,47 @@ local function EditBoxBuilder(parent)
 		return self.textbox
 	end
 
+end
+
+local function DropdownBuilder(parent)
+	local o = {
+		parent = parent,
+		items = {}
+	}
+
+	setmetatable(o, object)
+	o.dropdown = CreateFrame("Frame", nil, parent)
+	o.dropdown.items = {}
+
+	function o:addItem(name)
+		table.insert(self.items, name)
+		return self
+	end
+
+	function o:onItemClick(func)
+		self.itemClick = func
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.dropdown)
+
+		for id,name in next, self.items do
+			
+			local buttonBuilder = A:ButtonBuilder(self.dropdown):onClick(function(self, b, down)
+				if b == "LeftButton" and not down then
+					o:itemClick(self)
+				end
+			end):below(id == 0 and self.dropdown or self.dropdown.items[id-1]):build()
+
+			button.name = name
+			button:SetText(name)
+
+			table.insert(self.dropdown.items, button)
+		end
+
+		return self.dropdown
+	end
 end
 
 function A:ColumnBuilder()
@@ -636,3 +693,4 @@ A.TextBuilder = TextBuilder
 A.ButtonBuilder = ButtonBuilder
 A.EditBoxBuilder = EditBoxBuilder
 A.DrawerBuilder = DrawerBuilder
+A.DropdownBuilder = DropdownBuilder
