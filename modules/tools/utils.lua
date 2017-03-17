@@ -389,15 +389,22 @@ end
 local function DropdownBuilder(parent)
 	local o = {
 		parent = parent,
-		items = {}
+		items = A:OrderedTable()
 	}
 
 	setmetatable(o, object)
 	o.dropdown = CreateFrame("Frame", nil, parent)
-	o.dropdown.items = {}
+	o.dropdown.items = A:OrderedTable()
 
-	function o:addItem(name)
-		table.insert(self.items, name)
+	function o:addItem(item)
+		local count = self.items:count()
+		local relative = self.items:getRelative(self.dropdown)
+		if type(item) ~= "table" then
+			self.items:add({ name = item, relative = relative })
+		else
+			item.relative = relative
+			self.items:add(item)
+		end
 		return self
 	end
 
@@ -409,18 +416,19 @@ local function DropdownBuilder(parent)
 	function o:build()
 		setPoints(self, self.dropdown)
 
-		for id,name in next, self.items do
+		for i = 1, self.items:count() do
+			local item = self.items:get(i)
 			
 			local buttonBuilder = A:ButtonBuilder(self.dropdown):onClick(function(self, b, down)
 				if b == "LeftButton" and not down then
 					o:itemClick(self)
 				end
-			end):below(id == 0 and self.dropdown or self.dropdown.items[id-1]):build()
+			end):below(item.relative):build()
 
-			button.name = name
-			button:SetText(name)
+			button.name = item.name
+			button:SetText(item.name)
 
-			table.insert(self.dropdown.items, button)
+			self.dropdown.items:add(button)
 		end
 
 		return self.dropdown

@@ -71,6 +71,11 @@ function OT:remove(t)
 	return false
 end
 
+function OT:getRelative(default)
+  local count = self.items:count()
+  return count == 0 and default or self.items:get(count-1)
+end
+
 local function search(result, tbl, key, value, steps, parents)
     for x, y in pairs(tbl) do
         if type(y) == "table" then
