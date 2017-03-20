@@ -1,6 +1,7 @@
 local A, L = unpack(select(2, ...))
 local GetUnitName = GetUnitName
 local Profile, profiles = {}, {}
+local activeProfile = nil
 
 function Profile:Init(db)
 	for name, profile in pairs(db["Profiles"]) do
@@ -23,6 +24,11 @@ end
 function Profile:SetActive(profile)
 	A:Debug("Setting active profile:", profile)
 	A["Profile"] = A.db["Profiles"][profile] or A.db["Profiles"]["Default"]
+	activeProfile = profile
+end
+
+function Profile:GetActive()
+	return activeProfile
 end
 
 function Profile:Update(name)
@@ -33,6 +39,12 @@ function Profile:Update(name)
 			A.db["Characters"][name] = profile
 		end
 	end
+end
+
+function Profile:Copy(name)
+	local profile = profiles[name]
+	A.db["Profiles"][name] = A.db["Profiles"][profile]
+	A.db["Characters"][name] = name
 end
 
 A["Modules"]["Profile"] = Profile

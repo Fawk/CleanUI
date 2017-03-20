@@ -186,7 +186,7 @@ local function extract(old, new, save)
     for k,v in pairs(old) do
         if type(v) == "table" then
             save[k] = {}
-            iter(old[k], new[k], save[k])
+            extract(old[k], new[k], save[k])
         else
             if new[k] ~= v then
                 save[k] = new[k]
@@ -197,8 +197,12 @@ end
 
 function Database:Save()
     local save = {}
-    extract(db, A.db, save)
-    CleanUI_DB = save
+    local activeProfile = A["Modules"]["Profile"]:GetActive()
+    extract(db["Profiles"][activeProfile], A.db["Profiles"][activeProfile], save)
+
+    A:DebugWindow(db["Profiles"][activeProfile])
+
+    --CleanUI_DB = save
 end
 
 function Database:CreateDatabase()

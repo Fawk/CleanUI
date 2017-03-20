@@ -128,29 +128,37 @@ local presets = {
             local ap = CreateFrame("Frame", nil, frame)
 			ap:SetAllPoints(frame)
 
-			local desc = buildText(ap, 0.8):atTop():y(-10):build()
-            local rankText = buildText(ap, 0.2):below(desc):y(-3):build()
-			local value = buildText(ap, 0.7):below(rankText):y(-3):build()
-            local perc = buildText(ap, 0.5):below(value):y(-3):build()
+			if UnitLevel("player") > 100 and getArtifactInfo() ~= nil then
 
-			ap.value = value
-			ap.rank = rankText
-			ap.perc = perc
-			ap:RegisterEvent("ARTIFACT_XP_UPDATE")
-			ap:SetScript("OnEvent", function(self, event, ...)
-                local c, m, r = getArtifactInfo()
-                self.rank:SetText(r)
-                self.value:SetText(getValue(c).."/"..getValue(m))
-                self.perc:SetText(getPerc(c/m))
-			end)
-			
-			desc:SetText(L["Artifact Level"])
-            ap:delayedCall(function(frame)
-                local current, max, rank = getArtifactInfo()
-                rankText:SetText(rank)
-                value:SetText(getValue(current).."/"..getValue(max))
-                perc:SetText(getPerc(current/max))
-            end, 1)
+				local desc = buildText(ap, 0.8):atTop():y(-10):build()
+	            local rankText = buildText(ap, 0.2):below(desc):y(-3):build()
+				local value = buildText(ap, 0.7):below(rankText):y(-3):build()
+	            local perc = buildText(ap, 0.5):below(value):y(-3):build()
+
+				ap.value = value
+				ap.rank = rankText
+				ap.perc = perc
+				ap:RegisterEvent("ARTIFACT_XP_UPDATE")
+				ap:SetScript("OnEvent", function(self, event, ...)
+	                local c, m, r = getArtifactInfo()
+	                self.rank:SetText(r)
+	                self.value:SetText(getValue(c).."/"..getValue(m))
+	                self.perc:SetText(getPerc(c/m))
+				end)
+				
+				desc:SetText(L["Artifact Level"])
+	            ap:delayedCall(function(frame)
+	                local current, max, rank = getArtifactInfo()
+	                rankText:SetText(rank)
+	                value:SetText(getValue(current).."/"..getValue(max))
+	                perc:SetText(getPerc(current/max))
+	            end, 1)
+	     	else
+	     		local desc = buildText(ap, 0.8):atCenter():y(5):build()
+	     		local value = buildText(ap, 0.5):below(desc):y(-2):build()
+	     		desc:SetText(L["Artifact Level"])
+	     		value:SetText("N/A")
+	     	end
 
 			frame.content = ap
 			frame.content:Show()
@@ -270,7 +278,8 @@ function A:CreateDropdown(column)
 				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(key):build(), column.index)
 
 				if grid.dbKey then
-					A["Profile"]["Options"]["Grids"][dbKey] = A.Grid:composeDb(updatedGrid)
+					A["Profile"]["Options"]["Grids"][grid.dbKey] = A.Grid:composeDBGrid(updatedGrid)
+					A["Database"]:Save()
 				end
 			end)
 
@@ -331,18 +340,30 @@ function Grid:composeDBGrid(grid)
 	return s
 end
 
-function Grid:parseDBGrid(key, parent)
-	local grid = A["Profile"]["Options"]["Grids"][key]
+function Grid:parseDBGrid(key, parent, ret)
+	local grid
+	if type(key) == "string" then
+		grid = A["Profile"]["Options"]["Grids"][key]
+	else
+		grid = key
+	end
 	local g = A:GridBuilder(parent, grid.isSingleLevel, key)
 	for _,row in next, grid.rows do
 		local rowBuilder = A:RowBuilder()
 		for _,column in next, row.columns do
-			rowBuilder:addColumn(A:ColumnBuilder()
-				:withView(type(column) == "function" and (function(container) return column(container) end) or column):build())
+			local view, t = nil, type(column)
+			if t == "function" then
+				view = function(container) return column(container) end
+			elseif t == "string" then
+				view = column
+			else
+				view = column.view
+			end
+			rowBuilder:addColumn(A:ColumnBuilder():withView(view):build())
 		end
 		g:addRow(rowBuilder:build())
 	end
-	return g:build(function(gg) A.Grid:Build(gg) end)
+	return g:build(function(gg) if ret then return gg else A.Grid:Build(gg) end end)
 end
 
 function Grid:Build(grid)

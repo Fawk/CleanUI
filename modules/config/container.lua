@@ -63,7 +63,7 @@ function Container:Update()
 end
 
 function Container:GetOption(id)
-	return shortcuts[keys[id]]
+	return self.shortcuts[keys[id]]
 end
 
 A["OptionsContainer"] = Container

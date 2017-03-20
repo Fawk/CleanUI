@@ -5,7 +5,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon["Modules"] = {}, {}
+Addon.frames, Addon["Modules"], Addon["Elements"] = {}, {}, {}
 Addon.debugging = true
 
 Addon.oUF = Args.oUF or oUF
@@ -244,4 +244,43 @@ end
 
 function Addon:OnDisable()
 
+end
+
+function Addon:DebugWindow(tbl)
+	local buildText = Addon.TextBuilder
+
+	local parent = CreateFrame("Frame", nil, UIParent)
+	parent:SetPoint("CENTER")
+	parent:SetSize(800, 600)
+	parent:SetBackdrop(Addon.enum.backdrops.buttonroundborder)
+	parent:SetBackdropColor(0.10, 0.10, 0.10, 1)
+	parent:SetBackdropBorderColor(0.33, 0.33, 0.33, 1)
+
+	local function sub(tbl, frame)
+		local i = 0
+		for k,v in pairs(tbl) do
+			local f = CreateFrame("Frame", nil, frame)
+			f:SetPoint("TOPLEFT")
+			f:SetSize(800, 20)
+			f.text = buildText(f, 0.1):atLeft():y(i * -40):x(10):build()
+
+			if type(v) == "table" then
+				f.text:SetText(k)
+			else
+				f.text:SetText(v)
+			end
+			i = i + 1
+		end
+	end
+
+	for k,v in pairs(tbl) do
+		if type(v) == "table" then
+			local f = CreateFrame("Frame", nil, parent)
+			f:SetPoint("TOPLEFT")
+			f:SetSize(800, 20)
+			f.text = buildText(f, 0.1):atLeft():y(-10):x(10):build()
+			f.text:SetText(k)
+			sub(v, f)
+		end
+	end
 end

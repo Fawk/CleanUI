@@ -564,21 +564,23 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 			isSingleLevel = self.isSingleLevel,
 			parent = self.parent,
 			dbKey = self.dbKey,
-			rows = {} 
+			rows = {}
 		}
 
-		for rowId = 1, grid.rows:count() do
-			local row = grid.rows:get(rowId)
+		for rowId = 1, self.rows:count() do
+			local row = self.rows:get(rowId)
+			local newRow = { columns = {} }
 			for columnId = 1, row.columns:count() do
 				if columnId ~= oldIndex then
-					table.insert(g.rows, row.columns:get(columnId))
+					table.insert(newRow.columns, row.columns:get(columnId))
 				else
-					table.insert(g.rows, newColumn)
+					table.insert(newRow.columns, newColumn)
 				end
 			end
+			table.insert(g.rows, newRow)
 		end
 
-		return A.Grid:parseDBGrid(g.dbKey, g, g.parent)
+		return A.Grid:parseDBGrid(g, g.parent, true)
 	end
 
 	function o:multiLayerReplace(grid)
@@ -588,7 +590,6 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 	end
 
 	function o:addRow(row)
-		row:SetParent(self.parent)
 		local width = self.parent:GetWidth()
 		row:SetSize(width, width / row.columns:count())
 		row.grid = self
