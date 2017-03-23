@@ -155,6 +155,11 @@ function object:leftOf(relative)
 	self:againstLeft()
 	return self
 end
+function object:size(w, h)
+	self.w = w
+	self.h = h
+	return self
+end
 
 object.__index = object
 
@@ -317,8 +322,16 @@ local function FrameBuilder(parent)
 	setmetatable(o, object)
 	o.frame = CreateFrame("Frame", nil, parent)
 
+	function o:backdrop(bd, bdColor, borderColor)
+		self.frame:SetBackdrop(bd)
+		self.frame:SetBackdropColor(unpack(bdColor))
+		self.frame:SetBackdropColor(unpack(borderColor))
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.frame)
+		self.frame:SetSize(self.w, self.h)
 		return self.frame
 	end
 
@@ -335,6 +348,7 @@ local function ButtonBuilder(parent)
 
 	function o:build()
 		setPoints(self, self.button)
+		self.button:SetSize(self.w, self.h)
 		return self.button
 	end
 
@@ -358,6 +372,13 @@ local function ButtonBuilder(parent)
 		end)
 	end
 
+	function o:backdrop(bd, bdColor, borderColor)
+		self.button:SetBackdrop(bd)
+		self.button:SetBackdropColor(unpack(bdColor))
+		self.button:SetBackdropColor(unpack(borderColor))
+		return self
+	end
+
 	return o
 end
 
@@ -379,8 +400,16 @@ local function EditBoxBuilder(parent)
 		return self
 	end
 
+	function o:backdrop(bd, bdColor, borderColor)
+		self.textbox:SetBackdrop(bd)
+		self.textbox:SetBackdropColor(unpack(bdColor))
+		self.textbox:SetBackdropColor(unpack(borderColor))
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
+		self.textbox:SetSize(self.w, self.h)
 		return self.textbox
 	end
 
@@ -413,8 +442,16 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:backdrop(bd, bdColor, borderColor)
+		self.dropdown:SetBackdrop(bd)
+		self.dropdown:SetBackdropColor(unpack(bdColor))
+		self.dropdown:SetBackdropColor(unpack(borderColor))
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
+		self.dropdown:SetSize(self.w, self.h)
 
 		for i = 1, self.items:count() do
 			local item = self.items:get(i)

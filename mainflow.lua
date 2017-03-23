@@ -248,39 +248,36 @@ end
 
 function Addon:DebugWindow(tbl)
 	local buildText = Addon.TextBuilder
+	local buildButton = Addon.ButtonBuilder
+	local buildFrame = Addon.FrameBuilder
 
-	local parent = CreateFrame("Frame", nil, UIParent)
-	parent:SetPoint("CENTER")
-	parent:SetSize(800, 600)
-	parent:SetBackdrop(Addon.enum.backdrops.buttonroundborder)
-	parent:SetBackdropColor(0.10, 0.10, 0.10, 1)
-	parent:SetBackdropBorderColor(0.33, 0.33, 0.33, 1)
+	local bd = Addon.enum.backdrops.buttonroundborder
+	local parent = buildFrame(UIParent):atCenter():size(800, 600):backdrop(bd, { .10, .10, .10 }, { .33, .33, .33 }):build()
+	local anchor = buildFrame(parent):atTopLeft():size(50, 20):build()
 
 	local function sub(tbl, frame)
-		local i = 0
 		for k,v in pairs(tbl) do
-			local f = CreateFrame("Frame", nil, frame)
-			f:SetPoint("TOPLEFT")
-			f:SetSize(800, 20)
-			f.text = buildText(f, 0.1):atLeft():y(i * -40):x(10):build()
-
+			local key = buildButton(frame):atTopLeft():againstBottomRight():onClick(function(self, button, down)
+				if self.children:IsShown() then
+					self.children:Hide()
+				else
+					self.children:Show()
+				end
+			end):build()
+			key:SetSize(50, 20)
+			key.text = buildText(f, 0.1):atLeft():build()
 			if type(v) == "table" then
-				f.text:SetText(k)
+				key.text:SetText(k.." => ")
+				local children = CreateFrame("Frame", nil, frame)
+				children:SetPoint("TOPLEFT", key, "BOTTOMRIGHT", 0, 0)
+				children:SetSize(50, 20)
+				key.children = children
+				sub(v, children)
 			else
-				f.text:SetText(v)
+				key.text:SetText(k.." => "..v)
 			end
-			i = i + 1
 		end
 	end
 
-	for k,v in pairs(tbl) do
-		if type(v) == "table" then
-			local f = CreateFrame("Frame", nil, parent)
-			f:SetPoint("TOPLEFT")
-			f:SetSize(800, 20)
-			f.text = buildText(f, 0.1):atLeft():y(-10):x(10):build()
-			f.text:SetText(k)
-			sub(v, f)
-		end
-	end
+	sub(tbl, anchor)
 end
