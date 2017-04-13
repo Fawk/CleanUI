@@ -253,28 +253,28 @@ function Addon:DebugWindow(tbl)
 
 	local bd = Addon.enum.backdrops.buttonroundborder
 	local parent = buildFrame(UIParent):atCenter():size(800, 600):backdrop(bd, { .10, .10, .10 }, { .33, .33, .33 }):build()
-	local anchor = buildFrame(parent):atTopLeft():size(50, 20):build()
+	local anchor = buildFrame(parent):atTopLeft():size(30, 20):build()
 
 	local function sub(tbl, frame)
 		for k,v in pairs(tbl) do
 			local key = buildButton(frame):atTopLeft():againstBottomRight():onClick(function(self, button, down)
-				if self.children:IsShown() then
-					self.children:Hide()
-				else
-					self.children:Show()
+				if self.children then 
+					if self.children:IsShown() then
+						self.children:Hide()
+					else
+						self.children:Show()
+					end
 				end
 			end):build()
-			key:SetSize(50, 20)
-			key.text = buildText(f, 0.1):atLeft():build()
+			key:SetSize(30, 20)
+			key.text = buildText(key, 14):atLeft():build()
 			if type(v) == "table" then
 				key.text:SetText(k.." => ")
-				local children = CreateFrame("Frame", nil, frame)
-				children:SetPoint("TOPLEFT", key, "BOTTOMRIGHT", 0, 0)
-				children:SetSize(50, 20)
+				local children = buildFrame(key):atTopLeft():againstBottomRight():size(30, 20):build()
 				key.children = children
 				sub(v, children)
 			else
-				key.text:SetText(k.." => "..v)
+				key.text:SetText(string.format("%s => %s", k, tostring(v)))
 			end
 		end
 	end

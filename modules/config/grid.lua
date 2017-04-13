@@ -117,11 +117,11 @@ local presets = {
 		getView = function(self, frame)
             
             local function getArtifactInfo()
-                local _,_,_,_,current,rank = GetEquippedArtifactInfo()
+                local _,_,_,_,current,rank,_,_,_,_,_,_,tier = GetEquippedArtifactInfo()
                 if not current or not rank then
                    return nil
                 end
-                local max = GetCostForPointAtRank(rank)
+                local max = GetCostForPointAtRank(rank, tier)
                 return current, max, rank
             end
 

@@ -284,29 +284,33 @@ local function TextBuilder(parent, sizeInPerc)
                 self:SetFont(font, size, "NONE")
             end
             self:OldSetText(value)
-            
-            if self:GetStringWidth() > parent:GetWidth() then
-                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
-                    size = size - 1
-                    self:SetFont(font, size, "NONE")
-                    if size == 1 then
-                    	return text
-                    end
-                end
-            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
-                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
-                    size = size - 1
-                    self:SetFont(font, size, "NONE")
-                    if size == 1 then
-                    	return text
-                    end
-                end
-            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
-                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
-                    size = size + 1
-                    self:SetFont(font, size, "NONE")
-                end
-            end
+
+            if sizeInPerc <= 1 then
+	            if self:GetStringWidth() > parent:GetWidth() then
+	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+	                    size = size - 1
+	                    self:SetFont(font, size, "NONE")
+	                    if size == 1 then
+	                    	return text
+	                    end
+	                end
+	            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
+	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+	                    size = size - 1
+	                    self:SetFont(font, size, "NONE")
+	                    if size == 1 then
+	                    	return text
+	                    end
+	                end
+	            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
+	                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
+	                    size = size + 1
+	                    self:SetFont(font, size, "NONE")
+	                end
+	            end
+	        else
+	        	self:SetFont(font, sizeInPerc, "NONE")
+	        end
         end
 		return text
 	end
@@ -348,7 +352,7 @@ local function ButtonBuilder(parent)
 
 	function o:build()
 		setPoints(self, self.button)
-		self.button:SetSize(self.w, self.h)
+		self.button:SetSize(self.w or 0, self.h or 0)
 		return self.button
 	end
 
@@ -737,6 +741,7 @@ end
 
 A.TextBuilder = TextBuilder
 A.ButtonBuilder = ButtonBuilder
+A.FrameBuilder = FrameBuilder
 A.EditBoxBuilder = EditBoxBuilder
 A.DrawerBuilder = DrawerBuilder
 A.DropdownBuilder = DropdownBuilder
