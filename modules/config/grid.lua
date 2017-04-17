@@ -226,7 +226,7 @@ local Grid = {}
 -- [ ] Artifact Knowledge
 -- [ ] Order Resources
 -- ...
-function A:CreateDropdown(column)
+function A:CreateDropdown(rowIndex, column)
 	local grid = column.grid
 
 	if grid == nil or column == nil then return end
@@ -272,13 +272,16 @@ function A:CreateDropdown(column)
 
 				if presets[key] then
 					presets[key]:getView(column)
+                    column.view = key
 				end
 
 				dropdown:Hide()
-				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(key):build(), column.index)
+                
+				local updatedGrid = grid:singleLayerReplace(A:ColumnBuilder():withView(key):build(), rowIndex, column.index)
 
 				if grid.dbKey then
-					A["Profile"]["Options"]["Grids"][grid.dbKey] = A.Grid:composeDBGrid(updatedGrid)
+                    local newGrid = A.Grid:composeDBGrid(updatedGrid)
+					A["Database"]:Prepare(A["Database"].TYPE_GRID, grid.dbKey, newGrid)
 					A["Database"]:Save()
 				end
 			end)
@@ -346,6 +349,7 @@ function Grid:parseDBGrid(key, parent, ret)
 		grid = A["Profile"]["Options"]["Grids"][key]
 	else
 		grid = key
+        key = grid.dbKey
 	end
 	local g = A:GridBuilder(parent, grid.isSingleLevel, key)
 	for _,row in next, grid.rows do

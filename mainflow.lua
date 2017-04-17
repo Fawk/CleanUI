@@ -246,32 +246,71 @@ function Addon:OnDisable()
 
 end
 
-function Addon:DebugWindow(tbl)
+function Addon:DebugWindow(tbl, titleText)
 	local buildText = Addon.TextBuilder
 	local buildButton = Addon.ButtonBuilder
 	local buildFrame = Addon.FrameBuilder
 
 	local bd = Addon.enum.backdrops.buttonroundborder
 	local parent = buildFrame(UIParent):atCenter():size(800, 600):backdrop(bd, { .10, .10, .10 }, { .33, .33, .33 }):build()
+    parent:RegisterForDrag("LeftButton", "RightButton")
+    parent:EnableMouse(true)
+    parent:SetMovable(true)
+    parent:SetScript("OnMouseDown", function(self, button)
+        if button == "LeftButton" and not self.isMoving then
+            self:StartMoving();
+            self.isMoving = true;
+        end
+    end)
+    parent:SetScript("OnMouseUp", function(self, button)
+        if button == "LeftButton" and self.isMoving then
+            self:StopMovingOrSizing();
+            self.isMoving = false;
+        end
+    end)
+
+    local title = buildText(parent, 14):atTopRight():y(-3):x(-3):build()
+    title:SetText(titleText)
+    
 	local anchor = buildFrame(parent):atTopLeft():size(30, 20):build()
 
 	local function sub(tbl, frame)
 		for k,v in pairs(tbl) do
-			local key = buildButton(frame):atTopLeft():againstBottomRight():onClick(function(self, button, down)
-				if self.children then 
+
+			local key = buildButton(frame):atTopLeft():againstBottomRight():y(frame.count and frame.count * -50 or 0):onClick(function(self, button, down)
+				if self.children then     
+                    local parent = self:GetParent()
 					if self.children:IsShown() then
+                        self.text:SetTextColor(1, 1, 1)
 						self.children:Hide()
 					else
+                        for i = 1, parent:GetNumChildren() do
+                            local child = select(i, parent:GetChildren())
+                            if child.children and child.children:IsShown() then
+                                child.text:SetTextColor(1, 1, 1)
+                                child.children:Hide()
+                            end
+                        end
+                        if self.text then
+                            self.text:SetTextColor(1, 0.3, 0.3)
+                        end
 						self.children:Show()
 					end
 				end
 			end):build()
-			key:SetSize(30, 20)
+        
+            if frame.count then
+                frame.count = frame.count + 1
+            end
+        
+			key:SetSize(80, 20)
 			key.text = buildText(key, 14):atLeft():build()
 			if type(v) == "table" then
 				key.text:SetText(k.." => ")
 				local children = buildFrame(key):atTopLeft():againstBottomRight():size(30, 20):build()
+                children.count = 0
 				key.children = children
+                children:Hide()
 				sub(v, children)
 			else
 				key.text:SetText(string.format("%s => %s", k, tostring(v)))

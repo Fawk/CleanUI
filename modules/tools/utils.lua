@@ -547,7 +547,7 @@ function A:RowBuilder()
 	    if column.rows:isEmpty() then
 			column:SetScript("OnClick", function(self, b, d)
 				if b == "RightButton" then
-					A:CreateDropdown(self)
+					A:CreateDropdown(o.row.index, self)
 				end
 			end)
 	    else
@@ -600,7 +600,7 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 		return nil
 	end
 
-	function o:singleLayerReplace(newColumn, oldIndex)
+	function o:singleLayerReplace(newColumn, oldRowId, oldColumnId)
 		local g = { 
 			isSingleLevel = self.isSingleLevel,
 			parent = self.parent,
@@ -612,10 +612,10 @@ function A:GridBuilder(parent, isSingleLevel, dbKey)
 			local row = self.rows:get(rowId)
 			local newRow = { columns = {} }
 			for columnId = 1, row.columns:count() do
-				if columnId ~= oldIndex then
-					table.insert(newRow.columns, row.columns:get(columnId))
+				if rowId == oldRowId and columnId == oldColumnId then
+                    table.insert(newRow.columns, newColumn)
 				else
-					table.insert(newRow.columns, newColumn)
+					table.insert(newRow.columns, row.columns:get(columnId))
 				end
 			end
 			table.insert(g.rows, newRow)
