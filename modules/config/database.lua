@@ -1,4 +1,5 @@
 local A, L = unpack(select(2, ...))
+local rawset, rawget, pairs, string.match, type, setmetatable = rawset, rawget, pairs, string.match, type, setmetatable
 
 local Database = {
     prepared = {}
@@ -169,13 +170,39 @@ local defaults =  {
     }
 }
 
+local function deepCopy(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
+end
+
+local defaultsMeta = {
+    __index = function(t, k)
+        if not rawget(t, k) and rawget(defaults, k) then
+            rawset(t, k, deepCopy(rawget(defaults, k)))
+        end
+        return rawget(t, k)
+    end
+}
+
 local function iter(old, new)
     for k,v in pairs(old) do
         if type(v) == "table" then
             iter(v, new[k]) 
         else
             if v ~= new[k] then
-                print(v, new[k])
                 old[k] = new[k]
             end
         end
@@ -219,33 +246,10 @@ local function merge(t1, t2)
     return t1
 end
 
-local function extract(old, new, save)
-    for k,v in pairs(old) do
-        if type(v) == "table" then
-            save[k] = {}
-            extract(old[k], new[k], save[k])
-        else
-            if new[k] ~= v then
-                print(k)
-                save[k] = new[k]
-            end
-        end
-    end
-end
-
 function Database:Save()
     local activeProfile = A["Modules"]["Profile"]:GetActive()
     
-    local save = {
-        ["Profiles"] = {
-            [activeProfile] = {
-                ["Options"] = {
-                    [self.TYPE_GRID] = {}
-                }
-            }
-        },
-        ["Characters"] = defaults["Characters"]
-    }
+    local save = setmetatable({}, defaultsMeta)
     
     A:DebugWindow(self.prepared, "prepared")
     
@@ -256,23 +260,7 @@ function Database:Save()
                 local newColumn = v.rows[rowId].columns[columnId].view
                 if type(column) == "string" and type(newColumn) == "string" then
                     if column ~= newColumn then
-                        local x = save["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k]
-                        if not x then
-                            save["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k] = {}
-                            x = save["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k]
-                        end
-                        if not x.rows then
-                            x.rows = {}
-                        end
-                        if not x.rows[rowId] then
-                            x.rows[rowId] = {}
-                        end
-                        if not x.rows[rowId].columns then
-                            x.rows[rowId].columns = {}
-                        end
-                        if not x.rows[rowId].columns[columnId] then
-                            x.rows[rowId].columns[columnId] = newColumn
-                        end
+                        save["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k][rowId][columnId] = newColumn
                     end
                 end
             end
@@ -287,9 +275,9 @@ end
 function Database:CreateDatabase()
 	if CleanUI_DB == nil then 
 		CleanUI_DB = {}
-        return copy(defaults)
+        return deepCopy(defaults)
 	else
-        return merge(copy(defaults), CleanUI_DB)
+        return merge(deepCopy(defaults), CleanUI_DB)
     end
 end
 

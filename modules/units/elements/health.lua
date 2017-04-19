@@ -42,7 +42,7 @@ local function Health(frame, db)
 
 		return health
 
-	)()
+	end)()
 
 	health:ClearAllPoints()
 	if db.Position["Local Point"] == "ALL" then
