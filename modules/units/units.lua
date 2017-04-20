@@ -1,11 +1,11 @@
 local A, L = unpack(select(2, ...))
 local Units, units, oUF = {}, {}, A.oUF
  
-function Units:GetFrame(unit)
+function Units:Get(unit)
     return units[unit]
 end
  
-function Units:AddFrame(object)
+function Units:Add(object)
     units[object:GetName()] = object
 end
  
@@ -39,7 +39,11 @@ end
  
 function Units:Position(frame, db)
     frame:ClearAllPoints()
-    frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], db["Offset X"], db["Offset Y"])
+    if db["Local Point"] == "ALL" then
+        frame:SetAllPoints()
+    else
+        frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], db["Offset X"], db["Offset Y"])
+    end
 end
  
 function Units:SetKeyBindings(frame, db)

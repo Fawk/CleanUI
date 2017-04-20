@@ -14,8 +14,8 @@ function Player:Init()
         Player:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
-    Units:AddFrame(Units:GetFrame(frameName) or oUF:Spawn(frameName, frameName))
-    self:Update(Units:GetFrame(frameName), db)
+    Units:Add(Units:Get(frameName) or oUF:Spawn(frameName, frameName))
+    self:Update(Units:Get(frameName), db)
 end
  
 function Player:Setup(frame, db)
@@ -30,7 +30,7 @@ function Player:Setup(frame, db)
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
     Units:SetKeyBindings(frame, bindings)
-    Units:UpdateElements(frame, db["Elements"])
+    Units:UpdateElements(frame, db)
 
     self:CreateFrame(frame, db)
 end
@@ -55,7 +55,7 @@ function Player:CreateFrame(frame, db)
 	frame:SetSize(size.Width, size.Height)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 	frame:SetBackdrop(E.backdrops.editbox)
-	frame:SetBackdropColor(unpack(E.colors.backdrop))
+	frame:SetBackdropColor(unpack(A.colors.backdrop.))
 	frame:SetFrameStrata("LOW")
 
 	local health = CreateFrame("StatusBar", "Health", frame)
@@ -74,7 +74,7 @@ function Player:CreateFrame(frame, db)
 		local function Gradient()
 			local r1, g1, b1 = unpack(colors.health.low)
 			local r2, g2, b2 = unpack(colors.health.medium)
-			local r3, g3, b3 = unpack(E.colors.backdrop)
+			local r3, g3, b3 = unpack(A.colors.backdrop.)
 			return r1, g1, b1, r2, g2, b2, r3, g3, b3
 		end
 
@@ -129,23 +129,6 @@ function Player:CreateFrame(frame, db)
 
 	--frame:SetAttribute("spell-help3", "Purify")
 	--frame:SetAttribute("shift-spell-help3", "Prayer of Mending")
-
-	-- macro
-	-- /cast [@mouseover,harm] Shadow Word: Pain
-	-- /cast [@mouseover,help] Plea
-	-- /cast [@mouseover,help,dead,nocombat] Ressurection
-	-- /
-
-	-- Left Mouse Button:
-	-- 
-	-- [Help] Plea
-	-- [Harm] Shadow Word: Pain
-	-- [Help] [Dead] [Out of Combat] Ressurection
-	-- [Help] [Shift] Shadow Mend
-	-- [Harm] [Shift] Pennance
-	-- [Help] [Ctrl] Dispel
-	-- [Help] [Ctrl] [Shift] Pain Suppressio
-
 
 	frame:SetAttribute("*type1", "target")
 	frame:SetAttribute("*type2", "togglemenu")

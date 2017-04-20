@@ -6,6 +6,7 @@ local Database = {
 }
 
 Database.TYPE_GRID = "Grids"
+Database.TYPE_CHARACTER = "Characters"
 
 for k,v in pairs(Database) do
     if string.match(k, "%a+_%a+") then
@@ -39,7 +40,10 @@ local defaults =  {
     						["Match height"] = false,
     						["Width"] = 250,
     						["Height"] = 25
-    					}
+    					},
+                        ["Color By"] = "Gradient",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33
     				},
     				["Power"] = {
     					["Enabled"] = true,
@@ -55,7 +59,10 @@ local defaults =  {
     						["Match height"] = false,
     						["Width"] = 250,
     						["Height"] = 25
-    					}
+    					},
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33
     				},
     				["Buffs"] = {
     					["Enabled"] = false,
@@ -99,7 +106,10 @@ local defaults =  {
     						["Match height"] = false,
     						["Width"] = 250,
     						["Height"] = 25
-    					}
+    					},
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33
     				},
     				["Power"] = {
     					["Enabled"] = true,
@@ -115,7 +125,10 @@ local defaults =  {
     						["Match height"] = false,
     						["Width"] = 250,
     						["Height"] = 25
-    					}
+    					},
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33
     				},
     				["Buffs"] = {
     					["Enabled"] = false,
@@ -134,7 +147,8 @@ local defaults =  {
     				["Size"] = {
     					["Width"] = 250,
     					["Height"] = 50
-    				}
+    				},
+                    ["Enabled"] = true
     			},
     			["Minimap"] = {
     				["Size"] = 250,
@@ -147,7 +161,7 @@ local defaults =  {
     				}
     			},
                 ["Grids"] = {
-                    ["Test"] = {
+                    ["Minimap"] = {
                         ["singleLayer"] = true,
                         ["rows"] = {
                             {
@@ -188,15 +202,6 @@ local function deepCopy(object)
     return _copy(object)
 end
 
-local defaultsMeta = {
-    __index = function(t, k)
-        if not rawget(t, k) and rawget(defaults, k) then
-            rawset(t, k, deepCopy(rawget(defaults, k)))
-        end
-        return rawget(t, k)
-    end
-}
-
 local function iter(old, new)
     for k,v in pairs(old) do
         if type(v) == "table" then
@@ -207,28 +212,6 @@ local function iter(old, new)
             end
         end
     end
-end
-
-function Database:Prepare(type, ...)
-    local key, value = ...
-    local t = self.prepared[type][key]
-    if not t then
-        self.prepared[type][key] = value
-    else
-        iter(self.prepared[type][key], value)
-    end
-end
-
-function Database:GetDefaults(profile)
-    return defaults["Profiles"][profile]
-end
-
-local function copy(tbl)
-    local new = {}
-    for k,v in pairs(tbl) do
-        new[k] = v
-    end
-    return new
 end
 
 local function merge(t1, t2)
@@ -246,28 +229,39 @@ local function merge(t1, t2)
     return t1
 end
 
-function Database:Save()
-    local activeProfile = A["Modules"]["Profile"]:GetActive()
-    
-    local save = setmetatable({}, defaultsMeta)
-    
-    A:DebugWindow(self.prepared, "prepared")
-    
-    -- Grids
-    for k,v in pairs(self.prepared[self.TYPE_GRID]) do
-        for rowId, row in pairs(defaults["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k].rows) do
-            for columnId, column in pairs(row.columns) do
-                local newColumn = v.rows[rowId].columns[columnId].view
-                if type(column) == "string" and type(newColumn) == "string" then
-                    if column ~= newColumn then
-                        save["Profiles"][activeProfile]["Options"][self.TYPE_GRID][k][rowId][columnId] = newColumn
-                    end
-                end
-            end
+local defaultsMeta = {
+    __index = function(t, k)
+        if not rawget(t, k) and rawget(defaults, k) then
+            rawset(t, k, deepCopy(rawget(defaults, k)))
         end
+        return rawget(t, k)
     end
-    
-    A:DebugWindow(save["Profiles"]["Default"], "saved")
+}
+
+function Database:Prepare(type, ...)
+    local key, value = ...
+    local t = self.prepared[type][key]
+    if not t then
+        self.prepared[type][key] = value
+    else
+        iter(self.prepared[type][key], value)
+    end
+end
+
+function Database:GetDefaults(profile)
+    return defaults["Profiles"][profile]
+end
+
+function Database:Save()
+    local activeProfile = A["Modules"]["Profile"]:GetActive()   
+    local save = setmetatable({}, defaultsMeta)
+    local db = save["Profiles"][activeProfile]
+    db[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
+    db = db["Options"]
+
+    for k,v in pairs(self.prepared) do
+        db[k] = v
+    end
 
     CleanUI_DB = save
 end
@@ -277,7 +271,7 @@ function Database:CreateDatabase()
 		CleanUI_DB = {}
         return deepCopy(defaults)
 	else
-        return merge(deepCopy(defaults), CleanUI_DB)
+        return merge(deepCopy(defaults), deepCopy(CleanUI_DB)
     end
 end
 
