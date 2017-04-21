@@ -27,7 +27,7 @@ function Units:Translate(frame, relative)
     if units[relative] then
         return units[relative]
     elseif A["Elements"][relative] then
-        return frame[relative]
+        return frame:GetParent()[relative]
     elseif A["Elements"][frame:GetName()] then
         A:Debug("Could not find relative frame '", relative, "' for element '", frame:GetName() or "Unknown", "', using parent.")
         return frame:GetParent()

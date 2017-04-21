@@ -22,7 +22,9 @@ local shoppingTexts = {
 	"ShoppingTooltip2TextRight1",
 	"ShoppingTooltip2TextRight2",
 	"ShoppingTooltip2TextRight3",
-	"ShoppingTooltip2TextRight4"
+	"ShoppingTooltip2TextRight4",
+
+	"WorldMapTooltip"
 }
 
 local function backdrop(es, ts, t, b, r, l)
@@ -90,7 +92,7 @@ local function setStyle()
 	do
 		for _,bd in pairs(backdrops) do
 			_G[bd]:SetBackdrop(backdrop(3, 1))
-			_G[bd]:SetBackdropColor(unpack(A.colors.backdrop.))
+			_G[bd]:SetBackdropColor(unpack(A.colors.backdrop.default))
 			_G[bd]:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
 		end
 	end
@@ -136,7 +138,7 @@ local function setStyle()
 					editbox:SetBackdrop(backdrop(3, 1))
 					editbox:SetPoint(E.regions.TL, frame, E.regions.BL, 0, -5)
 					editbox:SetPoint(E.regions.TR, frame, E.regions.BR, 0, -5)
-					local r, g, b, a = unpack(A.colors.backdrop.)
+					local r, g, b, a = unpack(A.colors.backdrop.default)
 					editbox:SetBackdropColor(r, g, b, 0.67)
 					editbox:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
 					_G[name.."EditBoxHeader"]:SetFont(font(12))
@@ -184,7 +186,7 @@ local function setStyle()
 	--ColorPickerFrame
 	do
 		ColorPickerFrame:SetBackdrop(backdrop(3, 1))
-		ColorPickerFrame:SetBackdropColor(unpack(A.colors.backdrop.))
+		ColorPickerFrame:SetBackdropColor(unpack(A.colors.backdrop.default))
 		ColorPickerFrame:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
 		
 		for i = 1, ColorPickerFrame:GetNumRegions() do
@@ -261,7 +263,7 @@ local function setStyle()
 		Minimap:SetQuestBlobRingAlpha(0)
 		MinimapBackdrop:SetSize(minimapConfig.Size, minimapConfig.Size)
 		MinimapBackdrop:SetBackdrop(backdrop(0, 1, 0, 0, 0, 0))
-		MinimapBackdrop:SetBackdropColor(unpack(A.colors.backdrop.))
+		MinimapBackdrop:SetBackdropColor(unpack(A.colors.backdrop.default))
 		MinimapBackdrop:SetParent(Minimap)
 		MinimapBackdrop:SetPoint(E.regions.C)
 		MinimapBackdrop:SetFrameLevel(Minimap:GetFrameLevel()-1)
@@ -295,7 +297,7 @@ local function setStyle()
 		MinimapZoneTextButton:SetHeight(20)
 		MinimapZoneTextButton:SetWidth(175)
 		MinimapZoneTextButton:SetBackdrop(backdrop(3, 1))
-		local r, g, b, a = unpack(A.colors.backdrop.)
+		local r, g, b, a = unpack(A.colors.backdrop.default)
 		MinimapZoneTextButton:SetBackdropColor(r, g, b, 0.76)
 		MinimapZoneTextButton:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
 		MinimapZoneText:SetFont(font(12, "NONE"))
@@ -338,7 +340,7 @@ local function setStyle()
 							minimapButton:SetPoint(E.regions.TR, minimapButtonRelative, minimapButtonRelative == Minimap and E.regions.TL or E.regions.BR, 0, 2)
 							minimapButton:SetSize(28, 28)
 							minimapButton:SetBackdrop(backdrop(0, 1))
-							minimapButton:SetBackdropColor(unpack(A.colors.backdrop.75alpha))
+							minimapButton:SetBackdropColor(unpack(A.colors.backdrop["75alpha"]))
 							minimapButton.icon:ClearAllPoints()
 							minimapButton.icon:SetPoint("CENTER")
 							minimapButton.icon:SetSize(24, 24)

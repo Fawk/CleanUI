@@ -1,5 +1,9 @@
 local A, L = unpack(select(2, ...))
-local rawset, rawget, pairs, string.match, type, setmetatable = rawset, rawget, pairs, string.match, type, setmetatable
+local rawset = rawset
+local rawget = rawget
+local pairs = pairs
+local smatch = string.match
+local setmetatable = setmetatable
 
 local Database = {
     prepared = {}
@@ -9,7 +13,7 @@ Database.TYPE_GRID = "Grids"
 Database.TYPE_CHARACTER = "Characters"
 
 for k,v in pairs(Database) do
-    if string.match(k, "%a+_%a+") then
+    if smatch(k, "%a+_%a+") then
         Database.prepared[Database[k]] = {}
     end
 end
@@ -43,7 +47,10 @@ local defaults =  {
     					},
                         ["Color By"] = "Gradient",
                         ["Custom Color"] = { 1, 1, 1 },
-                        ["Background Multiplier"] = 0.33
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
     				},
     				["Power"] = {
     					["Enabled"] = true,
@@ -58,11 +65,14 @@ local defaults =  {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25
+    						["Height"] = 5
     					},
                         ["Color By"] = "Power",
                         ["Custom Color"] = { 1, 1, 1 },
-                        ["Background Multiplier"] = 0.33
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
     				},
     				["Buffs"] = {
     					["Enabled"] = false,
@@ -109,7 +119,10 @@ local defaults =  {
     					},
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
-                        ["Background Multiplier"] = 0.33
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
     				},
     				["Power"] = {
     					["Enabled"] = true,
@@ -124,11 +137,14 @@ local defaults =  {
     						["Match width"] = true,
     						["Match height"] = false,
     						["Width"] = 250,
-    						["Height"] = 25
+    						["Height"] = 5
     					},
                         ["Color By"] = "Power",
                         ["Custom Color"] = { 1, 1, 1 },
-                        ["Background Multiplier"] = 0.33
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
     				},
     				["Buffs"] = {
     					["Enabled"] = false,
@@ -271,7 +287,7 @@ function Database:CreateDatabase()
 		CleanUI_DB = {}
         return deepCopy(defaults)
 	else
-        return merge(deepCopy(defaults), deepCopy(CleanUI_DB)
+        return merge(deepCopy(defaults), deepCopy(CleanUI_DB))
     end
 end
 

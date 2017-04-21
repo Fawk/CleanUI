@@ -211,9 +211,9 @@ function Addon:OnEnable()
 	frame:SetAllPoints(Minimap)
 	frame:SetSize(minimapConfig.Size, minimapConfig.Size)
 
-	local grid = Addon.Grid:parseDBGrid("Test", frame)
+	--local grid = Addon.Grid:parseDBGrid("Minimap", frame)
     
-    --frame:Hide()
+    frame:Hide()
 
 	local buildText = Addon.TextBuilder
     

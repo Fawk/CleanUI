@@ -17,25 +17,31 @@ function Health(frame, db)
 		local function Gradient()
 			local r1, g1, b1 = unpack(A.colors.health.low)
 			local r2, g2, b2 = unpack(A.colors.health.medium)
-			local r3, g3, b3 = unpack(A.colors.backdrop)
+			local r3, g3, b3 = unpack(A.colors.backdrop.default)
 			return r1, g1, b1, r2, g2, b2, r3, g3, b3
 		end
 
 		health.PostUpdate = function(self, unit, min, max)
+			
 			local r, g, b, t
+			local colorType = db["Color By"]
+			
 			if colorType == "Class" then
 				power.colorClass = true
-			else if colorType == "Health" then
+			elseif colorType == "Health" then
 				power.colorHealth = true
-			else if colorType == "Custom" then
+			elseif colorType == "Custom" then
 				t = db["Custom Color"]
-			else if colorType == "Gradient" then
+			elseif colorType == "Gradient" then
 				r, g, b = oUF.ColorGradient(min, max, Gradient())
 			end
+			
 			if t then
 				r, g, b = unpack(t)
 			end
+			
 			self:SetStatusBarColor(r, g, b)
+			
 			local mult = db["Background Multiplier"]
 			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 		end
@@ -47,12 +53,16 @@ function Health(frame, db)
 
 	end)()
 
-	Units:SetPosition(health, db["Position"])
+	Units:Position(health, db["Position"])
 
 	local texture = media:Fetch("texture", db["Texture"])
+	local size = db["Size"]
 
 	health:SetOrientation(db["Orientation"])
+	health:SetReverseFill(db["Reversed"])
 	health:SetStatusBarTexture(texture)
+	health:SetWidth(size["Match Width"] and frame:GetWidth() or size["Width"])
+	health:SetHeight(size["Match Height"] and frame:GetHeight() or size["Height"])
 	health.bg:ClearAllPoints()
 	health.bg:SetAllPoints()
 	health.bg:SetTexture(texture)
