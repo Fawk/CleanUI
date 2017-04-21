@@ -12,11 +12,13 @@ end
 function Units:UpdateElements(frame, db)
     if db then
         for name in next, oUF:GetRegisteredElements() do
-            if db[name] and db[name]["Enabled"] then
-                frame:EnableElement(name)
-                A["Elements"][name](frame, db[name])
-            else
-                frame:DisableElement(name)
+            if db[name] then
+                if db[name]["Enabled"] then
+                    frame:EnableElement(name)
+                    A["Elements"][name](frame, db[name])
+                else
+                    frame:DisableElement(name)
+                end
             end
         end
         frame:UpdateAllElements()
@@ -24,15 +26,16 @@ function Units:UpdateElements(frame, db)
 end
  
 function Units:Translate(frame, relative)
+    local parent, name = frame:GetParent(), frame:GetName()
     if units[relative] then
         return units[relative]
     elseif A["Elements"][relative] then
-        return frame:GetParent()[relative]
-    elseif A["Elements"][frame:GetName()] then
-        A:Debug("Could not find relative frame '", relative, "' for element '", frame:GetName() or "Unknown", "', using parent.")
-        return frame:GetParent()
+        return frame[relative] and frame[relative] or parent[relative]
+    elseif A["Elements"][name] then
+        A:Debug("Could not find relative frame '", relative, "' for element '", name or "Unknown", "', using parent.")
+        return parent
     else
-        A:Debug("Could not find relative frame '", relative, "' for frame '", frame:GetName() or "Unknown", "' using Frameparent.")
+        A:Debug("Could not find relative frame '", relative, "' for frame '", name or "Unknown", "' using Frameparent.")
         return A["Frameparent"]
     end
 end

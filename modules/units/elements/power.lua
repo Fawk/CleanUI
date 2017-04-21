@@ -20,8 +20,7 @@ local function Power(frame, db)
 			if colorType == "Class" then
 				power.colorClass = true
 			elseif colorType == "Power" then
-				t = A.colors.power[select(2, UnitPowerType(frame.unit))]
-				power.colorPower = true
+				t = A.colors.power[select(2, UnitPowerType(unit))]
 			elseif colorType == "Custom" then
 				t = db["Custom Color"]
 			end
@@ -29,9 +28,11 @@ local function Power(frame, db)
 				r, g, b = unpack(t)
 			end
 
-			self:SetStatusBarColor(r, g, b)
-			local mult = db["Background Multiplier"]
-			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+			if r then
+				self:SetStatusBarColor(r, g, b)
+				local mult = db["Background Multiplier"]
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+			end
 		end
 		
 		local min, max = UnitPower(frame.unit), UnitPowerMax(frame.unit)

@@ -14,8 +14,8 @@ function Party:Init()
         Party:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
-    Units:AddFrame(Units:GetFrame(frameName) or oUF:SpawnHeader(frameName))
-    self:Update(Units:GetFrame(frameName), db)
+    Units:Add(Units:Get(frameName) or oUF:SpawnHeader(frameName))
+    self:Update(Units:Get(frameName), db)
 end
  
 function Party:Setup(frame, db)
@@ -27,14 +27,10 @@ function Party:Setup(frame, db)
  
     local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
 
-    frame:SetAttribute("showParty", true)
- 
     Units:Position(frame, position)
-    frame:SetSize(size["Width"], size["Height"])
+    frame:SetSize(size["Width"] * 5, size["Height"] * 5)
     Units:SetKeyBindings(frame, bindings)
-    Units:UpdateElements(frame, db["Elements"])
-
-    self:CreateFrame(frame, db)
+    Units:UpdateElements(frame, db)
 end
  
 function Party:Update(frame, db)
@@ -44,16 +40,7 @@ function Party:Update(frame, db)
         frame:Enable()
     end
  
-    Units:UpdateElements(frame, db["Elements"])
-    self:UpdateFrame()
-end
-
-function Party:CreateFrame(frame, db)
-
-end
-
-function Party:UpdateFrame()
-
+    Units:UpdateElements(frame, db)
 end
 
 A.modules["party"] = Party
