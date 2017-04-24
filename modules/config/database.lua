@@ -92,6 +92,23 @@ local defaults =  {
     					["Width"] = 250,
     					["Height"] = 50
     				},
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "Noto",
+                            ["Size"] = 14,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "Outline",
+                            ["Text"] = "[name]",
+                            ["Position"] = {
+                                ["Point"] = "TOPLEFT",
+                                ["Local Point"] = "BOTTOMLEFT",
+                                ["Offset X"] = 10,
+                                ["Offset Y"] = 3,
+                                ["Relative To"] = "Player"
+                            }
+                        },
+                        ["Custom"] = {}
+                    },
     				["Enabled"] = true
     			},
     			["Target"] = {
@@ -218,25 +235,43 @@ local defaults =  {
                         ["Reversed"] = false,
                         ["Texture"] = "Default"
                     },
-                    ["Buffs"] = {
-                        ["Enabled"] = false,
-                        ["Position"] = "ABOVE",
-                        ["Relative To"] = "Player",
-                        ["Offset X"] = 0,
-                        ["Offset Y"] = 0
-                    },
-                    ["Debuffs"] = {
-                        ["Enabled"] = false,
-                        ["Position"] = "ABOVE",
-                        ["Relative To"] = "Buffs",
-                        ["Offset X"] = 0,
-                        ["Offset Y"] = 0
-                    },
                     ["Size"] = {
                         ["Width"] = 64,
                         ["Height"] = 48
                     },
                     ["Orientation"] = "VERTICAL",
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "Noto",
+                            ["Size"] = 14,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "NONE",
+                            ["Text"] = "[3charname]",
+                            ["Position"] = {
+                                ["Point"] = "ALL",
+                                ["Local Point"] = "ALL",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0,
+                                ["Relative To"] = "Parent"
+                            }
+                        },
+                        ["Custom"] = {}
+                    },
+                    ["RaidBuffs"] = {
+                        ["Limit"] = 40,
+                        ["Tracked"] = {
+                            [81749] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = -2,
+                                    ["Offset Y"] = -2,
+                                    ["Relative To"] = "Parent"
+                                }
+                            }
+                        }
+                    },
                     ["Enabled"] = true
                 },
     			["Minimap"] = {

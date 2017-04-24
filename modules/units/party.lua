@@ -81,34 +81,7 @@ function Party:Init()
 end
  
 function Party:Setup(frame, db)
-    if not db["Enabled"] then
-        return frame:Hide()
-    else
-        frame:Show()
-    end
-    
-    local size = db["Size"]
-
-    print("SETUP: ", frame:GetName())
-
-    frame:SetParent(A.frameParent)
- 
-    local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
-
-    Units:Position(frame, position)
-    frame:SetSize(size["Width"], size["Height"])
-    Units:SetKeyBindings(frame, bindings)
-    Units:UpdateElements(frame, db)
-
-    frame.name = frame:CreateFontString(nil, "OVERLAY")
-    frame.name:SetFont(media:Fetch("font", "Noto"), 14, "NONE")
-    frame.name:ClearAllPoints()
-    frame.name:SetAllPoints()
-    
-    frame.name:SetTextColor(1, 1, 1, 1)
-    
-    frame:Tag(frame.name, "[3charname]")
-
+    self:Update(frame, db)
     return frame
 end
  
@@ -119,21 +92,25 @@ function Party:Update(frame, db)
         frame:Show()
     end
 
-    print("UPDATE: ", frame:GetName())
+    local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
 
-    print(frame.name:GetPoint())
-
-    --frame.name:SetFont(media:Fetch("font", "Noto"), 14, "NONE")
-    --frame.name:ClearAllPoints()
-    --frame.name:SetAllPoints()
-    --frame.name:UpdateTag()
-
-    print(frame.name:GetPoint())
-
-    print(frame:GetSize())
-    print(frame.name:GetText())
- 
+    Units:Position(frame, position)
+    frame:SetSize(size["Width"], size["Height"])
+    Units:SetKeyBindings(frame, bindings)
     Units:UpdateElements(frame, db)
+
+    --[[ Tags ]]--
+    if not frame["Tags"] then
+        frame["Tags"] = {}
+    end
+
+    --[[ Name ]]--
+    T:Tag(frame, "Name", db["Tags"]["Name"])
+
+    --[[ Custom ]]--
+    for name, custom in next, db["Tags"]["Custom"] do
+        T:Tag(frame, name, custom)
+    end
 end
 
 A.modules["party"] = Party

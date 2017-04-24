@@ -139,6 +139,26 @@ function Desc:Set(regions, owner, title, desc, dependencies)
 	end
 end
 
+function Tools:Tag(frame, name, db)
+	
+	local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
+    
+    tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "Shadow" and "NONE" or db["Outline"])
+    tag:ClearAllPoints()
+    tag:SetAllPoints()
+    tag:SetTextColor(unpack(db["Color"]))
+    
+    local position = db["Position"]
+    if position["Local Point"] == "ALL" then
+    	tag:SetAllPoints()
+    else
+    	tag:SetPoint(position["Local Point"], position["Relative To"], position["Point"], position["Offset X"], position["Offset Y"])
+    end
+
+    frame:Tag(tag, db["Text"])
+    frame["Tags"][name] = tag
+end
+
 T.Desc = Desc
 T.Table = Table
 T.FontString = FontString
