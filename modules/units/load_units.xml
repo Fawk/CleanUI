@@ -3,5 +3,6 @@
     <Script file="units.lua"/>
     <Include file="elements\load_elements.xml"/>
     <Script file="player.lua"/>
+    <Script file="party.lua"/>
 
 </Ui>

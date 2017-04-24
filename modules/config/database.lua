@@ -35,8 +35,8 @@ local defaults =  {
     					["Position"] = {
     						["Point"] = "CENTER",
     						["Local Point"] = "ALL",
-    						["Offset X"] = -200,
-    						["Offset Y"] = -200,
+    						["Offset X"] = 0,
+    						["Offset Y"] = 0,
     						["Relative To"] = "Player"
     					},
     					["Size"] = {
@@ -107,8 +107,8 @@ local defaults =  {
     					["Position"] = {
     						["Point"] = "CENTER",
     						["Local Point"] = "CENTER",
-    						["Offset X"] = -200,
-    						["Offset Y"] = -200,
+    						["Offset X"] = 0,
+    						["Offset Y"] = 0,
     						["Relative To"] = "Target"
     					},
     					["Size"] = {
@@ -129,8 +129,8 @@ local defaults =  {
     					["Position"] = {
     						["Point"] = "CENTER",
     						["Local Point"] = "CENTER",
-    						["Offset X"] = -200,
-    						["Offset Y"] = -200,
+    						["Offset X"] = 0,
+    						["Offset Y"] = 0,
     						["Relative To"] = "Health"
     					},
     					["Size"] = {
@@ -166,6 +166,79 @@ local defaults =  {
     				},
                     ["Enabled"] = true
     			},
+                ["Party"] = {
+                    ["Position"] = {
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "CENTER",
+                        ["Offset X"] = 200,
+                        ["Offset Y"] = 200,
+                        ["Relative To"] = "UIParent"
+                    },
+                    ["Health"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "ALL",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Party"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 64,
+                            ["Height"] = 48
+                        },
+                        ["Color By"] = "Gradient",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "VERTICAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
+                    },
+                    ["Power"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Health"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 64,
+                            ["Height"] = 3
+                        },
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
+                    },
+                    ["Buffs"] = {
+                        ["Enabled"] = false,
+                        ["Position"] = "ABOVE",
+                        ["Relative To"] = "Player",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0
+                    },
+                    ["Debuffs"] = {
+                        ["Enabled"] = false,
+                        ["Position"] = "ABOVE",
+                        ["Relative To"] = "Buffs",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0
+                    },
+                    ["Size"] = {
+                        ["Width"] = 64,
+                        ["Height"] = 48
+                    },
+                    ["Orientation"] = "VERTICAL",
+                    ["Enabled"] = true
+                },
     			["Minimap"] = {
     				["Size"] = 250,
     				["Position"] = {

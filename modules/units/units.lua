@@ -1,5 +1,22 @@
 local A, L = unpack(select(2, ...))
 local Units, units, oUF = {}, {}, A.oUF
+
+for key, obj in next, {
+    ["3charname"] = {
+        method = [[function(u, r)
+            print(u, r)
+            if not u and not r then return end
+            if UnitExists(r or u) then
+                return string.sub(UnitName(r or u), 1, 3)
+            end
+        end]],
+        events = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+    }
+} do
+    oUF["Tags"]["Methods"][key] = obj.method
+    oUF["Tags"]["Events"][key] = obj.events
+end
+
  
 function Units:Get(unit)
     return units[unit]
@@ -14,14 +31,20 @@ function Units:UpdateElements(frame, db)
         for name in next, oUF:GetRegisteredElements() do
             if db[name] then
                 if db[name]["Enabled"] then
-                    frame:EnableElement(name)
+                    if frame.EnableElement then
+                        frame:EnableElement(name)
+                    end
                     A["Elements"][name](frame, db[name])
                 else
-                    frame:DisableElement(name)
+                    if frame.DisableElement then
+                        frame:DisableElement(name)
+                    end
                 end
             end
         end
-        frame:UpdateAllElements()
+        if frame.UpdateAllElements then
+            frame:UpdateAllElements()
+        end
     end
 end
  

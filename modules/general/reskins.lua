@@ -22,9 +22,7 @@ local shoppingTexts = {
 	"ShoppingTooltip2TextRight1",
 	"ShoppingTooltip2TextRight2",
 	"ShoppingTooltip2TextRight3",
-	"ShoppingTooltip2TextRight4",
-
-	"WorldMapTooltip"
+	"ShoppingTooltip2TextRight4"
 }
 
 local function backdrop(es, ts, t, b, r, l)
@@ -99,10 +97,28 @@ local function setStyle()
 
 	--Chat
 	do
-
 		for _,name in pairs(CHAT_FRAMES) do
 			local frame = _G[name]
 			if frame then
+
+				frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+				frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+				frame:HookScript("OnEvent", function(self, event, ...)
+					if event == "PLAYER_REGEN_DISABLED" then
+						self:SetAlpha(0)
+						local tab = _G[name.."Tab"]
+						if tab then
+							tab:SetAlpha(0)
+						end
+					elseif event == "PLAYER_REGEN_ENABLED" then
+						self:SetAlpha(1)
+						local tab = _G[name.."Tab"]
+						if tab then
+							tab:SetAlpha(1)
+						end
+					end
+				end)
+
 				local bf = _G[name.."ButtonFrame"]
 				if bf then 
 					kill(bf)
@@ -181,6 +197,12 @@ local function setStyle()
 		for _,st in pairs(shoppingTexts) do
 			_G[st]:SetFont(font(12))
 		end
+
+		_G["WorldMapTooltip"]:HookScript("OnShow", function(self)
+			self:SetBackdrop(backdrop(3, 1))
+			self:SetBackdropColor(unpack(A.colors.backdrop.light))
+			self:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
+		end)
 	end
 
 	--ColorPickerFrame
@@ -323,6 +345,17 @@ local function setStyle()
 		Minimap:SetScript("OnMouseUp", function(self, button)
 			if button == "RightButton" then
 				ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, "cursor", -10, -20)
+			elseif button == "LeftButton" then
+				local x, y = GetCursorPosition();
+				x = x / self:GetEffectiveScale();
+				y = y / self:GetEffectiveScale();
+
+				local cx, cy = self:GetCenter();
+				x = x - cx;
+				y = y - cy;
+				if ( sqrt(x * x + y * y) < (self:GetWidth() / 2) ) then
+					self:PingLocation(x, y);
+				end
 			end
 		end)
 

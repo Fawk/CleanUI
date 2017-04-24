@@ -5,6 +5,12 @@ local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
 
+local pp = function(unit, ...)
+	if unit == "party" then
+		print(...)
+	end
+end
+
 function Health(frame, db)
 
 	local health = frame.Health or (function()
@@ -27,9 +33,10 @@ function Health(frame, db)
 			local colorType = db["Color By"]
 			
 			if colorType == "Class" then
-				power.colorClass = true
+				health.colorClass = true
+				r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))])
 			elseif colorType == "Health" then
-				power.colorHealth = true
+				health.colorHealth = true
 			elseif colorType == "Custom" then
 				t = db["Custom Color"]
 			elseif colorType == "Gradient" then
@@ -39,15 +46,13 @@ function Health(frame, db)
 			if t then
 				r, g, b = unpack(t)
 			end
-			
-			self:SetStatusBarColor(r, g, b)
-			
-			local mult = db["Background Multiplier"]
-			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+
+			if r then
+				self:SetStatusBarColor(r, g, b)
+				local mult = db["Background Multiplier"]
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+			end
 		end
-		
-		local min, max = UnitHealth(frame.unit), UnitHealthMax(frame.unit)
-		health:PostUpdate(frame.unit, min, max)
 
 		return health
 
