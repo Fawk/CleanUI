@@ -102,12 +102,19 @@ local defaults =  {
                             ["Position"] = {
                                 ["Point"] = "TOPLEFT",
                                 ["Local Point"] = "BOTTOMLEFT",
-                                ["Offset X"] = 10,
-                                ["Offset Y"] = 3,
+                                ["Offset X"] = 5,
+                                ["Offset Y"] = 2,
                                 ["Relative To"] = "Player"
-                            }
+                            },
+                            ["Enabled"] = false
                         },
                         ["Custom"] = {}
+                    },
+                    ["HealPrediction"] = {
+                        ["Texture"] = "Default",
+                        ["MaxOverflow"] = 1,
+                        ["FrequentUpdates"] = true,
+                        ["Enabled"] = true
                     },
     				["Enabled"] = true
     			},
@@ -253,24 +260,32 @@ local defaults =  {
                                 ["Offset X"] = 0,
                                 ["Offset Y"] = 0,
                                 ["Relative To"] = "Parent"
-                            }
+                            },
+                            ["Enabled"] = true,
                         },
                         ["Custom"] = {}
                     },
                     ["RaidBuffs"] = {
                         ["Limit"] = 40,
                         ["Tracked"] = {
-                            [81749] = {
+                            [194384] = {
                                 ["Own Only"] = true,
                                 ["Position"] = {
                                     ["Point"] = "TOPRIGHT",
                                     ["Local Point"] = "TOPRIGHT",
-                                    ["Offset X"] = -2,
-                                    ["Offset Y"] = -2,
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
                                     ["Relative To"] = "Parent"
                                 }
                             }
-                        }
+                        },
+                        ["Enabled"] = true
+                    },
+                    ["HealPrediction"] = {
+                        ["Texture"] = "Default",
+                        ["MaxOverflow"] = 1,
+                        ["FrequentUpdates"] = true,
+                        ["Enabled"] = true
                     },
                     ["Enabled"] = true
                 },

@@ -1,10 +1,10 @@
 local A, L = unpack(select(2, ...))
 local Units, units, oUF = {}, {}, A.oUF
+local media = LibStub("LibSharedMedia-3.0")
 
 for key, obj in next, {
     ["3charname"] = {
         method = [[function(u, r)
-            print(u, r)
             if not u and not r then return end
             if UnitExists(r or u) then
                 return string.sub(UnitName(r or u), 1, 3)
@@ -57,6 +57,8 @@ function Units:Translate(frame, relative)
     elseif A["Elements"][name] then
         A:Debug("Could not find relative frame '", relative, "' for element '", name or "Unknown", "', using parent.")
         return parent
+    elseif relative == parent:GetName() or relative == "Parent" then
+        return parent
     else
         A:Debug("Could not find relative frame '", relative, "' for frame '", name or "Unknown", "' using Frameparent.")
         return A["Frameparent"]
@@ -79,6 +81,27 @@ function Units:SetKeyBindings(frame, db)
             frame:SetAttribute(binding.type, binding.action)
         end
     end
+end
+
+function Units:Tag(frame, name, db)
+    
+    local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
+    
+    tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "Shadow" and "NONE" or db["Outline"])
+    tag:ClearAllPoints()
+    tag:SetTextColor(unpack(db["Color"]))
+    
+    local position = db["Position"]
+    if position["Local Point"] == "ALL" then
+        tag:SetAllPoints()
+    else
+        tag:SetPoint(position["Local Point"], self:Translate(tag, position["Relative To"]), position["Point"], position["Offset X"], position["Offset Y"])
+    end
+
+    frame:Tag(tag, db["Text"])
+    frame["Tags"][name] = tag
+
+   if not db["Enabled"] then tag:Hide() end
 end
 
 A.Units = Units

@@ -5,9 +5,9 @@ local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
 
-local pp = function(unit, ...)
-	if unit == "party" then
-		print(...)
+local function SetTagColor(frame, tag, color)
+	if frame["Tags"][tag] then
+		frame["Tags"][tag]:SetTextColor(unpack(color))
 	end
 end
 
@@ -30,7 +30,9 @@ function Health(frame, db)
 		health.PostUpdate = function(self, unit, min, max)
 			
 			local r, g, b, t
+			local a = 1
 			local colorType = db["Color By"]
+			local mult = db["Background Multiplier"]
 			
 			if colorType == "Class" then
 				health.colorClass = true
@@ -47,10 +49,37 @@ function Health(frame, db)
 				r, g, b = unpack(t)
 			end
 
+			if unit ~= "player" then
+				if UnitIsDeadOrGhost(unit) then
+					r, g, b = unpack(A.colors.health.dead)
+					if UnitIsDead(unit) then
+						SetTagColor(frame, "Name", A.colors.text.dead)
+					else
+						SetTagColor(frame, "Name", A.colors.text.ghost)
+					end
+				elseif not UnitIsConnected(unit) then
+					r, g, b, a = unpack(A.colors.health.disconnected)
+					SetTagColor(frame, "Name", A.colors.text.disconnected)
+				else
+					SetTagColor(frame, "Name", { 1, 1, 1, 1})
+				end
+
+				self.timer = 0
+				self:SetScript("OnUpdate", function(self, elapsed)
+					self.timer = self.timer + elapsed
+					if self.timer > 0.10 then
+						a = not select(1, UnitInRange(unit)) and 0.4 or 1
+						self:SetStatusBarColor(r, g, b, a or 1)
+						self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
+						SetTagColor(frame, "Name", { 1, 1, 1, a })
+						self.timer = 0
+					end
+				end)
+			end
+
 			if r then
-				self:SetStatusBarColor(r, g, b)
-				local mult = db["Background Multiplier"]
-				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+				self:SetStatusBarColor(r, g, b, a or 1)
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
 			end
 		end
 

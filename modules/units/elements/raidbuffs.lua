@@ -3,7 +3,7 @@ local media = LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 
-local function RaidBuffs(frame, db)
+function RaidBuffs(frame, db)
 	
 	local buffs = frame.RaidBuffs or { numLimit = nil, Tracked = {} }
 	buffs.numLimit = db["Limit"]
@@ -20,11 +20,13 @@ local function RaidBuffs(frame, db)
 			
 			local position = obj["Position"]
 
-			local buff = CreateFrame("Frame", nil, frame)
+			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
 			buff:SetPoint(position["Local Point"], frame, position["Point"], position["Offset X"], position["Offset Y"])
+			buff:SetSize(14, 14)
 
 			local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
 			cd:SetAllPoints(buff)
+			cd:SetReverse(true)
 
 			local icon = buff:CreateTexture(nil, "BORDER")
 			icon:SetAllPoints(buff)

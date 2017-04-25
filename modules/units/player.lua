@@ -42,11 +42,11 @@ function Player:Update(frame, db)
     end
 
     --[[ Name ]]--
-    T:Tag(frame, "Name", db["Tags"]["Name"])
+    Units:Tag(frame, "Name", db["Tags"]["Name"])
 
     --[[ Custom ]]--
     for name, custom in next, db["Tags"]["Custom"] do
-        T:Tag(frame, name, custom)
+        Units:Tag(frame, name, custom)
     end
 end
 
