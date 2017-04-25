@@ -195,7 +195,7 @@ local defaults =  {
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = 200,
-                        ["Offset Y"] = 200,
+                        ["Offset Y"] = -200,
                         ["Relative To"] = "UIParent"
                     },
                     ["Health"] = {
@@ -287,6 +287,9 @@ local defaults =  {
                         ["FrequentUpdates"] = true,
                         ["Enabled"] = true
                     },
+                    ["Offset X"] = 2,
+                    ["Offset Y"] = 0,
+                    ["Show Player"] = true,
                     ["Enabled"] = true
                 },
     			["Minimap"] = {

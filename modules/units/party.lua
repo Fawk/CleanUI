@@ -33,12 +33,12 @@ function Party:Init()
         A:GetName().."_"..frameName,
         nil,
         "party",
-        "showPlayer",         true,
+        "showPlayer",         db["Show Player"],
         "showSolo",           false,
         "showParty",          true,
         "point",              point,
-        "yOffset",            0,
-        "xOffset",            2,
+        "yOffset",            db["Offset X"],
+        "xOffset",            db["Offset Y"],
         "maxColumns",         maxColumns,
         "unitsPerColumn",     unitsPerColumn,
         "columnAnchorPoint",  anchorPoint,
@@ -48,36 +48,45 @@ function Party:Init()
         ]]):format(size["Width"], size["Height"])
     )
 
-    A["partyContainer"] = CreateFrame("Frame", A:GetName().."_PartyContainer", A.frameParent)
-    A["partyContainer"]["UpdateSize"] = function(self, db) 
-        local x, y = unpack({ 2, 0 })
-        local w, h = ((size["Width"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * x)), size["Height"]
-        if db["Orientation"] == "VERTICAL" then
-            w = size["Width"]
-            h = ((size["Height"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * y))
-        end
-        self:SetSize(w, h)
-    end
-    A["partyContainer"]:SetPoint("CENTER", A.frameParent, "CENTER", 200, -200)
-    A["partyContainer"]:UpdateSize(db)
-    A["partyContainer"]:RegisterEvent("GROUP_ROSTER_UPDATE")
-    A["partyContainer"]:SetScript("OnEvent", function(self, event) 
-        if event == "GROUP_ROSTER_UPDATE" then
-            local i = 1
-            for name, frame in next, partyFrames do
-                local uf = partyHeader:GetAttribute("child"..i)
-                if not uf then break end
-                uf:RegisterForClicks("AnyUp")
-                uf.unit = uf:GetAttribute("unit")
-                Party:Update(frame, db)
-                i = i + 1
+    local partyContainer = Units:Get(frameName)
+    if not partyContainer then
+        
+        partyContainer = CreateFrame("Frame", frameName, A.frameParent)
+        
+        partyContainer["UpdateSize"] = function(self, db) 
+            local x, y = db["Offset X"], db["Offset Y"]
+            local w, h = ((size["Width"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * x)), size["Height"]
+            if db["Orientation"] == "VERTICAL" then
+                w = size["Width"]
+                h = ((size["Height"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * y))
             end
+            self:SetSize(w, h)
         end
-    end)
 
-    partyHeader:SetParent(A["partyContainer"])
+        partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
+        partyContainer:SetScript("OnEvent", function(self, event) 
+            if event == "GROUP_ROSTER_UPDATE" then
+                local i = 1
+                for name, frame in next, partyFrames do
+                    local uf = partyHeader:GetAttribute("child"..i)
+                    if not uf then break end
+                    uf:RegisterForClicks("AnyUp")
+                    uf.unit = uf:GetAttribute("unit")
+                    Party:Update(frame, db)
+                    i = i + 1
+                end
+            end
+        end)
+
+        Units:Add(partyContainer)
+    end
+
+    Units:Position(partyContainer, db["Position"])
+    partyContainer:UpdateSize(db)
+    A:CreateMover(partyContainer, db)
+
+    partyHeader:SetParent(Units:Get(frameName))
     partyHeader:SetAllPoints()
-
 end
  
 function Party:Setup(frame, db)
@@ -92,9 +101,8 @@ function Party:Update(frame, db)
         frame:Show()
     end
 
-    local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
+    local size, bindings = db["Size"], db["Key Bindings"]
 
-    Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
     Units:SetKeyBindings(frame, bindings)
     Units:UpdateElements(frame, db)
