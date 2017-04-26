@@ -6,8 +6,8 @@ A.colors = {
 	health = {
 		low = { .54, .16, .11 },
 		medium = { .40, .26, .04 },
-		dead = { 77/255, 15/255, 15/255 },
-		disconnected = { .5, .5, .5, .5 }
+		dead = { 100/255, 15/255, 15/255 },
+		disconnected = { .5, .5, .5, }
 	},
 	power = {
 		["MANA"] = { 80/255, 109/255, 155/255 },
@@ -26,7 +26,7 @@ A.colors = {
 		dead = { 1, 0, 0 },
 		ghost = { 1, 1, 0 },
 		disconnected = { 0, 0, 0 },
-		default = { 1, 1, 1, 1 }
+		default = { 1, 1, 1 }
 	},
 	healPrediction = {
 		my = { 0, .827, .765, .5 },

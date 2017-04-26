@@ -82,16 +82,20 @@ function Party:Init()
         partyContainer.timer = 0
         partyContainer:SetScript("OnUpdate", function(self, elapsed)
             self.timer = self.timer + elapsed
-            if self.timer > 0.10 then
+            if self.timer > 0.05 then
                 for i = 1, 5 do 
                     local uf = partyHeader:GetAttribute("child"..i)
-                    if uf and uf.unit or uf:GetAttribute("unit") and UnitExists("target") then
-                        local unit = uf.unit or uf:GetAttribute("unit")
-                        local name = GetUnitName(unit, true)
-                        if name == GetUnitName("target", true) then
-                            uf:SetTargeted(true)
+                    if (uf and uf.unit or uf and uf:GetAttribute("unit")) then
+                        if UnitExists("target") then
+                            local unit = uf.unit or uf:GetAttribute("unit")
+                            local name = GetUnitName(unit, true)
+                            if name == GetUnitName("target", true) then
+                                uf:SetTargeted(true)
+                            end
                         else
-                            uf:SetTargeted(false)
+                            if uf.targetedFrame:IsShown() then
+                                uf:SetTargeted(false)
+                            end
                         end
                     end
                 end
@@ -145,6 +149,7 @@ function Party:Update(frame, db)
     if not targetedFrame then
         targetedFrame = CreateFrame("Frame", nil, frame)
         targetedFrame:SetBackdrop(A.enum.backdrops.editboxborder)
+        targetedFrame:SetBackdropColor(0, 0, 0, 0)
         targetedFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
         frame.targetedFrame = targetedFrame
     end

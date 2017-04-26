@@ -49,38 +49,36 @@ function Health(frame, db)
 			end
 
 			if unit ~= "player" then
-				if UnitIsDeadOrGhost(unit) then
-					r, g, b = unpack(A.colors.health.dead)
-					if UnitIsDead(unit) then
-						SetTagColor(frame, "Name", A.colors.text.dead)
-					else
-						SetTagColor(frame, "Name", A.colors.text.ghost)
-					end
-				elseif not UnitIsConnected(unit) then
-					r, g, b, a = unpack(A.colors.health.disconnected)
-					SetTagColor(frame, "Name", A.colors.text.disconnected)
-				else
-					SetTagColor(frame, "Name", A.colors.text.default)
-				end
-
 				self.timer = 0
-				self:SetScript("OnUpdate", function(self, elapsed)
-					self.timer = self.timer + elapsed
-					if self.timer > 0.10 then
-						self.inRange = select(1, UnitInRange(unit))
-						self:SetStatusBarColor(r, g, b, self.inRange and 1 or 0.5)
-						self.bg:SetVertexColor(r * mult, g * mult, b * mult, self.inRange and 1 or 0.5)
-						SetTagColor(frame, "Name", { 1, 1, 1, self.inRange and 1 or 0.5 })
-						self.timer = 0
-					end
-				end)
+				if not self:GetScript("OnUpdate") then
+					self:SetScript("OnUpdate", function(self, elapsed)
+						self.timer = self.timer + elapsed
+						if self.timer > 0.10 then
+							if UnitIsDeadOrGhost(unit) then
+								r, g, b = unpack(A.colors.health.dead)
+								if UnitIsDead(unit) then
+									SetTagColor(frame, "Name", A.colors.text.dead)
+								else
+									SetTagColor(frame, "Name", A.colors.text.ghost)
+								end
+							elseif not UnitIsConnected(unit) then
+								r, g, b = unpack(A.colors.health.disconnected)
+								SetTagColor(frame, "Name", A.colors.text.disconnected)
+							else
+								SetTagColor(frame, "Name", A.colors.text.default)
+							end
+							self.inRange = select(1, UnitInRange(unit))
+							self:SetAlpha(self.inRange and 1 or 0.5)
+							frame["Tags"]["Name"]:SetAlpha(self.inRange and 1 or 0.5)
+							self.timer = 0
+						end
+					end)
+				end
 			end
 
 			if r then
-				a = unit == "player" and 1 or (self.inRange and 1 or 0.5)
-				SetTagColor(frame, "Name", { 1, 1, 1, a })
-				self:SetStatusBarColor(r, g, b, a)
-				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
+				self:SetStatusBarColor(r, g, b, a or 1)
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
 			end
 		end
 

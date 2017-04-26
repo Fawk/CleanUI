@@ -290,6 +290,7 @@ local defaults =  {
                     ["Offset X"] = 2,
                     ["Offset Y"] = 0,
                     ["Show Player"] = true,
+                    ["Highlight Target"] = true,
                     ["Enabled"] = true
                 },
     			["Minimap"] = {
