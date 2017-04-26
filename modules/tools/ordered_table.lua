@@ -26,6 +26,12 @@ function OT:add(t)
 	end
 	self.c = self.c + 1
   if type(t) == "table" then
+    local p = self.e[self.c - 1]
+    if p then
+      t.previous = p
+      p.next = t
+    end
+    t.parent = self
     t.index = self.c
   end
 	self.e[self.c] = t
@@ -128,6 +134,22 @@ end
 
 function OT:isEmpty()
 	return self:count() == 0
+end
+
+function OT:isLessThan(size)
+  return self:count() < size
+end
+
+function OT:isMoreThan(size)
+  return self:count() > size
+end
+
+function OT:isLessOrEqualTo(size)
+  return self:count() <= size
+end
+
+function OT:isMoreOrEqualTo(size)
+  return self:count() >= size
 end
 
 function OT:isSize(size)
