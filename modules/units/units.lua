@@ -22,8 +22,9 @@ function Units:Get(unit)
     return units[unit]
 end
  
-function Units:Add(object)
-    units[object:GetName()] = object
+function Units:Add(object, overrideName)
+    A:Debug("Adding unit:", overrideName or object:GetName())
+    units[overrideName or object:GetName()] = object
 end
  
 function Units:UpdateElements(frame, db)

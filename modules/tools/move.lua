@@ -69,7 +69,7 @@ function A:CreateMover(frame, db, overrideName)
 	local moveFrame = CreateFrame("Button", name.."_Mover", A.frameParent)
 	moveFrame.affecting = frame
 	moveFrame:SetBackdrop(A.enum.backdrops.editboxborder)
-	moveFrame:SetBackdropColor(unpack(A.color.moving.backdrop))
+	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
 	moveFrame:SetPoint(position["Local Point"], select(2, frame:GetPoint()), position["Point"], position["Offset X"], position["Offset Y"])

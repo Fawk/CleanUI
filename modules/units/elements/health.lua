@@ -29,8 +29,7 @@ function Health(frame, db)
 
 		health.PostUpdate = function(self, unit, min, max)
 			
-			local r, g, b, t
-			local a = 1
+			local r, g, b, t, a
 			local colorType = db["Color By"]
 			local mult = db["Background Multiplier"]
 			
@@ -61,25 +60,27 @@ function Health(frame, db)
 					r, g, b, a = unpack(A.colors.health.disconnected)
 					SetTagColor(frame, "Name", A.colors.text.disconnected)
 				else
-					SetTagColor(frame, "Name", { 1, 1, 1, 1})
+					SetTagColor(frame, "Name", A.colors.text.default)
 				end
 
 				self.timer = 0
 				self:SetScript("OnUpdate", function(self, elapsed)
 					self.timer = self.timer + elapsed
 					if self.timer > 0.10 then
-						a = not select(1, UnitInRange(unit)) and 0.4 or 1
-						self:SetStatusBarColor(r, g, b, a or 1)
-						self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
-						SetTagColor(frame, "Name", { 1, 1, 1, a })
+						self.inRange = select(1, UnitInRange(unit))
+						self:SetStatusBarColor(r, g, b, self.inRange and 1 or 0.5)
+						self.bg:SetVertexColor(r * mult, g * mult, b * mult, self.inRange and 1 or 0.5)
+						SetTagColor(frame, "Name", { 1, 1, 1, self.inRange and 1 or 0.5 })
 						self.timer = 0
 					end
 				end)
 			end
 
 			if r then
-				self:SetStatusBarColor(r, g, b, a or 1)
-				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
+				a = unit == "player" and 1 or (self.inRange and 1 or 0.5)
+				SetTagColor(frame, "Name", { 1, 1, 1, a })
+				self:SetStatusBarColor(r, g, b, a)
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
 			end
 		end
 

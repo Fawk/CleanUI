@@ -5,6 +5,7 @@
     <Script file="ordered_table.lua"/>
 	<Script file="tools.lua"/>
 	<Script file="utils.lua"/>
+	<Script file="move.lua"/>
 	<Include file="elements\load_elements.xml"/>
 
 </Ui>

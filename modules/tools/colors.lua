@@ -11,7 +11,8 @@ A.colors = {
 	},
 	power = {
 		["MANA"] = { 80/255, 109/255, 155/255 },
-		["RAGE"] = { 200/255, 33/255, 33/255 }
+		["RAGE"] = { 200/255, 33/255, 33/255 },
+		["FURY"] = { 200/255, 33/255, 200/255 }
 	},
 	backdrop = {
         default = { 0.1, 0.1, 0.1, 1 },
@@ -24,7 +25,8 @@ A.colors = {
 	text = {
 		dead = { 1, 0, 0 },
 		ghost = { 1, 1, 0 },
-		disconnected = { 0, 0, 0 }
+		disconnected = { 0, 0, 0 },
+		default = { 1, 1, 1, 1 }
 	},
 	healPrediction = {
 		my = { 0, .827, .765, .5 },

@@ -30,7 +30,7 @@ function Party:Init()
     oUF:SetActiveStyle(frameName)
 
     partyHeader = oUF:SpawnHeader(
-        A:GetName().."_"..frameName,
+        A:GetName().."_"..frameName.."Header",
         nil,
         "party",
         "showPlayer",         db["Show Player"],
@@ -51,9 +51,9 @@ function Party:Init()
     local partyContainer = Units:Get(frameName)
     if not partyContainer then
         
-        partyContainer = CreateFrame("Frame", frameName, A.frameParent)
+        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
         
-        partyContainer["UpdateSize"] = function(self, db) 
+        partyContainer.UpdateSize = function(self, db) 
             local x, y = db["Offset X"], db["Offset Y"]
             local w, h = ((size["Width"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * x)), size["Height"]
             if db["Orientation"] == "VERTICAL" then
@@ -66,6 +66,7 @@ function Party:Init()
         partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         partyContainer:SetScript("OnEvent", function(self, event) 
             if event == "GROUP_ROSTER_UPDATE" then
+                self:UpdateSize(db)
                 local i = 1
                 for name, frame in next, partyFrames do
                     local uf = partyHeader:GetAttribute("child"..i)
@@ -78,14 +79,14 @@ function Party:Init()
             end
         end)
 
-        Units:Add(partyContainer)
+        Units:Add(partyContainer, frameName)
     end
 
     Units:Position(partyContainer, db["Position"])
     partyContainer:UpdateSize(db)
     A:CreateMover(partyContainer, db)
 
-    partyHeader:SetParent(Units:Get(frameName))
+    partyHeader:SetParent(partyContainer)
     partyHeader:SetAllPoints()
 end
  

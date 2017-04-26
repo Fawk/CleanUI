@@ -338,6 +338,10 @@ local function setStyle()
 			end
 		end)
 
+		hooksecurefunc(GameTooltip, "Show", function(self)
+			
+		end)
+
 		MiniMapWorldMapButton:Hide()
 		GarrisonLandingPageMinimapButton:SetAlpha(0)
 
