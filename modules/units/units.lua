@@ -29,13 +29,13 @@ end
  
 function Units:UpdateElements(frame, db)
     if db then
-        for name in next, oUF:GetRegisteredElements() do
+        for name, func in next, A["Elements"] do
             if db[name] then
                 if db[name]["Enabled"] then
                     if frame.EnableElement then
                         frame:EnableElement(name)
                     end
-                    A["Elements"][name](frame, db[name])
+                    func(frame, db[name])
                 else
                     if frame.DisableElement then
                         frame:DisableElement(name)
@@ -58,7 +58,7 @@ function Units:Translate(frame, relative)
     elseif A["Elements"][name] then
         A:Debug("Could not find relative frame '", relative, "' for element '", name or "Unknown", "', using parent.")
         return parent
-    elseif relative == parent:GetName() or relative == "Parent" then
+    elseif relative:equals(parent:GetName(), "Parent") then
         return parent
     else
         A:Debug("Could not find relative frame '", relative, "' for frame '", name or "Unknown", "' using Frameparent.")

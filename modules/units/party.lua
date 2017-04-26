@@ -79,6 +79,26 @@ function Party:Init()
             end
         end)
 
+        partyContainer.timer = 0
+        partyContainer:SetScript("OnUpdate", function(self, elapsed)
+            self.timer = self.timer + elapsed
+            if self.timer > 0.10 then
+                for i = 1, 5 do 
+                    local uf = partyHeader:GetAttribute("child"..i)
+                    if uf and uf.unit or uf:GetAttribute("unit") and UnitExists("target") then
+                        local unit = uf.unit or uf:GetAttribute("unit")
+                        local name = GetUnitName(unit, true)
+                        if name == GetUnitName("target", true) then
+                            uf:SetTargeted(true)
+                        else
+                            uf:SetTargeted(false)
+                        end
+                    end
+                end
+                self.timer = 0
+            end
+        end)
+
         Units:Add(partyContainer, frameName)
     end
 
@@ -119,6 +139,30 @@ function Party:Update(frame, db)
     --[[ Custom ]]--
     for name, custom in next, db["Tags"]["Custom"] do
         Units:Tag(frame, name, custom)
+    end
+
+    local targetedFrame = frame.targetedFrame
+    if not targetedFrame then
+        targetedFrame = CreateFrame("Frame", nil, frame)
+        targetedFrame:SetBackdrop(A.enum.backdrops.editboxborder)
+        targetedFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
+        frame.targetedFrame = targetedFrame
+    end
+
+    targetedFrame:ClearAllPoints()
+    targetedFrame:SetAllPoints()
+    targetedFrame:Hide()
+
+    if not frame.SetTargeted then
+        frame.SetTargeted = function(self, targeted)
+            if db["Highlight Target"] then
+                if targeted then 
+                    self.targetedFrame:Show()
+                else
+                    self.targetedFrame:Hide()
+                end
+            end
+        end
     end
 end
 

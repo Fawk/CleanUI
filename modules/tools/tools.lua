@@ -21,6 +21,16 @@ setmetatable(Controls, P)
 setmetatable(Backdrops, P)
 setmetatable(Textures, P)
 
+function string.equals(self, ...)
+   local match = false
+   for _,value in next, { ... } do
+      if type(value) ~= "string" and false or self == value then
+         match = true
+      end
+   end
+   return match
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v
