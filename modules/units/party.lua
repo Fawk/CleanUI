@@ -82,31 +82,66 @@ function Party:Init()
             end
         end)
 
-        partyContainer.timer = 0
-        partyContainer:SetScript("OnUpdate", function(self, elapsed)
-            self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
-                for i = 1, 5 do 
-                    local uf = partyHeader:GetAttribute("child"..i)
-                    if uf and uf.unit or uf:GetAttribute("unit") then
-                        if UnitExists("target") then
-                            local unit = uf.unit or uf:GetAttribute("unit")
-                            local name = GetUnitName(unit, true)
-                            if name == GetUnitName("target", true) then
-                                uf:SetTargeted(true)
-                            else
-                                uf:SetTargeted(false)
-                            end
-                        else
-                            if uf.targetedFrame:IsShown() then
-                                uf:SetTargeted(false)
-                            end
-                        end
+        -- partyContainer.timer = 0
+        -- partyContainer:SetScript("OnUpdate", function(self, elapsed)
+        --     self.timer = self.timer + elapsed
+        --     if self.timer > 0.05 then
+        --         for i = 1, 5 do 
+        --             local uf = partyHeader:GetAttribute("child"..i)
+        --             if uf and uf.unit or uf:GetAttribute("unit") then
+        --                 if UnitExists("target") then
+        --                     local unit = uf.unit or uf:GetAttribute("unit")
+        --                     local name = GetUnitName(unit, true)
+        --                     if name == GetUnitName("target", true) then
+        --                         uf:SetTargeted(true)
+        --                     else
+        --                         uf:SetTargeted(false)
+        --                     end
+        --                 else
+        --                     if uf.targetedFrame:IsShown() then
+        --                         uf:SetTargeted(false)
+        --                     end
+        --                 end
+        --             end
+        --         end
+        --         self.timer = 0
+        --     end
+        -- end)
+
+        Units:CreateStatusBorder(partyContainer, "Targeted", {
+            ["Enabled"] = db["Highlight Target"],
+            ["FrameLevel"] = 5,
+            ["Color"] = A.colors.target, 
+            ["Condition"] = function(self, elapsed) 
+                self.timer = self.timer + elapsed
+                if self.timer > 0.05 then
+                    local unit = self.unit or self:GetAttribute("unit")
+                    if unit and UnitExists("target") and GetUnitName(unit, true) == GetUnitName("target", true) then
+                        self:Show()
+                    else
+                        self:Hide()
                     end
+                    self.timer = 0
                 end
-                self.timer = 0
             end
-        end)
+        })
+
+        Units:CreateStatusBorder(partyContainer, "Debuff", {
+            ["Enabled"] = db["Show Debuff Border"],
+            ["FrameLevel"] = 5,
+            ["Condition"] = function(self, elapsed) 
+                self.timer = self.timer + elapsed
+                if self.timer > 0.05 then
+                    local unit = self.unit or self:GetAttribute("unit")
+                    if unit and UnitExists("target") and GetUnitName(unit, true) == GetUnitName("target", true) then
+                        self:Show()
+                    else
+                        self:Hide()
+                    end
+                    self.timer = 0
+                end
+            end
+        })
 
         Units:Add(partyContainer, frameName)
     end

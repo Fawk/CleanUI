@@ -84,8 +84,7 @@ function Units:SetKeyBindings(frame, db)
     end
 end
 
-function Units:Tag(frame, name, db)
-    
+function Units:Tag(frame, name, db)  
     local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
     
     tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "Shadow" and "NONE" or db["Outline"])
@@ -103,6 +102,29 @@ function Units:Tag(frame, name, db)
     frame["Tags"][name] = tag
 
    if not db["Enabled"] then tag:Hide() end
+end
+
+function Units:CreateStatusBorder(frame, name, db)
+    if not frame["StatusBorder"][name] then
+        local border = CreateFrame("Frame", nil, frame)
+        border:SetBackdrop(A.enum.backdrops.editboxborder)
+        border:SetBackdropColor(0, 0, 0, 0)
+        border:SetBackdropBorderColor(0, 0, 0, 0)
+        border.timer = 0
+        frame["StatusBorder"][name] = border
+    end
+
+    if not db["Enabled"] then
+        border:SetScript("OnUpdate", nil)
+        border:Hide()
+    else
+        border:SetBackdropBorderColor(unpack(db["Color"] or { 0, 0, 0, 0 }))
+        border:SetFrameStrata("HIGH")
+        border:SetFrameLevel(db["FrameLevel"])
+        border:SetAllPoints()
+        border:SetScript("OnUpdate", db["Condition"])
+        border:Hide()
+    end
 end
 
 A.Units = Units

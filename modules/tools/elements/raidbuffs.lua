@@ -26,6 +26,7 @@ local Update = function(self, event, unit)
 			if (obj.trackOnlyPlayer and casterIsPlayer) or not obj.trackOnlyPlayer then 
 				if(duration and duration > 0) then
 					obj.cd:SetCooldown(expirationTime - duration, duration)
+					obj.cd:SetHideCountdownNumbers(obj.hideNumbers)
 					for _,region in next, {obj.cd:GetRegions()} do
 						if region:GetObjectType() == "FontString" then
 							obj.cd.cooldownText = region

@@ -35,7 +35,8 @@ function RaidBuffs(frame, db)
 			count:SetFontObject(NumberFontNormal)
 			count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
 
-			buff.trackOnlyPlayer = obj["Own Only"]
+			buff.hideNumbers = obj["Hide countdown numbers"]
+			buff.trackOnlyPlayer = obj["Own only"]
 			buff.icon = icon
 			buff.count = count
 			buff.cd = cd
