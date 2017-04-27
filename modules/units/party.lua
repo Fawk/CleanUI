@@ -177,11 +177,30 @@ function Party:Update(frame, db)
 
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
-        ["FrameLevel"] = 5,
+        ["FrameLevel"] = 6,
         ["Condition"] = function(self, elapsed) 
             self.timer = self.timer + elapsed
             if self.timer > 0.05 then
+                local debuffs = { ["Magic"] = false, ["Disease"] = false, ["Poison"] = false, ["Curse"] = false }
+                for i = 1, 40 do
+                    local name, rank, texture, count, dtype, duration, expirationTime = UnitAura(unit, index, "HARMFUL")
+                    if name and dtype then
+                        if(duration and duration > 0) then
+                            debuffs[dtype] = true
+                        end
+                    end
+                end
 
+                local active = 0
+                for i = 4, 1, -1 do
+                    local name = db["Debuff Order"][i]
+                    if debuffs[name] then
+                        self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))
+                        active = 1
+                    end
+                end
+
+                self:SetAlpha(active)
                 self.timer = 0
             end
         end

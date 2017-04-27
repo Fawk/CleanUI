@@ -276,7 +276,8 @@ local defaults =  {
                                     ["Offset X"] = 0,
                                     ["Offset Y"] = 0,
                                     ["Relative To"] = "Parent"
-                                }
+                                },
+                                ["Size"] = 14
                             }
                         },
                         ["Enabled"] = true
@@ -291,6 +292,7 @@ local defaults =  {
                     ["Offset Y"] = 0,
                     ["Show Player"] = true,
                     ["Highlight Target"] = true,
+                    ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
                     ["Enabled"] = true
                 },
     			["Minimap"] = {
