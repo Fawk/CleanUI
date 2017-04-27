@@ -105,9 +105,14 @@ function Units:Tag(frame, name, db)
 end
 
 function Units:CreateStatusBorder(frame, name, db)
-    if not frame["StatusBorder"][name] then
-        local border = CreateFrame("Frame", nil, frame)
-        border:SetBackdrop(A.enum.backdrops.editboxborder)
+    if not frame["StatusBorder"] then
+        frame["StatusBorder"] = {}
+    end
+
+    local border = frame["StatusBorder"][name]
+    if not border then
+        border = CreateFrame("Frame", A:GetName().."_"..frame:GetName().."_"..name, frame)
+        border:SetBackdrop(A.enum.backdrops.optiongroupborder)
         border:SetBackdropColor(0, 0, 0, 0)
         border:SetBackdropBorderColor(0, 0, 0, 0)
         border.timer = 0
@@ -118,12 +123,14 @@ function Units:CreateStatusBorder(frame, name, db)
         border:SetScript("OnUpdate", nil)
         border:Hide()
     else
+        border.unit = frame.unit or frame:GetAttribute("unit")
         border:SetBackdropBorderColor(unpack(db["Color"] or { 0, 0, 0, 0 }))
         border:SetFrameStrata("HIGH")
         border:SetFrameLevel(db["FrameLevel"])
         border:SetAllPoints()
         border:SetScript("OnUpdate", db["Condition"])
-        border:Hide()
+        border:Show()
+        border:SetAlpha(0)
     end
 end
 

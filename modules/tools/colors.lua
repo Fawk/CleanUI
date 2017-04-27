@@ -42,5 +42,8 @@ A.colors = {
 	moving = {
 		backdrop = { .1, .1, .1, .5 },
 		border = { .3, .3, .6, .5 }
+	},
+	border = {
+		target = { 1, 1, 1, 0.3 }
 	}
 }

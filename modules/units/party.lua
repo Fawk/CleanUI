@@ -66,19 +66,23 @@ function Party:Init()
             self:SetSize(w, h)
         end
 
+        partyContainer.UpdateUnits = function(self)
+            local i = 1
+            for name, frame in next, partyFrames do
+                local uf = partyHeader:GetAttribute("child"..i)
+                if not uf then break end
+                uf:RegisterForClicks("AnyUp")
+                uf.unit = uf:GetAttribute("unit")
+                Party:Update(frame, db)
+                i = i + 1
+            end
+        end
+
         partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         partyContainer:SetScript("OnEvent", function(self, event) 
             if event == "GROUP_ROSTER_UPDATE" then
                 self:UpdateSize(db)
-                local i = 1
-                for name, frame in next, partyFrames do
-                    local uf = partyHeader:GetAttribute("child"..i)
-                    if not uf then break end
-                    uf:RegisterForClicks("AnyUp")
-                    uf.unit = uf:GetAttribute("unit")
-                    Party:Update(frame, db)
-                    i = i + 1
-                end
+                self:UpdateUnits()
             end
         end)
 
@@ -108,40 +112,7 @@ function Party:Init()
         --     end
         -- end)
 
-        Units:CreateStatusBorder(partyContainer, "Targeted", {
-            ["Enabled"] = db["Highlight Target"],
-            ["FrameLevel"] = 5,
-            ["Color"] = A.colors.target, 
-            ["Condition"] = function(self, elapsed) 
-                self.timer = self.timer + elapsed
-                if self.timer > 0.05 then
-                    local unit = self.unit or self:GetAttribute("unit")
-                    if unit and UnitExists("target") and GetUnitName(unit, true) == GetUnitName("target", true) then
-                        self:Show()
-                    else
-                        self:Hide()
-                    end
-                    self.timer = 0
-                end
-            end
-        })
-
-        Units:CreateStatusBorder(partyContainer, "Debuff", {
-            ["Enabled"] = db["Show Debuff Border"],
-            ["FrameLevel"] = 5,
-            ["Condition"] = function(self, elapsed) 
-                self.timer = self.timer + elapsed
-                if self.timer > 0.05 then
-                    local unit = self.unit or self:GetAttribute("unit")
-                    if unit and UnitExists("target") and GetUnitName(unit, true) == GetUnitName("target", true) then
-                        self:Show()
-                    else
-                        self:Hide()
-                    end
-                    self.timer = 0
-                end
-            end
-        })
+        partyContainer:UpdateUnits()
 
         Units:Add(partyContainer, frameName)
     end
@@ -187,30 +158,34 @@ function Party:Update(frame, db)
         Units:Tag(frame, name, custom)
     end
 
-    local targetedFrame = frame.targetedFrame
-    if not targetedFrame then
-        targetedFrame = CreateFrame("Frame", nil, frame)
-        targetedFrame:SetBackdrop(A.enum.backdrops.editboxborder)
-        targetedFrame:SetBackdropColor(0, 0, 0, 0)
-        targetedFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
-        frame.targetedFrame = targetedFrame
-    end
-
-    targetedFrame:ClearAllPoints()
-    targetedFrame:SetAllPoints()
-    targetedFrame:Hide()
-
-    if not frame.SetTargeted then
-        frame.SetTargeted = function(self, targeted)
-            if db["Highlight Target"] then
-                if targeted then 
-                    self.targetedFrame:Show()
+    Units:CreateStatusBorder(frame, "Targeted", {
+        ["Enabled"] = db["Highlight Target"],
+        ["FrameLevel"] = 5,
+        ["Color"] = A.colors.border.target, 
+        ["Condition"] = function(self, elapsed)
+            self.timer = self.timer + elapsed
+            if self.timer > 0.05 then
+                if UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
+                    self:SetAlpha(1)
                 else
-                    self.targetedFrame:Hide()
+                    self:SetAlpha(0)
                 end
+                self.timer = 0
             end
         end
-    end
+    })
+
+    Units:CreateStatusBorder(frame, "Debuff", {
+        ["Enabled"] = db["Show Debuff Border"],
+        ["FrameLevel"] = 5,
+        ["Condition"] = function(self, elapsed) 
+            self.timer = self.timer + elapsed
+            if self.timer > 0.05 then
+
+                self.timer = 0
+            end
+        end
+    })
 end
 
 A.modules["party"] = Party
