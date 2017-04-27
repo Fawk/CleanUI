@@ -4,6 +4,11 @@ local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local UnitIsDeadOrGhost = UnitIsDeadOrGhost
+local UnitIsDead = UnitIsDead
+local UnitIsConnected = UnitIsConnected
+local UnitClass = UnitClass
+local UnitInRange = UnitInRange
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
@@ -68,8 +73,7 @@ function Health(frame, db)
 								SetTagColor(frame, "Name", A.colors.text.default)
 							end
 							self.inRange = select(1, UnitInRange(unit))
-							self:SetAlpha(self.inRange and 1 or 0.5)
-							frame["Tags"]["Name"]:SetAlpha(self.inRange and 1 or 0.5)
+							self:GetParent():SetAlpha(self.inRange and 1 or 0.5)
 							self.timer = 0
 						end
 					end)

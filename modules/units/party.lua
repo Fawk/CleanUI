@@ -2,6 +2,8 @@ local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
+local InCombatLockdown = InCombatLockdown
+local CreateFrame = CreateFrame
 
 local Party = {}
 local frameName = "Party"
@@ -37,8 +39,8 @@ function Party:Init()
         "showSolo",           false,
         "showParty",          true,
         "point",              point,
-        "yOffset",            db["Offset X"],
-        "xOffset",            db["Offset Y"],
+        "yOffset",            db["Offset Y"],
+        "xOffset",            db["Offset X"],
         "maxColumns",         maxColumns,
         "unitsPerColumn",     unitsPerColumn,
         "columnAnchorPoint",  anchorPoint,
@@ -54,6 +56,7 @@ function Party:Init()
         partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
         
         partyContainer.UpdateSize = function(self, db) 
+            if InCombatLockdown() then return end
             local x, y = db["Offset X"], db["Offset Y"]
             local w, h = ((size["Width"] * GetNumGroupMembers()) + ((GetNumGroupMembers()-1) * x)), size["Height"]
             if db["Orientation"] == "VERTICAL" then
@@ -85,12 +88,14 @@ function Party:Init()
             if self.timer > 0.05 then
                 for i = 1, 5 do 
                     local uf = partyHeader:GetAttribute("child"..i)
-                    if (uf and uf.unit or uf and uf:GetAttribute("unit")) then
+                    if uf and uf.unit or uf:GetAttribute("unit") then
                         if UnitExists("target") then
                             local unit = uf.unit or uf:GetAttribute("unit")
                             local name = GetUnitName(unit, true)
                             if name == GetUnitName("target", true) then
                                 uf:SetTargeted(true)
+                            else
+                                uf:SetTargeted(false)
                             end
                         else
                             if uf.targetedFrame:IsShown() then
@@ -120,6 +125,8 @@ function Party:Setup(frame, db)
 end
  
 function Party:Update(frame, db)
+    if InCombatLockdown() then return end
+
     if not db["Enabled"] then
         return frame:Hide()
     else

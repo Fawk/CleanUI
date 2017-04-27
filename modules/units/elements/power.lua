@@ -15,7 +15,7 @@ local function Power(frame, db)
 		power.frequentUpdates = true
 		power.bg = power:CreateTexture(nil, "BACKGROUND")
 		power.PostUpdate = function(self, unit, min, max)
-			local r, g, b, t, a
+			local r, g, b, t
 			local mult = db["Background Multiplier"]
 			local colorType = db["Color By"]
 			if colorType == "Class" then
@@ -29,25 +29,9 @@ local function Power(frame, db)
 				r, g, b = unpack(t)
 			end
 
-			if unit ~= "player" then
-				self.timer = 0
-				self:SetScript("OnUpdate", function(self, elapsed)
-					self.timer = self.timer + elapsed
-					if self.timer > 0.10 then
-						self.inRange = select(1, UnitInRange(unit))
-						if r then
-							self:SetStatusBarColor(r, g, b, self.inRange and 1 or 0.5)
-							self.bg:SetVertexColor(r * mult, g * mult, b * mult, self.inRange and 1 or 0.5)
-						end
-						self.timer = 0
-					end
-				end)
-			end
-
 			if r then
-				a = unit == "player" and 1 or (self.inRange and 1 or 0.5)
-				self:SetStatusBarColor(r, g, b, a)
-				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
+				self:SetStatusBarColor(r, g, b)
+				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 			end
 		end
 		
