@@ -11,11 +11,33 @@ local cacheInit = false
 local find = string.find
 local lower = string.lower
 local length = string.length
+local table.insert = table.insert
+local table.sort = table.sort
+local select = select
 
 local function tsize(t)
 	local i = 0
 	for x in next, t do i = i + 1 end
 	return i
+end
+
+local function sortStates(t, k)
+    local keys, newtbl = {}, {}
+    for k in next, t do table.insert(keys, k) end
+    table.sort(keys, function(a,b) return t[a][k] < t[b][k] end)
+    for _,v in ipairs(keys) do table.insert(newtbl, { key = v, value = t[v][k] }) end
+    
+    local relative = nil
+    for _,v in next, newtbl do
+    	local row = v.value
+    	local isParent = false
+    	if not relative then
+    		relative = row:GetParent()
+    	end
+    	row:SetPoint("TOPLEFT", relative, isParent and "TOPLEFT" or "BOTTOMLEFT", 0, 0)
+    	row:SetPoint("TOPRIGHT", relative, isParent and "TOPRIGHT" or "BOTTOMRIGHT", 0, 0)
+    	relative = row
+    end
 end
 
 local function createCache()
@@ -85,14 +107,6 @@ local states = {
 	}
 }
 
-for _,v in next, states do 
-	setmetatable(v, {
-		__lt = function(a, b)
-			return a.prio < b.prio
-		end
-	})
-end
-
 local function verifyState(stateButtons, state, button)
 	if not stateButtons[state] and states[state] then
 		for name,_ in next, stateButtons do
@@ -108,13 +122,6 @@ local function verifyState(stateButtons, state, button)
 	end
 
 	return false
-end
-
-local function sortStates(stateButtons)
-	local previous, sorted, temp = nil, {}, {}
-	for name, stateButton in next, stateButtons do
-
-	end
 end
 
 local function createRow(parent, db)
@@ -150,7 +157,7 @@ local function createRow(parent, db)
 			end
 		end
 
-		sortStates(row.stateButtons)
+		sortStates(row.stateButtons, "prio")
 	end
 
 	local addButton = buildButton(row):onClick(function(self, button, down)
@@ -260,8 +267,8 @@ function Keybindings:Init(parent, unit, db)
 		cacheInit = true
 	end
 
-	for i = 1, parent:GetNumRegions() do
-		select(i, parent:GetRegions()):Hide()
+	for _,region in, next { parent:GetRegions() } do
+		region:Hide()
 	end
 
 	if db then
