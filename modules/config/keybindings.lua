@@ -12,6 +12,12 @@ local find = string.find
 local lower = string.lower
 local length = string.length
 
+local function tsize(t)
+	local i = 0
+	for x in next, t do i = i + 1 end
+	return i
+end
+
 local function createCache()
 	for i = 1, GetNumSpellTabs() do
 		local name,texture,offset,numSpells = GetSpellTabInfo(i)
@@ -66,26 +72,70 @@ local states = {
 		type = 3
 	},
 	nocombat = {
-		prio = 2,
+		prio = 3,
 		type = 3
 	},
 	dead = {
 		prio = 2,
 		type = 2
 	},
-	alive = {
+	nodead = {
 		prio = 2,
 		type = 2
 	}
 }
 
+for _,v in next, states do 
+	setmetatable(v, {
+		__lt = function(a, b)
+			return a.prio < b.prio
+		end
+	})
+end
+
+local function verifyState(stateButtons, state, button)
+	if not stateButtons[state] and states[state] then
+		for name,_ in next, stateButtons do
+			if states[name].type == states[state].type then
+				A:Debug("Two of the same state type is not allowed. E.g both dead and nodead.")
+			else
+				stateButtons[state] = button
+				return true
+			end
+		end
+	else
+		A:Debug("Two of the same exact state is not necessary.")
+	end
+
+	return false
+end
+
+local function sortStates(stateButtons)
+	local previous, sorted, temp = nil, {}, {}
+	for name, stateButton in next, stateButtons do
+
+	end
+end
+
 local function createRow(parent, db)
 
 	local row = CreateFrame("Frame", nil, parent)
+	row:SetHeight(20)
+	row.stateButtons = {}
+
+	if not parent["Keybindings"] then
+		parent["Keybindings"] = A:OrderedTable()
+		row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, 0)
+		row:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 0, 0)
+	else
+		row:SetPoint("TOPLEFT", parent["Keybindings"]:last(), "BOTTOMLEFT", 0, 0)
+		row:SetPoint("TOPRIGHT", parent["Keybindings"]:last(), "BOTTOMRIGHT", 0, 0)
+	end
+	parent["Keybindings"]:add(row)
 
 	if db then
 		for _,state in next, db.states do
-			local stateButton = buildButton(parent):onClick(function(self, button, down)
+			local stateButton = buildButton(row):onClick(function(self, button, down)
 
 			end):onHover(function(self, motion)
 				if self.hover and not self.oldText then
@@ -94,58 +144,104 @@ local function createRow(parent, db)
 
 				self:SetText(self.hover and L["Remove?"] or self.oldText)
 			end):build()
+
+			if not verifyState(row.stateButtons, state, stateButton) then
+				stateButton:Hide()
+			end
 		end
+
+		sortStates(row.stateButtons)
 	end
 
-	local addButton = buildButton(parent):onClick(function(self, button, down)
+	local addButton = buildButton(row):onClick(function(self, button, down)
 		if not down and button == "LeftButton" then
+			
 			-- Display dropdown with choices to add, modifiers,
-			local dropdownBuilder = buildDropdown(parent):below(self):onItemClick(function(self, itemButton)
+			if self.dropdown then
+				self.dropdown:Hide()
+			end
 
+			local dropdownBuilder = buildDropdown(row):below(self):onItemClick(function(self, itemButton)
+				if row.editbox.valid then
+					Keybindings:Save(parent["Keybindings"], db)
+				end
 			end)
 
 			-- iterate choices and addItem to dropdown
+			for state,_ in next, states do 
+				dropdownBuilder:addItem(state)
+			end
 
-			local dropdown = dropdownBuilder:build()
+			for modifier,_ in next, modifiers do
+				dropdownBuilder:addItem(modifier)
+			end
+
+			self.dropdown = dropdownBuilder:build()
 		end
 	end):build()
 
-	local editbox = buildEditbox(parent):onTextChanged(function(self, userInput) 
+	local editbox = buildEditbox(row):onTextChanged(function(self, userInput) 
 		if userInput then
 			local searchResult = search(self:GetText())
 			if #searchResult > 1 then
+				-- Clear existing dropdown
 				-- Display dropdown with searchResult where each result in list is clickable, thus choosing the result
 				-- set self.valid to true when clicking one of the choices
+
+				if self.dropdown then
+					self.dropdown:Hide()
+				end
+
+				local dropdownBuilder = buildDropdown(row):below(self):onItemClick(function(self, itemButton)
+					editbox.valid = true
+					editbox:SetText(itemButton.name)
+					self:Hide()
+				end)
+
+				for name, searchObject in next, searchResult do
+					local type, obj = searchObject.type, searchObject.obj
+					local texture, id = obj.texture, obj.id
+
+					dropdownBuilder:addItem(name)
+				end
+
+				self.dropdown = dropdownBuilder:build()
 			end
 		end
 	end):onEnterPressed(function(self)
 		if self.valid then
 			self:SetEnabled(false)
 			--icon:SetTexture(nil)
+			if tsize(row.stateButtons) > 0 then
+				Keybindings:Save(parent["Keybindings"], db)
+			end
 		end
 	end):build()
 
 	if db then
 		editbox:SetEnabled(false)
 
-		local icon = parent:CreateTexture(nil, "OVERLAY")
+		local icon = row:CreateTexture(nil, "OVERLAY")
 		icon:SetTexture(db.icon)
 
-		local editButton = buildButton(parent):rightOf(editbox):onClick(function(self, button, down)
+		local editButton = buildButton(row):rightOf(editbox):onClick(function(self, button, down)
 			editbox:SetEnabled(true)
 			icon:SetTexture(nil)
 		end):build()
 	end
+
+	row.editbox = editbox
+	row.addButton = addButton
 end
 
-local Mouseover = {}
+local Keybindings = {}
 
 --local function setup(button, )
 
 -- macro
--- /cast [@mouseover,harm] Shadow Word: Pain
--- /cast [@mouseover,help] Plea
--- /cast [@mouseover,help,dead,nocombat] Ressurection
+-- /cast [@unit,harm] Shadow Word: Pain
+-- /cast [@unit,help] Plea
+-- /cast [@unit,help,dead,nocombat] Ressurection
 -- /
 
 -- Left Mouse Button:
@@ -158,7 +254,7 @@ local Mouseover = {}
 -- [Help] [Ctrl] Dispel
 -- [Help] [Ctrl] [Shift] Pain Suppression
 
-function Mouseover:Init(parent, unit, db)
+function Keybindings:Init(parent, unit, db)
 	if not cacheInit then
 		createCache()
 		cacheInit = true
@@ -175,4 +271,8 @@ function Mouseover:Init(parent, unit, db)
 	end
 
 	createRow(parent, nil)
+end
+
+function Keybindings:Save(bindings, db)
+
 end
