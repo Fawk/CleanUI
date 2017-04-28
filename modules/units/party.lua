@@ -165,7 +165,7 @@ function Party:Update(frame, db)
         ["Condition"] = function(self, elapsed)
             self.timer = self.timer + elapsed
             if self.timer > 0.05 then
-                if UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
+                if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
                     self:SetAlpha(1)
                 else
                     self:SetAlpha(0)
@@ -181,18 +181,24 @@ function Party:Update(frame, db)
         ["Condition"] = function(self, elapsed) 
             self.timer = self.timer + elapsed
             if self.timer > 0.05 then
-                local debuffs = { ["Magic"] = false, ["Disease"] = false, ["Poison"] = false, ["Curse"] = false }
-                for i = 1, 40 do
-                    local name, rank, texture, count, dtype, duration, expirationTime = UnitAura(unit, index, "HARMFUL")
-                    if name and dtype then
-                        if(duration and duration > 0) then
-                            debuffs[dtype] = true
+                local debuffs, count = {}, 0
+                for k,v in next, db["Debuff Order"] do
+                    debuffs[v] = false
+                    count = count + 1
+                end
+                for index = 1, 40 do
+                    if self and self.unit then
+                        name,_,_,_,dtype,duration = UnitAura(self.unit, index, "HARMFUL")
+                        if name then
+                            if(duration and duration > 0) then
+                                debuffs[dtype or "Physical"] = true
+                            end
                         end
                     end
                 end
 
                 local active = 0
-                for i = 4, 1, -1 do
+                for i = count, 1, -1 do
                     local name = db["Debuff Order"][i]
                     if debuffs[name] then
                         self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))

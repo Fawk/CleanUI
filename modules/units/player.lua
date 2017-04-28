@@ -33,8 +33,21 @@ function Player:Update(frame, db)
 
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
-    Units:SetKeyBindings(frame, bindings)
     Units:UpdateElements(frame, db)
+
+    --[[ Bindings ]]--
+    local formattedBindings = {}
+
+
+    frame:SetAttribute("*type1", "macro")
+    frame:SetAttribute("*macrotext1", string.format("/cast [@%s,help,nodead] Plea", frame.unit))
+    frame:SetAttribute("shift-macrotext1", string.format("/cast [@%s,help,nodead] Shadow Mend", frame.unit))
+    frame:SetAttribute("ctrl-macrotext1", string.format("/cast [@%s,help,nodead] Pain Suppression", frame.unit))
+    frame:SetAttribute("alt-ctrl-macrotext1", string.format("/cast [@%s,help,nodead] Power Word: Shield", frame.unit))
+    frame:SetAttribute("alt-ctrl-shift-macrotext1", string.format("/cast [@%s,help,nodead] Power Word: Radiance", frame.unit))
+    frame:SetAttribute("ctrl-shift-type1", "target")
+
+    Units:SetKeyBindings(frame, formattedBindings)
 
     --[[ Tags ]]--
     if not frame["Tags"] then

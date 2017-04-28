@@ -112,7 +112,7 @@ function Units:CreateStatusBorder(frame, name, db)
     local border = frame["StatusBorder"][name]
     if not border then
         border = CreateFrame("Frame", A:GetName().."_"..frame:GetName().."_"..name, frame)
-        border:SetBackdrop(A.enum.backdrops.optiongroupborder)
+        border:SetBackdrop(A.enum.backdrops.editboxborder2)
         border:SetBackdropColor(0, 0, 0, 0)
         border:SetBackdropBorderColor(0, 0, 0, 0)
         border.timer = 0
@@ -125,7 +125,7 @@ function Units:CreateStatusBorder(frame, name, db)
     else
         border.unit = frame.unit or frame:GetAttribute("unit")
         border:SetBackdropBorderColor(unpack(db["Color"] or { 0, 0, 0, 0 }))
-        border:SetFrameStrata("HIGH")
+        border:SetFrameStrata(db["Framestrata"] or "LOW")
         border:SetFrameLevel(db["FrameLevel"])
         border:SetAllPoints()
         border:SetScript("OnUpdate", db["Condition"])

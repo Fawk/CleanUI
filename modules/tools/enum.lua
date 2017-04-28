@@ -35,10 +35,43 @@ local enum = {
         C = "CENTER"
     },
     backdrops = {
-        editbox = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1 },
-        editboxborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
-        optiongroupborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "test-border"), edgeSize = 2, insets = { top = -5, bottom = -5, left = -5, right = -5 } },
-        buttonroundborder = { bgFile = media:Fetch("background", "cui-default-bg"), tile = true, tileSize = 1, edgeFile = media:Fetch("border", "cui-round-border2"), edgeSize = 3, insets = { top = 1, bottom = 1, left = 1, right = 1 } },
+        editbox = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1
+        },
+        editboxborder = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1, 
+            edgeFile = media:Fetch("border", "test-border"), 
+            edgeSize = 2, 
+            insets = { top = 1, bottom = 1, left = 1, right = 1 } 
+        },
+        editboxborder2 = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1, 
+            edgeFile = media:Fetch("border", "test-border"), 
+            edgeSize = 4, 
+            insets = { top = 5, bottom = 5, left = 5, right = 5 } 
+        },
+        optiongroupborder = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1, 
+            edgeFile = media:Fetch("border", "test-border"), 
+            edgeSize = 2, 
+            insets = { top = -5, bottom = -5, left = -5, right = -5 } 
+        },
+        buttonroundborder = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1, 
+            edgeFile = media:Fetch("border", "cui-round-border2"), 
+            edgeSize = 3, 
+            insets = { top = 1, bottom = 1, left = 1, right = 1 } 
+        },
         slider = {},
         dropdown = {}
     },

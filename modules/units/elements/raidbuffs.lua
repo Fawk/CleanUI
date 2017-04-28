@@ -22,7 +22,8 @@ function RaidBuffs(frame, db)
 
 			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
 			buff:SetPoint(position["Local Point"], frame, position["Point"], position["Offset X"], position["Offset Y"])
-			buff:SetSize(db["Size"], db["Size"])
+			buff:SetSize(obj["Size"], obj["Size"])
+			buff:SetFrameStrata("HIGH")
 
 			local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
 			cd:SetAllPoints(buff)
