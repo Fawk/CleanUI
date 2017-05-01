@@ -125,6 +125,9 @@ function Addon:OnInitialize()
 	self.frameParent:SetSize(UIParent:GetSize())
 	self.frameParent:SetFrameLevel(UIParent:GetFrameLevel())
 	self.frameParent:SetAllPoints(UIParent)
+    
+    self.hiddenFrame = CreateFrame("Frame")
+    self.hiddenFrame:Hide()
 
 	local profile = Addon["Modules"]["Profile"]
 

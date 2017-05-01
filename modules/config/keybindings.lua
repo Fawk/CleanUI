@@ -7,13 +7,27 @@ local buildEditbox = A.EditBoxBuilder
 local buildDropdown = A.DropdownBuilder
 local spells, items = {}, {}
 local cacheInit = false
+local actions = { ["cast"] = false, ["use"] = false }
 
 local find = string.find
 local lower = string.lower
 local length = string.length
-local table.insert = table.insert
-local table.sort = table.sort
+local tinsert = table.insert
+local tsort = table.sort
 local select = select
+
+local GetSpellInfo = GetSpellInfo
+
+function string:split(sep)
+   local sep, fields = sep or ":", {}
+   local pattern = string.format("([^%s]+)", sep)
+   self:gsub(pattern, function(c) fields[#fields+1] = c end)
+   return fields
+end
+
+function string:ltrim()
+   return self:gsub("^%s*", "") 
+end
 
 local function tsize(t)
 	local i = 0
@@ -24,8 +38,8 @@ end
 local function sortStates(t, k)
     local keys, newtbl = {}, {}
     for k in next, t do table.insert(keys, k) end
-    table.sort(keys, function(a,b) return t[a][k] < t[b][k] end)
-    for _,v in ipairs(keys) do table.insert(newtbl, { key = v, value = t[v][k] }) end
+    tsort(keys, function(a,b) return t[a][k] < t[b][k] end)
+    for _,v in ipairs(keys) do tinsert(newtbl, { key = v, value = t[v][k] }) end
     
     local relative = nil
     for _,v in next, newtbl do
@@ -50,7 +64,7 @@ local function createCache()
 	end
 	for i = 1, NUM_BAG_SLOTS do
 		for slotId = 1, GetContainerNumSlots(i) do
-			local itemId = select(10, GetContainerItemInfo))
+			local itemId = select(10, GetContainerItemInfo)
 			local name,_,_,_,_,_,_,_,_,texture,_ = GetItemInfo(itemId)
 			items[name] = { icon = texture, id = itemId }
 		end
@@ -75,9 +89,9 @@ local function search(text)
 end
 
 local modifiers = {
-	alt = "Alt"
+	alt = "Alt",
 	ctrl = "Ctrl",
-	shift = "Shift",
+	shift = "Shift"
 }
 
 local states = {
@@ -108,15 +122,20 @@ local states = {
 }
 
 local function verifyState(stateButtons, state, button)
-	if not stateButtons[state] and states[state] then
-		for name,_ in next, stateButtons do
-			if states[name].type == states[state].type then
-				A:Debug("Two of the same state type is not allowed. E.g both dead and nodead.")
-			else
-				stateButtons[state] = button
-				return true
-			end
-		end
+	if not stateButtons[state] then
+        if states[state] then
+            for name,_ in next, stateButtons do
+                if states[name].type == states[state].type then
+                    A:Debug("Two of the same state type is not allowed. E.g both dead and nodead.")
+                else
+                    stateButtons[state] = button
+                    return true
+                end
+            end
+        elseif modifiers[state] then
+            stateButtons[state] = button
+            return true
+        end
 	else
 		A:Debug("Two of the same exact state is not necessary.")
 	end
@@ -124,7 +143,31 @@ local function verifyState(stateButtons, state, button)
 	return false
 end
 
-local function createRow(parent, db)
+local function resolveAction(db)
+   return db:gmatch("/%w+")():sub(1)
+end
+
+local function resolveVariations(db)
+    local variations = {}
+    for _,variation in next, db:split(";") do tinsert(variations, variation) end
+    return variations
+end
+
+local function resolveStates(db)
+    local s = {}
+    for match in g:gmatch("%a+") do if states[match] then table.insert(s, match) end end
+    return s
+end
+
+local function resolveName(db)
+    for match in db:gmatch("%a+") do if spells[match] or items[match] then return match end end
+end
+
+local function resolveIcon(name)
+    return items[name] and items[name].icon or (spells[name] and spells[name].icon or nil)
+end
+
+local function createRow(parent, binding, db)
 
 	local row = CreateFrame("Frame", nil, parent)
 	row:SetHeight(20)
@@ -141,7 +184,7 @@ local function createRow(parent, db)
 	parent["Keybindings"]:add(row)
 
 	if db then
-		for _,state in next, db.states do
+		for _,state in next, binding.states do
 			local stateButton = buildButton(row):onClick(function(self, button, down)
 
 			end):onHover(function(self, motion)
@@ -225,17 +268,16 @@ local function createRow(parent, db)
 		end
 	end):build()
 
-	if db then
-		editbox:SetEnabled(false)
+    editbox:SetText(binding.name)
+    editbox:SetEnabled(false)
 
-		local icon = row:CreateTexture(nil, "OVERLAY")
-		icon:SetTexture(db.icon)
+    local icon = row:CreateTexture(nil, "OVERLAY")
+    icon:SetTexture(binding.icon)
 
-		local editButton = buildButton(row):rightOf(editbox):onClick(function(self, button, down)
-			editbox:SetEnabled(true)
-			icon:SetTexture(nil)
-		end):build()
-	end
+    local editButton = buildButton(row):rightOf(editbox):onClick(function(self, button, down)
+        editbox:SetEnabled(true)
+        icon:SetTexture(nil)
+    end):build()
 
 	row.editbox = editbox
 	row.addButton = addButton
@@ -267,15 +309,27 @@ function Keybindings:Init(parent, unit, db)
 		cacheInit = true
 	end
 
-	for _,region in, next { parent:GetRegions() } do
+	for _,region in next, { parent:GetRegions() } do
 		region:Hide()
 	end
 
-	if db then
-		for _,binding in next, db do
-			createRow(parent, binding)
-		end
-	end
+    local bindings = {}
+    for _,binding in next, db do
+        local action = resolveAction(db)
+        for _,variation in next, resolveVariations(db) do
+            local name = resolveName(variation)
+            tinsert(bindings, {
+                action = action,
+                states = resolveStates(variation),
+                name = name,
+                icon = resolveIcon(name)
+            })
+        end
+    end
+
+    for _,binding in next, bindings do
+        createRow(parent, binding)
+    end
 
 	createRow(parent, nil)
 end

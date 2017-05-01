@@ -6,9 +6,9 @@ local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
 
-local Party = {}
-local frameName = "Party"
-local partyHeader, partyFrames = nil, {}
+local Raid = {}
+local frameName = "Raid"
+local raidHeader, raidFrames = nil, {}
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
@@ -49,8 +49,8 @@ local function Visibility(uf)
         end
     end
 end
- 
-function Party:Init()
+
+function Raid:Init()
 
 	local db = A["Profile"]["Options"][frameName]
     local maxColumns, unitsPerColumn = 5, 1
@@ -64,67 +64,65 @@ function Party:Init()
         maxColumns = 1
         unitsPerColumn = 5
         point = "LEFT"
-        anchorPoint = "RIGHT"
+        anchorPoint = "BOTTOM"
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        partyFrames[frame:GetName()] = Party:Setup(frame, db)
+        Raid:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
 
-    partyHeader = oUF:SpawnHeader(
+    raidHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
-        "party",
+        "raid",
         "showPlayer",         db["Show Player"],
         "showSolo",           false,
-        "showParty",          true,
-        "point",              point,
+        "showParty",          false,
+        "showRaid",           true,
         "yOffset",            db["Offset Y"],
         "xOffset",            db["Offset X"],
-        "maxColumns",         maxColumns,
-        "unitsPerColumn",     unitsPerColumn,
-        "columnAnchorPoint",  anchorPoint,
+        'point', 'LEFT',
+        'maxColumns', 8,
+        'unitsPerColumn', 5,
+        'columnAnchorPoint', 'TOP',
+        "columnSpacing", db["Offset Y"],
         "groupBy", "ASSIGNEDROLE",
         "groupingOrder", "TANK,HEALER,DAMAGER",
+        "sortMethod", "NAME",
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
         ]]):format(size["Width"], size["Height"])
     )
 
-    local partyContainer = Units:Get(frameName)
-    if not partyContainer then
+    local raidContainer = Units:Get(frameName)
+    if not raidContainer then
         
-        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
+        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
         
-        partyContainer.UpdateSize = function(self, db) 
+        raidContainer.UpdateSize = function(self, db) 
             if InCombatLockdown() then return end
             local numGroupMembers = GetNumGroupMembers()
             local x, y = db["Offset X"], db["Offset Y"]
-            local w, h = size["Width"] * (numGroupMembers > 5 and 5 or numGroupMembers), size["Height"]
-            if db["Orientation"] == "VERTICAL" then
-                w = size["Width"]
-                h = size["Height"] * (numGroupMembers > 5 and 5 or numGroupMembers)
-            end
+            local w = size["Width"] * (numGroupMembers > 5 and 5 or numGroupMembers) + (x * (numGroupMembers - 1))
+            local h = size["Height"] * (numGroupMembers / 5) + (y * (numGroupMembers - 1))
             self:SetSize(w, h)
         end
 
-        partyContainer.UpdateUnits = function(self)
-            local i = 1
-            for name, frame in next, partyFrames do
-                local uf = partyHeader:GetAttribute("child"..i)
+        raidContainer.UpdateUnits = function(self)
+            for i = 1, 40 do
+                local uf = raidHeader:GetAttribute("child"..i)
                 if not uf then break end
                 uf:RegisterForClicks("AnyUp")
                 uf.unit = uf:GetAttribute("unit")
-                Party:Update(frame, db)
-                i = i + 1
+                Raid:Update(uf, db)
             end
         end
 
-        partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
-        partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
-        partyContainer:SetScript("OnEvent", function(self, event) 
+        raidContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
+        raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
+        raidContainer:SetScript("OnEvent", function(self, event) 
             if event == "GROUP_ROSTER_UPDATE" then
                 Units:DisableBlizzardRaid()
                 self:UpdateSize(db)
@@ -132,14 +130,14 @@ function Party:Init()
             end
         end)
     
-        partyContainer:UpdateUnits()
+        raidContainer:UpdateUnits()
     
-        partyContainer.timer = 0
-        partyContainer:SetScript("OnUpdate", function(self, elapsed)
+        raidContainer.timer = 0
+        raidContainer:SetScript("OnUpdate", function(self, elapsed)
             self.timer = self.timer + elapsed
             if self.timer > 0.10 then
-                for i = 1, 5 do
-                    local uf = partyHeader:GetAttribute("child"..i)
+                for i = 1, 40 do
+                    local uf = raidHeader:GetAttribute("child"..i)
                     if uf and uf.unit then
                         Visibility(uf)
                     end
@@ -148,25 +146,23 @@ function Party:Init()
             end
         end)
 
-        Units:Add(partyContainer, frameName)
+        Units:Add(raidContainer, frameName)
     end
 
-    Units:Position(partyContainer, db["Position"])
-    partyContainer:UpdateSize(db)
-    A:CreateMover(partyContainer, db)
+    Units:Position(raidContainer, db["Position"])
+    raidContainer:UpdateSize(db)
+    A:CreateMover(raidContainer, db)
 
-    partyHeader:SetParent(partyContainer)
-    partyHeader:SetAllPoints()
-    
-    Units:DisableBlizzardRaid()
+    raidHeader:SetParent(raidContainer)
+    raidHeader:SetAllPoints()
 end
  
-function Party:Setup(frame, db)
+function Raid:Setup(frame, db)
     self:Update(frame, db)
     return frame
 end
  
-function Party:Update(frame, db)
+function Raid:Update(frame, db)
     if InCombatLockdown() then return end
 
     if not db["Enabled"] then
@@ -217,7 +213,8 @@ function Party:Update(frame, db)
         [57724] = true,     -- Sated
         [160455] = true,    -- Fatigued
         [97821] = true,     -- Void-Touched
-        [123981] = true     -- Perdition
+        [123981] = true,    -- Perdition
+        [113942] = true     -- Demonic Gateway
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
@@ -257,4 +254,4 @@ function Party:Update(frame, db)
     })
 end
 
-A.modules["party"] = Party
+A.modules["raid"] = Raid

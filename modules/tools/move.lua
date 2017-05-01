@@ -26,7 +26,7 @@ function A:InitMove()
 		finishFrame:SetSize(200, 150)
 		finishFrame:SetPoint("TOP", A.frameParent, "TOP", 0, -200)
 		finishFrame:SetBackdrop(A.enum.backdrops.editboxborder)
-		finishFrame:SetBackdropColor(unpack(A.color.moving.backdrop))
+		finishFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 		finishFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 		
 		finishFrame.timer = 0
@@ -74,13 +74,25 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetSize(size["Width"], size["Height"])
 	moveFrame:SetPoint(position["Local Point"], select(2, frame:GetPoint()), position["Point"], position["Offset X"], position["Offset Y"])
 	moveFrame:EnableMouse(true)
-	moveFrame.moveAble = false
+	moveFrame.moveAble = true
 	moveFrame:SetMovable(moveFrame.moveAble)
 	moveFrame:RegisterForDrag("LeftButton")
-	moveFrame:SetScript("OnDragStart", moveFrame.StartMoving)
-	moveFrame:SetScript("OnDragStop", moveFrame.StopMovingOrSizing)
+
+    moveFrame:SetScript("OnMouseDown", function(self, button)
+        if self.moveAble then
+            self:StartMoving()
+        end
+    end)
+
+    moveFrame:SetScript("OnMouseUp", function(self, button)
+        if self.moveAble then
+            self:StopMovingOrSizing()
+        end   
+    end)  
+
 	moveFrame.Apply = function(self)
 		local point, relative, localPoint, x, y = self:GetPoint()
+        self.affecting:ClearAllPoints()
 		self.affecting:SetPoint(point, A.frameParent, localPoint, x, y)
 		db["Position"] = {
 	        ["Point"] = point,
@@ -117,5 +129,16 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame.text = text
 
 	moveableFrames[name] = moveFrame
+end
+
+SLASH_CLEANUI1 = '/cui'
+function SlashCmdList.CLEANUI(msg, editbox)
+    if msg == "move" then
+       A:InitMove() 
+    end
+    
+    if msg == "finish" then
+       FinalizeMove() 
+    end
 end
 

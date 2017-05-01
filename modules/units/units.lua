@@ -7,7 +7,7 @@ for key, obj in next, {
         method = [[function(u, r)
             if not u and not r then return end
             if UnitExists(r or u) then
-                return string.sub(UnitName(r or u), 1, 3)
+                return string.utf8sub(UnitName(r or u), 1, 3)
             end
         end]],
         events = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
@@ -76,10 +76,9 @@ function Units:Position(frame, db)
 end
  
 function Units:SetKeyBindings(frame, db)
-    frame:RegisterForClicks("AnyUp")
-    if db then
+    if db and frame.unit then
         for _,binding in next, db do
-            frame:SetAttribute(binding.type, binding.action)
+            frame:SetAttribute(binding.type, binding.action:gsub("@unit", "@"..frame.unit))
         end
     end
 end
@@ -111,7 +110,7 @@ function Units:CreateStatusBorder(frame, name, db)
 
     local border = frame["StatusBorder"][name]
     if not border then
-        border = CreateFrame("Frame", A:GetName().."_"..frame:GetName().."_"..name, frame)
+        border = CreateFrame("Frame", frame:GetName().."_"..name, frame)
         border:SetBackdrop(A.enum.backdrops.editboxborder2)
         border:SetBackdropColor(0, 0, 0, 0)
         border:SetBackdropBorderColor(0, 0, 0, 0)
@@ -129,9 +128,40 @@ function Units:CreateStatusBorder(frame, name, db)
         border:SetFrameLevel(db["FrameLevel"])
         border:SetAllPoints()
         border:SetScript("OnUpdate", db["Condition"])
-        border:Show()
         border:SetAlpha(0)
+        border:Show()
     end
+end
+
+local function HideFrame(frame)
+	if InCombatLockdown() then return end
+	
+    if frame.UnregisterAllEvents then
+		frame:UnregisterAllEvents()
+		frame:SetParent(A.hiddenFrame)
+	else
+		frame.Show = frame.Hide
+	end
+
+	frame:Hide()
+    
+	local compact = _G[frame:GetName().."_GetSetting"]("IsShown")
+	if compact and compact ~= "0" then
+		_G[frame:GetName().."_GetSetting"]("IsShown", "0")
+	end
+end
+
+function Units:DisableBlizzardRaid()
+	if CompactRaidFrameManager_UpdateShown then
+		if not CompactRaidFrameManager.hookedHide then
+			hooksecurefunc("CompactRaidFrameManager_UpdateShown", function(self) HideFrame(self) end)
+			CompactRaidFrameManager:HookScript('OnShow', function(self) HideFrame(self) end)
+			CompactRaidFrameManager.hookedHide = true
+		end
+		CompactRaidFrameContainer:UnregisterAllEvents()
+
+		HideFrame(CompactRaidFrameManager)
+	end
 end
 
 A.Units = Units

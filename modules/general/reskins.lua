@@ -273,7 +273,6 @@ local function setStyle()
 		end
 		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
-		--Minimap:ClearAllPoints()
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
 		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
 		Minimap:SetPoint(minimapConfig.Position["Local Point"], minimapConfig.Position["Relative To"], minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
@@ -338,9 +337,7 @@ local function setStyle()
 			end
 		end)
 
-		hooksecurefunc(GameTooltip, "Show", function(self)
-			
-		end)
+		GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 2, -2)
 
 		MiniMapWorldMapButton:Hide()
 		GarrisonLandingPageMinimapButton:SetAlpha(0)
@@ -438,6 +435,130 @@ local function setStyle()
 
 		killTimeFrames()
 	end
+    
+    -- Quest Log
+    do
+        if not IsAddOnLoaded("Blizzard_ObjectiveTracker") then 
+            LoadAddOn("Blizzard_ObjectiveTracker")
+        end
+        
+        ObjectiveTrackerFrame:SetAlpha(0)
+        ObjectiveTrackerFrame.timer = 0
+        ObjectiveTrackerFrame.FadeIn = function(self)
+            local f = CreateFrame("Frame")
+            f:SetScript("OnUpdate", function(ff, elapsed)
+                self.timer = self.timer + elapsed
+                if self.timer > 0.1 then
+                    if self:GetAlpha() >= 1 then
+                        ff:SetScript("OnUpdate", nil)
+                    else
+                        self:SetAlpha(self:GetAlpha() + self.timer) 
+                    end
+                    self.timer = 0
+                end
+            end)
+        end
+        
+        local lp, r, p, x, y = ObjectiveTrackerFrame:GetPoint()
+        
+        local moveFrame = CreateFrame("Frame", "MoveFrame_ObjectiveTracker", A.frameParent)
+        moveFrame:SetPoint(ObjectiveTrackerFrame:GetPoint())
+        moveFrame:SetSize(ObjectiveTrackerFrame:GetSize())
+        
+        ObjectiveTrackerFrame:ClearAllPoints()
+        ObjectiveTrackerFrame:SetParent(moveFrame)
+        ObjectiveTrackerFrame:SetAllPoints()
+        
+        A:CreateMover(moveFrame, { 
+            ["Position"] = { 
+                ["Local Point"] = lp,
+                ["Relative To"] = r,
+                ["Point"] = p,
+                ["Offset X"] = x,
+                ["Offset Y"] = y
+            },
+            ["Size"] = {
+                ["Width"] = moveFrame:GetWidth(),
+                ["Height"] = moveFrame:GetHeight()
+            }
+        }, "Objective Tracker")
+
+        local ff = CreateFrame("Frame")
+        ff.timer = 0
+        ff:SetScript("OnUpdate", function(self, elapsed)
+            self.timer = self.timer + elapsed
+            if self.timer > 0.05 then
+                if ObjectiveTrackerBlocksFrameHeader ~= nil then
+                    kill(ObjectiveTrackerBlocksFrame.QuestHeader)
+                    setFont(ObjectiveTrackerBlocksFrame.QuestHeader, 16)
+                    kill(ObjectiveTrackerBlocksFrame.AchievementHeader)
+                    setFont(ObjectiveTrackerBlocksFrame.AchievementHeader, 16)
+                    kill(ObjectiveTrackerBlocksFrame.ScenarioHeader)
+                    setFont(ObjectiveTrackerBlocksFrame.ScenarioHeader, 16)
+
+                    kill(BONUS_OBJECTIVE_TRACKER_MODULE.Header)
+                    setFont(BONUS_OBJECTIVE_TRACKER_MODULE.Header, 13)
+                    kill(WORLD_QUEST_TRACKER_MODULE.Header)
+                    setFont(WORLD_QUEST_TRACKER_MODULE.Header, 13)
+                    
+                    setFont(ObjectiveTrackerFrame.HeaderMenu, 13)
+                    
+                    for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
+                        if v.currentLine then
+                            setFont(v.currentLine, 12)
+                        elseif v.HeaderText then
+                            setFont(v.HeaderText, 12)
+                        end
+                        setFont(v, 13)
+                    end
+                    
+                    self:SetScript("OnUpdate", nil)
+                    ObjectiveTrackerFrame:FadeIn()
+                end
+                self.timer = 0
+            end
+        end)
+        
+        hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
+            local item = block.itemButton
+            if item and not item.skinned then
+                item:SetSize(25, 25)
+                --item:SetTemplate("Transparent")
+                --item:StyleButton()
+                item:SetNormalTexture(nil)
+                --item.icon:SetTexCoord(unpack(E.TexCoords))
+                item.icon:SetPoint("TOPLEFT", item, 2, -2)
+                item.icon:SetPoint("BOTTOMRIGHT", item, -2, 2)
+                item.Cooldown:SetAllPoints(item.icon)
+                item.Count:ClearAllPoints()
+                item.Count:SetPoint("TOPLEFT", 1, -1)
+                item.Count:SetFont(media:Fetch("font", "Noto", 12, "OUTLINE"))
+                item.Count:SetShadowOffset(5, -5)
+                --E:RegisterCooldown(item.Cooldown)
+                item.skinned = true
+            end
+        end)
+        
+        hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", function(_, block)
+            local item = block.itemButton
+            if item and not item.skinned then
+                item:SetSize(25, 25)
+                --item:SetTemplate("Transparent")
+                --item:StyleButton()
+                item:SetNormalTexture(nil)
+                --item.icon:SetTexCoord(unpack(E.TexCoords))
+                item.icon:SetPoint("TOPLEFT", item, 2, -2)
+                item.icon:SetPoint("BOTTOMRIGHT", item, -2, 2)
+                item.Cooldown:SetAllPoints(item.icon)
+                item.Count:ClearAllPoints()
+                item.Count:SetPoint("TOPLEFT", 1, -1)
+                item.Count:SetFont(media:Fetch("font", "Noto", 12, "OUTLINE"))
+                item.Count:SetShadowOffset(5, -5)
+                --E:RegisterCooldown(item.Cooldown)
+                item.skinned = true
+            end
+        end)
+    end
 
 	--Blizzard windows
 	do

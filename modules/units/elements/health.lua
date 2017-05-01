@@ -10,12 +10,6 @@ local UnitIsConnected = UnitIsConnected
 local UnitClass = UnitClass
 local UnitInRange = UnitInRange
 
-local function SetTagColor(frame, tag, color)
-	if frame["Tags"][tag] then
-		frame["Tags"][tag]:SetTextColor(unpack(color))
-	end
-end
-
 function Health(frame, db)
 
 	local health = frame.Health or (function()
@@ -51,33 +45,6 @@ function Health(frame, db)
 			
 			if t then
 				r, g, b = unpack(t)
-			end
-
-			if unit ~= "player" then
-				self.timer = 0
-				if not self:GetScript("OnUpdate") then
-					self:SetScript("OnUpdate", function(self, elapsed)
-						self.timer = self.timer + elapsed
-						if self.timer > 0.10 then
-							if UnitIsDeadOrGhost(unit) then
-								r, g, b = unpack(A.colors.health.dead)
-								if UnitIsDead(unit) then
-									SetTagColor(frame, "Name", A.colors.text.dead)
-								else
-									SetTagColor(frame, "Name", A.colors.text.ghost)
-								end
-							elseif not UnitIsConnected(unit) then
-								r, g, b = unpack(A.colors.health.disconnected)
-								SetTagColor(frame, "Name", A.colors.text.disconnected)
-							else
-								SetTagColor(frame, "Name", A.colors.text.default)
-							end
-							self.inRange = select(1, UnitInRange(unit))
-							self:GetParent():SetAlpha(self.inRange and 1 or 0.5)
-							self.timer = 0
-						end
-					end)
-				end
 			end
 
 			if r then

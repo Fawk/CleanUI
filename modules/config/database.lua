@@ -196,7 +196,7 @@ local defaults =  {
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = 200,
                         ["Offset Y"] = -200,
-                        ["Relative To"] = "UIParent"
+                        ["Relative To"] = "Parent"
                     },
                     ["Health"] = {
                         ["Enabled"] = true,
@@ -246,7 +246,7 @@ local defaults =  {
                         ["Width"] = 64,
                         ["Height"] = 48
                     },
-                    ["Orientation"] = "VERTICAL",
+                    ["Orientation"] = "HORIZONTAL",
                     ["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "Noto",
@@ -295,6 +295,161 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison", "Physical" },
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
+                    },
+                    ["LFDRole"] = {
+                        ["Position"] = {
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 2,
+                            ["Offset Y"] = -2,
+                            ["Relative To"] = "Parent"    
+                        },
+                        ["Enabled"] = true
+                    },
+                    ["Enabled"] = true
+                },
+                ["Raid"] = {
+                    ["Position"] = {
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 800,
+                        ["Offset Y"] = -780,
+                        ["Relative To"] = "Parent"
+                    },
+                    ["Health"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "ALL",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Party"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 64,
+                            ["Height"] = 48
+                        },
+                        ["Color By"] = "Gradient",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "VERTICAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
+                    },
+                    ["Power"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Health"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 64,
+                            ["Height"] = 3
+                        },
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default"
+                    },
+                    ["Size"] = {
+                        ["Width"] = 64,
+                        ["Height"] = 48
+                    },
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "Noto",
+                            ["Size"] = 14,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "NONE",
+                            ["Text"] = "[3charname]",
+                            ["Position"] = {
+                                ["Point"] = "ALL",
+                                ["Local Point"] = "ALL",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0,
+                                ["Relative To"] = "Parent"
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Custom"] = {}
+                    },
+                    ["RaidBuffs"] = {
+                        ["Limit"] = 40,
+                        ["Tracked"] = {
+                            [194384] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide countdown numbers"] = false,
+                                ["Size"] = 14
+                            }
+                        },
+                        ["Enabled"] = true
+                    },
+                    ["HealPrediction"] = {
+                        ["Texture"] = "Default",
+                        ["MaxOverflow"] = 1,
+                        ["FrequentUpdates"] = true,
+                        ["Enabled"] = true
+                    },
+                    ["Offset X"] = 2,
+                    ["Offset Y"] = 4,
+                    ["Show Player"] = true,
+                    ["Highlight Target"] = true,
+                    ["Show Debuff Border"] = true,
+                    ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison", "Physical" },
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
+                    },
+                    ["LFDRole"] = {
+                        ["Position"] = {
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 2,
+                            ["Offset Y"] = -2,
+                            ["Relative To"] = "Parent"    
+                        },
+                        ["Enabled"] = true
+                    },
                     ["Enabled"] = true
                 },
     			["Minimap"] = {

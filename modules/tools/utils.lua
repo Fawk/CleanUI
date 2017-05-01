@@ -268,6 +268,7 @@ local function TextBuilder(parent, sizeInPerc)
         text.OldSetText = text.SetText
         text.SetText = function(self, value)
             local isSpecial, font, size = false, nil, 10
+            print(value)
             if type(value) == "string" then
                 for i = 1, #value do
                     local c = value:sub(i,i)

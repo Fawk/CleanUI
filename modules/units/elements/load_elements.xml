@@ -4,6 +4,7 @@
     <Script file="power.lua"/>
     <Script file="raidbuffs.lua"/>
     <Script file="healprediction.lua"/>
+    <Script file="lfdrole.lua"/>
     <!-- etc -->
 
 </Ui>
