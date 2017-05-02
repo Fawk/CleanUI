@@ -14,7 +14,13 @@ function Player:Init()
         Player:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
-    Units:Add(Units:Get(frameName) or oUF:Spawn(frameName, frameName))
+
+    local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
+    Units:Add(frame)
+
+   	frame.overrideShow = true
+
+    A:CreateMover(frame, db)
 end
 -- https://jsfiddle.net/859zu65s/
 function Player:Setup(frame, db)

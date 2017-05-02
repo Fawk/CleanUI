@@ -105,8 +105,8 @@ function Raid:Init()
             if InCombatLockdown() then return end
             local numGroupMembers = GetNumGroupMembers()
             local x, y = db["Offset X"], db["Offset Y"]
-            local w = size["Width"] * (numGroupMembers > 5 and 5 or numGroupMembers) + (x * (numGroupMembers - 1))
-            local h = size["Height"] * (numGroupMembers / 5) + (y * (numGroupMembers - 1))
+            local w = size["Width"] * 5 + (x * 4)
+            local h = size["Height"] * 8 + (y * 7)
             self:SetSize(w, h)
         end
 
@@ -151,7 +151,7 @@ function Raid:Init()
 
     Units:Position(raidContainer, db["Position"])
     raidContainer:UpdateSize(db)
-    A:CreateMover(raidContainer, db)
+    A:CreateMover(raidContainer, db, "Raid")
 
     raidHeader:SetParent(raidContainer)
     raidHeader:SetAllPoints()

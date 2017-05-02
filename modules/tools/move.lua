@@ -12,6 +12,10 @@ local function FinalizeMove()
 	for name, moveFrame in next, moveableFrames do
 		moveFrame:Hide()
 		moveFrame:Apply()
+
+		if moveFrame.affecting.OldShow then
+			moveFrame.affecting.Show = moveFrame.affecting.OldShow
+		end
 		moveFrame.affecting:Show()
 	end
 	finishFrame:Hide()
@@ -55,8 +59,23 @@ function A:InitMove()
 	end
 
 	for name, moveFrame in next, moveableFrames do
+		
 		moveFrame:Show()
+
+		local w, h = moveFrame.affecting:GetSize()
+		moveFrame.affecting:SetParent(moveFrame)
+		moveFrame.affecting:ClearAllPoints()
+		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
+		moveFrame.affecting:SetSize(w, h)
+
+		if moveFrame.affecting.overrideShow then
+			moveFrame.affecting.OldShow = moveFrame.affecting.Show
+			moveFrame.affecting.Show = moveFrame.affecting.Hide
+		end
+
 		moveFrame.affecting:Hide()
+
+		moveFrame:SetSize(w, h)
 	end
 end
 
@@ -91,12 +110,11 @@ function A:CreateMover(frame, db, overrideName)
     end)  
 
 	moveFrame.Apply = function(self)
-		local point, relative, localPoint, x, y = self:GetPoint()
-        self.affecting:ClearAllPoints()
-		self.affecting:SetPoint(point, A.frameParent, localPoint, x, y)
+		local lp, relative, p, x, y = self:GetPoint()
+		self.affecting:SetParent(A.frameParent)
 		db["Position"] = {
-	        ["Point"] = point,
-	        ["Local Point"] = localPoint,
+	        ["Point"] = p,
+	        ["Local Point"] = lp,
 	        ["Offset X"] = x,
 	        ["Offset Y"] = y,
 	        ["Relative To"] = "Parent"

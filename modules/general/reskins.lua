@@ -273,6 +273,21 @@ local function setStyle()
 		end
 		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
+		local lp, r, p, x, y = Minimap:GetPoint()
+        A:CreateMover(Minimap, { 
+            ["Position"] = { 
+                ["Local Point"] = lp,
+                ["Relative To"] = r,
+                ["Point"] = p,
+                ["Offset X"] = x,
+                ["Offset Y"] = y
+            },
+            ["Size"] = {
+                ["Width"] = Minimap:GetWidth(),
+                ["Height"] = Minimap:GetHeight()
+            }
+        }, "Minimap")
+
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
 		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
 		Minimap:SetPoint(minimapConfig.Position["Local Point"], minimapConfig.Position["Relative To"], minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
@@ -314,6 +329,8 @@ local function setStyle()
 		MinimapZoomOut:GetNormalTexture():SetAllPoints()
 
 		kill(MinimapZoneTextButton)
+
+		MinimapZoneTextButton:SetParent(Minimap)
 		MinimapZoneTextButton:SetPoint(E.regions.T, Minimap, E.regions.T, 0, -5)
 		MinimapZoneTextButton:SetHeight(20)
 		MinimapZoneTextButton:SetWidth(175)
@@ -323,6 +340,7 @@ local function setStyle()
 		MinimapZoneTextButton:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
 		MinimapZoneText:SetFont(font(12, "NONE"))
 		MinimapZoneText:SetPoint(E.regions.C)
+
 		hooksecurefunc(MinimapZoneText, "SetTextColor", function(t, rr, gg, bb)
 			local pvpType, isSubZonePvP, factionName = GetZonePVPInfo();
 			if ( pvpType == "sanctuary" ) then
@@ -460,16 +478,7 @@ local function setStyle()
         end
         
         local lp, r, p, x, y = ObjectiveTrackerFrame:GetPoint()
-        
-        local moveFrame = CreateFrame("Frame", "MoveFrame_ObjectiveTracker", A.frameParent)
-        moveFrame:SetPoint(ObjectiveTrackerFrame:GetPoint())
-        moveFrame:SetSize(ObjectiveTrackerFrame:GetSize())
-        
-        ObjectiveTrackerFrame:ClearAllPoints()
-        ObjectiveTrackerFrame:SetParent(moveFrame)
-        ObjectiveTrackerFrame:SetAllPoints()
-        
-        A:CreateMover(moveFrame, { 
+        A:CreateMover(ObjectiveTrackerFrame, { 
             ["Position"] = { 
                 ["Local Point"] = lp,
                 ["Relative To"] = r,
@@ -478,8 +487,8 @@ local function setStyle()
                 ["Offset Y"] = y
             },
             ["Size"] = {
-                ["Width"] = moveFrame:GetWidth(),
-                ["Height"] = moveFrame:GetHeight()
+                ["Width"] = ObjectiveTrackerFrame:GetWidth(),
+                ["Height"] = ObjectiveTrackerFrame:GetHeight()
             }
         }, "Objective Tracker")
 
@@ -487,7 +496,7 @@ local function setStyle()
         ff.timer = 0
         ff:SetScript("OnUpdate", function(self, elapsed)
             self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
+            if self.timer > 0.01 then
                 if ObjectiveTrackerBlocksFrameHeader ~= nil then
                     kill(ObjectiveTrackerBlocksFrame.QuestHeader)
                     setFont(ObjectiveTrackerBlocksFrame.QuestHeader, 16)
@@ -532,7 +541,7 @@ local function setStyle()
                 item.Cooldown:SetAllPoints(item.icon)
                 item.Count:ClearAllPoints()
                 item.Count:SetPoint("TOPLEFT", 1, -1)
-                item.Count:SetFont(media:Fetch("font", "Noto", 12, "OUTLINE"))
+                item.Count:SetFont(media:Fetch("font", "Noto"), 12, "OUTLINE")
                 item.Count:SetShadowOffset(5, -5)
                 --E:RegisterCooldown(item.Cooldown)
                 item.skinned = true
@@ -552,13 +561,31 @@ local function setStyle()
                 item.Cooldown:SetAllPoints(item.icon)
                 item.Count:ClearAllPoints()
                 item.Count:SetPoint("TOPLEFT", 1, -1)
-                item.Count:SetFont(media:Fetch("font", "Noto", 12, "OUTLINE"))
+                item.Count:SetFont(media:Fetch("font", "Noto"), 12, "OUTLINE")
                 item.Count:SetShadowOffset(5, -5)
                 --E:RegisterCooldown(item.Cooldown)
                 item.skinned = true
             end
         end)
     end
+
+    -- Vechicle
+    do
+    	local lp, r, p, x, y = VehicleSeatIndicator:GetPoint()
+        A:CreateMover(VehicleSeatIndicator, { 
+            ["Position"] = { 
+                ["Local Point"] = lp,
+                ["Relative To"] = r,
+                ["Point"] = p,
+                ["Offset X"] = x,
+                ["Offset Y"] = y
+            },
+            ["Size"] = {
+                ["Width"] = VehicleSeatIndicator:GetWidth(),
+                ["Height"] = VehicleSeatIndicator:GetHeight()
+            }
+        }, "Vechicle Seat Indicator")
+   	end
 
 	--Blizzard windows
 	do

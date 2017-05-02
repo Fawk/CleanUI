@@ -100,12 +100,11 @@ function Party:Init()
         
         partyContainer.UpdateSize = function(self, db) 
             if InCombatLockdown() then return end
-            local numGroupMembers = GetNumGroupMembers()
             local x, y = db["Offset X"], db["Offset Y"]
-            local w, h = size["Width"] * (numGroupMembers > 5 and 5 or numGroupMembers), size["Height"]
+            local w, h = size["Width"] * 5 + (x * 4), size["Height"]
             if db["Orientation"] == "VERTICAL" then
                 w = size["Width"]
-                h = size["Height"] * (numGroupMembers > 5 and 5 or numGroupMembers)
+                h = size["Height"] * 5 + (y * 4)
             end
             self:SetSize(w, h)
         end
@@ -153,7 +152,7 @@ function Party:Init()
 
     Units:Position(partyContainer, db["Position"])
     partyContainer:UpdateSize(db)
-    A:CreateMover(partyContainer, db)
+    A:CreateMover(partyContainer, db, "Party")
 
     partyHeader:SetParent(partyContainer)
     partyHeader:SetAllPoints()
