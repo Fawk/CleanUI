@@ -31,6 +31,28 @@ function string.equals(self, ...)
    return match
 end
 
+function Tools:HookSetPoint(frame, position, w, h)
+	
+	frame.needsPositionFix = true
+	
+	hooksecurefunc(frame, "SetPoint", function(lp, r, p, x, y)
+		if frame.needsPositionFix then
+			frame:ClearAllPoints()
+			frame.needsPositionFix = false
+			frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+			frame:SetSize(w, h)
+		else
+			if lp ~= position["Local Point"] or p ~= position["Point"] or r ~= A.frameParent then
+				frame.needsPositionFix = true
+			end
+		end
+	end)
+
+	frame:ClearAllPoints()
+	frame:SetParent(A.frameParent)
+	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v

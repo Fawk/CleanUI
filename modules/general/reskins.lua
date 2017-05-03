@@ -2,6 +2,7 @@
 local A, L = unpack(select(2, ...))
 local _G, E, media = _G, A.enum, LibStub("LibSharedMedia-3.0")
 local iconLib = LibStub("LibDBIcon-1.0", true)
+local Tools = A.Tools
 
 
 local backdrops = { "DropDownList1MenuBackdrop", "DropDownList2MenuBackdrop", "GameTooltip", "GameMenuFrame" }
@@ -592,25 +593,7 @@ local function setStyle()
     do
     	local position = A["Profile"]["Options"]["Vehicle Seat Indicator"]["Position"]
     	local w, h = VehicleSeatIndicator:GetSize()
-    	local localpoint, point, ox, oy = position["Local Point"], position["Point"], position["Offset X"], position["Offset Y"]
-
-    	VehicleSeatIndicator.needsPositionFix = true
-		hooksecurefunc(VehicleSeatIndicator, "SetPoint", function(lp, r, p, x, y)
-			if VehicleSeatIndicator.needsPositionFix then
-				VehicleSeatIndicator:ClearAllPoints()
-				VehicleSeatIndicator.needsPositionFix = false
-				VehicleSeatIndicator:SetPoint(localpoint, A.frameParent, point, ox, oy)
-    			VehicleSeatIndicator:SetSize(w, h)
-			else
-				if lp ~= localpoint or point ~= p or r ~= A.frameParent or ox ~= x or oy ~= y then
-					VehicleSeatIndicator.needsPositionFix = true
-				end
-			end
-		end)
-
-    	VehicleSeatIndicator:ClearAllPoints()
-    	VehicleSeatIndicator:SetParent(A.frameParent)
-		VehicleSeatIndicator:SetPoint(localpoint, A.frameParent, point, ox, oy)
+    	Tools:HookSetPoint(VehicleSeatIndicator, position, w, h)
 
     	VehicleSeatIndicatorBackgroundTexture:ClearAllPoints()
     	VehicleSeatIndicatorBackgroundTexture:SetParent(VehicleSeatIndicator)
