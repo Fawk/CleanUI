@@ -53,6 +53,46 @@ function Tools:HookSetPoint(frame, position, w, h)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 end
 
+function Tools:FadeIn(frame, seconds)
+	frame.timer = frame.timer or 0
+    local f = CreateFrame("Frame")
+    f:SetScript("OnUpdate", function(self, elapsed)
+        frame.timer = frame.timer + elapsed
+        if frame.timer > .01 then
+            if frame:GetAlpha() >= 1 then
+                self:SetScript("OnUpdate", nil)
+            else
+            	local alpha = frame:GetAlpha() + (100 / ((seconds * 1000) * .01))
+            	if alpha > 1 then
+            		alpha = 1
+    			end
+                frame:SetAlpha(alpha) 
+            end
+            frame.timer = 0
+        end
+    end)
+end
+
+function Tools:FadeOut(frame, seconds)
+	frame.timer = frame.timer or 0
+    local f = CreateFrame("Frame")
+    f:SetScript("OnUpdate", function(self, elapsed)
+        frame.timer = frame.timer + elapsed
+        if frame.timer > .01  then
+            if frame:GetAlpha() <= 0 then
+                self:SetScript("OnUpdate", nil)
+            else
+            	local alpha = frame:GetAlpha() - (100 / ((seconds * 1000) * .01))
+            	if alpha < 0 then
+            		alpha = 0
+    			end
+                frame:SetAlpha(alpha) 
+            end
+            frame.timer = 0
+        end
+    end)
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v

@@ -274,11 +274,10 @@ local function setStyle()
 		end
 		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
-        Minimap:ClearAllPoints()
-        Minimap:SetParent(A.frameParent)
+		Tools:HookSetPoint(Minimap, minimapConfig["Position"], minimapConfig["Size"] - 3, minimapConfig["Size"] - 3)
+
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
 		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
-		Minimap:SetPoint(minimapConfig.Position["Local Point"], A.frameParent, minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
 
 		local lp, r, p, x, y = Minimap:GetPoint()
         A:CreateMover(Minimap, { 
@@ -294,7 +293,6 @@ local function setStyle()
                 ["Height"] = Minimap:GetHeight()
             }
         }, "Minimap")
-
 
 		Minimap:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))
@@ -466,43 +464,10 @@ local function setStyle()
         end
         
         ObjectiveTrackerFrame:SetAlpha(0)
-        ObjectiveTrackerFrame.timer = 0
-        ObjectiveTrackerFrame.FadeIn = function(self)
-            local f = CreateFrame("Frame")
-            f:SetScript("OnUpdate", function(ff, elapsed)
-                self.timer = self.timer + elapsed
-                if self.timer > 0.1 then
-                    if self:GetAlpha() >= 1 then
-                        ff:SetScript("OnUpdate", nil)
-                    else
-                        self:SetAlpha(self:GetAlpha() + self.timer) 
-                    end
-                    self.timer = 0
-                end
-            end)
-        end
-        
+
         local position = A["Profile"]["Options"]["Objective Tracker"]["Position"]
         local w, h = ObjectiveTrackerFrame:GetSize()
-
-        ObjectiveTrackerFrame.needsPositionFix = true
-        hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(lp, r, p, x, y)
-        	if ObjectiveTrackerFrame.needsPositionFix then
-        		ObjectiveTrackerFrame.needsPositionFix = false
-		        ObjectiveTrackerFrame:ClearAllPoints()
-		       	ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
-		       	ObjectiveTrackerFrame:SetSize(w, h)
-        	else
-        		if position["Local Point"] ~= lp or r ~= A.frameParent or p ~= position["Point"] then
-        			ObjectiveTrackerFrame.needsPositionFix = true
-        		end
-        	end
-        end)
-
-
-        ObjectiveTrackerFrame:ClearAllPoints()
-        ObjectiveTrackerFrame:SetParent(A.frameParent)
-       	ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+        Tools:HookSetPoint(ObjectiveTrackerFrame, position, w, h)
 
         A:CreateMover(ObjectiveTrackerFrame, { 
             ["Position"] = position,
@@ -542,7 +507,7 @@ local function setStyle()
                     end
                     
                     self:SetScript("OnUpdate", nil)
-                    ObjectiveTrackerFrame:FadeIn()
+                    Tools:FadeIn(ObjectiveTrackerFrame)
                 end
                 self.timer = 0
             end
