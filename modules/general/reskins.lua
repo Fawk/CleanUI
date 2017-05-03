@@ -273,6 +273,12 @@ local function setStyle()
 		end
 		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
+        Minimap:ClearAllPoints()
+        Minimap:SetParent(A.frameParent)
+		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
+		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
+		Minimap:SetPoint(minimapConfig.Position["Local Point"], A.frameParent, minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
+
 		local lp, r, p, x, y = Minimap:GetPoint()
         A:CreateMover(Minimap, { 
             ["Position"] = { 
@@ -288,9 +294,7 @@ local function setStyle()
             }
         }, "Minimap")
 
-		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
-		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
-		Minimap:SetPoint(minimapConfig.Position["Local Point"], minimapConfig.Position["Relative To"], minimapConfig.Position["Point"], minimapConfig.Position["Offset X"], minimapConfig.Position["Offset Y"])
+
 		Minimap:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))
 		Minimap:SetArchBlobRingScalar(0)
@@ -477,18 +481,33 @@ local function setStyle()
             end)
         end
         
-        local lp, r, p, x, y = ObjectiveTrackerFrame:GetPoint()
+        local position = A["Profile"]["Options"]["Objective Tracker"]["Position"]
+        local w, h = ObjectiveTrackerFrame:GetSize()
+
+        ObjectiveTrackerFrame.needsPositionFix = true
+        hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(lp, r, p, x, y)
+        	if ObjectiveTrackerFrame.needsPositionFix then
+        		ObjectiveTrackerFrame.needsPositionFix = false
+		        ObjectiveTrackerFrame:ClearAllPoints()
+		       	ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		       	ObjectiveTrackerFrame:SetSize(w, h)
+        	else
+        		if position["Local Point"] ~= lp or r ~= A.frameParent or p ~= position["Point"] then
+        			ObjectiveTrackerFrame.needsPositionFix = true
+        		end
+        	end
+        end)
+
+
+        ObjectiveTrackerFrame:ClearAllPoints()
+        ObjectiveTrackerFrame:SetParent(A.frameParent)
+       	ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+
         A:CreateMover(ObjectiveTrackerFrame, { 
-            ["Position"] = { 
-                ["Local Point"] = lp,
-                ["Relative To"] = r,
-                ["Point"] = p,
-                ["Offset X"] = x,
-                ["Offset Y"] = y
-            },
+            ["Position"] = position,
             ["Size"] = {
-                ["Width"] = ObjectiveTrackerFrame:GetWidth(),
-                ["Height"] = ObjectiveTrackerFrame:GetHeight()
+                ["Width"] = w,
+                ["Height"] = h
             }
         }, "Objective Tracker")
 
@@ -571,20 +590,42 @@ local function setStyle()
 
     -- Vechicle
     do
-    	local lp, r, p, x, y = VehicleSeatIndicator:GetPoint()
+    	local position = A["Profile"]["Options"]["Vehicle Seat Indicator"]["Position"]
+    	local w, h = VehicleSeatIndicator:GetSize()
+    	local localpoint, point, ox, oy = position["Local Point"], position["Point"], position["Offset X"], position["Offset Y"]
+
+    	VehicleSeatIndicator.needsPositionFix = true
+		hooksecurefunc(VehicleSeatIndicator, "SetPoint", function(lp, r, p, x, y)
+			if VehicleSeatIndicator.needsPositionFix then
+				VehicleSeatIndicator:ClearAllPoints()
+				VehicleSeatIndicator.needsPositionFix = false
+				VehicleSeatIndicator:SetPoint(localpoint, A.frameParent, point, ox, oy)
+    			VehicleSeatIndicator:SetSize(w, h)
+			else
+				if lp ~= localpoint or point ~= p or r ~= A.frameParent or ox ~= x or oy ~= y then
+					VehicleSeatIndicator.needsPositionFix = true
+				end
+			end
+		end)
+
+    	VehicleSeatIndicator:ClearAllPoints()
+    	VehicleSeatIndicator:SetParent(A.frameParent)
+		VehicleSeatIndicator:SetPoint(localpoint, A.frameParent, point, ox, oy)
+
+    	VehicleSeatIndicatorBackgroundTexture:ClearAllPoints()
+    	VehicleSeatIndicatorBackgroundTexture:SetParent(VehicleSeatIndicator)
+    	VehicleSeatIndicatorBackgroundTexture:SetPoint("TOPLEFT")
+    	VehicleSeatIndicatorBackgroundTexture:SetSize(w, h)
+
+    	VehicleSeatIndicator:SetSize(w, h)
+
         A:CreateMover(VehicleSeatIndicator, { 
-            ["Position"] = { 
-                ["Local Point"] = lp,
-                ["Relative To"] = r,
-                ["Point"] = p,
-                ["Offset X"] = x,
-                ["Offset Y"] = y
-            },
+            ["Position"] = position,
             ["Size"] = {
-                ["Width"] = VehicleSeatIndicator:GetWidth(),
-                ["Height"] = VehicleSeatIndicator:GetHeight()
+                ["Width"] = w,
+                ["Height"] = h
             }
-        }, "Vechicle Seat Indicator")
+        }, "Vehicle Seat Indicator")
    	end
 
 	--Blizzard windows

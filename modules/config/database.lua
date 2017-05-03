@@ -459,9 +459,27 @@ local defaults =  {
     					["Local Point"] = "TOPRIGHT",
     					["Offset X"] = 0,
     					["Offset Y"] = 0,
-    					["Relative To"] = "UIParent"
+    					["Relative To"] = "Parent"
     				}
     			},
+                ["Vehicle Seat Indicator"] = {
+                    ["Position"] = {
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 100,
+                        ["Offset Y"] = -100,
+                        ["Relative To"] = "Parent"
+                    }
+                },
+                ["Objective Tracker"] = {
+                    ["Position"] = {
+                        ["Point"] = "TOPRIGHT",
+                        ["Local Point"] = "TOPRIGHT",
+                        ["Offset X"] = -10,
+                        ["Offset Y"] = -300,
+                        ["Relative To"] = "Parent"
+                    }
+                },
                 ["Grids"] = {
                     ["Minimap"] = {
                         ["singleLayer"] = true,

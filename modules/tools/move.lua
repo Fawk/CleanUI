@@ -65,7 +65,7 @@ function A:InitMove()
 		local w, h = moveFrame.affecting:GetSize()
 		moveFrame.affecting:SetParent(moveFrame)
 		moveFrame.affecting:ClearAllPoints()
-		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
+		moveFrame.affecting:SetAllPoints(moveFrame)
 		moveFrame.affecting:SetSize(w, h)
 
 		if moveFrame.affecting.overrideShow then
@@ -91,7 +91,13 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
-	moveFrame:SetPoint(position["Local Point"], select(2, frame:GetPoint()), position["Point"], position["Offset X"], position["Offset Y"])
+	
+	for i = 1, 5 do
+		if frame:GetPoint(i) then
+			moveFrame:SetPoint(frame:GetPoint(i))
+		end
+	end
+
 	moveFrame:EnableMouse(true)
 	moveFrame.moveAble = true
 	moveFrame:SetMovable(moveFrame.moveAble)

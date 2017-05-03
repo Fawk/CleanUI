@@ -2,6 +2,7 @@ local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
+local InCombatLockdown = InCombatLockdown
 
 local Player = {}
 local frameName = "Player"
@@ -29,6 +30,8 @@ function Player:Setup(frame, db)
 end
  
 function Player:Update(frame, db)
+    if InCombatLockdown() then return end
+
     if not db["Enabled"] then
         return frame:Hide()
     else
