@@ -216,7 +216,9 @@ function Party:Update(frame, db)
         [57724] = true,     -- Sated
         [160455] = true,    -- Fatigued
         [97821] = true,     -- Void-Touched
-        [123981] = true     -- Perdition
+        [123981] = true,    -- Perdition
+        [113942] = true,    -- Demonic Gateway
+        [233377] = true     -- Gaze of Aman'Thul
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],

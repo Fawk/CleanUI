@@ -31,7 +31,7 @@ function string.equals(self, ...)
    return match
 end
 
-function Tools:HookSetPoint(frame, position, w, h)
+function T:HookSetPoint(frame, position, w, h)
 	
 	frame.needsPositionFix = true
 	
@@ -53,7 +53,8 @@ function Tools:HookSetPoint(frame, position, w, h)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 end
 
-function Tools:FadeIn(frame, seconds)
+function T:FadeIn(frame, seconds)
+	local seconds = seconds or 1
 	frame.timer = frame.timer or 0
     local f = CreateFrame("Frame")
     f:SetScript("OnUpdate", function(self, elapsed)
@@ -62,7 +63,7 @@ function Tools:FadeIn(frame, seconds)
             if frame:GetAlpha() >= 1 then
                 self:SetScript("OnUpdate", nil)
             else
-            	local alpha = frame:GetAlpha() + (100 / ((seconds * 1000) * .01))
+            	local alpha = frame:GetAlpha() + ((100 / ((seconds * 1000) * .01)) / 100)
             	if alpha > 1 then
             		alpha = 1
     			end
@@ -73,7 +74,8 @@ function Tools:FadeIn(frame, seconds)
     end)
 end
 
-function Tools:FadeOut(frame, seconds)
+function T:FadeOut(frame, seconds)
+	local seconds = seconds or 1
 	frame.timer = frame.timer or 0
     local f = CreateFrame("Frame")
     f:SetScript("OnUpdate", function(self, elapsed)
@@ -82,7 +84,7 @@ function Tools:FadeOut(frame, seconds)
             if frame:GetAlpha() <= 0 then
                 self:SetScript("OnUpdate", nil)
             else
-            	local alpha = frame:GetAlpha() - (100 / ((seconds * 1000) * .01))
+            	local alpha = frame:GetAlpha() - ((100 / ((seconds * 1000) * .01)) / 100)
             	if alpha < 0 then
             		alpha = 0
     			end

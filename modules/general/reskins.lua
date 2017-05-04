@@ -358,7 +358,13 @@ local function setStyle()
 			end
 		end)
 
+		GuildInstanceDifficulty:SetParent(Minimap)
+		GuildInstanceDifficulty:ClearAllPoints()
 		GuildInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 2, -2)
+
+		MiniMapInstanceDifficulty:SetParent(Minimap)
+		MiniMapInstanceDifficulty:ClearAllPoints()
+		MiniMapInstanceDifficulty:SetAllPoints(GuildInstanceDifficulty)
 
 		MiniMapWorldMapButton:Hide()
 		GarrisonLandingPageMinimapButton:SetAlpha(0)
