@@ -30,12 +30,11 @@ function Player:Setup(frame, db)
 end
  
 function Player:Update(frame, db)
-    if InCombatLockdown() then return end
+	if not db["Enabled"] then return end
 
-    if not db["Enabled"] then
-        return frame:Hide()
-    else
-        frame:Show()
+	if InCombatLockdown() then
+		T:RunAfterCombat(self.Update)
+		return
     end
 
     local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]

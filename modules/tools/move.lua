@@ -16,7 +16,6 @@ local function FinalizeMove()
 		if moveFrame.affecting.OldShow then
 			moveFrame.affecting.Show = moveFrame.affecting.OldShow
 		end
-		moveFrame.affecting:Show()
 	end
 	finishFrame:Hide()
 end
@@ -63,7 +62,7 @@ function A:InitMove()
 		moveFrame:Show()
 
 		local w, h = moveFrame.affecting:GetSize()
-		moveFrame.affecting:SetParent(moveFrame)
+		moveFrame.affecting:SetParent(moveFrame.hiddenFrame)
 		moveFrame.affecting:ClearAllPoints()
 		moveFrame.affecting:SetAllPoints(moveFrame)
 		moveFrame.affecting:SetSize(w, h)
@@ -72,8 +71,6 @@ function A:InitMove()
 			moveFrame.affecting.OldShow = moveFrame.affecting.Show
 			moveFrame.affecting.Show = moveFrame.affecting.Hide
 		end
-
-		moveFrame.affecting:Hide()
 
 		moveFrame:SetSize(w, h)
 	end
@@ -91,7 +88,12 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
+
+	local hiddenFrame = CreateFrame("Frame", nil, moveFrame)
+	hiddenFrame:Hide()
 	
+	moveFrame.hiddenFrame = hiddenFrame
+
 	for i = 1, 5 do
 		if frame:GetPoint(i) then
 			moveFrame:SetPoint(frame:GetPoint(i))

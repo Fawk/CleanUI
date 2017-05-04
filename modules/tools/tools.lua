@@ -95,6 +95,15 @@ function T:FadeOut(frame, seconds)
     end)
 end
 
+function T:RunAfterCombat(func)
+	local f = CreateFrame("Frame")
+	f:RegisterEvent("PLAYER_REGEN_ENABLED")
+	f:SetScript("OnEvent", function(self, event, ...)
+		self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		func()
+	end)
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v

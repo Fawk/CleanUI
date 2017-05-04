@@ -167,12 +167,7 @@ end
  
 function Party:Update(frame, db)
     if InCombatLockdown() then return end
-
-    if not db["Enabled"] then
-        return frame:Hide()
-    else
-        frame:Show()
-    end
+    if not db["Enabled"] then return end
 
     local size, bindings = db["Size"], db["Key Bindings"]
 
