@@ -8,7 +8,6 @@ local GetNumGroupMembers = GetNumGroupMembers
 
 local Party = {}
 local frameName = "Party"
-local partyHeader, partyFrames = nil, {}
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
@@ -68,11 +67,11 @@ function Party:Init()
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        partyFrames[frame:GetName()] = Party:Setup(frame, db)
+        Party:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
 
-    partyHeader = oUF:SpawnHeader(
+    local partyHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
         "party",
@@ -110,25 +109,21 @@ function Party:Init()
         end
 
         partyContainer.UpdateUnits = function(self)
-            local i = 1
-            for name, frame in next, partyFrames do
+            for i = 1, 5 do
                 local uf = partyHeader:GetAttribute("child"..i)
                 if not uf then break end
                 uf:RegisterForClicks("AnyUp")
                 uf.unit = uf:GetAttribute("unit")
-                Party:Update(frame, db)
-                i = i + 1
+                Party:Update(uf, db)
             end
         end
 
         partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         partyContainer:SetScript("OnEvent", function(self, event) 
-            if event == "GROUP_ROSTER_UPDATE" then
-                Units:DisableBlizzardRaid()
-                self:UpdateSize(db)
-                self:UpdateUnits()
-            end
+            Units:DisableBlizzardRaid()
+            self:UpdateSize(db)
+            self:UpdateUnits()
         end)
     
         partyContainer:UpdateUnits()
@@ -166,12 +161,10 @@ function Party:Setup(frame, db)
 end
  
 function Party:Update(frame, db)
-    if InCombatLockdown() then return end
     if not db["Enabled"] then return end
 
-    local size, bindings = db["Size"], db["Key Bindings"]
+    local bindings = db["Key Bindings"]
 
-    frame:SetSize(size["Width"], size["Height"])
     Units:SetKeyBindings(frame, bindings)
     Units:UpdateElements(frame, db)
 

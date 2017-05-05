@@ -163,17 +163,10 @@ function Raid:Setup(frame, db)
 end
  
 function Raid:Update(frame, db)
-    if InCombatLockdown() then return end
+    if not db["Enabled"] then return end
 
-    if not db["Enabled"] then
-        return frame:Hide()
-    else
-        frame:Show()
-    end
+    local bindings = db["Key Bindings"]
 
-    local size, bindings = db["Size"], db["Key Bindings"]
-
-    frame:SetSize(size["Width"], size["Height"])
     Units:SetKeyBindings(frame, bindings)
     Units:UpdateElements(frame, db)
 
@@ -214,7 +207,8 @@ function Raid:Update(frame, db)
         [160455] = true,    -- Fatigued
         [97821] = true,     -- Void-Touched
         [123981] = true,    -- Perdition
-        [113942] = true     -- Demonic Gateway
+        [113942] = true,    -- Demonic Gateway
+        [233377] = true     -- Gaze of Aman'Thul
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],

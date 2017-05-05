@@ -509,6 +509,9 @@ local function setStyle()
                         elseif v.HeaderText then
                             setFont(v.HeaderText, 12)
                         end
+                        for x, y in pairs({ v:GetChildren() }) do
+                        	setFont(y, 12)
+                        end
                         setFont(v, 13)
                     end
                     
@@ -537,6 +540,18 @@ local function setStyle()
                 --E:RegisterCooldown(item.Cooldown)
                 item.skinned = true
             end
+
+            for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
+                if v.currentLine then
+                    setFont(v.currentLine, 12)
+                elseif v.HeaderText then
+                    setFont(v.HeaderText, 12)
+                end
+                for x, y in pairs({ v:GetChildren() }) do
+                	setFont(y, 12)
+                end
+                setFont(v, 13)
+            end
         end)
         
         hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", function(_, block)
@@ -556,6 +571,18 @@ local function setStyle()
                 item.Count:SetShadowOffset(5, -5)
                 --E:RegisterCooldown(item.Cooldown)
                 item.skinned = true
+            end
+
+            for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
+                if v.currentLine then
+                    setFont(v.currentLine, 12)
+                elseif v.HeaderText then
+                    setFont(v.HeaderText, 12)
+                end
+                for x, y in pairs({ v:GetChildren() }) do
+                	setFont(y, 12)
+                end
+                setFont(v, 13)
             end
         end)
     end
