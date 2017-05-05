@@ -33,7 +33,9 @@ function Player:Update(frame, db)
 	if not db["Enabled"] then return end
 
 	if InCombatLockdown() then
-		T:RunAfterCombat(self.Update)
+		T:RunAfterCombat(function() 
+			self.Update(frame, db)
+		end)
 		return
     end
 

@@ -8,7 +8,6 @@ local GetNumGroupMembers = GetNumGroupMembers
 
 local Raid = {}
 local frameName = "Raid"
-local raidHeader, raidFrames = nil, {}
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
@@ -68,11 +67,11 @@ function Raid:Init()
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Raid:Setup(frame, db)
+        Raid:Update(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
 
-    raidHeader = oUF:SpawnHeader(
+    local raidHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
         "raid",
@@ -93,6 +92,7 @@ function Raid:Init()
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
+          Units:SetKeyBindings(self, db["Key Bindings"])
         ]]):format(size["Width"], size["Height"])
     )
 
@@ -102,7 +102,6 @@ function Raid:Init()
         raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
         
         raidContainer.UpdateSize = function(self, db) 
-            if InCombatLockdown() then return end
             local numGroupMembers = GetNumGroupMembers()
             local x, y = db["Offset X"], db["Offset Y"]
             local w = size["Width"] * 5 + (x * 4)
@@ -123,11 +122,9 @@ function Raid:Init()
         raidContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
-            if event == "GROUP_ROSTER_UPDATE" then
-                Units:DisableBlizzardRaid()
-                self:UpdateSize(db)
-                self:UpdateUnits()
-            end
+            Units:DisableBlizzardRaid()
+            self:UpdateSize(db)
+            self:UpdateUnits()
         end)
     
         raidContainer:UpdateUnits()
@@ -157,17 +154,18 @@ function Raid:Init()
     raidHeader:SetAllPoints()
 end
  
-function Raid:Setup(frame, db)
-    self:Update(frame, db)
-    return frame
-end
- 
 function Raid:Update(frame, db)
     if not db["Enabled"] then return end
 
     local bindings = db["Key Bindings"]
 
-    Units:SetKeyBindings(frame, bindings)
+    if InCombatLockdown() then
+        T:RunAfterCombat(function() 
+            Units:SetKeyBindings(frame, bindings)
+        end)
+    else
+        Units:SetKeyBindings(frame, bindings)
+    end
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--

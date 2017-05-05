@@ -67,10 +67,10 @@ function Party:Init()
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Party:Setup(frame, db)
+        Party:Update(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
-
+-- https://jsfiddle.net/gb3ka3re/
     local partyHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
@@ -89,6 +89,7 @@ function Party:Init()
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
+          Units:SetKeyBindings(self, db["Key Bindings"])
         ]]):format(size["Width"], size["Height"])
     )
 
@@ -98,7 +99,6 @@ function Party:Init()
         partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
         
         partyContainer.UpdateSize = function(self, db) 
-            if InCombatLockdown() then return end
             local x, y = db["Offset X"], db["Offset Y"]
             local w, h = size["Width"] * 5 + (x * 4), size["Height"]
             if db["Orientation"] == "VERTICAL" then
@@ -108,7 +108,7 @@ function Party:Init()
             self:SetSize(w, h)
         end
 
-        partyContainer.UpdateUnits = function(self)
+        partyContainer.UpdateUnits = function()
             for i = 1, 5 do
                 local uf = partyHeader:GetAttribute("child"..i)
                 if not uf then break end
@@ -155,17 +155,18 @@ function Party:Init()
     Units:DisableBlizzardRaid()
 end
  
-function Party:Setup(frame, db)
-    self:Update(frame, db)
-    return frame
-end
- 
 function Party:Update(frame, db)
     if not db["Enabled"] then return end
 
     local bindings = db["Key Bindings"]
 
-    Units:SetKeyBindings(frame, bindings)
+    if InCombatLockdown() then
+        T:RunAfterCombat(function() 
+            Units:SetKeyBindings(frame, bindings)
+        end)
+    else
+        Units:SetKeyBindings(frame, bindings)
+    end
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--
