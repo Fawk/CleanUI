@@ -92,7 +92,6 @@ function Raid:Init()
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
-          Units:SetKeyBindings(self, db["Key Bindings"])
         ]]):format(size["Width"], size["Height"])
     )
 
