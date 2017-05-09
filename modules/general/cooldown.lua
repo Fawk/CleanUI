@@ -15,7 +15,7 @@ local tW = 24
 local startOffset = 16
 local barWidth = ( tW * #timeStamps ) + ( startOffset * 2 )
 local buildText = A.TextBuilder
-local groups = {}
+local blacklist = {}
 
 local bar = CreateFrame("Frame", nil, A.frameParent)
 bar:SetSize(barWidth, tW + 5)
@@ -30,10 +30,6 @@ for i = 1, #timeStamps do
 	text:SetSize(tW, tW)
 	text:SetTextColor(0.43, 0.43, 0.43)
 	text:SetText(format("%s", timeStamps[i] > 60 and (timeStamps[i] / 60).."m" or timeStamps[i]))
-end
-
-for i = 1, #timeStamps do
-	groups[i] = { icons = {}, fadingOut = true }
 end
 
 local function GetNumSpells()
@@ -52,12 +48,18 @@ local function getFirst(tbl)
 	for i in next, tbl do return i end
 end
 
-local function cycleGroups() -- Bug to fix, icon does not seem to be removed from group when finished?
+local function cycleGroups()
 
-	for i, group in next, groups do
-		if not group.current then
-			group.current = getFirst(group.icons)
+	local groups = {}
+	for spellId, icon in next, active do
+		if icon.group ~= -1 then
+			local group = groups[icon.group] or { current = spellId, icons = {} }
+			group.icons[spellId] = icon
+			tinsert(groups, group)
 		end
+	end
+
+	for _,group in next, groups do
 
 		local icon = group.icons[group.current]
 		local nextId = next(group.icons, group.current)
@@ -72,18 +74,18 @@ local function cycleGroups() -- Bug to fix, icon does not seem to be removed fro
 			local nextIconAlpha = nextIcon:GetAlpha()
 			print(iconAlpha)
 			
-			if #group.icons == 1 then
-				if icon.fadingOut then
-					if iconAlpha > 0 then
-						icon:SetAlpha(iconAlpha - 0.07)
-					else
-						icon.fadingOut = false
-					end
-				else
+			if icon == nextIcon then
+				if not icon.fadingOut then
 					if iconAlpha < 1 then
 						icon:SetAlpha(iconAlpha + 0.07)
 					else
 						icon.fadingOut = true
+					end
+				else
+					if iconAlpha > 0 then
+						icon:SetAlpha(iconAlpha - 0.07)
+					else
+						icon.fadingOut = false
 					end
 				end
 			else
@@ -100,31 +102,8 @@ local function cycleGroups() -- Bug to fix, icon does not seem to be removed fro
 	end
 end
 
-local function removeFromGroups(spellId)
-	local toRemove = nil
-	for i, group in next, groups do
-		for x, s in next, group.icons do
-			if s == spellId then
-				if group.current == x then
-					group.current = group.current + 1
-					if group.current > #group.icons then
-						group.current = 1
-					end
-				end
-			end
-		end
-	end
-
-	for i, group in next, groups do
-		if group.icons[toRemove] then
-			tremove(group.icons, toRemove)
-		end
-	end
-end
-
-local function addToGroup(group, spellId, icon)
-	removeFromGroups(spellId)
-	group.icons[spellId] = icon
+local function changeGroup(index, icon)
+	icon.group = index
 end
 
 local interval = 0.05
@@ -141,7 +120,7 @@ local function Update(self, elapsed)
 			local texture = select(3, GetSpellInfo(spellId))
 			local start, duration = GetSpellCooldown(spellId)
 
-			if start ~= 0 and duration ~= 0 and duration > 1.5 then
+			if start ~= 0 and duration ~= 0 and duration > 1.5 and not blacklist[spellId] then
 
 				local icon = active[spellId]
 				if not icon then
@@ -182,13 +161,7 @@ local function Update(self, elapsed)
 
 				    local stamp = timeStamps[i]
 				    local next = timeStamps[i + 1] or timeStamps[#timeStamps]
-				    local group
-
-				    if i - 1 <= 0 then
-				    	group = groups[1]
-				    else
-				    	group = groups[i]
-				    end
+				    local group = (i - 1) <= 0 and 1 or i
 
 				    if current >= stamp and current <= next then
 				        local diff = next - stamp
@@ -201,14 +174,14 @@ local function Update(self, elapsed)
 				        	icon:SetAlpha(1)
 				        end
 
-				        addToGroup(group, spellId, icon)
+				        changeGroup(group, icon)
 			        	icon:SetPoint("LEFT", bar, "LEFT", x, 0)
 						
 						if current < .05 then
 							current = 0
 							icon:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
 							icon.endGroup:Play()
-							removeFromGroups(spellId)
+							changeGroup(-1, icon)
 						end 
 				    end
 				end
