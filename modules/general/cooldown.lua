@@ -60,29 +60,40 @@ local function cycleGroups() -- Bug to fix, icon does not seem to be removed fro
 		end
 
 		local icon = group.icons[group.current]
+		local nextId = next(group.icons, group.current)
+		local nextIcon = group.icons[nextId]
 
-		if icon then
-			local alpha = icon:GetAlpha()
-			if group.fadingOut then
-				print(alpha)
-				if alpha > 0 then
-					icon:SetAlpha(alpha - 0.07)
+		if not nextIcon then
+			nextIcon = group.icons[getFirst(group.icons)]
+		end
+
+		if icon and nextIcon then
+			local iconAlpha = icon:GetAlpha()
+			local nextIconAlpha = nextIcon:GetAlpha()
+			print(iconAlpha)
+			
+			if #group.icons == 1 then
+				if icon.fadingOut then
+					if iconAlpha > 0 then
+						icon:SetAlpha(iconAlpha - 0.07)
+					else
+						icon.fadingOut = false
+					end
 				else
-					group.current = next(group.icons, group.current)
-					if not group.current then
-						group.current = getFirst(group.icons)
-						group.fadingOut = false
+					if iconAlpha < 1 then
+						icon:SetAlpha(iconAlpha + 0.07)
+					else
+						icon.fadingOut = true
 					end
 				end
 			else
-				if alpha < 1 then
-					icon:SetAlpha(alpha + 0.07)
-				else
-					group.current = next(group.icons, group.current)
-					if not group.current then
-						group.current = getFirst(group.icons)
-						group.fadingOut = true
-					end
+				if iconAlpha > 0 then
+					icon:SetAlpha(iconAlpha - 0.07)
+					nextIcon:SetAlpha(nextIconAlpha + 0.07)
+				end
+
+				if iconAlpha >= 1 then
+					group.current = nextId
 				end
 			end
 		end
@@ -197,6 +208,7 @@ local function Update(self, elapsed)
 							current = 0
 							icon:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
 							icon.endGroup:Play()
+							removeFromGroups(spellId)
 						end 
 				    end
 				end
