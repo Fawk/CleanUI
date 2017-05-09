@@ -82,6 +82,10 @@ function A:CreateMover(frame, db, overrideName)
 	local lockedTexture = media:Fetch("texture", "locked")
 	local unLockedTexture = media:Fetch("texture", "unlocked")
 
+	if not size then
+		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
+	end
+
 	local moveFrame = CreateFrame("Button", name.."_Mover", A.frameParent)
 	moveFrame.affecting = frame
 	moveFrame:SetBackdrop(A.enum.backdrops.editboxborder)

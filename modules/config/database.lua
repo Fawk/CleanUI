@@ -495,6 +495,15 @@ local defaults =  {
                             }
                         }
                     }
+                },
+                ["Cooldown"] = {
+                    ["Position"] = {
+                        ["Local Point"] = "BOTTOM",
+                        ["Relative To"] = "Parent",
+                        ["Point"] = "BOTTOM",
+                        ["Offset X"] = -200,
+                        ["Offset Y"] = 200,
+                    }
                 }
     		}
 	    }
