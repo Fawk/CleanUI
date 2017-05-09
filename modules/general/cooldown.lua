@@ -30,7 +30,10 @@ for i = 1, #timeStamps do
 	text:SetSize(tW, tW)
 	text:SetTextColor(0.43, 0.43, 0.43)
 	text:SetText(format("%s", timeStamps[i] > 60 and (timeStamps[i] / 60).."m" or timeStamps[i]))
-	groups[tostring(i)] = { children = {}, running = false }
+end
+
+for i = 1, #timeStamps do
+	groups[i] = { icons = {}, fadingOut = true }
 end
 
 local function GetNumSpells()
@@ -49,50 +52,68 @@ local function getFirst(tbl)
 	for i in next, tbl do return i end
 end
 
-local function cycleChildrenAlpha(group)
-	if group.running then return end
+local function cycleGroups() -- Bug to fix, icon does not seem to be removed from group when finished?
 
-	local first = getFirst(group.children)
-	if not first then
-		group.running = false
-		return
-	else
-		first = active[first]
-	end
+	for i, group in next, groups do
+		if not group.current then
+			group.current = getFirst(group.icons)
+		end
 
-	-- Start fading in one icon at a time in a loop
-	group.running = true
-	for spellId in next, group.children do
-		local spell = active[spellId]
-		spell:SetAlpha(0)
-		spell.fadeIn:SetScript("OnFinished", function(self, requested)
-			if not requested then
-				local nextSpellId = next(group.children, spellId)
-				if nextSpellId then
-					active[nextSpellId].fadeIn:Play()
+		local icon = group.icons[group.current]
+
+		if icon then
+			local alpha = icon:GetAlpha()
+			if group.fadingOut then
+				print(alpha)
+				if alpha > 0 then
+					icon:SetAlpha(alpha - 0.07)
 				else
-					first.fadeIn:Play()
+					group.current = next(group.icons, group.current)
+					if not group.current then
+						group.current = getFirst(group.icons)
+						group.fadingOut = false
+					end
 				end
-				spell.fadeOut:Play()
+			else
+				if alpha < 1 then
+					icon:SetAlpha(alpha + 0.07)
+				else
+					group.current = next(group.icons, group.current)
+					if not group.current then
+						group.current = getFirst(group.icons)
+						group.fadingOut = true
+					end
+				end
 			end
-		end)
-	end
-
-	first.fadeIn:Play()
-end
-
-local function addToGroup(group, spellId)
-	if not group.children[spellId] then
-		group.children[spellId] = true
+		end
 	end
 end
 
-local function removeFromGroup(group, spellId)
-	for s in next, group.children do
-		if s == spellId then
-			tremove(group.children, s)
-		end 
+local function removeFromGroups(spellId)
+	local toRemove = nil
+	for i, group in next, groups do
+		for x, s in next, group.icons do
+			if s == spellId then
+				if group.current == x then
+					group.current = group.current + 1
+					if group.current > #group.icons then
+						group.current = 1
+					end
+				end
+			end
+		end
 	end
+
+	for i, group in next, groups do
+		if group.icons[toRemove] then
+			tremove(group.icons, toRemove)
+		end
+	end
+end
+
+local function addToGroup(group, spellId, icon)
+	removeFromGroups(spellId)
+	group.icons[spellId] = icon
 end
 
 local interval = 0.05
@@ -117,27 +138,16 @@ local function Update(self, elapsed)
 					icon = CreateFrame("Frame", nil, bar)
 					icon:SetSize(tW, tW)
 					icon.endGroup = icon:CreateAnimationGroup()
-					icon.cycleGroup = icon:CreateAnimationGroup()
-					icon:SetAlpha(1)
+					icon.endGroup:SetScript("OnFinished", function(self, requested) 
+						icon:SetAlpha(0) 
+						icon.hidden = true 
+					end)
 					icon:SetSize(tW, tW)
 					icon:SetScale(1, 1)
 
-					local fadeIn = icon.cycleGroup:CreateAnimation("Alpha")
-					local fadeOut = icon.cycleGroup:CreateAnimation("Alpha")
-
-					fadeIn:SetDuration(0.5)
-					fadeIn:SetChange(1)
-					fadeIn:SetSmoothing("IN")
-
-					fadeOut:SetDuration(0.5)
-					fadeOut:SetChange(-1)
-					fadeOut:SetSmoothing("OUT")
-
-					icon.fadeIn = fadeIn
-					icon.fadeOut = fadeOut
-
 					local alpha = icon.endGroup:CreateAnimation("Alpha")
-					alpha:SetChange(-1)
+					alpha:SetFromAlpha(1)
+					alpha:SetToAlpha(0)
 					alpha:SetDuration(1)
 					alpha:SetSmoothing("OUT")
 
@@ -161,34 +171,39 @@ local function Update(self, elapsed)
 
 				    local stamp = timeStamps[i]
 				    local next = timeStamps[i + 1] or timeStamps[#timeStamps]
-				    local group = groups[tostring(i)]
+				    local group
+
+				    if i - 1 <= 0 then
+				    	group = groups[1]
+				    else
+				    	group = groups[i]
+				    end
 
 				    if current >= stamp and current <= next then
 				        local diff = next - stamp
 				        local offset = startOffset + ( tW / 2 + ( tW * ( i - 1 ) ) )
-				        local tdiff = ( ( current - stamp ) / diff)
-				        local x = offset + ( tdiff * tW ) - (tW / 2)
+				        local tdiff = ( ( current - stamp ) / diff )
+				        local x = offset + ( tdiff * tW ) - ( tW / 2 )
 
-				        addToGroup(group, spellId)
+				        if icon.hidden then
+				        	icon.hidden = false
+				        	icon:SetAlpha(1)
+				        end
+
+				        addToGroup(group, spellId, icon)
 			        	icon:SetPoint("LEFT", bar, "LEFT", x, 0)
-			        	cycleChildrenAlpha(group)
 						
 						if current < .05 then
+							current = 0
 							icon:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
-							if icon.fadeIn:IsRunning() then
-								icon.fadeIn:Finish()
-							else
-								icon.fadeOut:Finish()
-								icon.fadeIn:Play()
-								icon.fadeIn:Finish()
-							end
 							icon.endGroup:Play()
-							removeFromGroup(group, spellId)
 						end 
 				    end
 				end
 			end
 		end
+
+		cycleGroups()
 
 		count = 0
 	end
