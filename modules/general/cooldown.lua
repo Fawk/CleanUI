@@ -53,7 +53,12 @@ local function cycleGroups()
 	local groups = {}
 	for spellId, icon in next, active do
 		if icon.group ~= -1 then
-			local group = groups[icon.group] or { current = spellId, icons = {} }
+			local group = groups[icon.group]
+			if not group then
+				group = { current = spellId, icons = {} }
+			else
+				icon:SetAlpha(0)
+			end
 			group.icons[spellId] = icon
 			tinsert(groups, group)
 		end
