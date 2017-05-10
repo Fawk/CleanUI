@@ -31,14 +31,6 @@ local function Event()
 	numSpells = GetNumSpells()
 end
 
-local function getFirst(tbl)
-	for i in next, tbl do return i end
-end
-
-local function changeGroup(index, icon)
-	icon.group = index
-end
-
 local interval = 0.03
 local count = 0
 local function Update(self, elapsed)

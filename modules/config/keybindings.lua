@@ -13,7 +13,7 @@ local find = string.find
 local lower = string.lower
 local length = string.length
 local tinsert = table.insert
-local tsort = table.sort
+local tsort, tinsert, tremove = table.sort, table.insert, table.remove
 local select = select
 
 local GetSpellInfo = GetSpellInfo
@@ -59,14 +59,19 @@ local function createCache()
 		local name,texture,offset,numSpells = GetSpellTabInfo(i)
 		for spellId = 1, numSpells do
 			local name,_,icon,_,_,_,id = GetSpellInfo(spellId, "spell")
-			spells[name] = { icon = icon, id = id }
+			if name and (IsSpellHelpful(spellId) or IsSpellHarmful(spellId)) then
+				spells[name] = { icon = icon, id = id }
+			end
 		end
 	end
 	for i = 1, NUM_BAG_SLOTS do
 		for slotId = 1, GetContainerNumSlots(i) do
-			local itemId = select(10, GetContainerItemInfo)
-			local name,_,_,_,_,_,_,_,_,texture,_ = GetItemInfo(itemId)
-			items[name] = { icon = texture, id = itemId }
+			local itemId = select(10, GetContainerItemInfo(i, slotId))
+			local spellName = GetItemSpell(itemId)
+			if spellName and (IsHelpfulItem(itemId) or IsHarmfulItem(itemId)) then
+				local name,_,_,_,_,_,_,_,_,texture = GetItemInfo(itemId)
+				items[name] = { icon = texture, id = itemId }
+			end
 		end
 	end
 end
@@ -127,13 +132,10 @@ local function verifyState(stateButtons, state, button)
             for name,_ in next, stateButtons do
                 if states[name].type == states[state].type then
                     A:Debug("Two of the same state type is not allowed. E.g both dead and nodead.")
-                else
-                    stateButtons[state] = button
-                    return true
                 end
             end
+            return true
         elseif modifiers[state] then
-            stateButtons[state] = button
             return true
         end
 	else
@@ -167,6 +169,12 @@ local function resolveIcon(name)
     return items[name] and items[name].icon or (spells[name] and spells[name].icon or nil)
 end
 
+local function getLast(tbl)
+	local ret
+	for _,o in next, tbl do ret = o end
+	return ret
+end
+
 local function createRow(parent, binding, db)
 
 	local row = CreateFrame("Frame", nil, parent)
@@ -186,7 +194,7 @@ local function createRow(parent, binding, db)
 	if db then
 		for _,state in next, binding.states do
 			local stateButton = buildButton(row):onClick(function(self, button, down)
-
+				tremove(row.stateButtons, state)
 			end):onHover(function(self, motion)
 				if self.hover and not self.oldText then
 					self.oldText = self:GetText()
@@ -197,6 +205,10 @@ local function createRow(parent, binding, db)
 
 			if not verifyState(row.stateButtons, state, stateButton) then
 				stateButton:Hide()
+			else
+				local parent = tsize(row.stateButtons) > 0 and getLast(row.stateButtons) or row
+				stateButton:SetPoint("LEFT", parent, parent == row and "LEFT" or "RIGHT", 5, 0)
+				row.stateButtons[state] = stateButton
 			end
 		end
 
@@ -206,7 +218,6 @@ local function createRow(parent, binding, db)
 	local addButton = buildButton(row):onClick(function(self, button, down)
 		if not down and button == "LeftButton" then
 			
-			-- Display dropdown with choices to add, modifiers,
 			if self.dropdown then
 				self.dropdown:Hide()
 			end
@@ -217,7 +228,6 @@ local function createRow(parent, binding, db)
 				end
 			end)
 
-			-- iterate choices and addItem to dropdown
 			for state,_ in next, states do 
 				dropdownBuilder:addItem(state)
 			end
@@ -234,9 +244,6 @@ local function createRow(parent, binding, db)
 		if userInput then
 			local searchResult = search(self:GetText())
 			if #searchResult > 1 then
-				-- Clear existing dropdown
-				-- Display dropdown with searchResult where each result in list is clickable, thus choosing the result
-				-- set self.valid to true when clicking one of the choices
 
 				if self.dropdown then
 					self.dropdown:Hide()
@@ -261,7 +268,7 @@ local function createRow(parent, binding, db)
 	end):onEnterPressed(function(self)
 		if self.valid then
 			self:SetEnabled(false)
-			--icon:SetTexture(nil)
+			row.icon:SetTexture(resolveIcon(self:GetText()))
 			if tsize(row.stateButtons) > 0 then
 				Keybindings:Save(parent["Keybindings"], db)
 			end
@@ -279,6 +286,7 @@ local function createRow(parent, binding, db)
         icon:SetTexture(nil)
     end):build()
 
+    row.iocn = icon
 	row.editbox = editbox
 	row.addButton = addButton
 end
