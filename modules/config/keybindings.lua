@@ -124,6 +124,12 @@ local states = {
 	}
 }
 
+local keys = {
+	[1] = "LMB",
+	[2] = "RMB",
+	[3] = "MMB"
+}
+
 local function verifyState(stateButtons, state, button)
 	if not stateButtons[state] then
         if states[state] then
@@ -155,12 +161,12 @@ end
 
 local function resolveStates(db)
     local s = {}
-    for match in db:gmatch("%a+") do if states[match] then table.insert(s, match) end end
+    for match in db:gmatch("%a+") do if states[match] then tinsert(s, match) end end
     return s
 end
 
 local function resolveName(db)
-    for match in db:gmatch("%a+") do print(match) if spells[match] or items[match] then return match end end
+    for match in db:gmatch("%s[%w%s:]+") do print(match) if spells[match] or items[match] then return string.ltrim(match) end end
 end
 
 local function resolveIcon(name)
@@ -168,13 +174,34 @@ local function resolveIcon(name)
 end
 
 local function resolveKey(type)
-	return nil
+	return keys[type:gmatch("%d")()]
+end
+
+local function resolveType(binding)
+	local type, key, mods = nil, nil, {}
+	for k,v in next, keys do
+		if binding.key == v then
+			key = k
+		end
+	end
+
+	return format("%s%s%s", concat(mods, "-").."-", "something", key)
 end
 
 local function getLast(tbl)
 	local ret
 	for _,o in next, tbl do ret = o end
 	return ret
+end
+
+local function resolveStateColor(state)
+	local typeOfState
+	if modifiers[state] then
+		typeOfState = "modifier"
+	elseif states[state] then
+		typeOfState = "state"
+	end
+	return A.colors.keybindings.states[state] or A.colors.keybindings.states[typeOfState]
 end
 
 local function createRow(parent, binding, db)
@@ -205,11 +232,7 @@ local function createRow(parent, binding, db)
 
 				self:SetText(self.hover and L["Remove?"] or self.oldText)
 				self:SetBackdropColor(self.hover and unpack(A.colors.keybindings.remove) or unpack(self.oldBackdropColor))
-			end):build()
-
-			stateButton:SetBackdrop(A.enum.backdrops.buttonroundborder)
-			stateButton:SetBackdropColor(unpack(A.colors.backdrop.light))
-			stateButton:SetBackdropBorderColor(unpack(A.colors.border.target))
+			end):backdrop(A.enum.backdrops.buttonroundborder, resolveStateColor(state), A.colors.border.target):build()
 
 			if not verifyState(row.stateButtons, state, stateButton) then
 				stateButton:Hide()
@@ -246,7 +269,7 @@ local function createRow(parent, binding, db)
 
 			self.dropdown = dropdownBuilder:build()
 		end
-	end):build()
+	end):backdrop(A.enum.backdrops.buttonroundborder, A.colors.backdrop.light, A.colors.border.target):build()
 
 	local editbox = buildEditbox(row):onTextChanged(function(self, userInput) 
 		if userInput then
@@ -281,7 +304,7 @@ local function createRow(parent, binding, db)
 				Keybindings:Save(parent["Keybindings"], db)
 			end
 		end
-	end):build()
+	end):backdrop(A.enum.backdrops.buttonroundborder, A.colors.backdrop.light, A.colors.border.target):build()
 
     editbox:SetText(binding.name)
     editbox:SetEnabled(false)
@@ -292,9 +315,9 @@ local function createRow(parent, binding, db)
     local editButton = buildButton(row):rightOf(editbox):onClick(function(self, button, down)
         editbox:SetEnabled(true)
         icon:SetTexture(nil)
-    end):build()
+    end):backdrop(A.enum.backdrops.buttonroundborder, A.colors.backdrop.light, A.colors.border.target):build()
 
-    row.iocn = icon
+    row.icon = icon
 	row.editbox = editbox
 	row.addButton = addButton
 end
@@ -361,10 +384,15 @@ function Keybindings:Init(parent, unit, db)
 end
 
 function Keybindings:Save(bindings, db)
+	db = {}
 	for _,binding in next, bindings do
-	    -- resolve if macro/target/togglemenu action and do different things
-		local key = binding.key
-		local action = format("/%s [@unit,%s] %s", binding.action, concat(binding.states, ","), binding.name)
+	   	local type, action = resolveType(binding), nil
+	    if ignored[binding.action] then
+	    	action = binding.action
+		else
+			action = format("/%s [@unit,%s] %s", binding.action, concat(binding.states, ","), binding.name)
+		end
+		tinsert(db, { type = type, action = action })
 	end
 end
 

@@ -1,6 +1,4 @@
 local A, L = unpack(select(2, ...))
-local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 
 A.colors = {
 	health = {
@@ -55,6 +53,11 @@ A.colors = {
 	},
 	keybindings = {
 		remove = { 1, .13, .13 },
-		
+		states = {
+			modifier = { .13, .13, 1 },
+			help = { .13, 1, .13 },
+			harm { 1, .13, .13 },
+			state = { .53, .53, 0 }
+		}
 	}
 }
