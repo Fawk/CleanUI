@@ -9,24 +9,22 @@ local spells, items = {}, {}
 local cacheInit = false
 local actions = { ["cast"] = false, ["use"] = false }
 
-local find = string.find
-local lower = string.lower
-local length = string.length
-local tinsert = table.insert
-local tsort, tinsert, tremove = table.sort, table.insert, table.remove
+local find, lower, length, format = string.find, string.lower, string.length, string.format
+local tsort, tinsert, tremove, concat = table.sort, table.insert, table.remove, table.concat
 local select = select
 
 local GetSpellInfo = GetSpellInfo
 
-function string:split(sep)
-   local sep, fields = sep or ":", {}
-   local pattern = string.format("([^%s]+)", sep)
-   self:gsub(pattern, function(c) fields[#fields+1] = c end)
-   return fields
-end
-
 function string:ltrim()
    return self:gsub("^%s*", "") 
+end
+
+function string:split(sep)
+   local sep = sep or ";"
+   local fields = {}
+   local pattern = string.format("([^%s]+)", sep)
+   self:gsub(pattern, function(c) fields[#fields+1] = string.ltrim(c) end)
+   return fields
 end
 
 local function tsize(t)
@@ -59,7 +57,7 @@ local function createCache()
 		local name,texture,offset,numSpells = GetSpellTabInfo(i)
 		for spellId = 1, numSpells do
 			local name,_,icon,_,_,_,id = GetSpellInfo(spellId, "spell")
-			if name and (IsSpellHelpful(spellId) or IsSpellHarmful(spellId)) then
+			if name and (IsHelpfulSpell(spellId) or IsHarmfulSpell(spellId)) then
 				spells[name] = { icon = icon, id = id }
 			end
 		end
@@ -151,22 +149,26 @@ end
 
 local function resolveVariations(db)
     local variations = {}
-    for _,variation in next, db:split(";") do tinsert(variations, variation) end
+    for _,variation in next, string.split(db, ";") do tinsert(variations, variation) end
     return variations
 end
 
 local function resolveStates(db)
     local s = {}
-    for match in g:gmatch("%a+") do if states[match] then table.insert(s, match) end end
+    for match in db:gmatch("%a+") do if states[match] then table.insert(s, match) end end
     return s
 end
 
 local function resolveName(db)
-    for match in db:gmatch("%a+") do if spells[match] or items[match] then return match end end
+    for match in db:gmatch("%a+") do print(match) if spells[match] or items[match] then return match end end
 end
 
 local function resolveIcon(name)
     return items[name] and items[name].icon or (spells[name] and spells[name].icon or nil)
+end
+
+local function resolveKey(type)
+	return nil
 end
 
 local function getLast(tbl)
@@ -198,10 +200,16 @@ local function createRow(parent, binding, db)
 			end):onHover(function(self, motion)
 				if self.hover and not self.oldText then
 					self.oldText = self:GetText()
+					self.oldBackdropColor = { self:GetBackdropColor() }
 				end
 
 				self:SetText(self.hover and L["Remove?"] or self.oldText)
+				self:SetBackdropColor(self.hover and unpack(A.colors.keybindings.remove) or unpack(self.oldBackdropColor))
 			end):build()
+
+			stateButton:SetBackdrop(A.enum.backdrops.buttonroundborder)
+			stateButton:SetBackdropColor(unpack(A.colors.backdrop.light))
+			stateButton:SetBackdropBorderColor(unpack(A.colors.border.target))
 
 			if not verifyState(row.stateButtons, state, stateButton) then
 				stateButton:Hide()
@@ -311,6 +319,12 @@ local Keybindings = {}
 -- [Help] [Ctrl] Dispel
 -- [Help] [Ctrl] [Shift] Pain Suppression
 
+local ignored = {
+	target = true,
+	macro = true,
+	togglemenu = true
+}
+
 function Keybindings:Init(parent, unit, db)
 	if not cacheInit then
 		createCache()
@@ -323,16 +337,20 @@ function Keybindings:Init(parent, unit, db)
 
     local bindings = {}
     for _,binding in next, db do
-        local action = resolveAction(db)
-        for _,variation in next, resolveVariations(db) do
-            local name = resolveName(variation)
-            tinsert(bindings, {
-                action = action,
-                states = resolveStates(variation),
-                name = name,
-                icon = resolveIcon(name)
-            })
-        end
+    	if not ignored[binding.action] then
+	        local action = resolveAction(binding.action)
+	        local key = resolveKey(binding.type)
+	        for _,variation in next, resolveVariations(binding.action) do
+	            local name = resolveName(variation)
+	            tinsert(bindings, {
+	            	key = key,
+	                action = action,
+	                states = resolveStates(variation),
+	                name = name,
+	                icon = resolveIcon(name)
+	            })
+	        end
+	    end
     end
 
     for _,binding in next, bindings do
@@ -343,5 +361,11 @@ function Keybindings:Init(parent, unit, db)
 end
 
 function Keybindings:Save(bindings, db)
-
+	for _,binding in next, bindings do
+	    -- resolve if macro/target/togglemenu action and do different things
+		local key = binding.key
+		local action = format("/%s [@unit,%s] %s", binding.action, concat(binding.states, ","), binding.name)
+	end
 end
+
+A.options["Keybindings"] = Keybindings

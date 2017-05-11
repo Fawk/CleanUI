@@ -404,6 +404,12 @@ local function EditBoxBuilder(parent)
 		return self
 	end
 
+	function o:withSize(w, h)
+		self.w = w
+		self.h = h
+		return
+	end
+
 	function o:backdrop(bd, bdColor, borderColor)
 		self.textbox:SetBackdrop(bd)
 		self.textbox:SetBackdropColor(unpack(bdColor))
@@ -413,10 +419,11 @@ local function EditBoxBuilder(parent)
 
 	function o:build()
 		setPoints(self, self.textbox)
-		self.textbox:SetSize(self.w, self.h)
+		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 20)
 		return self.textbox
 	end
 
+	return o
 end
 
 local function DropdownBuilder(parent)

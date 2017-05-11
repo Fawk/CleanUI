@@ -5,7 +5,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon["Modules"], Addon["Elements"] = {}, {}, {}
+Addon.frames, Addon["Modules"], Addon["Elements"], Addon.options = {}, {}, {}, {}
 Addon.debugging = true
 
 Addon.oUF = Args.oUF or oUF

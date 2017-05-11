@@ -144,6 +144,13 @@ function Party:Init()
         Units:Add(partyContainer, frameName)
     end
 
+
+    local f = CreateFrame("Frame", nil, A.frameParent)
+    f:SetSize(250, 500)
+    f:SetPoint("CENTER")
+
+    A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
+
     Units:Position(partyContainer, db["Position"])
     partyContainer:UpdateSize(db)
     A:CreateMover(partyContainer, db, "Party")
