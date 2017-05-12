@@ -56,7 +56,7 @@ A.colors = {
 		states = {
 			modifier = { .13, .13, 1 },
 			help = { .13, 1, .13 },
-			harm { 1, .13, .13 },
+			harm = { 1, .13, .13 },
 			state = { .53, .53, 0 }
 		}
 	}

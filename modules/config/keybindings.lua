@@ -9,11 +9,12 @@ local spells, items = {}, {}
 local cacheInit = false
 local actions = { ["cast"] = false, ["use"] = false }
 
-local find, lower, length, format = string.find, string.lower, string.length, string.format
+local find, lower, len, format = string.find, string.lower, string.len, string.format
 local tsort, tinsert, tremove, concat = table.sort, table.insert, table.remove, table.concat
 local select = select
 
 local GetSpellInfo = GetSpellInfo
+local GetNumSpellTabs = GetNumSpellTabs
 
 function string:ltrim()
    return self:gsub("^%s*", "") 
@@ -35,7 +36,7 @@ end
 
 local function sortStates(t, k)
     local keys, newtbl = {}, {}
-    for k in next, t do table.insert(keys, k) end
+    for k in next, t do tinsert(keys, k) end
     tsort(keys, function(a,b) return t[a][k] < t[b][k] end)
     for _,v in ipairs(keys) do tinsert(newtbl, { key = v, value = t[v][k] }) end
     
@@ -52,14 +53,20 @@ local function sortStates(t, k)
     end
 end
 
-local function createCache()
+local function GetNumSpells()
+	local r = 0
 	for i = 1, GetNumSpellTabs() do
-		local name,texture,offset,numSpells = GetSpellTabInfo(i)
-		for spellId = 1, numSpells do
-			local name,_,icon,_,_,_,id = GetSpellInfo(spellId, "spell")
-			if name and (IsHelpfulSpell(spellId) or IsHarmfulSpell(spellId)) then
-				spells[name] = { icon = icon, id = id }
-			end
+		r = r + select(4, GetSpellTabInfo(i))
+	end
+	return r
+end
+
+local function createCache()
+	for i = 1, GetNumSpells() do
+		local _,id = GetSpellBookItemInfo(i, "spell")
+		local spellName = GetSpellInfo(id)
+		if spellName then
+			spells[spellName] = { icon = icon, id = id }
 		end
 	end
 	for i = 1, NUM_BAG_SLOTS do
@@ -76,7 +83,7 @@ end
 
 local function search(text)
 	local result = {}
-	if length(text) > 1 then
+	if len(text) > 1 then
 		for name, obj in next, spells do
 			if find(lower(name), lower(text)) then
 				result[name] = { obj = obj, type = "spell" }
@@ -166,7 +173,13 @@ local function resolveStates(db)
 end
 
 local function resolveName(db)
-    for match in db:gmatch("%s[%w%s:]+") do print(match) if spells[match] or items[match] then return string.ltrim(match) end end
+	print("Resolving name:", db)
+    for match in db:gmatch("%s[%w%s:]+") do
+    	local m = string.ltrim(match)
+    	if spells[m] or items[m] then
+    		return m
+    	end 
+    end
 end
 
 local function resolveIcon(name)
@@ -206,6 +219,8 @@ end
 
 local function createRow(parent, binding, db)
 
+	if not binding then return end
+
 	local row = CreateFrame("Frame", nil, parent)
 	row:SetHeight(20)
 	row.stateButtons = {}
@@ -232,7 +247,8 @@ local function createRow(parent, binding, db)
 
 				self:SetText(self.hover and L["Remove?"] or self.oldText)
 				self:SetBackdropColor(self.hover and unpack(A.colors.keybindings.remove) or unpack(self.oldBackdropColor))
-			end):backdrop(A.enum.backdrops.buttonroundborder, resolveStateColor(state), A.colors.border.target):build()
+			end):backdrop(A.enum.backdrops.buttonroundborder, resolveStateColor(state), A.colors.border.target)
+				:size(20, 10):build()
 
 			if not verifyState(row.stateButtons, state, stateButton) then
 				stateButton:Hide()
@@ -269,7 +285,13 @@ local function createRow(parent, binding, db)
 
 			self.dropdown = dropdownBuilder:build()
 		end
-	end):backdrop(A.enum.backdrops.buttonroundborder, A.colors.backdrop.light, A.colors.border.target):build()
+	end):backdrop(A.enum.backdrops.buttonroundborder, A.colors.backdrop.light, A.colors.border.target)
+		:size(20, 10)
+		:build()
+
+	local addText = buildText(addButton, 12):atCenter():build()
+	addText:SetText("Add")
+	addButton:SetFontString(addText)
 
 	local editbox = buildEditbox(row):onTextChanged(function(self, userInput) 
 		if userInput then
@@ -308,6 +330,8 @@ local function createRow(parent, binding, db)
 
     editbox:SetText(binding.name)
     editbox:SetEnabled(false)
+    editbox:ClearFocus()
+    editbox:SetAutoFocus(false)
 
     local icon = row:CreateTexture(nil, "OVERLAY")
     icon:SetTexture(binding.icon)
@@ -354,9 +378,9 @@ function Keybindings:Init(parent, unit, db)
 		cacheInit = true
 	end
 
-	for _,region in next, { parent:GetRegions() } do
-		region:Hide()
-	end
+	--for _,region in next, { parent:GetRegions() } do
+		--region:Hide()
+	--end
 
     local bindings = {}
     for _,binding in next, db do
@@ -365,11 +389,12 @@ function Keybindings:Init(parent, unit, db)
 	        local key = resolveKey(binding.type)
 	        for _,variation in next, resolveVariations(binding.action) do
 	            local name = resolveName(variation)
+				print(name)
 	            tinsert(bindings, {
 	            	key = key,
 	                action = action,
 	                states = resolveStates(variation),
-	                name = name,
+	                name = name or "skit",
 	                icon = resolveIcon(name)
 	            })
 	        end
@@ -379,8 +404,6 @@ function Keybindings:Init(parent, unit, db)
     for _,binding in next, bindings do
         createRow(parent, binding)
     end
-
-	createRow(parent, nil)
 end
 
 function Keybindings:Save(bindings, db)

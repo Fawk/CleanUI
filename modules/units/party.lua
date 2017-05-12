@@ -145,9 +145,12 @@ function Party:Init()
     end
 
 
-    local f = CreateFrame("Frame", nil, A.frameParent)
+    local f = CreateFrame("Frame", A:GetName().."_Keybindings", A.frameParent)
     f:SetSize(250, 500)
     f:SetPoint("CENTER")
+    f:SetBackdrop(E.backdrops.buttonroundborder)
+    f:SetBackdropColor(unpack(A.colors.backdrop.default))
+    f:SetBackdropBorderColor(unpack(A.colors.border.target))
 
     A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
 
