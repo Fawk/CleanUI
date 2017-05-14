@@ -110,10 +110,11 @@ function Party:Init()
         partyContainer.UpdateUnits = function()
             for i = 1, 5 do
                 local uf = partyHeader:GetAttribute("child"..i)
-                if not uf then break end
-                uf:RegisterForClicks("AnyUp")
-                uf.unit = uf:GetAttribute("unit")
-                Party:Update(uf, db)
+                if uf then
+                    uf:RegisterForClicks("AnyUp")
+                    uf.unit = uf:GetAttribute("unit")
+                    Party:Update(uf, db)
+                end
             end
         end
 
@@ -145,14 +146,14 @@ function Party:Init()
     end
 
 
-    local f = CreateFrame("Frame", A:GetName().."_Keybindings", A.frameParent)
-    f:SetSize(250, 500)
-    f:SetPoint("CENTER")
-    f:SetBackdrop(E.backdrops.buttonroundborder)
-    f:SetBackdropColor(unpack(A.colors.backdrop.default))
-    f:SetBackdropBorderColor(unpack(A.colors.border.target))
+    --local f = CreateFrame("Frame", A:GetName().."_Keybindings", A.frameParent)
+    --f:SetSize(250, 500)
+    --f:SetPoint("CENTER")
+    --f:SetBackdrop(E.backdrops.buttonroundborder)
+    --f:SetBackdropColor(unpack(A.colors.backdrop.default))
+    --f:SetBackdropBorderColor(unpack(A.colors.border.target))
 
-    A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
+    --A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
 
     Units:Position(partyContainer, db["Position"])
     partyContainer:UpdateSize(db)
@@ -216,7 +217,8 @@ function Party:Update(frame, db)
         [97821] = true,     -- Void-Touched
         [123981] = true,    -- Perdition
         [113942] = true,    -- Demonic Gateway
-        [233377] = true     -- Gaze of Aman'Thul
+        [233377] = true,    -- Gaze of Aman'Thul
+        [95809] = true      -- Insanity 
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],

@@ -16,7 +16,9 @@ local tW = 32
 local startOffset = 16
 local barWidth = ( tW * #timeStamps ) + ( startOffset * 2 )
 local buildText = A.TextBuilder
-local blacklist = {}
+local blacklist = {
+    [125439] = true -- Revive Battle Pets
+}
 local bar
 
 local function GetNumSpells()
@@ -44,6 +46,13 @@ local function Update(self, elapsed)
 			local spellType, spellId = GetSpellBookItemInfo(x, "spell")
 			local texture = select(3, GetSpellInfo(spellId))
 			local start, duration = GetSpellCooldown(spellId)
+
+            if start == 0 and active[spellId] and active[spellId]:GetAlpha() > 0 then
+                active[spellId]:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
+				active[spellId].cycleGroup:Stop()
+				active[spellId].endGroup:Play()
+				active[spellId] = nil
+            end
 
 			if start ~= 0 and duration ~= 0 and (duration > 1.5 or active[spellId]) and not blacklist[spellId] then
 
