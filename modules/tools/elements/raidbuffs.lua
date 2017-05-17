@@ -13,8 +13,12 @@ local UpdateTime = function(self, elapsed)
 end
 
 local Update = function(self, event, unit)
-	if(self.unit ~= unit) then return end
-    if not unit then return end
+	if not unit or self.unit ~= unit or UnitIsDead(unit) then
+		for _,obj in next, tracked do
+			obj:Hide()
+		end
+		return
+	end
 
 	local buffs = self.RaidBuffs
 	local tracked = buffs.Tracked
