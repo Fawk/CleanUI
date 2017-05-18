@@ -13,15 +13,17 @@ local UpdateTime = function(self, elapsed)
 end
 
 local Update = function(self, event, unit)
-	if not unit or self.unit ~= unit or UnitIsDead(unit) then
+	if not unit then return end
+	local buffs = self.RaidBuffs
+	local tracked = buffs.Tracked
+
+	if self.unit ~= unit or UnitIsDead(unit) then
 		for _,obj in next, tracked do
 			obj:Hide()
 		end
 		return
 	end
 
-	local buffs = self.RaidBuffs
-	local tracked = buffs.Tracked
 	for index = 1, (buffs.numLimit or 40) do
 		local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL")
 		local obj = tracked[spellID]
