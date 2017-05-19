@@ -24,6 +24,7 @@ local Update = function(self, event, unit)
 		--return
 	--end
 
+	local hasBuffs = false
 	for index = 1, (buffs.numLimit or 40) do
 		local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL")
 		local obj = tracked[spellID]
@@ -56,6 +57,7 @@ local Update = function(self, event, unit)
 
 					obj.nextUpdate = -1
 					UpdateTime(obj, 0)
+					hasBuffs = true
 				else
 					obj:Hide()
 				end
@@ -66,13 +68,18 @@ local Update = function(self, event, unit)
             obj:Hide()
         end
 	end
+
+	if not hasBuffs then
+		for _,obj in next, tracked do
+			obj:Hide()
+		end
+	end
 end
 
 local Enable = function(self)
 	local buffs = self.RaidBuffs
 	if(buffs) then
 		self:RegisterEvent("UNIT_AURA", Update)
-		self:RegisterEvent("GROUP_ROSTER_UPDATE", Update)
 	end
 end
 
@@ -80,7 +87,6 @@ local Disable = function(self)
 	local buffs = self.RaidBuffs
 	if(buffs) then
 		self:UnregisterEvent("UNIT_AURA", Update)
-		self:UnregisterEvent("GROUP_ROSTER_UPDATE", Update)
 	end
 end
 
