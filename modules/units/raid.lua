@@ -54,7 +54,7 @@ function Raid:Init()
 	local db = A["Profile"]["Options"][frameName]
     local maxColumns, unitsPerColumn = 5, 1
 
-    local size, point, anchorPoint = db["Size"], "BOTTOM", "TOP"
+    local size, point, anchorPoint = db["Size"], "LEFT", "TOP"
 
     if db["Orientation"] == "VERTICAL" then
         maxColumns = 5
@@ -81,10 +81,10 @@ function Raid:Init()
         "showRaid",           true,
         "yOffset",            db["Offset Y"],
         "xOffset",            db["Offset X"],
-        'point', 'LEFT',
+        'point', point,
         'maxColumns', 8,
         'unitsPerColumn', 5,
-        'columnAnchorPoint', 'TOP',
+        'columnAnchorPoint', anchorPoint,
         "columnSpacing", db["Offset Y"],
         "groupBy", "ASSIGNEDROLE",
         "groupingOrder", "TANK,HEALER,DAMAGER",
@@ -223,7 +223,7 @@ function Raid:Update(frame, db)
                         name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
                         if name and not ignored[spellID] then
                             if(duration and duration > 0) then
-                                debuffs[dtype or "Physical"] = true
+                                debuffs[dtype] = true
                             end
                         end
                     end

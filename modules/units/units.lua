@@ -48,6 +48,88 @@ function Units:UpdateElements(frame, db)
         end
     end
 end
+
+local UpdateTime = function(self, elapsed)
+    self.timeLeft = self.timeLeft - elapsed
+    if(self.nextUpdate > 0) then
+        self.nextUpdate = self.nextUpdate - elapsed
+        return
+    end
+    if self.timeLeft <= 0 then
+        self:Hide()
+    end
+end
+
+local important = {
+    ["BossDebuff"] = function(self, frame, db)
+        local size, position, tracked, ignored = db["Size"], db["Position"], db["Tracked"], db["Ignored"]
+
+        local debuff = frame["Boss Debuff"]
+        if not debuff then
+            debuff = CreateFrame("Frame", nil, frame)
+            debuff:SetSize(size, size)
+            Units:Position(debuff, position)
+
+            local icon = debuff:CreateTexture(nil, "OVERLAY")
+            icon:SetAllPoints()
+
+            debuff.icon = icon
+        end
+
+        local hasBuffs = false
+        for index = 1, (buffs.numLimit or 40) do
+            local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL")
+            local obj = tracked[spellID]
+            if(name and obj) then
+                obj.expirationTime = expirationTime
+                if(duration and duration > 0) then
+                    obj.cd:SetCooldown(expirationTime - duration, duration)
+                    obj.cd:SetHideCountdownNumbers(db["Hide Cooldown Numbers"])
+                    for _,region in next, {obj.cd:GetRegions()} do
+                        if region:GetObjectType() == "FontString" then
+                            obj.cd.cooldownText = region
+                        end
+                    end
+                    if obj.cd.cooldownText then
+                        local media = LibStub("LibSharedMedia-3.0")
+                        obj.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), db["Cooldown Numbers Text Size"], "OUTLINE")
+                    end
+                    if count > 0 then
+                        obj.count:SetText(count)
+                        obj.count:Show()
+                    end
+                    local timeLeft = expirationTime - GetTime()
+                    if(not obj.timeLeft) then
+                        obj.timeLeft = timeLeft
+                        obj:SetScript("OnUpdate", UpdateTime)
+                    else
+                        obj.timeLeft = timeLeft
+                    end
+
+                    obj.nextUpdate = -1
+                    UpdateTime(obj, 0)
+                    hasBuffs = true
+                else
+                    obj:Hide()
+                end
+                obj.icon:SetTexture(texture)
+                obj:Show()
+            elseif (not name and obj) then
+                obj:Hide()
+            end
+        end
+    end
+}
+
+function Units:UpdateImportantElements(frame, db)
+    if db then
+        for name, element in next, db do
+            if element["Important"] then
+                important[name](frame, element)
+            end
+        end
+    end
+end
  
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()

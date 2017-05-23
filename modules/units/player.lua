@@ -41,6 +41,7 @@ function Player:Update(frame, db)
 
     local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
 
+    frame:SetUserPlaced(true)
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
     Units:UpdateElements(frame, db)

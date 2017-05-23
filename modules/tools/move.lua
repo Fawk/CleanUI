@@ -65,7 +65,7 @@ function A:InitMove()
 		moveFrame.affecting:SetParent(moveFrame.hiddenFrame)
 		moveFrame.affecting:ClearAllPoints()
 		moveFrame.affecting:SetAllPoints(moveFrame)
-		moveFrame.affecting:SetSize(w, h)
+		--moveFrame.affecting:SetSize(w, h)
 
 		if moveFrame.affecting.overrideShow then
 			moveFrame.affecting.OldShow = moveFrame.affecting.Show
