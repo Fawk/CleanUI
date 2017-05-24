@@ -41,7 +41,6 @@ function Player:Update(frame, db)
 
     local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
 
-    frame:SetUserPlaced(true)
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
     Units:UpdateElements(frame, db)
@@ -65,6 +64,21 @@ function Player:Update(frame, db)
     for name, custom in next, db["Tags"]["Custom"] do
         Units:Tag(frame, name, custom)
     end
-end
+	
+	-- this displays how to use recursive functions to traverse an encounter
+	local function traverse(id,off)
+	  off=off or ""
+	  while id do
+		local nex,ch,_,li=select(6,EJ_GetSectionInfo(id))
+		print(off..li)
+		if ch then
+		  traverse(ch,off.."  ")
+		end
+		id=nex
+	  end
+	end
+	-- 198 is the encounterID for Ragnaros
+	traverse((select(4,EJ_GetEncounterInfo(2037))))
+	end
 
 A.modules["player"] = Player
