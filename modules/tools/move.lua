@@ -18,6 +18,7 @@ local function FinalizeMove()
 		end
 	end
 	finishFrame:Hide()
+    A.Database:Save()
 end
 
 function A:InitMove()
@@ -60,19 +61,16 @@ function A:InitMove()
 	for name, moveFrame in next, moveableFrames do
 		
 		moveFrame:Show()
-
-		local w, h = moveFrame.affecting:GetSize()
 		moveFrame.affecting:SetParent(moveFrame.hiddenFrame)
 		moveFrame.affecting:ClearAllPoints()
-		moveFrame.affecting:SetAllPoints(moveFrame)
-		--moveFrame.affecting:SetSize(w, h)
+		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 
 		if moveFrame.affecting.overrideShow then
 			moveFrame.affecting.OldShow = moveFrame.affecting.Show
 			moveFrame.affecting.Show = moveFrame.affecting.Hide
 		end
 
-		moveFrame:SetSize(w, h)
+		moveFrame:SetSize(moveFrame.affecting:GetSize())
 	end
 end
 
@@ -85,6 +83,13 @@ function A:CreateMover(frame, db, overrideName)
 	if not size then
 		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
 	end
+    
+    if type(size) == "number" then
+        size = {
+            ["Width"] = size, 
+            ["Height"] = size
+        }
+    end
 
 	local moveFrame = CreateFrame("Button", name.."_Mover", A.frameParent)
 	moveFrame.affecting = frame
@@ -124,13 +129,25 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame.Apply = function(self)
 		local lp, relative, p, x, y = self:GetPoint()
 		self.affecting:SetParent(A.frameParent)
-		db["Position"] = {
-	        ["Point"] = p,
-	        ["Local Point"] = lp,
-	        ["Offset X"] = x,
-	        ["Offset Y"] = y,
-	        ["Relative To"] = "Parent"
-		}
+
+        if A["Profile"]["Options"][name] then
+            local position = {
+                ["Point"] = p,
+                ["Local Point"] = lp,
+                ["Offset X"] = x,
+                ["Offset Y"] = y,
+                ["Relative To"] = "Parent"
+            }
+            local obj = {}
+            for k,v in next, A["Profile"]["Options"][name] do
+                obj[k] = v
+            end
+            obj["Position"] = position
+            A.Database:Prepare(name, obj)
+        else
+            A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
+        end
+        
 	end
 	moveFrame:Hide()
 

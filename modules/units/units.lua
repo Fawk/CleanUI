@@ -1,6 +1,7 @@
 local A, L = unpack(select(2, ...))
 local Units, units, oUF = {}, {}, A.oUF
 local media = LibStub("LibSharedMedia-3.0")
+local T = A.Tools
 
 for key, obj in next, {
     ["3charname"] = {
@@ -60,6 +61,27 @@ local UpdateTime = function(self, elapsed)
     end
 end
 
+local function GetUnitAuras(unit, filter)
+    local auras = {}    
+    for index = 1, 40 do
+        local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, filter)
+        if name and duration and duration > 0 then
+            auras[spellID] = {
+                name = name,
+                dtype = dtype,
+                duration = duration,
+                count = count,
+                texture = texture,
+                caster = caster,
+                isBossDebuff = isBossDebuff,
+                expirationTime = expirationTime,
+                casterIsPlayer = casterIsPlayer
+            }
+        end
+    end
+    return auras
+end
+
 local important = {
     ["BossDebuff"] = function(self, frame, db)
         local size, position, tracked, ignored = db["Size"], db["Position"], db["Tracked"], db["Ignored"]
@@ -74,57 +96,150 @@ local important = {
             icon:SetAllPoints()
 
             debuff.icon = icon
+            debuff:Hide()
         end
 
-        local hasBuffs = false
-        for index = 1, (buffs.numLimit or 40) do
-            local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, "HELPFUL")
-            local obj = tracked[spellID]
-            if(name and obj) then
-                obj.expirationTime = expirationTime
-                if(duration and duration > 0) then
-                    obj.cd:SetCooldown(expirationTime - duration, duration)
-                    obj.cd:SetHideCountdownNumbers(db["Hide Cooldown Numbers"])
-                    for _,region in next, {obj.cd:GetRegions()} do
-                        if region:GetObjectType() == "FontString" then
-                            obj.cd.cooldownText = region
-                        end
+        for spellId, aura in next, GetUnitAuras(frame.unit, "HARMFUL") do
+            if tracked[spellId] and not ignored[spellId] then
+                debuff.expirationTime = aura.expirationTime
+                debuff.cd:SetCooldown(expirationTime - duration, duration)
+                debuff.cd:SetHideCountdownNumbers(db["Hide Cooldown Numbers"])
+                for _,region in next, {debuff.cd:GetRegions()} do
+                    if region:GetObjectType() == "FontString" then
+                        debuff.cd.cooldownText = region
                     end
-                    if obj.cd.cooldownText then
-                        local media = LibStub("LibSharedMedia-3.0")
-                        obj.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), db["Cooldown Numbers Text Size"], "OUTLINE")
-                    end
-                    if count > 0 then
-                        obj.count:SetText(count)
-                        obj.count:Show()
-                    end
-                    local timeLeft = expirationTime - GetTime()
-                    if(not obj.timeLeft) then
-                        obj.timeLeft = timeLeft
-                        obj:SetScript("OnUpdate", UpdateTime)
-                    else
-                        obj.timeLeft = timeLeft
-                    end
-
-                    obj.nextUpdate = -1
-                    UpdateTime(obj, 0)
-                    hasBuffs = true
-                else
-                    obj:Hide()
                 end
-                obj.icon:SetTexture(texture)
-                obj:Show()
-            elseif (not name and obj) then
-                obj:Hide()
+                if debuff.cd.cooldownText then
+                    local media = LibStub("LibSharedMedia-3.0")
+                    debuff.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), db["Cooldown Numbers Text Size"], "OUTLINE")
+                end
+                if count > 0 then
+                    debuff.count:SetText(count)
+                    debuff.count:Show()
+                end
+                local timeLeft = expirationTime - GetTime()
+                if(not debuff.timeLeft) then
+                    debuff.timeLeft = timeLeft
+                    debuff:SetScript("OnUpdate", UpdateTime)
+                else
+                    debuff.timeLeft = timeLeft
+                end
+
+                debuff.nextUpdate = -1
+                UpdateTime(debuff, 0)
+            else
+                debuff:Hide()
+            end
+            
+            debuff.icon:SetTexture(texture)
+            debuff:Show()
+        end
+    end,
+    ["RaidBuffs"] = function(frame, db)   
+
+        local tracked = db["Tracked"]
+        
+        local buffs = frame["RaidBuffs"]
+        if not buffs then
+            buffs = {}
+        end
+
+        for spellId,_ in next, buffs do	
+            if not tracked[spellId] then
+                buffs[spellId]:Hide()
+                table.remove(buffs, spellId)
             end
         end
+
+        for spellId, obj in next, tracked do
+            local size, position, ignored = obj["Size"], obj["Position"]
+
+            if not buffs[spellId] then
+
+                local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
+                Units:Position(buff, position)
+                buff:SetSize(size, size)
+                buff:SetFrameStrata("HIGH")
+
+                local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
+                cd:SetAllPoints(buff)
+                cd:SetReverse(true)
+
+                local icon = buff:CreateTexture(nil, "BORDER")
+                icon:SetAllPoints(buff)
+
+                local count = buff:CreateFontString(nil, "OVERLAY")
+                count:SetFontObject(NumberFontNormal)
+                count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
+
+                buff.hideNumbers = obj["Hide Countdown Numbers"]
+                buff.trackOnlyPlayer = obj["Own only"]
+                buff.cdTextSize = obj["Cooldown Numbers Text Size"]
+                buff.icon = icon
+                buff.count = count
+                buff.cd = cd
+
+                buff:Hide()
+            
+                buffs[spellId] = buff
+            end         
+        end
+        
+        local auras = GetUnitAuras(frame.unit, "HELPFUL")
+        if T:tcount(auras) == 0 then
+            for spellId, buff in next, buffs do
+                buff:Hide()
+            end
+        end
+        
+        for spellId, buff in next, buffs do
+            if not auras[spellId] and buffs[spellId] then
+                buff:Hide()
+            end
+        end
+        
+        for spellId, aura in next, auras do
+            local obj = buffs[spellId]
+            if obj and ((obj.trackOnlyPlayer and aura.casterIsPlayer) or not obj.trackOnlyPlayer) then 
+                obj.cd:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
+                obj.cd:SetHideCountdownNumbers(obj.hideNumbers)
+                for _,region in next, {obj.cd:GetRegions()} do
+                    if region:GetObjectType() == "FontString" then
+                        obj.cd.cooldownText = region
+                    end
+                end
+                if obj.cd.cooldownText then
+                    local media = LibStub("LibSharedMedia-3.0")
+                    obj.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), obj.cdTextSize, "OUTLINE")
+                end
+                if aura.count and aura.count > 0 then
+                    obj.count:SetText(aura.count)
+                    obj.count:Show()
+                end
+                local timeLeft = aura.expirationTime - GetTime()
+                if(not obj.timeLeft) then
+                    obj.timeLeft = timeLeft
+                    obj:SetScript("OnUpdate", UpdateTime)
+                else
+                    obj.timeLeft = timeLeft
+                end
+
+                obj.nextUpdate = -1
+                UpdateTime(obj, 0)
+                
+                obj.icon:SetTexture(aura.texture)
+                obj:Show()
+            end
+        end
+        
+        frame["RaidBuffs"] = buffs
     end
 }
 
 function Units:UpdateImportantElements(frame, db)
     if db then
         for name, element in next, db do
-            if element["Important"] then
+            if type(element) == "table" and element["Important"] then
                 important[name](frame, element)
             end
         end

@@ -104,7 +104,13 @@ function Party:Init()
                 w = size["Width"]
                 h = size["Height"] * 5 + (y * 4)
             end
-            self:SetSize(w, h)
+            if InCombatLockdown() then
+                T:RunAfterCombat(function() 
+                    partyContainer:SetSize(w, h)
+                end)
+            else
+                self:SetSize(w, h)
+            end
         end
 
         partyContainer.UpdateUnits = function()
@@ -217,7 +223,7 @@ function Party:Update(frame, db)
         [97821] = true,     -- Void-Touched
         [123981] = true,    -- Perdition
         [113942] = true,    -- Demonic Gateway
-        [233377] = true,    -- Gaze of Aman'Thul
+        [233375] = true,    -- Gaze of Aman'Thul
         [95809] = true      -- Insanity 
     }
     Units:CreateStatusBorder(frame, "Debuff", {

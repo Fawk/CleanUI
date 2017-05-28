@@ -710,9 +710,13 @@ local function DrawerBuilder()
 	test:SetScript("OnUpdate", function(self, elapsed)
 		self.time = self.time + elapsed
 		if self.time > 0.3 then
-			if not self.ag:IsPlaying() and self.forceClose and self.isOpen and not self:IsMouseOver() then
-				self.ag:Play()
-			end
+            if InCombatLockdown() and self.isOpen then
+                self.ag:Play()
+            else
+                if not self.ag:IsPlaying() and self.forceClose and self.isOpen and not self:IsMouseOver() then
+                    self.ag:Play()
+                end
+            end
 			self.time = 0
 		end
 	end)
@@ -721,7 +725,7 @@ local function DrawerBuilder()
 		self:Finish()
 	end)
 
-	test:SetScript("OnLeave", function(self, arg)
+	--[[test:SetScript("OnLeave", function(self, arg)
 		if arg then
 			if self.isOpen then
 				self.ag:Play()
@@ -737,7 +741,17 @@ local function DrawerBuilder()
 				self.ag:Play()
 			end
 		end
-	end)
+	end)]]
+    
+    test:SetScript("OnClick", function(self, button, down)
+        if button == "LeftButton" and not down then
+            if self.isOpen then
+                self.ag:Play()
+            else
+                self.ag:Play()
+            end
+        end
+    end)
 end
 
 A.TextBuilder = TextBuilder

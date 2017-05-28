@@ -63,7 +63,7 @@ function Raid:Init()
         maxColumns = 1
         unitsPerColumn = 5
         point = "LEFT"
-        anchorPoint = "BOTTOM"
+        anchorPoint = "TOP"
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
@@ -105,7 +105,13 @@ function Raid:Init()
             local x, y = db["Offset X"], db["Offset Y"]
             local w = size["Width"] * 5 + (x * 4)
             local h = size["Height"] * 8 + (y * 7)
-            self:SetSize(w, h)
+            if InCombatLockdown() then
+                T:RunAfterCombat(function() 
+                    raidContainer:SetSize(w, h)
+                end)
+            else
+                self:SetSize(w, h)
+            end
         end
 
         raidContainer.UpdateUnits = function(self)
@@ -136,6 +142,7 @@ function Raid:Init()
                     local uf = raidHeader:GetAttribute("child"..i)
                     if uf and uf.unit then
                         Visibility(uf)
+                        Units:UpdateImportantElements(uf, db)
                     end
                 end
                 self.timer = 0
@@ -205,7 +212,7 @@ function Raid:Update(frame, db)
         [97821] = true,     -- Void-Touched
         [123981] = true,    -- Perdition
         [113942] = true,    -- Demonic Gateway
-        [233377] = true     -- Gaze of Aman'Thul
+        [233375] = true     -- Gaze of Aman'Thul
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
@@ -223,7 +230,9 @@ function Raid:Update(frame, db)
                         name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
                         if name and not ignored[spellID] then
                             if(duration and duration > 0) then
-                                debuffs[dtype] = true
+                                if dtype then
+                                    debuffs[dtype] = true
+                                end
                             end
                         end
                     end

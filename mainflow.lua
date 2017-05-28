@@ -237,6 +237,8 @@ function Addon:OnEnable()
 
 		return control
 	end
+    
+    Addon.DrawerBuilder()
 end
 
 function Addon:Update()

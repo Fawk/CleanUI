@@ -9,7 +9,6 @@ local Database = {
     prepared = {}
 }
 
-Database.TYPE_GRID = "Grids"
 Database.TYPE_CHARACTER = "Characters"
 
 for k,v in pairs(Database) do
@@ -397,10 +396,9 @@ local defaults =  {
                         ["Custom"] = {}
                     },
                     ["RaidBuffs"] = {
-                        ["Limit"] = 40,
                         ["Tracked"] = {
                             [194384] = {
-                                ["Own Only"] = true,
+                                ["Own only"] = true,
                                 ["Position"] = {
                                     ["Point"] = "TOPRIGHT",
                                     ["Local Point"] = "TOPRIGHT",
@@ -408,10 +406,12 @@ local defaults =  {
                                     ["Offset Y"] = 0,
                                     ["Relative To"] = "Parent"
                                 },
-                                ["Hide countdown numbers"] = false,
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
                                 ["Size"] = 14
                             }
                         },
+                        ["Important"] = true,
                         ["Enabled"] = true
                     },
                     ["HealPrediction"] = {
@@ -567,14 +567,11 @@ local defaultsMeta = {
     end
 }
 
-function Database:Prepare(type, ...)
-    local key, value = ...
-    local t = self.prepared[type][key]
-    if not t then
-        self.prepared[type][key] = value
-    else
-        iter(self.prepared[type][key], value)
+function Database:Prepare(type, value)
+    if not self.prepared[type] and defaults["Profiles"][A["Modules"]["Profile"]:GetActive()]["Options"][type] then
+        self.prepared[type] = {}
     end
+    self.prepared[type] = value
 end
 
 function Database:GetDefaults(profile)
@@ -584,13 +581,13 @@ end
 function Database:Save()
     local activeProfile = A["Modules"]["Profile"]:GetActive()   
     local save = setmetatable({}, defaultsMeta)
-    local db = save["Profiles"][activeProfile]
-    db[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
-    db = db["Options"]
+    save[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
 
     for k,v in pairs(self.prepared) do
-        db[k] = v
+        save["Profiles"][activeProfile]["Options"][k] = v
     end
+    
+    --A:DebugTable(save["Profiles"][activeProfile]["Options"]["Minimap"])
 
     CleanUI_DB = save
 end

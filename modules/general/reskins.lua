@@ -269,7 +269,6 @@ local function setStyle()
 
 		Minimap.Update = function(self, db)
 			self:SetSize(db.Size - 3, db.Size - 3)
-			self:SetPoint(db.Position["Local Point"], db.Position["Relative To"], db.Position["Point"], db.Position["Offset X"], db.Position["Offset Y"])
 			MinimapBackdrop:SetSize(db.Size, db.Size)
 		end
 		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
@@ -279,20 +278,7 @@ local function setStyle()
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
 		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
 
-		local lp, r, p, x, y = Minimap:GetPoint()
-        A:CreateMover(Minimap, { 
-            ["Position"] = { 
-                ["Local Point"] = lp,
-                ["Relative To"] = r,
-                ["Point"] = p,
-                ["Offset X"] = x,
-                ["Offset Y"] = y
-            },
-            ["Size"] = {
-                ["Width"] = Minimap:GetWidth(),
-                ["Height"] = Minimap:GetHeight()
-            }
-        }, "Minimap")
+        A:CreateMover(Minimap, minimapConfig, "Minimap")
 
 		Minimap:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))

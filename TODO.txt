@@ -1,10 +1,10 @@
-[ ] Update minimap with grid based layout (Currencies, Item-level, ...)
-[ ] Simple units and party & click2heal system
-[ ] Raid
+[o] Update minimap with grid based layout (Currencies, Item-level, ...)
+[x] Simple units and party & click2heal system
+[x] Raid
 [ ] Style all remaining blizzard frames
 [ ] Actionbars
-[ ] Chat
-[ ] Quest log
+[x] Chat
+[x] Quest log
 [ ] Create own damage and healing recorder
 
 
