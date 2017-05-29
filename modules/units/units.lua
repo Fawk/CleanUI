@@ -239,7 +239,7 @@ local important = {
 function Units:UpdateImportantElements(frame, db)
     if db then
         for name, element in next, db do
-            if type(element) == "table" and element["Important"] then
+            if type(element) == "table" and element["Important"] and element["Enabled"] then
                 important[name](frame, element)
             end
         end

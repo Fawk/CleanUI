@@ -142,6 +142,7 @@ function Party:Init()
                     local uf = partyHeader:GetAttribute("child"..i)
                     if uf and uf.unit then
                         Visibility(uf)
+						Units:UpdateImportantElements(uf, db)
                     end
                 end
                 self.timer = 0

@@ -276,10 +276,12 @@ local defaults =  {
                                     ["Offset Y"] = 0,
                                     ["Relative To"] = "Parent"
                                 },
-                                ["Hide countdown numbers"] = false,
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
                                 ["Size"] = 14
                             }
                         },
+						["Important"] = true,
                         ["Enabled"] = true
                     },
                     ["HealPrediction"] = {
