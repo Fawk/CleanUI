@@ -46,6 +46,11 @@ local function kill(frame)
 	if not frame.GetNumRegions then return end
 	for i = 1, frame:GetNumRegions() do
 		local region = select(i, frame:GetRegions())
+		if region.GetChildren then
+			for k,v in pairs({ region:GetChildren() }) do
+				kill(v)
+			end
+		end
 		if region:GetObjectType() == "Texture" then 
 			region:SetTexture(nil)
 		end
@@ -627,7 +632,100 @@ local function setStyle()
 			UIParent:UnregisterEvent("UNIT_AURA")
 		end)
 
-		--Something else
+		--Character Info
+		kill(PaperDollFrame)
+		kill(CharacterFrame)
+		kill(CharacterFrameBg)
+		kill(CharacterFramePortraitFrame)
+		kill(CharacterFramePortrait)
+		for k,v in pairs({ CharacterStatsPane:GetChildren() }) do
+			kill(v)
+		end
+		
+		CharacterStatsPane.ClassBackground:SetTexture(nil)
+		
+		CharacterFrameInsetBg:SetTexture(nil)
+		CharacterFrameInsetRightBg:SetTexture(nil)
+		kill(CharacterFrameInsetRight)
+		kill(CharacterModelFrame)
+		kill(PaperDollItemsFrame)
+		
+		CharacterModelFrameBackgroundOverlay:SetTexture(nil)
+		
+		hooksecurefunc(CharacterModelFrameBackgroundOverlay, "SetTexture", function(self, texture)
+			if texture ~= nil then
+				self:SetTexture(nil)
+			end
+		end)
+		
+		CharacterFrameInsetInsetLeftBorder:SetTexture(nil)
+		CharacterFrameInsetInsetBotLeftCorner:SetTexture(nil)
+		CharacterFrameInsetInsetRightBorder:SetTexture(nil)
+		CharacterFrameInsetInsetBotRightCorner:SetTexture(nil)
+		CharacterFrameInsetInsetBottomBorder:SetTexture(nil)
+		CharacterFrameInsetInsetTopRightCorner:SetTexture(nil)
+		CharacterFrameInsetInsetTopLeftCorner:SetTexture(nil)
+		CharacterFrameInsetInsetTopBorder:SetTexture(nil)
+		CharacterFrameTopTileStreaks:SetTexture(nil)
+		
+		CharacterModelFrameBackgroundTopLeft:SetTexture(nil)
+		CharacterModelFrameBackgroundBotLeft:SetTexture(nil)
+		CharacterModelFrameBackgroundBotRight:SetTexture(nil)
+		CharacterModelFrameBackgroundTopRight:SetTexture(nil)
+		
+		CharacterHeadSlotFrame:SetTexture(nil)
+		CharacterNeckSlotFrame:SetTexture(nil)
+		CharacterShoulderSlotFrame:SetTexture(nil)
+		CharacterBackSlotFrame:SetTexture(nil)
+		CharacterChestSlotFrame:SetTexture(nil)
+		CharacterShirtSlotFrame:SetTexture(nil)
+		CharacterTabardSlotFrame:SetTexture(nil)
+		CharacterWristSlotFrame:SetTexture(nil)
+		CharacterHandsSlotFrame:SetTexture(nil)
+		CharacterWaistSlotFrame:SetTexture(nil)
+		CharacterLegsSlotFrame:SetTexture(nil)
+		CharacterFeetSlotFrame:SetTexture(nil)
+		CharacterFinger0SlotFrame:SetTexture(nil)
+		CharacterFinger1SlotFrame:SetTexture(nil)
+		CharacterTrinket0SlotFrame:SetTexture(nil)
+		CharacterTrinket1SlotFrame:SetTexture(nil)
+		CharacterMainHandSlotFrame:SetTexture(nil)
+		CharacterSecondaryHandSlotFrame:SetTexture(nil)
+		
+		hooksecurefunc(CharacterModelFrameBackgroundTopLeft, "SetTexture", function(self, texture)
+			if texture ~= nil then
+				self:SetTexture(nil)
+			end
+		end)
+		
+		hooksecurefunc(CharacterModelFrameBackgroundBotLeft, "SetTexture", function(self, texture)
+			if texture ~= nil then
+				self:SetTexture(nil)
+			end
+		end)
+		
+		hooksecurefunc(CharacterModelFrameBackgroundBotRight, "SetTexture", function(self, texture)
+			if texture ~= nil then
+				self:SetTexture(nil)
+			end
+		end)
+		
+		hooksecurefunc(CharacterModelFrameBackgroundTopRight, "SetTexture", function(self, texture)
+			if texture ~= nil then
+				self:SetTexture(nil)
+			end
+		end)
+		
+		PaperDollInnerBorderTopLeft:SetTexture(nil)
+		PaperDollInnerBorderTopRight:SetTexture(nil)
+		PaperDollInnerBorderBottomLeft:SetTexture(nil)
+		PaperDollInnerBorderBottomRight:SetTexture(nil)
+		PaperDollInnerBorderLeft:SetTexture(nil)
+		PaperDollInnerBorderRight:SetTexture(nil)
+		PaperDollInnerBorderTop:SetTexture(nil)
+		PaperDollInnerBorderBottom:SetTexture(nil)
+		PaperDollInnerBorderBottom2:SetTexture(nil)
+
 
 		--Something else
 

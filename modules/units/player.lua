@@ -20,6 +20,13 @@ function Player:Init()
     Units:Add(frame)
 
    	frame.overrideShow = true
+	
+	local f = CreateFrame("Frame")
+	f:SetPoint("CENTER")
+	f:SetSize(1024 * 0.67, 1024 * 0.67)
+	f.tex = f:CreateTexture(nil, "BACKGROUND")
+	f.tex:SetAllPoints()
+	f.tex:SetTexture(media:Fetch("background", "PriestBackground"))
 
     A:CreateMover(frame, db)
 end
