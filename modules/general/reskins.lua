@@ -654,13 +654,11 @@ local function setStyle()
 		
 		kill(CharacterFrame)
 		kill(CharacterFrameBg)
-		
-		--CharacterFrame:SetHitRectInsets(left, right, top, bottom)
 		CharacterFrame:SetSize(640, 637)
 		
 		hooksecurefunc(CharacterFrame, "SetWidth", function(self, width)
-			if width ~= 620 then
-				self:SetWidth(620)
+			if width ~= 640 then
+				self:SetWidth(640)
 			end
 		end)
 		
@@ -669,15 +667,25 @@ local function setStyle()
 		CharacterFrame.CuiBackground:SetSize(1024, 1024)
 		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "PriestBackground"))
 		
+		CharacterFramePortrait:Hide()
 		CharacterFramePortraitFrame:SetTexture(nil)
 		CharacterFramePortrait:SetTexture(nil)
 		for k,v in pairs({ CharacterStatsPane:GetChildren() }) do
 			kill(v)
 		end
-		
-		CharacterFramePortrait:Hide()
-		
+
 		CharacterStatsPane.ClassBackground:SetTexture(nil)
+
+		local statsContainer = CreateFrame("Frame", nil, CharacterFrame)
+		statsContainer:SetSize(200, 220)
+		statsContainer:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -5, -10)
+		statsContainer:SetBackdrop(backdrop(3, 1))
+		statsContainer:SetBackdropColor(.1, .1, .1, .5)
+		statsContainer:SetBackdropBorderColor(0, 0, 0, 0)
+		
+		-- Remove category titles
+		-- Add item level as a row with xxx / xxx format
+		-- Place stats in container
 		
 		CharacterFrameInsetBg:SetTexture(nil)
 		CharacterFrameInsetRightBg:SetTexture(nil)
@@ -789,9 +797,9 @@ local function setStyle()
 		PaperDollInnerBorderBottom:SetTexture(nil)
 		PaperDollInnerBorderBottom2:SetTexture(nil)
 		
-		if PawnUI_InventoryPawnButton then
-			PawnUI_InventoryPawnButton:ClearAllPoints()
-			PawnUI_InventoryPawnButton:SetPoint("BOTTOMRIGHT", itemsContainer, "BOTTOMRIGHT", -10, 10)
+		if _G["PawnUI_InventoryPawnButton"] then
+			_G["PawnUI_InventoryPawnButton"]:ClearAllPoints()
+			_G["PawnUI_InventoryPawnButton"]:SetPoint("BOTTOMRIGHT", itemsContainer, "BOTTOMRIGHT", -10, 10)
 		end
 
 		--Something else
