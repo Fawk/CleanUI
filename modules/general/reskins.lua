@@ -634,13 +634,48 @@ local function setStyle()
 
 		--Character Info
 		kill(PaperDollFrame)
+
+		CharacterFrame:EnableMouse(true)
+		CharacterFrame.moveAble = true
+		CharacterFrame:SetMovable(CharacterFrame)
+		CharacterFrame:RegisterForDrag("LeftButton")
+
+		CharacterFrame:SetScript("OnMouseDown", function(self, button)
+			if self.moveAble then
+				self:StartMoving()
+			end
+		end)
+
+		CharacterFrame:SetScript("OnMouseUp", function(self, button)
+			if self.moveAble then
+				self:StopMovingOrSizing()
+			end   
+		end)
+		
 		kill(CharacterFrame)
 		kill(CharacterFrameBg)
-		kill(CharacterFramePortraitFrame)
-		kill(CharacterFramePortrait)
+		
+		--CharacterFrame:SetHitRectInsets(left, right, top, bottom)
+		CharacterFrame:SetSize(640, 637)
+		
+		hooksecurefunc(CharacterFrame, "SetWidth", function(self, width)
+			if width ~= 620 then
+				self:SetWidth(620)
+			end
+		end)
+		
+		CharacterFrame.CuiBackground = CharacterFrame:CreateTexture(nil, "BACKGROUND")
+		CharacterFrame.CuiBackground:SetPoint("CENTER")
+		CharacterFrame.CuiBackground:SetSize(1024, 1024)
+		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "PriestBackground"))
+		
+		CharacterFramePortraitFrame:SetTexture(nil)
+		CharacterFramePortrait:SetTexture(nil)
 		for k,v in pairs({ CharacterStatsPane:GetChildren() }) do
 			kill(v)
 		end
+		
+		CharacterFramePortrait:Hide()
 		
 		CharacterStatsPane.ClassBackground:SetTexture(nil)
 		
@@ -692,6 +727,34 @@ local function setStyle()
 		CharacterMainHandSlotFrame:SetTexture(nil)
 		CharacterSecondaryHandSlotFrame:SetTexture(nil)
 		
+		local itemsContainer = CreateFrame("Frame", nil, CharacterFrame)
+		itemsContainer:SetSize(200, 220)
+		itemsContainer:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMLEFT", 5, 10)
+		itemsContainer:SetBackdrop(backdrop(3, 1))
+		itemsContainer:SetBackdropColor(.1, .1, .1, .5)
+		itemsContainer:SetBackdropBorderColor(0, 0, 0, 0)
+		
+		CharacterHeadSlot:ClearAllPoints()
+		CharacterHeadSlot:SetPoint("TOPLEFT", itemsContainer, "TOPLEFT", 23, -13)
+		
+		CharacterChestSlot:ClearAllPoints()
+		CharacterChestSlot:SetPoint("LEFT", CharacterHeadSlot, "RIGHT", 2, 0)
+		
+		CharacterHandsSlot:ClearAllPoints()
+		CharacterHandsSlot:SetPoint("LEFT", CharacterChestSlot, "RIGHT", 2, 0)
+		
+		CharacterFinger0Slot:ClearAllPoints()
+		CharacterFinger0Slot:SetPoint("LEFT", CharacterHandsSlot, "RIGHT", 2, 0)
+		
+		CharacterMainHandSlot:ClearAllPoints()
+		CharacterMainHandSlot:SetPoint("TOP", CharacterWristSlot, "BOTTOM", 0, -2)
+		
+		CharacterSecondaryHandSlot:ClearAllPoints()
+		CharacterSecondaryHandSlot:SetPoint("TOP", CharacterFeetSlot, "BOTTOM", 0, -2)
+		
+		kill(CharacterMainHandSlot)
+		kill(CharacterSecondaryHandSlot)
+		
 		hooksecurefunc(CharacterModelFrameBackgroundTopLeft, "SetTexture", function(self, texture)
 			if texture ~= nil then
 				self:SetTexture(nil)
@@ -725,7 +788,11 @@ local function setStyle()
 		PaperDollInnerBorderTop:SetTexture(nil)
 		PaperDollInnerBorderBottom:SetTexture(nil)
 		PaperDollInnerBorderBottom2:SetTexture(nil)
-
+		
+		if PawnUI_InventoryPawnButton then
+			PawnUI_InventoryPawnButton:ClearAllPoints()
+			PawnUI_InventoryPawnButton:SetPoint("BOTTOMRIGHT", itemsContainer, "BOTTOMRIGHT", -10, 10)
+		end
 
 		--Something else
 
