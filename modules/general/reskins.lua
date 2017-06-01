@@ -41,7 +41,7 @@ local function backdrop(es, ts, t, b, r, l)
 		} 
 	}
 end
-local function font(size, outline) return media:Fetch("font", "Default"), size, outline or "NONE" end
+local function font(size, outline) return media:Fetch("font", "NotoBold"), size, outline or "NONE" end
 local function kill(frame) 
 	if not frame.GetNumRegions then return end
 	for i = 1, frame:GetNumRegions() do
@@ -132,12 +132,13 @@ local function setStyle()
 				end
 				frame:SetClampedToScreen(false)
 				kill(frame)
-				frame:SetFont(font(12))
+				--frame:SetFont(font(12))
+				frame:SetFont(media:Fetch("font", "NotoBold"), 10, "NONE")
 				local tab = _G[name.."Tab"]
 				if tab then
 					kill(tab)
 					tab.text = _G[name.."TabText"]
-					tab.text:SetFont(font(12))
+					tab.text:SetFont(font(10))
 					tab.text:SetTextColor(1, 1, 1)
 					hooksecurefunc(tab.text, "SetTextColor", function(t, r, g, b, a)
 					if r ~= 1 or g ~= 1 or b ~= 1 then
@@ -156,14 +157,14 @@ local function setStyle()
 						end
 					end	
 					editbox:SetHeight(24)
-					editbox:SetFont(font(12))
+					editbox:SetFont(font(10))
 					editbox:SetBackdrop(backdrop(3, 1))
 					editbox:SetPoint(E.regions.TL, frame, E.regions.BL, 0, -5)
 					editbox:SetPoint(E.regions.TR, frame, E.regions.BR, 0, -5)
 					local r, g, b, a = unpack(A.colors.backdrop.default)
 					editbox:SetBackdropColor(r, g, b, 0.67)
 					editbox:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
-					_G[name.."EditBoxHeader"]:SetFont(font(12))
+					_G[name.."EditBoxHeader"]:SetFont(font(10))
 				end
 			end
 		end
@@ -181,9 +182,9 @@ local function setStyle()
 			end
 		end
 		
-		GameTooltipHeaderText:SetFont(font(13))
-		GameTooltipText:SetFont(font(12))
-		GameTooltipTextSmall:SetFont(font(11))
+		GameTooltipHeaderText:SetFont(font(11))
+		GameTooltipText:SetFont(font(10))
+		GameTooltipTextSmall:SetFont(font(10))
 
 		GameTooltip:HookScript("OnSizeChanged", checkTooltipColor)
 		GameTooltip:RegisterEvent("CURSOR_UPDATE", checkTooltipColor)
@@ -201,7 +202,7 @@ local function setStyle()
 		end
 
 		for _,st in pairs(shoppingTexts) do
-			_G[st]:SetFont(font(12))
+			_G[st]:SetFont(font(10))
 		end
 
 		_G["WorldMapTooltip"]:HookScript("OnShow", function(self)
@@ -220,7 +221,7 @@ local function setStyle()
 		for i = 1, ColorPickerFrame:GetNumRegions() do
 			local region = select(i, ColorPickerFrame:GetRegions())
 			if region:GetObjectType() == "FontString" then
-				region:SetFont(font(12))
+				region:SetFont(font(10))
 				region:SetTextColor(1, 1, 1, 1)
 				region:SetPoint(E.regions.T, region:GetParent(), E.regions.T, 0, -5)
 			end
@@ -332,7 +333,7 @@ local function setStyle()
 		local r, g, b, a = unpack(A.colors.backdrop.default)
 		MinimapZoneTextButton:SetBackdropColor(r, g, b, 0.76)
 		MinimapZoneTextButton:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
-		MinimapZoneText:SetFont(font(12, "NONE"))
+		MinimapZoneText:SetFont(font(11, "NONE"))
 		MinimapZoneText:SetPoint(E.regions.C)
 
 		hooksecurefunc(MinimapZoneText, "SetTextColor", function(t, rr, gg, bb)
@@ -420,7 +421,7 @@ local function setStyle()
 		local function killTimeFrames()
 
 			kill(TimeManagerClockButton)
-			local f = setFont(TimeManagerClockButton, 11)
+			local f = setFont(TimeManagerClockButton, 10)
 			f:SetPoint(E.regions.C, TimeManagerClockButton, E.regions.C, 0, 0)
 			f:SetJustifyH(E.regions.C)
 			f:SetJustifyV(E.regions.C)
@@ -436,7 +437,7 @@ local function setStyle()
 			GameTimeFrame.tex = GameTimeFrame:CreateTexture(nil, "BACKGROUND")
 			GameTimeFrame.tex:SetTexture(media:Fetch("widget", "cui-calendar"))
 			GameTimeFrame.tex:SetAllPoints()
-			f = setFont(GameTimeFrame, 11)
+			f = setFont(GameTimeFrame, 10)
 			f:SetTextColor(1, 1, 1)
 			--f:ClearAllPoints()
 			f:SetPoint(E.regions.C, GameTimeFrame, E.regions.C, 0, -3)
@@ -481,29 +482,29 @@ local function setStyle()
             if self.timer > 0.01 then
                 if ObjectiveTrackerBlocksFrameHeader ~= nil then
                     kill(ObjectiveTrackerBlocksFrame.QuestHeader)
-                    setFont(ObjectiveTrackerBlocksFrame.QuestHeader, 16)
+                    setFont(ObjectiveTrackerBlocksFrame.QuestHeader, 12)
                     kill(ObjectiveTrackerBlocksFrame.AchievementHeader)
-                    setFont(ObjectiveTrackerBlocksFrame.AchievementHeader, 16)
+                    setFont(ObjectiveTrackerBlocksFrame.AchievementHeader, 12)
                     kill(ObjectiveTrackerBlocksFrame.ScenarioHeader)
-                    setFont(ObjectiveTrackerBlocksFrame.ScenarioHeader, 16)
+                    setFont(ObjectiveTrackerBlocksFrame.ScenarioHeader, 12)
 
                     kill(BONUS_OBJECTIVE_TRACKER_MODULE.Header)
-                    setFont(BONUS_OBJECTIVE_TRACKER_MODULE.Header, 13)
+                    setFont(BONUS_OBJECTIVE_TRACKER_MODULE.Header, 11)
                     kill(WORLD_QUEST_TRACKER_MODULE.Header)
-                    setFont(WORLD_QUEST_TRACKER_MODULE.Header, 13)
+                    setFont(WORLD_QUEST_TRACKER_MODULE.Header, 11)
                     
-                    setFont(ObjectiveTrackerFrame.HeaderMenu, 13)
+                    setFont(ObjectiveTrackerFrame.HeaderMenu, 11)
                     
                     for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
                         if v.currentLine then
-                            setFont(v.currentLine, 12)
+                            setFont(v.currentLine, 11)
                         elseif v.HeaderText then
-                            setFont(v.HeaderText, 12)
+                            setFont(v.HeaderText, 11)
                         end
                         for x, y in pairs({ v:GetChildren() }) do
-                        	setFont(y, 12)
+                        	setFont(y, 10)
                         end
-                        setFont(v, 13)
+                        setFont(v, 10)
                     end
                     
                     self:SetScript("OnUpdate", nil)
@@ -534,14 +535,14 @@ local function setStyle()
 
             for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
                 if v.currentLine then
-                    setFont(v.currentLine, 12)
+                    setFont(v.currentLine, 10)
                 elseif v.HeaderText then
-                    setFont(v.HeaderText, 12)
+                    setFont(v.HeaderText, 11)
                 end
                 for x, y in pairs({ v:GetChildren() }) do
-                	setFont(y, 12)
+                	setFont(y, 10)
                 end
-                setFont(v, 13)
+                setFont(v, 10)
             end
         end)
         
@@ -566,14 +567,14 @@ local function setStyle()
 
             for k,v in pairs({ ObjectiveTrackerBlocksFrame:GetChildren() }) do
                 if v.currentLine then
-                    setFont(v.currentLine, 12)
+                    setFont(v.currentLine, 10)
                 elseif v.HeaderText then
-                    setFont(v.HeaderText, 12)
+                    setFont(v.HeaderText, 11)
                 end
                 for x, y in pairs({ v:GetChildren() }) do
-                	setFont(y, 12)
+                	setFont(y, 10)
                 end
-                setFont(v, 13)
+                setFont(v, 10)
             end
         end)
     end
@@ -605,7 +606,7 @@ local function setStyle()
 		--GameMenuFrame
 		local gameMenuFrame = _G["GameMenuFrame"]
 		_G["GameMenuFrameHeader"]:SetTexture(nil)
-		local f = setFont(gameMenuFrame, 13)
+		local f = setFont(gameMenuFrame, 11)
 		f:SetPoint(E.regions.T, gameMenuFrame, E.regions.T, 0, -8)
 		f:SetTextColor(1, 1, 1)
 		for _,b in pairs({ gameMenuFrame:GetChildren() }) do
@@ -616,7 +617,7 @@ local function setStyle()
 			b:SetBackdrop(backdrop(3, 1))
 			b:SetBackdropColor(unpack(A.colors.backdrop.light))
 			b:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
-			setFont(b, 12)
+			setFont(b, 10)
 		end
 
 		-- OrderHallCommandBar
@@ -654,11 +655,11 @@ local function setStyle()
 		
 		kill(CharacterFrame)
 		kill(CharacterFrameBg)
-		CharacterFrame:SetSize(640, 637)
+		CharacterFrame:SetSize(620, 637)
 		
 		hooksecurefunc(CharacterFrame, "SetWidth", function(self, width)
-			if width ~= 640 then
-				self:SetWidth(640)
+			if width ~= 620 then
+				self:SetWidth(620)
 			end
 		end)
 		
@@ -668,6 +669,21 @@ local function setStyle()
 		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "PriestBackground"))
 		
 		CharacterFramePortrait:Hide()
+		CharacterStatsPane.ItemLevelCategory.oldShow = CharacterStatsPane.ItemLevelCategory.Show
+		CharacterStatsPane.AttributesCategory.oldShow = CharacterStatsPane.AttributesCategory.Show
+		CharacterStatsPane.EnhancementsCategory.oldShow = CharacterStatsPane.EnhancementsCategory.Show
+		
+		CharacterStatsPane.ItemLevelCategory.Show = CharacterStatsPane.ItemLevelCategory.Hide
+		--CharacterStatsPane.AttributesCategory.Show = CharacterStatsPane.AttributesCategory.Hide
+		--CharacterStatsPane.EnhancementsCategory.Show = CharacterStatsPane.EnhancementsCategory.Hide
+		
+		CharacterStatsPane.AttributesCategory:SetShown(true)
+		CharacterStatsPane.EnhancementsCategory:SetShown(true)
+		
+		CharacterStatsPane.ItemLevelCategory:Hide()
+		CharacterStatsPane.AttributesCategory:Hide()
+		CharacterStatsPane.EnhancementsCategory:Hide()
+		
 		CharacterFramePortraitFrame:SetTexture(nil)
 		CharacterFramePortrait:SetTexture(nil)
 		for k,v in pairs({ CharacterStatsPane:GetChildren() }) do
@@ -678,14 +694,40 @@ local function setStyle()
 
 		local statsContainer = CreateFrame("Frame", nil, CharacterFrame)
 		statsContainer:SetSize(200, 220)
-		statsContainer:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -5, -10)
+		statsContainer:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -5, 10)
 		statsContainer:SetBackdrop(backdrop(3, 1))
 		statsContainer:SetBackdropColor(.1, .1, .1, .5)
 		statsContainer:SetBackdropBorderColor(0, 0, 0, 0)
 		
-		-- Remove category titles
+		CharacterStatsPane.AttributesCategory:ClearAllPoints()
+		hooksecurefunc(CharacterStatsPane.AttributesCategory, "SetPoint", function(self, lp, r, p, x, y)
+			if lp ~= "TOP" or r ~= statsContainer or p ~= "TOP" then
+				self:SetPoint("TOP", statsContainer, "TOP", 0, 0)
+			end
+		end)
+
+		CharacterStatsPane.AttributesCategory:SetSize(1, 1)
+		CharacterStatsPane.EnhancementsCategory:SetSize(1, 1)
+		CharacterStatsPane.AttributesCategory.Title:SetText("")
+		CharacterStatsPane.EnhancementsCategory.Title:SetText("")
 		-- Add item level as a row with xxx / xxx format
 		-- Place stats in container
+		
+		local statsUpdateFrame = CreateFrame("Frame")
+		statsUpdateFrame.timer = 0
+		
+		statsUpdateFrame:SetScript("OnUpdate", function(self, elapsed)
+			self.timer = self.timer + elapsed
+			if self.timer > 0.1 then
+				for k,v in pairs({ CharacterStatsPane:GetChildren() }) do
+					if v.Label then
+						v.Label:SetFont(media:Fetch("font", "Noto"), 10, "NONE")
+						v.Value:SetFont(media:Fetch("font", "Noto"), 10, "NONE")
+					end
+				end
+				self.timer = 0
+			end
+		end)
 		
 		CharacterFrameInsetBg:SetTexture(nil)
 		CharacterFrameInsetRightBg:SetTexture(nil)
