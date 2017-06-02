@@ -277,7 +277,7 @@ local function TextBuilder(parent, sizeInPerc)
                 end
             end
             if isSpecial then
-                font = media:Fetch("font", "Noto")
+                font = media:Fetch("font", "NotoBold")
                 self:SetFont(font, size, "NONE")
             else
                 font = media:Fetch("font", "Default")

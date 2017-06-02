@@ -180,7 +180,7 @@ function Cooldown:Init()
 
 	for i = 1, #timeStamps do
 		local offset = startOffset + (tW * (i - 1))
-		local text = buildText(bar, 13):atLeft():againstLeft():x(offset):build()
+		local text = buildText(bar, 11):atLeft():againstLeft():x(offset):build()
 		text:SetSize(tW, tW)
 		text:SetTextColor(0.43, 0.43, 0.43)
 		text:SetText(format("%s", timeStamps[i] > 60 and (timeStamps[i] / 60).."m" or timeStamps[i]))
