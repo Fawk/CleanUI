@@ -674,11 +674,6 @@ local function setStyle()
 		CharacterStatsPane.EnhancementsCategory.oldShow = CharacterStatsPane.EnhancementsCategory.Show
 		
 		CharacterStatsPane.ItemLevelCategory.Show = CharacterStatsPane.ItemLevelCategory.Hide
-		--CharacterStatsPane.AttributesCategory.Show = CharacterStatsPane.AttributesCategory.Hide
-		--CharacterStatsPane.EnhancementsCategory.Show = CharacterStatsPane.EnhancementsCategory.Hide
-		
-		CharacterStatsPane.AttributesCategory:SetShown(true)
-		CharacterStatsPane.EnhancementsCategory:SetShown(true)
 		
 		CharacterStatsPane.ItemLevelCategory:Hide()
 		CharacterStatsPane.AttributesCategory:Hide()
@@ -710,8 +705,8 @@ local function setStyle()
 		CharacterStatsPane.EnhancementsCategory:SetSize(1, 1)
 		CharacterStatsPane.AttributesCategory.Title:SetText("")
 		CharacterStatsPane.EnhancementsCategory.Title:SetText("")
+		
 		-- Add item level as a row with xxx / xxx format
-		-- Place stats in container
 		
 		local statsUpdateFrame = CreateFrame("Frame")
 		statsUpdateFrame.timer = 0
