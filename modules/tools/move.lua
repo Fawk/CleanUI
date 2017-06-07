@@ -46,7 +46,7 @@ function A:InitMove()
 
 		local text = finishFrame:CreateFontString(nil, "OVERLAY")
 		text:SetPoint("CENTER")
-		text:SetFont(media:Fetch("font", "Noto"), 14, "NONE")
+		text:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
 		text:SetText(L["Moving frames..."])
 
 		local button = CreateFrame("Button", nil, finishFrame)
@@ -99,6 +99,8 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetSize(size["Width"], size["Height"])
 
 	local hiddenFrame = CreateFrame("Frame", nil, moveFrame)
+	hiddenFrame:SetSize(moveFrame:GetSize())
+	hiddenFrame:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 	hiddenFrame:Hide()
 	
 	moveFrame.hiddenFrame = hiddenFrame
@@ -143,7 +145,15 @@ function A:CreateMover(frame, db, overrideName)
                 obj[k] = v
             end
             obj["Position"] = position
-            A.Database:Prepare(name, obj)
+			
+			self.affecting:ClearAllPoints()
+			print(name)
+			print(lp, relative, p, x, y)
+			print(self.affecting:GetPoint())
+			self.affecting:SetAllPoints(self)
+			print(self.affecting:GetPoint())
+           
+			A.Database:Prepare(name, obj)
         else
             A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
         end
@@ -152,7 +162,7 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:Hide()
 
 	local text = moveFrame:CreateFontString(nil, "OVERLAY")
-	text:SetFont(media:Fetch("font", "Noto"), 14, "NONE")
+	text:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
 	text:SetPoint("CENTER")
 	text:SetText(name)
 

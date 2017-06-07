@@ -668,6 +668,23 @@ local function setStyle()
 		CharacterFrame.CuiBackground:SetSize(1024, 1024)
 		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "PriestBackground"))
 		
+		local crest = CharacterFrame:CreateTexture(nil, "OVERLAY")
+		crest:SetPoint("TOP", 0, 10)
+		crest:SetSize(256, 256)
+		crest:SetTexture(media:Fetch("background", "PriestCrest"))
+		
+		CharacterFrameTitleText:SetFont(media:Fetch("font", "NotoBold"), 16, "NONE")
+		CharacterFrameTitleText:ClearAllPoints()
+		CharacterFrameTitleText:SetPoint("TOP", crest, "BOTTOM", 0, 10)
+		CharacterFrameTitleText:SetShadowColor(0, 0, 0)
+		CharacterFrameTitleText:SetShadowOffset(1, -1)
+		
+		CharacterLevelText:ClearAllPoints()
+		CharacterLevelText:SetPoint("TOP", CharacterFrameTitleText, "BOTTOM", 0, 0)
+		CharacterLevelText:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
+		CharacterLevelText:SetShadowColor(0, 0, 0)
+		CharacterLevelText:SetShadowOffset(1, -1)
+		
 		CharacterFramePortrait:Hide()
 		CharacterStatsPane.ItemLevelCategory.oldShow = CharacterStatsPane.ItemLevelCategory.Show
 		CharacterStatsPane.AttributesCategory.oldShow = CharacterStatsPane.AttributesCategory.Show
@@ -693,13 +710,84 @@ local function setStyle()
 		statsContainer:SetBackdrop(backdrop(3, 1))
 		statsContainer:SetBackdropColor(.1, .1, .1, .5)
 		statsContainer:SetBackdropBorderColor(0, 0, 0, 0)
+		statsContainer.ag = statsContainer:CreateAnimationGroup()
+		
+		statsContainer.fadeIn = statsContainer.ag:CreateAnimation("Alpha")
+		statsContainer.fadeIn:SetFromAlpha(0)
+		statsContainer.fadeIn:SetToAlpha(1)
+		statsContainer.fadeIn:SetDuration(0.5)
+		statsContainer.fadeIn:SetScript("OnFinished", function(self, ...)
+			statsContainer.hidden = false
+		end)
+		
+		statsContainer.fadeOut = statsContainer.ag:CreateAnimation("Alpha")
+		statsContainer.fadeOut:SetFromAlpha(1)
+		statsContainer.fadeOut:SetToAlpha(0)
+		statsContainer.fadeOut:SetDuration(0.5)
+		statsContainer.fadeOut:SetScript("OnFinished", function(self, ...)
+			statsContainer.hidden = true
+		end)
+		
+		statsContainer.timer = 0
+		statsContainer.hidden = true
+		statsContainer:SetScript("OnUpdate", function(self, elapsed)
+			self.timer = self.timer + elapsed
+			if self.timer > 0.1 then
+				if self:IsMouseOver() and self.hidden then
+					self.fadeIn:Play()
+				elseif not self:IsMouseOver() and not self.hidden then
+					self.fadeOut:Play()
+				end
+				self.timer = 0
+			end
+		end)
 		
 		CharacterStatsPane.AttributesCategory:ClearAllPoints()
 		hooksecurefunc(CharacterStatsPane.AttributesCategory, "SetPoint", function(self, lp, r, p, x, y)
-			if lp ~= "TOP" or r ~= statsContainer or p ~= "TOP" then
-				self:SetPoint("TOP", statsContainer, "TOP", 0, 0)
+			if lp ~= "TOP" or r ~= CharacterStatsPane.ItemLevelFrame or p ~= "BOTTOM" then
+				self:SetPoint("TOP", CharacterStatsPane.ItemLevelFrame, "BOTTOM", 0, 4)
 			end
 		end)
+		
+		CharacterStatsPane.ItemLevelFrame:ClearAllPoints()
+		CharacterStatsPane.ItemLevelFrame:SetSize(185, 19)
+		CharacterStatsPane.ItemLevelFrame:SetPoint("TOP", statsContainer, "TOP", 0, -20)
+		hooksecurefunc(CharacterStatsPane.ItemLevelFrame, "SetPoint", function(self, lp, r, p, x, y)
+			if lp ~= "TOP" or r ~= statsContainer or p ~= "TOP" then
+				self:SetPoint("TOP", statsContainer, "TOP", 0, -10)
+			end
+		end)
+		
+		local itemLevelLabel = statsContainer:CreateFontString(nil, "OVERLAY")
+		itemLevelLabel:SetFont(media:Fetch("font", "Noto"), 10, "NONE")
+		itemLevelLabel:SetShadowColor(0, 0, 0)
+		itemLevelLabel:SetShadowOffset(1, -1)
+		itemLevelLabel:SetPoint("LEFT", CharacterStatsPane.ItemLevelFrame, "LEFT", 10, 0)
+		itemLevelLabel:SetText("Item Level:")
+		itemLevelLabel:SetTextColor(1, 0.8, 0)
+		
+		CharacterStatsPane.ItemLevelFrame.Value:SetFont(media:Fetch("font", "Noto"), 10, "NONE")
+		CharacterStatsPane.ItemLevelFrame.Value:SetShadowColor(0, 0, 0)
+		CharacterStatsPane.ItemLevelFrame.Value:SetShadowOffset(1, -1)
+		CharacterStatsPane.ItemLevelFrame.Value:ClearAllPoints()
+		CharacterStatsPane.ItemLevelFrame.Value:SetPoint("RIGHT", -8, 0)
+		hooksecurefunc(CharacterStatsPane.ItemLevelFrame.Value, "SetTextColor", function(self, r, g, b) 
+			if r ~= 1 or g ~= 1 or b ~= 1 then
+				self:SetTextColor(1, 1, 1)
+			end
+		end)
+		
+		CharacterStatsPane.ItemLevelFrame.Value.modified = false
+		hooksecurefunc(CharacterStatsPane.ItemLevelFrame.Value, "SetText", function(self, text)
+			if not string.find(text, "/") then
+				local total, equipped, pvp = GetAverageItemLevel()
+				self:SetText(equipped.." / "..total)
+			end
+		end)
+		
+		CharacterStatsPane.ItemLevelFrame.Background:SetAtlas("UI-Character-Info-Line-Bounce")
+		CharacterStatsPane.ItemLevelFrame.Background:SetAlpha(0.3)
+		CharacterStatsPane.ItemLevelFrame.Background:SetSize(CharacterStatsPane.ItemLevelFrame:GetSize())
 
 		CharacterStatsPane.AttributesCategory:SetSize(1, 1)
 		CharacterStatsPane.EnhancementsCategory:SetSize(1, 1)
@@ -737,6 +825,10 @@ local function setStyle()
 				self:SetTexture(nil)
 			end
 		end)
+		
+		CharacterModelFrame:SetSize(250, 350)
+		CharacterModelFrame:ClearAllPoints()
+		CharacterModelFrame:SetPoint("BOTTOM", 0, 10)
 		
 		CharacterFrameInsetInsetLeftBorder:SetTexture(nil)
 		CharacterFrameInsetInsetBotLeftCorner:SetTexture(nil)
@@ -834,10 +926,22 @@ local function setStyle()
 		PaperDollInnerBorderBottom:SetTexture(nil)
 		PaperDollInnerBorderBottom2:SetTexture(nil)
 		
-		if _G["PawnUI_InventoryPawnButton"] then
-			_G["PawnUI_InventoryPawnButton"]:ClearAllPoints()
-			_G["PawnUI_InventoryPawnButton"]:SetPoint("BOTTOMRIGHT", itemsContainer, "BOTTOMRIGHT", -10, 10)
-		end
+		PaperDollSidebarTabs.DecorLeft:SetTexture(nil)
+		PaperDollSidebarTabs.DecorRight:SetTexture(nil)
+		
+		PaperDollSidebarTab1:Hide()
+		PaperDollSidebarTab2:Hide()
+		PaperDollSidebarTab3:Hide()
+		
+		CharacterFrameTab1:Hide()
+		CharacterFrameTab2:Hide()
+		CharacterFrameTab3:Hide()
+		
+		--Add these to some modified dropdowns
+		--PaperDollTitlesPaneScrollChild
+		--PaperDollEquipmentManagerPaneScrollChild
+		--ReputationListScrollFrameScrollChildFrame
+		--TokenFrameContainerScrollChild
 
 		--Something else
 

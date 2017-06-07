@@ -136,6 +136,36 @@ local important = {
         end
     end,
     ["RaidBuffs"] = function(frame, db)   
+	
+		local function buffButton(frame, position, size, spellId, obj)
+			
+			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
+			Units:Position(buff, position)
+			buff:SetSize(size, size)
+			buff:SetFrameStrata("HIGH")
+
+			local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
+			cd:SetAllPoints(buff)
+			cd:SetReverse(true)
+
+			local icon = buff:CreateTexture(nil, "BORDER")
+			icon:SetAllPoints(buff)
+
+			local count = buff:CreateFontString(nil, "OVERLAY")
+			count:SetFontObject(NumberFontNormal)
+			count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
+
+			buff.hideNumbers = obj["Hide Countdown Numbers"]
+			buff.trackOnlyPlayer = obj["Own Only"]
+			buff.cdTextSize = obj["Cooldown Numbers Text Size"]
+			buff.icon = icon
+			buff.count = count
+			buff.cd = cd
+
+			buff:Hide()
+			
+			return buff
+		end
 
         local tracked = db["Tracked"]
         
@@ -146,8 +176,10 @@ local important = {
 
         for spellId,_ in next, buffs do	
             if not tracked[spellId] then
-                buffs[spellId]:Hide()
-                table.remove(buffs, spellId)
+				for unit, buff in next, buffs[spellId] do
+					buff:Hide()
+				end
+				table.remove(buffs, spellId)
             end
         end
 
@@ -155,81 +187,86 @@ local important = {
             local size, position, ignored = obj["Size"], obj["Position"]
 
             if not buffs[spellId] then
-
-                local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
-                Units:Position(buff, position)
-                buff:SetSize(size, size)
-                buff:SetFrameStrata("HIGH")
-
-                local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
-                cd:SetAllPoints(buff)
-                cd:SetReverse(true)
-
-                local icon = buff:CreateTexture(nil, "BORDER")
-                icon:SetAllPoints(buff)
-
-                local count = buff:CreateFontString(nil, "OVERLAY")
-                count:SetFontObject(NumberFontNormal)
-                count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
-
-                buff.hideNumbers = obj["Hide Countdown Numbers"]
-                buff.trackOnlyPlayer = obj["Own only"]
-                buff.cdTextSize = obj["Cooldown Numbers Text Size"]
-                buff.icon = icon
-                buff.count = count
-                buff.cd = cd
-
-                buff:Hide()
-            
-                buffs[spellId] = buff
+				buffs[spellId] = {
+					player = buffButton(frame, position, size, spellId, obj)
+				}
+				for i = 1, 5 do
+					buffs[spellId]["party"..i] = buffButton(frame, position, size, spellId, obj)
+				end
+				for i = 1, 40 do
+					buffs[spellId]["raid"..i] = buffButton(frame, position, size, spellId, obj)
+				end
             end         
         end
         
         local auras = GetUnitAuras(frame.unit, "HELPFUL")
         if T:tcount(auras) == 0 then
-            for spellId, buff in next, buffs do
-                buff:Hide()
+            for spellId, obj in next, buffs do
+				for unit, buff in next, obj do
+					buff:Hide()
+				end
             end
         end
         
         for spellId, buff in next, buffs do
             if not auras[spellId] and buffs[spellId] then
-                buff:Hide()
+				for unit, buff in next, buffs[spellId] do
+					buff:Hide()
+				end
             end
         end
+		
+		local function visibility(obj, aura)
+		
+			obj.cd:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
+			obj.cd:SetHideCountdownNumbers(obj.hideNumbers)
+			for _,region in next, {obj.cd:GetRegions()} do
+				if region:GetObjectType() == "FontString" then
+					obj.cd.cooldownText = region
+				end
+			end
+			if obj.cd.cooldownText then
+				local media = LibStub("LibSharedMedia-3.0")
+				obj.cd.cooldownText:SetFont(media:Fetch("font", "NotoBold"), obj.cdTextSize, "OUTLINE")
+			end
+			if aura.count and aura.count > 0 then
+				obj.count:SetText(aura.count)
+				obj.count:Show()
+			end
+			local timeLeft = aura.expirationTime - GetTime()
+			if(not obj.timeLeft) then
+				obj.timeLeft = timeLeft
+				obj:SetScript("OnUpdate", UpdateTime)
+			else
+				obj.timeLeft = timeLeft
+			end
+
+			obj.nextUpdate = -1
+			UpdateTime(obj, 0)
+			
+			obj.icon:SetTexture(aura.texture)
+			obj:Show()
+		end
         
         for spellId, aura in next, auras do
             local obj = buffs[spellId]
-            if obj and ((obj.trackOnlyPlayer and aura.casterIsPlayer) or not obj.trackOnlyPlayer) then 
-                obj.cd:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
-                obj.cd:SetHideCountdownNumbers(obj.hideNumbers)
-                for _,region in next, {obj.cd:GetRegions()} do
-                    if region:GetObjectType() == "FontString" then
-                        obj.cd.cooldownText = region
-                    end
-                end
-                if obj.cd.cooldownText then
-                    local media = LibStub("LibSharedMedia-3.0")
-                    obj.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), obj.cdTextSize, "OUTLINE")
-                end
-                if aura.count and aura.count > 0 then
-                    obj.count:SetText(aura.count)
-                    obj.count:Show()
-                end
-                local timeLeft = aura.expirationTime - GetTime()
-                if(not obj.timeLeft) then
-                    obj.timeLeft = timeLeft
-                    obj:SetScript("OnUpdate", UpdateTime)
-                else
-                    obj.timeLeft = timeLeft
-                end
-
-                obj.nextUpdate = -1
-                UpdateTime(obj, 0)
-                
-                obj.icon:SetTexture(aura.texture)
-                obj:Show()
-            end
+			
+			if obj then
+				
+				local playerObj = obj["player"]
+				
+				if playerObj.trackOnlyPlayer and aura.caster == "player" then
+					visibility(playerObj, aura)
+				elseif not playerObj.trackOnlyPlayer then
+					for unit, buff in next, obj do 
+						if unit ~= "player" then
+							if unit == aura.caster then
+								visibility(buff, aura)
+							end
+						end
+					end
+				end
+			end
         end
         
         frame["RaidBuffs"] = buffs
