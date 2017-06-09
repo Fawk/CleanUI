@@ -137,9 +137,10 @@ local important = {
     end,
     ["RaidBuffs"] = function(frame, db)   
 	
-		local function buffButton(frame, position, size, spellId, obj)
+		local function buffButton(frame, position, size, spellId, obj, unit)
 			
-			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId), frame)
+			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId).."_"..unit, frame)
+
 			Units:Position(buff, position)
 			buff:SetSize(size, size)
 			buff:SetFrameStrata("HIGH")
@@ -188,13 +189,13 @@ local important = {
 
             if not buffs[spellId] then
 				buffs[spellId] = {
-					player = buffButton(frame, position, size, spellId, obj)
+					player = buffButton(frame, position, size, spellId, obj, "player")
 				}
 				for i = 1, 5 do
-					buffs[spellId]["party"..i] = buffButton(frame, position, size, spellId, obj)
+					buffs[spellId]["party"..i] = buffButton(frame, position, size, spellId, obj, "party"..i)
 				end
 				for i = 1, 40 do
-					buffs[spellId]["raid"..i] = buffButton(frame, position, size, spellId, obj)
+					buffs[spellId]["raid"..i] = buffButton(frame, position, size, spellId, obj, "raid"..i)
 				end
             end         
         end
