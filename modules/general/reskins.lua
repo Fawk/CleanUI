@@ -962,6 +962,7 @@ local function setStyle()
 		local button = _G["ExtraActionButton1"]
 
 		if button then
+			A:CreateMover(button, eabdb, "Extra Action Button")
 			button:SetPoint(eabdb["Position"]["Local Point"], A.frameParent, eabdb["Position"]["Point"], eabdb["Position"]["Offset X"], eabdb["Position"]["Offset Y"])
 		end
 
