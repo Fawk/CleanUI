@@ -163,12 +163,15 @@ end
 
 function Cooldown:Init()
 
-	local db = A["Profile"]["Options"]["Cooldown"]
+	local db = A["Profile"]["Options"]["Cooldown bar"]
 	local position = db["Position"]
 
 	if not bar then
 		bar = CreateFrame("Frame", nil, A.frameParent)
-		bar:SetBackdrop(A.enum.backdrops.buttonroundborder)
+		bar:SetBackdrop({
+			bgFile = media:Fetch("statusbar", "Default2"),
+			tile = false,
+		})
 		bar:SetBackdropColor(unpack(A.colors.backdrop.light))
 		bar:SetBackdropBorderColor(unpack(A.colors.border.target))
 	end

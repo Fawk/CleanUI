@@ -19,10 +19,10 @@ function Health(frame, db)
 		health.frequentUpdates = true
 		health.bg = health:CreateTexture(nil, "BACKGROUND")
 
-		local function Gradient()
+		local function Gradient(unit)
 			local r1, g1, b1 = unpack(A.colors.health.low)
 			local r2, g2, b2 = unpack(A.colors.health.medium)
-			local r3, g3, b3 = unpack(A.colors.backdrop.default)
+			local r3, g3, b3 = unpack(unit and oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.light)
 			return r1, g1, b1, r2, g2, b2, r3, g3, b3
 		end
 
@@ -40,7 +40,7 @@ function Health(frame, db)
 			elseif colorType == "Custom" then
 				t = db["Custom Color"]
 			elseif colorType == "Gradient" then
-				r, g, b = oUF.ColorGradient(min, max, Gradient())
+				r, g, b = oUF.ColorGradient(min, max, Gradient(unit))
 			end
 			
 			if t then
@@ -59,14 +59,14 @@ function Health(frame, db)
 
 	Units:Position(health, db["Position"])
 
-	local texture = media:Fetch("texture", db["Texture"])
+	local texture = media:Fetch("statusbar", db["Texture"])
 	local size = db["Size"]
 
 	health:SetOrientation(db["Orientation"])
 	health:SetReverseFill(db["Reversed"])
 	health:SetStatusBarTexture(texture)
-	health:SetWidth(size["Match Width"] and frame:GetWidth() or size["Width"])
-	health:SetHeight(size["Match Height"] and frame:GetHeight() or size["Height"])
+	health:SetWidth(size["Match width"] and frame:GetWidth() or size["Width"])
+	health:SetHeight(size["Match height"] and frame:GetHeight() or size["Height"])
 	health.bg:ClearAllPoints()
 	health.bg:SetAllPoints()
 	health.bg:SetTexture(texture)

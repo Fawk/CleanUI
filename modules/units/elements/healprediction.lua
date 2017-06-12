@@ -52,8 +52,8 @@ end
 
 function HealPrediction(frame, db)
 
-	local texture = media:Fetch("texture", db["Texture"] or "Default")
-	
+	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
+
 	local healPrediction = frame.HealPrediction or (function()
 		
 		local healPrediction, my, all, absorb, healAbsorb = {}, CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame)

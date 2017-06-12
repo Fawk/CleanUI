@@ -216,6 +216,31 @@ function Party:Update(frame, db)
         end
     })
 
+        --[[ Background ]]--
+    local background = frame.Background or CreateFrame("Frame", nil, frame)
+    if db["Background"] and db["Background"]["Enabled"] then
+        local offset = db["Background"]["Offset"]
+        background:SetBackdrop({
+            bgFile = media:Fetch("statusbar", "Default"),
+            tile = true,
+            tileSize = 16,
+            insets = {
+                top = offset["Top"],
+                bottom = offset["Bottom"],
+                left = offset["Left"],
+                right = offset["Right"],
+            }
+        })
+        background:SetBackdropColor(unpack(db["Background"]["Color"]))
+        background:SetPoint("CENTER", frame, "CENTER", 0, 0)
+        background:SetSize(frame:GetSize())
+        background:SetFrameStrata("LOW")
+        background:SetFrameLevel(1)
+        background:Show()
+    else
+        background:Hide()
+    end
+
     local ignored = {
         [80354] = true,     -- Temporal Displacement
         [57723] = true,     -- Exhaustion

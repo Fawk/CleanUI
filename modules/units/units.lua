@@ -321,9 +321,14 @@ end
 function Units:Tag(frame, name, db)  
     local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
     
-    tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "Shadow" and "NONE" or db["Outline"])
+    tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "SHADOW" and "NONE" or db["Outline"])
     tag:ClearAllPoints()
     tag:SetTextColor(unpack(db["Color"]))
+
+    if db["Outline"] == "SHADOW" then
+        tag:SetShadowColor(0, 0, 0)
+        tag:SetShadowOffset(1, -1)
+    end
     
     local position = db["Position"]
     if position["Local Point"] == "ALL" then

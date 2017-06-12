@@ -103,27 +103,40 @@ local function setStyle()
 
 	--Chat
 	do
+		CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA = 1.0;
+		CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0;
+		CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA = 1.0;
+		CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA = 0.4;
+		CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA = 0.6;
+		CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0;
+		
+		local db = A["Profile"]["Options"]["Chat"]
+	
 		for _,name in pairs(CHAT_FRAMES) do
 			local frame = _G[name]
 			if frame then
-
-				frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-				frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-				frame:HookScript("OnEvent", function(self, event, ...)
-					if event == "PLAYER_REGEN_DISABLED" then
-						self:SetAlpha(0)
-						local tab = _G[name.."Tab"]
-						if tab then
-							tab:SetAlpha(0)
+	
+				if db["Hide In Combat"] then
+		
+					frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+					frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+					frame:HookScript("OnEvent", function(self, event, ...)
+						if event == "PLAYER_REGEN_DISABLED" then
+							self:SetAlpha(0)
+							local tab = _G[name.."Tab"]
+							if tab then
+								tab:SetAlpha(0)
+							end
+						elseif event == "PLAYER_REGEN_ENABLED" then
+							self:SetAlpha(1)
+							local tab = _G[name.."Tab"]
+							if tab then
+								tab:SetAlpha(1)
+							end
 						end
-					elseif event == "PLAYER_REGEN_ENABLED" then
-						self:SetAlpha(1)
-						local tab = _G[name.."Tab"]
-						if tab then
-							tab:SetAlpha(1)
-						end
-					end
-				end)
+					end)
+					
+				end
 
 				local bf = _G[name.."ButtonFrame"]
 				if bf then 
@@ -943,7 +956,14 @@ local function setStyle()
 		--ReputationListScrollFrameScrollChildFrame
 		--TokenFrameContainerScrollChild
 
-		--Something else
+		--Extra Action Buttons
+
+		local eabdb = A["Profile"]["Options"]["Extra Action Button"]
+		local button = _G["ExtraActionButton1"]
+
+		if button then
+			button:SetPoint(eabdb["Position"]["Local Point"], A.frameParent, eabdb["Position"]["Point"], eabdb["Position"]["Offset X"], eabdb["Position"]["Offset Y"])
+		end
 
 		--Something else
 

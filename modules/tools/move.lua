@@ -147,11 +147,7 @@ function A:CreateMover(frame, db, overrideName)
             obj["Position"] = position
 			
 			self.affecting:ClearAllPoints()
-			print(name)
-			print(lp, relative, p, x, y)
-			print(self.affecting:GetPoint())
 			self.affecting:SetAllPoints(self)
-			print(self.affecting:GetPoint())
            
 			A.Database:Prepare(name, obj)
         else

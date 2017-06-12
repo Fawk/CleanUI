@@ -4,15 +4,15 @@ local oUF = oUF or A.oUF
 local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
 local InCombatLockdown = InCombatLockdown
 
-local Player = {}
-local frameName = "Player"
+local Target = {}
+local frameName = "Target"
  
-function Player:Init()
+function Target:Init()
 
 	local db = A["Profile"]["Options"][frameName]
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Player:Setup(frame, db)
+        Target:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
 
@@ -24,20 +24,20 @@ function Player:Init()
     A:CreateMover(frame, db)
 end
 -- https://jsfiddle.net/859zu65s/
-function Player:Setup(frame, db)
+function Target:Setup(frame, db)
     self:Update(frame, db)
     return frame
 end
  
-function Player:Update(frame, db)
+function Target:Update(frame, db)
 	if not db["Enabled"] then return end
 
-	if InCombatLockdown() then
-		T:RunAfterCombat(function()
-			self.Update(frame, db)
-		end)
-		return
-    end
+	--if InCombatLockdown() then
+		--T:RunAfterCombat(function()
+			--self.Update(frame, db)
+		--end)
+		--return
+   -- end
 
     local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
 
@@ -91,4 +91,4 @@ function Player:Update(frame, db)
     end
 end
 
-A.modules["player"] = Player
+A.modules["target"] = Target

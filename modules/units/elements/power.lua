@@ -44,14 +44,14 @@ local function Power(frame, db)
 
 	Units:Position(power, db["Position"])
 
-	local texture = media:Fetch("texture", db["Texture"])
+	local texture = media:Fetch("statusbar", db["Texture"])
 	local size = db["Size"]
 
 	power:SetOrientation(db["Orientation"])
 	power:SetReverseFill(db["Reversed"])
 	power:SetStatusBarTexture(texture)
-	power:SetWidth(size["Match Width"] and frame:GetWidth() or size["Width"])
-	power:SetHeight(size["Match Height"] and frame:GetHeight() or size["Height"])
+	power:SetWidth(size["Match width"] and frame:GetWidth() or size["Width"])
+	power:SetHeight(size["Match height"] and frame:GetHeight() or size["Height"])
 	power.bg:ClearAllPoints()
 	power.bg:SetAllPoints()
 	power.bg:SetTexture(texture)
