@@ -14,7 +14,7 @@ function Health(frame, db)
 
 	local health = frame.Health or (function()
 
-		local health = CreateFrame("StatusBar", "Health", frame)
+		local health = CreateFrame("StatusBar", frame:GetName().."_Health", frame)
 		health:SetFrameStrata("LOW")
 		health.frequentUpdates = true
 		health.bg = health:CreateTexture(nil, "BACKGROUND")

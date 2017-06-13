@@ -60,10 +60,10 @@ function Raid:Init()
         maxColumns = 5
         unitsPerColumn = 1
     else
-        maxColumns = 1
-        unitsPerColumn = 5
+        maxColumns = 5
+        unitsPerColumn = 8
         point = "LEFT"
-        anchorPoint = "TOP"
+        anchorPoint = "RIGHT"
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
@@ -82,8 +82,8 @@ function Raid:Init()
         "yOffset",            db["Offset Y"],
         "xOffset",            db["Offset X"],
         'point', point,
-        'maxColumns', 8,
-        'unitsPerColumn', 5,
+        'maxColumns', maxColumns,
+        'unitsPerColumn', unitsPerColumn,
         'columnAnchorPoint', anchorPoint,
         "columnSpacing", db["Offset Y"],
         "groupBy", "ASSIGNEDROLE",
@@ -118,6 +118,13 @@ function Raid:Init()
             for i = 1, 40 do
                 local uf = raidHeader:GetAttribute("child"..i)
                 if not uf then break end
+                if i == 1 then
+                    hooksecurefunc(uf, "SetPoint", function(self, lp, r, p, x, y)
+                        if lp ~= "TOPLEFT" or p ~= "TOPLEFT" then
+                            self:SetPoint("TOPLEFT", raidHeader, "TOPLEFT", 0, 0)
+                        end
+                    end)
+                end
                 uf:RegisterForClicks("AnyUp")
                 uf.unit = uf:GetAttribute("unit")
                 Raid:Update(uf, db)
@@ -205,10 +212,11 @@ function Raid:Update(frame, db)
     })
 
         --[[ Background ]]--
-    local background = frame.Background or CreateFrame("Frame", nil, frame)
+    frame.Background = frame.Background or CreateFrame("Frame", frame:GetName().."_Background", frame)
+
     if db["Background"] and db["Background"]["Enabled"] then
         local offset = db["Background"]["Offset"]
-        background:SetBackdrop({
+        frame.Background:SetBackdrop({
             bgFile = media:Fetch("statusbar", "Default"),
             tile = true,
             tileSize = 16,
@@ -219,14 +227,14 @@ function Raid:Update(frame, db)
                 right = offset["Right"],
             }
         })
-        background:SetBackdropColor(unpack(db["Background"]["Color"]))
-        background:SetPoint("CENTER", frame, "CENTER", 0, 0)
-        background:SetSize(frame:GetSize())
-        background:SetFrameStrata("LOW")
-        background:SetFrameLevel(1)
-        background:Show()
+        frame.Background:SetBackdropColor(unpack(db["Background"]["Color"]))
+        frame.Background:SetPoint("CENTER", frame, "CENTER", 0, 0)
+        frame.Background:SetSize(frame:GetSize())
+        frame.Background:SetFrameStrata("LOW")
+        frame.Background:SetFrameLevel(1)
+        frame.Background:Show()
     else
-        background:Hide()
+        frame.Background:Hide()
     end
 
     local ignored = {

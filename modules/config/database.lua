@@ -200,9 +200,9 @@ local defaults =  {
 					["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "NotoBold",
-                            ["Size"] = 14,
+                            ["Size"] = 12,
                             ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "Outline",
+                            ["Outline"] = "SHADOW",
                             ["Text"] = "[name]",
                             ["Position"] = {
                                 ["Point"] = "LEFT",
@@ -382,7 +382,7 @@ local defaults =  {
                         ["Point"] = "BOTTOM",
                         ["Local Point"] = "BOTTOM",
                         ["Offset X"] = -0.920713663101196,
-                        ["Offset Y"] = 1.57280504703522,
+                        ["Offset Y"] = 22.3593578338623,
                     },
                     ["Health"] = {
                         ["Enabled"] = true,
@@ -391,7 +391,7 @@ local defaults =  {
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0,
-                            ["Relative To"] = "Party"
+                            ["Relative To"] = "Parent"
                         },
                         ["Size"] = {
                             ["Match width"] = true,
@@ -477,7 +477,7 @@ local defaults =  {
                         ["Enabled"] = true
                     },
                     ["Offset X"] = 2,
-                    ["Offset Y"] = 4,
+                    ["Offset Y"] = 2,
                     ["Show Player"] = true,
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
@@ -564,12 +564,12 @@ local defaults =  {
                 },
                 ["Cooldown bar"] = {
                     ["Position"] = {
-                        ["Local Point"] = "BOTTOM",
                         ["Relative To"] = "Parent",
-                        ["Point"] = "BOTTOM",
-                        ["Offset X"] = -200,
-                        ["Offset Y"] = 200,
-                    }
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "CENTER",
+                        ["Offset X"] = 3.4875648021698,
+                        ["Offset Y"] = -158.936065673828,
+                    },
                 },
 				["Chat"] = {
 					["Hide In Combat"] = false

@@ -10,7 +10,7 @@ local function Power(frame, db)
 
 	local power = frame.Power or (function()
 
-		local power = CreateFrame("StatusBar", "Power", frame)
+		local power = CreateFrame("StatusBar", frame:GetName().."_Power", frame)
 		power:SetFrameStrata("LOW")
 		power.frequentUpdates = true
 		power.bg = power:CreateTexture(nil, "BACKGROUND")
