@@ -519,7 +519,7 @@ local defaults =  {
                     ["Enabled"] = true
                 },
     			["Minimap"] = {
-    				["Size"] = 250,
+    				["Size"] = 150,
     				["Position"] = {
     					["Point"] = "TOPRIGHT",
     					["Local Point"] = "TOPRIGHT",
@@ -576,12 +576,12 @@ local defaults =  {
 				},
                 ["Extra Action Button"] = {
                     ["Position"] = {
-                        ["Local Point"] = "BOTTOM",
                         ["Relative To"] = "Parent",
                         ["Point"] = "BOTTOM",
-                        ["Offset X"] = 0,
-                        ["Offset Y"] = 200,
-                    }
+                        ["Local Point"] = "BOTTOM",
+                        ["Offset X"] = -6.56422424316406,
+                        ["Offset Y"] = 144.222183227539,
+                    },
                 }
     		}
 	    }
