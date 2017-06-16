@@ -465,6 +465,19 @@ local defaults =  {
                                 ["Hide Countdown Numbers"] = false,
                                 ["Cooldown Numbers Text Size"] = 9,
                                 ["Size"] = 14
+                            },
+                            [17] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
                             }
                         },
                         ["Important"] = true,

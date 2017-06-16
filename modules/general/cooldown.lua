@@ -33,6 +33,30 @@ local function Event()
 	numSpells = GetNumSpells()
 end
 
+local function handleGroupCycles()
+	local groups = {}
+	for i = 1, #timeStamps do
+		for spellId, icon in next, active do
+			if icon.group == i then
+				local group = groups[i] or {}
+				tinsert(group, icon)
+			end
+		end
+	end
+
+	for groupId, group in pairs(groups) do
+		for i, icon in next, group do
+			icon.fadeIn:SetScript("OnFinished", function(self, called)
+				self.fadeOut:Play()
+			end)
+			icon.fadeOut:SetScript("OnFinished", function(self, called)
+				next.fadeIn:Play()
+			end)
+		end
+		group[1].fadeIn:Play()
+	end
+end
+
 local interval = 0.03
 local count = 0
 local function Update(self, elapsed)
@@ -95,6 +119,9 @@ local function Update(self, elapsed)
 					fadeIn:SetSmoothing("IN")
 					fadeIn:SetOrder(2)
 
+					icon.fadeOut = fadeOut
+					icon.fadeIn = fadeIn
+
 					local alpha = icon.endGroup:CreateAnimation("Alpha")
 					alpha:SetFromAlpha(0.5)
 					alpha:SetToAlpha(0)
@@ -133,15 +160,16 @@ local function Update(self, elapsed)
 				        local x = offset + ( tdiff * tW ) - ( tW / 2 )
 
 			        	icon.current = current
+			        	icon.group = i
 
 				        if icon.hidden then
 				        	icon.hidden = false
 				        	icon:SetAlpha(0.5)
 				        end
 
-				        if not icon.hidden and not icon.cycleGroup:IsPlaying() then
-				        	icon.cycleGroup:Play()
-				        end
+				        --if not icon.hidden and not icon.cycleGroup:IsPlaying() then
+				        	--icon.cycleGroup:Play()
+				        --end
 
 			        	icon:SetPoint("LEFT", bar, "LEFT", x, 0)
 			
@@ -154,6 +182,8 @@ local function Update(self, elapsed)
 						end 
 				    end
 				end
+
+				handleGroupCycles()
 			end
 		end
 

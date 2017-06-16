@@ -58,12 +58,12 @@ function Raid:Init()
 
     if db["Orientation"] == "VERTICAL" then
         maxColumns = 5
-        unitsPerColumn = 1
-    else
-        maxColumns = 5
         unitsPerColumn = 8
+    else
+        maxColumns = 8
+        unitsPerColumn = 5
         point = "LEFT"
-        anchorPoint = "RIGHT"
+        anchorPoint = "TOP"
     end
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
@@ -118,13 +118,6 @@ function Raid:Init()
             for i = 1, 40 do
                 local uf = raidHeader:GetAttribute("child"..i)
                 if not uf then break end
-                if i == 1 then
-                    hooksecurefunc(uf, "SetPoint", function(self, lp, r, p, x, y)
-                        if lp ~= "TOPLEFT" or p ~= "TOPLEFT" then
-                            self:SetPoint("TOPLEFT", raidHeader, "TOPLEFT", 0, 0)
-                        end
-                    end)
-                end
                 uf:RegisterForClicks("AnyUp")
                 uf.unit = uf:GetAttribute("unit")
                 Raid:Update(uf, db)
