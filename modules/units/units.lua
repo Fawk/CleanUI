@@ -191,12 +191,6 @@ local important = {
 				buffs[spellId] = {
 					player = buffButton(frame, position, size, spellId, obj, "player")
 				}
-				for i = 1, 5 do
-					buffs[spellId]["party"..i] = buffButton(frame, position, size, spellId, obj, "party"..i)
-				end
-				for i = 1, 40 do
-					buffs[spellId]["raid"..i] = buffButton(frame, position, size, spellId, obj, "raid"..i)
-				end
             end         
         end
         
@@ -259,13 +253,12 @@ local important = {
 				if playerObj.trackOnlyPlayer and aura.caster == "player" then
 					visibility(playerObj, aura)
 				elseif not playerObj.trackOnlyPlayer then
-					for unit, buff in next, obj do 
-						if unit ~= "player" then
-							if unit == aura.caster then
-								visibility(buff, aura)
-							end
-						end
-					end
+                    if aura.caster ~= "player" then
+                        if not obj[aura.caster] then
+                            buffs[spellId][aura.caster] = buffButton(frame, position, size, spellId, obj, aura.caster)
+                        end
+                        visibility(buffs[spellId][aura.caster], aura)
+                    end
 				end
 			end
         end

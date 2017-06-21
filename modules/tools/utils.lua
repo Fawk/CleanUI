@@ -262,8 +262,35 @@ local function TextBuilder(parent, sizeInPerc)
 
 	setmetatable(o, object)
 
+	function o:outline()
+		self.textOutline = "OUTLINE"
+		return self
+	end
+
+	function o:thickOutline()
+		self.textOutline = "THICKOUTLINE"
+		return self
+	end
+
+	function o:shadow()
+		self.textOutline = "SHADOW"
+		return self
+	end
+
 	function o:build()
 		local text = self.parent:CreateFontString(nil, "OVERLAY")
+
+		local textOutline = "NONE"
+		if self.textOutline then
+			if self.textOutline == "SHADOW" then
+				textOutline = "NONE"
+				text:SetShadowOffset(1, -1)
+				text:SetShadowColor(1, 1, 1)
+			else
+				textOutline = self.textOutline
+			end
+		end
+
 		setPoints(self, text)
         text.OldSetText = text.SetText
         text.SetText = function(self, value)
@@ -278,10 +305,10 @@ local function TextBuilder(parent, sizeInPerc)
             end
             if isSpecial then
                 font = media:Fetch("font", "NotoBold")
-                self:SetFont(font, size, "NONE")
+                self:SetFont(font, size, textOutline)
             else
                 font = media:Fetch("font", "Default")
-                self:SetFont(font, size, "NONE")
+                self:SetFont(font, size, textOutline)
             end
             self:OldSetText(value)
 
@@ -289,7 +316,7 @@ local function TextBuilder(parent, sizeInPerc)
 	            if self:GetStringWidth() > parent:GetWidth() then
 	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
 	                    size = size - 1
-	                    self:SetFont(font, size, "NONE")
+	                    self:SetFont(font, size, textOutline)
 	                    if size == 1 then
 	                    	return text
 	                    end
@@ -297,7 +324,7 @@ local function TextBuilder(parent, sizeInPerc)
 	            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
 	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
 	                    size = size - 1
-	                    self:SetFont(font, size, "NONE")
+	                    self:SetFont(font, size, textOutline)
 	                    if size == 1 then
 	                    	return text
 	                    end
@@ -305,11 +332,11 @@ local function TextBuilder(parent, sizeInPerc)
 	            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
 	                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
 	                    size = size + 1
-	                    self:SetFont(font, size, "NONE")
+	                    self:SetFont(font, size, textOutline)
 	                end
 	            end
 	        else
-	        	self:SetFont(font, sizeInPerc, "NONE")
+	        	self:SetFont(font, sizeInPerc, textOutline)
 	        end
         end
 		return text

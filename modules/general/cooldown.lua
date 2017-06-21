@@ -38,22 +38,47 @@ local function handleGroupCycles()
 	for i = 1, #timeStamps do
 		for spellId, icon in next, active do
 			if icon.group == i then
-				local group = groups[i] or {}
-				tinsert(group, icon)
+				local groupId = math.ceil(i / 3)
+				local group = groups[groupId]
+				if not group then
+					group = { icons = {} }
+					groups[groupId] = group
+				end
+				tinsert(group.icons, icon)
 			end
 		end
 	end
 
 	for groupId, group in pairs(groups) do
-		for i, icon in next, group do
+
+		local playing = nil
+
+		for i, icon in next, group.icons do
 			icon.fadeIn:SetScript("OnFinished", function(self, called)
-				self.fadeOut:Play()
+				icon.fadeOut:Play()
 			end)
 			icon.fadeOut:SetScript("OnFinished", function(self, called)
-				next.fadeIn:Play()
+				icon:SetAlpha(0)
+				local index, nextIcon = next(group.icons, i)
+				if nextIcon then
+					nextIcon.fadeIn:Play()
+				else
+					if #group.icons > 1 then
+						group.icons[1].fadeIn:Play()
+					else
+						icon.fadeIn:Play()
+					end
+				end
 			end)
+			if icon.fadeIn:IsPlaying() or icon.fadeOut:IsPlaying() then
+				playing = icon
+			end
 		end
-		group[1].fadeIn:Play()
+
+		if not playing then
+			group.icons[1].fadeIn:Play()
+			playing = group.icons[1]
+		end
 	end
 end
 
@@ -73,8 +98,9 @@ local function Update(self, elapsed)
 
             if start == 0 and active[spellId] and active[spellId]:GetAlpha() > 0 then
                 active[spellId]:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
-				active[spellId].cycleGroup:Stop()
 				active[spellId].endGroup:Play()
+				active[spellId].fadeIn:Stop()
+				active[spellId].fadeOut:Stop()
 				active[spellId] = nil
             end
 
@@ -94,7 +120,8 @@ local function Update(self, elapsed)
 					
 					icon = CreateFrame("Frame", nil, bar)
 					icon:SetSize(tW, tW)
-					icon.cycleGroup = icon:CreateAnimationGroup()
+					icon.fadeIn = icon:CreateAnimationGroup()
+					icon.fadeOut = icon:CreateAnimationGroup()
 					icon.endGroup = icon:CreateAnimationGroup()
 					icon.endGroup:SetScript("OnFinished", function(self, requested) 
 						icon:SetAlpha(0)
@@ -105,22 +132,17 @@ local function Update(self, elapsed)
 					icon:SetFrameLevel(1)
 					icon:SetAlpha(0.5)
 
-					local fadeOut = icon.cycleGroup:CreateAnimation("Alpha")
-					fadeOut:SetFromAlpha(0.5)
-					fadeOut:SetToAlpha(0)
-					fadeOut:SetDuration(0.5)
-					fadeOut:SetSmoothing("OUT")
-					fadeOut:SetOrder(1)
+					local fadeOutA = icon.fadeOut:CreateAnimation("Alpha")
+					fadeOutA:SetFromAlpha(0.5)
+					fadeOutA:SetToAlpha(0)
+					fadeOutA:SetDuration(0.5)
+					fadeOutA:SetSmoothing("OUT")
 
-					local fadeIn = icon.cycleGroup:CreateAnimation("Alpha")
-					fadeIn:SetFromAlpha(0)
-					fadeIn:SetToAlpha(0.5)
-					fadeIn:SetDuration(0.5)
-					fadeIn:SetSmoothing("IN")
-					fadeIn:SetOrder(2)
-
-					icon.fadeOut = fadeOut
-					icon.fadeIn = fadeIn
+					local fadeInA = icon.fadeIn:CreateAnimation("Alpha")
+					fadeInA:SetFromAlpha(0)
+					fadeInA:SetToAlpha(0.5)
+					fadeInA:SetDuration(0.5)
+					fadeInA:SetSmoothing("IN")
 
 					local alpha = icon.endGroup:CreateAnimation("Alpha")
 					alpha:SetFromAlpha(0.5)
@@ -176,8 +198,9 @@ local function Update(self, elapsed)
 						if current < .05 then
 							current = 0
 							icon:SetPoint("LEFT", bar, "LEFT", startOffset, 0)
-							icon.cycleGroup:Stop()
 							icon.endGroup:Play()
+							icon.fadeIn:Stop()
+							icon.fadeOut:Stop()
 							active[spellId] = nil
 						end 
 				    end
@@ -213,9 +236,9 @@ function Cooldown:Init()
 
 	for i = 1, #timeStamps do
 		local offset = startOffset + (tW * (i - 1))
-		local text = buildText(bar, 11):atLeft():againstLeft():x(offset):build()
+		local text = buildText(bar, 11):outline():atLeft():againstLeft():x(offset):build()
 		text:SetSize(tW, tW)
-		text:SetTextColor(0.43, 0.43, 0.43)
+		text:SetTextColor(1, 1, 1)
 		text:SetText(format("%s", timeStamps[i] > 60 and (timeStamps[i] / 60).."m" or timeStamps[i]))
 		text:SetDrawLayer("OVERLAY", 1)
 	end
