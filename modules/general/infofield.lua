@@ -22,7 +22,7 @@ local function createIcon(parent, anchor, name, size, texture, priority, conditi
 	icon.texture:SetTexCoord(0.133,0.867,0.133,0.867)
 
 	icon.priority = priority
-	icon.condition = condition
+	icon.condition = loadstring(condition)
 	icon.options = options
 
 	icon.timer = 0
@@ -42,11 +42,11 @@ local function createIcon(parent, anchor, name, size, texture, priority, conditi
 end
 
 local exampleCondition = [[
-	return function(spellId)
+	return function()
 		local exists = false
 		for i = 1, 40 do
 			local name,_,_,_,_,duration,_,_,_,_,spellID = UnitAura("player", index, "HELPFUL")
-			if name and duration and duration > 0 and spellId == spellID then
+			if name and duration and duration > 0 and 198068 == spellID then -- Power of the Dark Side
 				exists = true
 			end
 		end
