@@ -66,7 +66,10 @@ local function GetUnitAuras(unit, filter)
     for index = 1, 40 do
         local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, filter)
         if name and duration and duration > 0 then
-            auras[spellID] = {
+            if not auras[spellID] then
+                auras[spellID] = {}
+            end
+            auras[spellID][caster] = {
                 name = name,
                 dtype = dtype,
                 duration = duration,
@@ -138,7 +141,7 @@ local important = {
     ["RaidBuffs"] = function(frame, db)   
 	
 		local function buffButton(frame, position, size, spellId, obj, unit)
-			
+
 			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId).."_"..unit, frame)
 
 			Units:Position(buff, position)
@@ -188,10 +191,8 @@ local important = {
             local size, position, ignored = obj["Size"], obj["Position"]
 
             if not buffs[spellId] then
-				buffs[spellId] = {
-					player = buffButton(frame, position, size, spellId, obj, "player")
-				}
-            end         
+				buffs[spellId] = {}
+            end
         end
         
         local auras = GetUnitAuras(frame.unit, "HELPFUL")
@@ -243,24 +244,30 @@ local important = {
 			obj:Show()
 		end
         
-        for spellId, aura in next, auras do
-            local obj = buffs[spellId]
-			
-			if obj then
-				
-				local playerObj = obj["player"]
-				
-				if playerObj.trackOnlyPlayer and aura.caster == "player" then
-					visibility(playerObj, aura)
-				elseif not playerObj.trackOnlyPlayer then
-                    if aura.caster ~= "player" then
-                        if not obj[aura.caster] then
-                            buffs[spellId][aura.caster] = buffButton(frame, position, size, spellId, obj, aura.caster)
-                        end
-                        visibility(buffs[spellId][aura.caster], aura)
+        for spellId, auraObj in next, auras do
+            for caster, aura in next, auraObj do
+                local obj = buffs[spellId]
+    			
+    			if obj then
+    				
+    				local playerObj = obj["player"]
+                    if not playerObj then
+                        playerObj = buffButton(frame, position, size, spellId, obj, "player")
+                        buffs[spellId]["player"] = playerObj
                     end
-				end
-			end
+
+    				if playerObj.trackOnlyPlayer and aura.caster == "player" then
+    					visibility(playerObj, aura)
+    				elseif not playerObj.trackOnlyPlayer then
+                        if aura.caster ~= "player" then
+                            if not obj[aura.caster] then
+                                buffs[spellId][aura.caster] = buffButton(frame, position, size, spellId, obj, aura.caster)
+                            end
+                            visibility(buffs[spellId][aura.caster], aura)
+                        end
+    				end
+    			end
+            end
         end
         
         frame["RaidBuffs"] = buffs

@@ -34,7 +34,7 @@ function Health(frame, db)
 			
 			if colorType == "Class" then
 				health.colorClass = true
-				r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))])
+				r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.default)
 			elseif colorType == "Health" then
 				health.colorHealth = true
 			elseif colorType == "Custom" then
