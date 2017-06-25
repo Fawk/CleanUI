@@ -65,7 +65,7 @@ local function GetUnitAuras(unit, filter)
     local auras = {}    
     for index = 1, 40 do
         local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, filter)
-        if name and duration and duration > 0 then
+        if name and caster and spellID and duration and duration > 0 then
             if not auras[spellID] then
                 auras[spellID] = {}
             end
@@ -180,7 +180,7 @@ local important = {
 
         for spellId,_ in next, buffs do	
             if not tracked[spellId] then
-				for unit, buff in next, buffs[spellId] do
+				for caster, buff in next, buffs[spellId] do
 					buff:Hide()
 				end
 				table.remove(buffs, spellId)
@@ -188,8 +188,6 @@ local important = {
         end
 
         for spellId, obj in next, tracked do
-            local size, position, ignored = obj["Size"], obj["Position"]
-
             if not buffs[spellId] then
 				buffs[spellId] = {}
             end
@@ -215,7 +213,7 @@ local important = {
 		local function visibility(obj, aura)
 		
 			obj.cd:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
-			obj.cd:SetHideCountdownNumbers(obj.hideNumbers)
+			obj.cd:SetHideCountdownNumbers(obj.hideNumbers or false)
 			for _,region in next, {obj.cd:GetRegions()} do
 				if region:GetObjectType() == "FontString" then
 					obj.cd.cooldownText = region
@@ -250,6 +248,8 @@ local important = {
     			
     			if obj then
     				
+                    local size, position = tracked[spellId]["Size"], tracked[spellId]["Position"]
+
     				local playerObj = obj["player"]
                     if not playerObj then
                         playerObj = buffButton(frame, position, size, spellId, obj, "player")
@@ -311,7 +311,7 @@ function Units:Position(frame, db)
 end
  
 function Units:SetKeyBindings(frame, db)
-    if db and frame.unit then
+    if db and frame.unit and frame:CanChangeAttribute() then
         for _,binding in next, db do
             frame:SetAttribute(binding.type, binding.action:gsub("@unit", "@"..frame.unit))
         end
