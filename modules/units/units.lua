@@ -158,7 +158,6 @@ local important = {
 			local count = buff:CreateFontString(nil, "OVERLAY")
 			count:SetFontObject(NumberFontNormal)
 			count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
-
 			buff.hideNumbers = obj["Hide Countdown Numbers"]
 			buff.trackOnlyPlayer = obj["Own Only"]
 			buff.cdTextSize = obj["Cooldown Numbers Text Size"]
@@ -237,20 +236,20 @@ local important = {
 
 			obj.nextUpdate = -1
 			UpdateTime(obj, 0)
-			
+
 			obj.icon:SetTexture(aura.texture)
 			obj:Show()
 		end
         
         for spellId, auraObj in next, auras do
             for caster, aura in next, auraObj do
-                local obj = buffs[spellId]
+                local obj = tracked[spellId]
     			
     			if obj then
     				
                     local size, position = tracked[spellId]["Size"], tracked[spellId]["Position"]
 
-    				local playerObj = obj["player"]
+    				local playerObj = buffs[spellId]["player"]
                     if not playerObj then
                         playerObj = buffButton(frame, position, size, spellId, obj, "player")
                         buffs[spellId]["player"] = playerObj
