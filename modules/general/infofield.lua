@@ -1,8 +1,58 @@
 local A, L = unpack(select(2, ...))
-
+local LBG = LibStub("LibButtonGlow-1.0")
 local I = {}
 
-local function createIcon(parent, anchor, name, size, texture, priority, condition, options)
+local function createAlphaAnimation(ag, from, to, duration, onFinished)
+	local a = ag:CreateAnimation("Alpha")
+	a:SetFromAlpha(from)
+	a:SetToAlpha(to)
+	a:SetDuration(duration)
+	a:SetScript("OnFinished", onFinished)
+end
+
+local presets = {
+	glow = function(icon)
+		LBG.ShowOverlayGlow(icon)
+	end,
+	fadeIn = function(icon)
+		local ag = icon:CreateAnimationGroup()
+		local a = createAlphaAnimation(ag, 0, 1, 0.5, function(self, called)
+			icon:SetAlpha(1) 
+		end)
+		icon.fadeIn = ag
+		icon.oldShow = icon.Show
+		icon.Show = function(self)
+			local alpha = self:GetAlpha()
+			if alpha >= 1 then return end
+			if self.ag:IsPlaying() then return end
+			self.ag:Play()
+		end
+	end,
+	fadeOut = function(icon)
+		local ag = icon:CreateAnimationGroup()
+		local a = createAlphaAnimation(ag, 1, 0, 0.5, function(self, called)
+			icon:SetAlpha(0)
+		end)
+		icon.fadeOut = ag
+		icon.oldHide = icon.Hide
+		icon.Hide = function(self)
+			local alpha = self:GetAlpha()
+			if alpha <= 0 then return end
+			if self.ag:IsPlaying() then return end
+			self.ag:Play()
+		end
+	end,
+end
+}
+
+local function evaluateOptions(icon)
+	local o = icon.options
+	for _,effect in next, o do
+		presets[effect](icon)
+	end
+end
+
+local function createIcon(parent, name, size, texture, priority, condition, options)
 	local icon = CreateFrame("Frame", A:GetName().."_InfoField_"..name, parent)
 	icon:SetSize(size - 1, size - 1)
 	icon:SetBackdrop({
@@ -25,13 +75,24 @@ local function createIcon(parent, anchor, name, size, texture, priority, conditi
 	icon.condition = loadstring(condition)
 	icon.options = options
 
+	evaluateOptions(icon)
+
 	icon.timer = 0
 	icon:SetScript("OnUpdate", function(self, elapsed)
 		self.timer = self.timer + elapsed
 		if self.timer > 0.03 then
 			if self:condition() then
+				if self.preShow then
+					self:preShow()
+				end
 				self:Show()
+				if self.postShow then
+					self:postShow()
+				end
 			else
+				if self.preHide then
+					self:preHide()
+				end
 				self:Hide()
 			end
 			self.timer = 0
@@ -53,6 +114,10 @@ local exampleCondition = [[
 		return exists
 	end
 ]]
+
+local function alreadyCreated(groups, id)
+	for groupId, 
+end
 
 function I:Init()
 
@@ -83,7 +148,34 @@ function I:Init()
 		A["Info Field"] = field
 	end
 
+	for _,preset in next, db["Presets"] do
+		if not alreadyCreated(preset.id) then
+			local name,_,texture = GetSpellInfo(preset.spellId)
+			local icon = createIcon(field, name, preset.size, texture, preset.priority, preset.condition, preset.options)
+			field.groups[preset.priority]:add(icon)
+		end
+	end
 
+	local anchor = field
+	for groupdId, group in next, field.groups do
+		for i = 1, group:size() do
+			local icon = group:get(i)
+			if db["Orientation"] == "HORIZONTAL" then
+				if db["Direction"] == "Right" then
+					icon:SetPoint("LEFT", anchor, anchor == field and "LEFT" or "RIGHT", 0, 0)
+				else
+					icon:SetPoint("RIGHT", anchor, anchor == field and "RIGHT" or "LEFT", 0, 0)
+				end
+			else
+				if db["Direction"] == "Upwards" then
+					icon:SetPoint("BOTTOM", anchor, anchor == field and "BOTTOM" or "TOP", 0, 0)
+				else
+					icon:SetPoint("TOP", anchor, anchor == field and "TOP" or "BOTTOM", 0, 0)
+				end
+			end
+			anchor =  icon
+		end
+	end
 
 end
 
