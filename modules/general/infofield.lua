@@ -116,7 +116,14 @@ local exampleCondition = [[
 ]]
 
 local function alreadyCreated(groups, id)
-	for groupId, 
+	for groupId, group in next, groups do
+		for i = 1, group:size() do
+			if group:get(i).id == id then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 function I:Init()
