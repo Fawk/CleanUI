@@ -42,6 +42,16 @@ local presets = {
 			self.ag:Play()
 		end
 	end,
+	blink = function(icon)
+		local ag = icon:CreateAnimationGroup()
+		local aIn = createAlphaAnimation(ag, 0, 1, 0.5, nil)
+		local aOut = createAlphaAnimation(ag, 1, 0, 0.5, nil)
+		aOut:SetOrder(1)
+		aIn:SetOrder(2)
+		ag:SetLooping("REPEAT")
+		icon.blink = ag
+		ag:Play()
+	end
 end
 }
 
@@ -126,34 +136,7 @@ local function alreadyCreated(groups, id)
 	return false
 end
 
-function I:Init()
-
-	local db = A["Profile"]["Options"]["Info Field"]
-
-	local field = A["Info Field"]
-	if not field then
-		field = CreateFrame("Frame", nil, A.frameParent)
-
-		local w, h = nil, nil
-		if db["Orientation"] == "HORIZONTAL" then
-			w = db["Size"] * db["Limit"]
-			h = db["Size"]
-		else
-			w = db["Size"]
-			h = db["Size"] * db["Limit"]
-		end
-		field:SetSize(w, h)
-
-		local position = db["Position"]
-		field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
-
-		field.groups = {}
-		for i = 1, tonumber(db["Limit"]) do
-			field.groups[i] = A:OrderedTable()
-		end
-
-		A["Info Field"] = field
-	end
+local function Update(field, db)
 
 	for _,preset in next, db["Presets"] do
 		if not alreadyCreated(preset.id) then
@@ -182,6 +165,46 @@ function I:Init()
 			end
 			anchor =  icon
 		end
+	end
+
+end
+
+function I:Init()
+
+	local db = A["Profile"]["Options"]["Info Field"]
+
+	local field = A["Info Field"]
+	if not field then
+		field = CreateFrame("Frame", nil, A.frameParent)
+
+		local w, h = nil, nil
+		if db["Orientation"] == "HORIZONTAL" then
+			w = db["Size"] * db["Limit"]
+			h = db["Size"]
+		else
+			w = db["Size"]
+			h = db["Size"] * db["Limit"]
+		end
+		field:SetSize(w, h)
+
+		local position = db["Position"]
+		field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+
+		field.groups = {}
+		for i = 1, tonumber(db["Limit"]) do
+			field.groups[i] = A:OrderedTable()
+		end
+
+		field.timer = 0
+		field:SetScript("OnUpdate", function(self, elapsed)
+			self.timer = self.timer + elapsed
+			if self.timer > 0.03 then
+				Update(self, db)
+				self.timer = 0
+			end
+		end)
+
+		A["Info Field"] = field
 	end
 
 end
