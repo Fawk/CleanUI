@@ -39,18 +39,11 @@ end
 
 function T:HookSetPoint(frame, position, w, h)
 	
-	frame.needsPositionFix = true
-	
-	hooksecurefunc(frame, "SetPoint", function(lp, r, p, x, y)
-		if frame.needsPositionFix then
-			frame:ClearAllPoints()
-			frame.needsPositionFix = false
-			frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
-			frame:SetSize(w, h)
-		else
-			if lp ~= position["Local Point"] or p ~= position["Point"] or r ~= A.frameParent then
-				frame.needsPositionFix = true
-			end
+	hooksecurefunc(frame, "SetPoint", function(self, lp, r, p, x, y)
+		if lp ~= position["Local Point"] or p ~= position["Point"] or r ~= A.frameParent then
+			self:ClearAllPoints()
+			self:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+			self:SetSize(w, h)
 		end
 	end)
 
