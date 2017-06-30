@@ -138,6 +138,19 @@ end
 
 local function Update(field, db)
 
+	local w, h = nil, nil
+	if db["Orientation"] == "HORIZONTAL" then
+		w = db["Size"] * db["Limit"]
+		h = db["Size"]
+	else
+		w = db["Size"]
+		h = db["Size"] * db["Limit"]
+	end
+	field:SetSize(w, h)
+
+	local position = db["Position"]
+	field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+
 	for _,preset in next, db["Presets"] do
 		if not alreadyCreated(preset.id) then
 			local name,_,texture = GetSpellInfo(preset.spellId)
@@ -176,19 +189,6 @@ function I:Init()
 	local field = A["Info Field"]
 	if not field then
 		field = CreateFrame("Frame", nil, A.frameParent)
-
-		local w, h = nil, nil
-		if db["Orientation"] == "HORIZONTAL" then
-			w = db["Size"] * db["Limit"]
-			h = db["Size"]
-		else
-			w = db["Size"]
-			h = db["Size"] * db["Limit"]
-		end
-		field:SetSize(w, h)
-
-		local position = db["Position"]
-		field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 
 		field.groups = {}
 		for i = 1, tonumber(db["Limit"]) do
