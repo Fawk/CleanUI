@@ -19,6 +19,7 @@ local presets = {
 		local a = createAlphaAnimation(ag, 0, 1, 0.5, function(self, called)
 			icon:SetAlpha(1) 
 		end)
+		a:SetSmoothing("IN")
 		icon.fadeIn = ag
 		icon.oldShow = icon.Show
 		icon.Show = function(self)
@@ -33,6 +34,7 @@ local presets = {
 		local a = createAlphaAnimation(ag, 1, 0, 0.5, function(self, called)
 			icon:SetAlpha(0)
 		end)
+		a:SetSmoothing("OUT")
 		icon.fadeOut = ag
 		icon.oldHide = icon.Hide
 		icon.Hide = function(self)
@@ -58,7 +60,9 @@ end
 local function evaluateOptions(icon)
 	local o = icon.options
 	for _,effect in next, o do
-		presets[effect](icon)
+		if presets[effect] then
+			presets[effect](icon)
+		end
 	end
 end
 
