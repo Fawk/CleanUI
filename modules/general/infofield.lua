@@ -1,6 +1,7 @@
 local A, L = unpack(select(2, ...))
 local LBG = LibStub("LibButtonGlow-1.0")
 local I = {}
+local builtText = A.TextBuilder
 
 local function createAlphaAnimation(ag, from, to, duration, onFinished)
 	local a = ag:CreateAnimation("Alpha")
@@ -9,6 +10,48 @@ local function createAlphaAnimation(ag, from, to, duration, onFinished)
 	a:SetDuration(duration)
 	a:SetScript("OnFinished", onFinished)
 end
+
+local functions = {
+	activeBuffWithStackAndCountdown = function(spellId) 
+		return ([[
+			return function(icon)
+				local exists = false
+				for i = 1, 40 do
+					local name,_,_,count,_,duration,_,_,_,_,spellID = UnitAura("player", index, "HELPFUL")
+					if name and duration and duration > 0 and %d == spellID then
+						exists = true
+						if icon.countdown then
+							icon.countdown:SetText(duration)
+						end
+						if icon.stack and count and count > 0 then
+							icon.stack:SetText(count)
+						end
+					end
+				end
+				return exists
+			end
+		]]):format(spellId)
+	end,
+	cooldownWithCountdown = function()
+		return [[
+			return function(icon)
+				print(icon) -- Does this print out icon?
+				local start, duration = GetSpellCooldown(spellId)
+				if start > 0 and duration > 0 then
+					local time = GetTime()
+					local current = duration - time + start
+					if current > 0.05 then
+						if icon.countdown then
+							icon.countdown:SetText(duration)
+						end
+						return true
+					end
+				end
+				return false
+			end
+		]]
+	end
+}
 
 local presets = {
 	glow = function(icon)
@@ -85,8 +128,11 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 	icon.texture:SetTexture(texture)
 	icon.texture:SetTexCoord(0.133,0.867,0.133,0.867)
 
+	icon.countdown = buildText(icon, 12):outline():alignAll():build()
+	icon.stack = buildText(icon, 10):outline():atBottomRight():x(-3):y(3):build()
+
 	icon.priority = priority
-	icon.condition = loadstring(condition)
+	icon.condition = assert(loadstring(condition))()
 	icon.options = options
 
 	evaluateOptions(icon)
@@ -95,7 +141,7 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 	icon:SetScript("OnUpdate", function(self, elapsed)
 		self.timer = self.timer + elapsed
 		if self.timer > 0.03 then
-			if self:condition() then
+			if self:condition(self) then
 				if self.preShow then
 					self:preShow()
 				end
@@ -116,19 +162,6 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 	frame.groups[priority]:add(icon)
 end
 
-local exampleCondition = [[
-	return function()
-		local exists = false
-		for i = 1, 40 do
-			local name,_,_,_,_,duration,_,_,_,_,spellID = UnitAura("player", index, "HELPFUL")
-			if name and duration and duration > 0 and 198068 == spellID then -- Power of the Dark Side
-				exists = true
-			end
-		end
-		return exists
-	end
-]]
-
 local function alreadyCreated(groups, id)
 	for groupId, group in next, groups do
 		for i = 1, group:size() do
@@ -141,6 +174,14 @@ local function alreadyCreated(groups, id)
 end
 
 local function Update(field, db)
+
+	if not db["Enabled"] then
+		field:Hide()
+		field:SetScript("OnUpdate", nil)
+		collectgarbage(field)
+		A["Field"] = nil
+		return
+	end
 
 	local w, h = nil, nil
 	if db["Orientation"] == "HORIZONTAL" then
@@ -189,6 +230,7 @@ end
 function I:Init()
 
 	local db = A["Profile"]["Options"]["Info Field"]
+	if not db["Enabled"] then return end
 
 	local field = A["Info Field"]
 	if not field then

@@ -54,7 +54,7 @@ function Raid:Init()
 	local db = A["Profile"]["Options"][frameName]
     local maxColumns, unitsPerColumn = 5, 1
 
-    local size, point, anchorPoint = db["Size"], "LEFT", "TOP"
+    local size, point, anchorPoint = db["Size"], "TOP", "LEFT"
 
     if db["Orientation"] == "VERTICAL" then
         maxColumns = 5
@@ -102,9 +102,16 @@ function Raid:Init()
         
         raidContainer.UpdateSize = function(self, db) 
             local numGroupMembers = GetNumGroupMembers()
-            local x, y = db["Offset X"], db["Offset Y"]
-            local w = size["Width"] * 5 + (x * 4)
-            local h = size["Height"] * 8 + (y * 7)
+            local x, y, w, h = db["Offset X"], db["Offset Y"], 0, 0
+
+            if db["Orientation"] == "VERTICAL" then
+                w = size["Width"] * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
+                h = size["Height"] * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
+            else
+                w = size["Width"] * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
+                h = size["Height"] * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
+            end
+
             if InCombatLockdown() then
                 T:RunAfterCombat(function() 
                     raidContainer:SetSize(w, h)
