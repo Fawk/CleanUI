@@ -19,6 +19,128 @@ end
 
 local defaults =  {
     ["Profiles"] = {
+        ["Seife"] = {
+            ["Options"] = {
+                ["Party"] = {
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Effuse; [@unit,help,dead] Resuscitate" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Enveloping Mist" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Life Cocoon" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Renewing Mist" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Vivify" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Detox" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Sheilun's Gift" }
+                    },
+                    ["RaidBuffs"] = {
+                        ["Tracked"] = {
+                            [119611] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 16
+                            },
+                            [116849] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOP",
+                                    ["Local Point"] = "TOP",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = -5,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = true,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 16
+                            },
+                            [191840] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "LEFT",
+                                    ["Local Point"] = "LEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            }
+                        }
+                    }
+                },
+                ["Raid"] = {
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Effuse; [@unit,help,dead] Resuscitate" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Enveloping Mist" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Life Cocoon" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Renewing Mist" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Vivify" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Detox" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Sheilun's Gift" }
+                    },
+                    ["RaidBuffs"] = {
+                        ["Tracked"] = {
+                            [119611] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            },
+                            [116849] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOP",
+                                    ["Local Point"] = "TOP",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = -5,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = true,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 16
+                            },
+                            [191840] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "LEFT",
+                                    ["Local Point"] = "LEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            }
+                        }
+                    }
+                }
+            }
+        },
 	    ["Default"] = {
     		["Options"] = {
     			["Player"] = {
@@ -600,7 +722,8 @@ local defaults =  {
 	    }
 	},
 	["Characters"] = {
-        ["Aiwen-ShatteredHand"] = "Default"
+        ["Aiwen-ShatteredHand"] = "Default",
+        ["Seife-ShatteredHand"] = "Seife"
     }
 }
 
@@ -658,6 +781,34 @@ local defaultsMeta = {
     end
 }
 
+local function scan(tbl, d)
+    for k,v in pairs(d) do
+        if type(v) == "table" then
+            if not tbl[k] then
+                tbl[k] = setmetatable({}, {
+                    __index = function(t, kv)
+                        if not rawget(t, kv) and rawget(v, kv) then
+                            rawset(t, kv, deepCopy(rawget(v, kv)))
+                        end
+                        return rawget(t, kv)
+                    end
+                })
+            end
+            scan(tbl[k], v)
+        else
+            if not tbl[k] then
+                tbl[k] = v
+            end
+        end
+    end
+end
+
+for profile, tbl in next, defaults["Profiles"] do
+    if profile ~= "Default" then
+        scan(tbl, defaults["Profiles"]["Default"])
+    end
+end
+
 function Database:Prepare(type, value)
     if not self.prepared[type] and defaults["Profiles"][A["Modules"]["Profile"]:GetActive()]["Options"][type] then
         self.prepared[type] = {}
@@ -670,7 +821,7 @@ function Database:GetDefaults(profile)
 end
 
 function Database:Save()
-    local activeProfile = A["Modules"]["Profile"]:GetActive()   
+    local activeProfile = A["Modules"]["Profile"]:GetActive()
     local save = setmetatable({}, defaultsMeta)
     save[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
 

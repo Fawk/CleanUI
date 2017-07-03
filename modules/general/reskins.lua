@@ -963,12 +963,10 @@ local function setStyle()
 
 		if button then
 			A:CreateMover(button, eabdb, "Extra Action Button")
-			A.Tools:HookSetPoint(button, eabdb["Position"])
+			A.Tools:HookSetPoint(button, eabdb["Position"], button:GetWidth(), button:GetHeight())
 			button:SetPoint(eabdb["Position"]["Local Point"], A.frameParent, eabdb["Position"]["Point"], eabdb["Position"]["Offset X"], eabdb["Position"]["Offset Y"])
 			button:HookScript("OnUpdate", function(self, elapsed)
-				if not HasExtraActionBar() then
-					self:Hide()
-				end
+				self:SetAlpha(HasExtraActionBar() and 1 or 0)
 			end)
 		end
 

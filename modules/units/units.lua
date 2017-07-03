@@ -221,6 +221,8 @@ local important = {
 			if obj.cd.cooldownText then
 				local media = LibStub("LibSharedMedia-3.0")
 				obj.cd.cooldownText:SetFont(media:Fetch("font", "NotoBold"), obj.cdTextSize, "OUTLINE")
+                obj.cd.cooldownText:ClearAllPoints()
+                obj.cd.cooldownText:SetPoint("CENTER", 2, 0)
 			end
 			if aura.count and aura.count > 0 then
 				obj.count:SetText(aura.count)

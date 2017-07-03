@@ -10,8 +10,16 @@ function Profile:Init(db)
 	end
 end
 
+local function getName(n, r)
+	return n.."-"..r
+end
+
 function Profile:Load()
-	local name = GetUnitName("player", true)
+	local name, realm = UnitFullName("player")
+	if not realm then
+		realm = GetRealmName()
+	end
+	name = getName(name, realm)
 	if not A.db["Characters"][name] then
 		A.db["Characters"][name] = "Default"
 		self:SetActive("Default")
