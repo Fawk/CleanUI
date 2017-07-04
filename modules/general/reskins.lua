@@ -944,7 +944,7 @@ local function setStyle()
 		
 		PaperDollSidebarTab1:Hide()
 		PaperDollSidebarTab2:Hide()
-		PaperDollSidebarTab3:Hide()
+		--PaperDollSidebarTab3:Hide()
 		
 		CharacterFrameTab1:Hide()
 		CharacterFrameTab2:Hide()
