@@ -81,7 +81,15 @@ function A:CreateMover(frame, db, overrideName)
 	local unLockedTexture = media:Fetch("texture", "unlocked")
 
 	if not size then
-		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
+		if frame.getMoverSize then
+			local w, h = frame:getMoverSize()
+			size = {
+				["Width"] = w,
+				["Height"] = h
+			}
+		else
+			size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
+		end
 	end
     
     if type(size) == "number" then

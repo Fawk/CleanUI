@@ -24,6 +24,7 @@ local functions = {
 							icon.countdown:SetText(duration)
 						end
 						if icon.stack and count and count > 0 then
+							icon:evaluteStacks(count, duration)
 							icon.stack:SetText(count)
 						end
 					end
@@ -32,11 +33,11 @@ local functions = {
 			end
 		]]):format(spellId)
 	end,
-	cooldownWithCountdown = function()
-		return [[
+	cooldownWithCountdown = function(spellId)
+		return ([[
 			return function(icon)
 				print(icon) -- Does this print out icon?
-				local start, duration = GetSpellCooldown(spellId)
+				local start, duration = GetSpellCooldown(%d)
 				if start > 0 and duration > 0 then
 					local time = GetTime()
 					local current = duration - time + start
@@ -49,8 +50,18 @@ local functions = {
 				end
 				return false
 			end
-		]]
-	end
+		]]):format(spellId)
+	end,
+	trackCharges = function(spellId)
+		return ([[
+			return function(icon)
+				local charges, maxCharges, start, duration = GetSpellCharges(%d)
+				if charges and maxCharges > 1 then
+					icon.stack:SetText(charges)
+				end
+			end
+		]]):format(spellId)
+	end,
 }
 
 local presets = {
