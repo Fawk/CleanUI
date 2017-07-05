@@ -25,7 +25,7 @@ local functions = {
 							icon.countdown:SetText(math.floor(expires - GetTime()))
 						end
 						if icon.stack and count and count > 1 then
-							--icon:evaluteStacks(count, duration)
+							icon:evaluteStacks(count, duration)
 							icon.stack:SetText(count)
 						end
 					end
@@ -74,7 +74,7 @@ local functions = {
 				icon.combat = InCombatLockdown()
 				if numCasts and numCasts > 0 then
 					if icon.combat then
-						icon.combatTimer = GetTime() + t -- Fix this, should be combatTimer set after going out of combat and then reset upon entering combat again
+						icon.combatTimer = GetTime() + t
 					end
 					icon.countdown:SetText(not icon.combat and (math.floor(icon.combatTimer - GetTime())) or "")
 					icon.stack:SetText(numCasts)
@@ -178,7 +178,7 @@ local function createIcon(parent, id, spellId, timer, size, priority, condition,
 	if predefined then
 		icon.condition = assert(loadstring(functions[predefined](spellId, timer)))()
 	else
-		icon.condition = assert(loadstring(condition))()
+		icon.condition = assert(loadstring(condition:format(spellId)))()
 	end
 	icon.options = options
 
@@ -284,6 +284,7 @@ function I:Init()
 	local field = A["Info Field"]
 	if not field then
 		field = CreateFrame("Frame", A:GetName().."_InfoField", A.frameParent)
+		field:SetAlpha(0)
 
 		field.groups = {}
 		for i = 1, tonumber(db["Limit"]) do
