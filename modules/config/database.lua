@@ -19,6 +19,108 @@ end
 
 local defaults =  {
     ["Profiles"] = {
+        ["Aiwen"] = {
+            ["Options"] = {
+                ["Party"] = {
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
+                    },
+                    ["RaidBuffs"] = {
+                        ["Limit"] = 40,
+                        ["Tracked"] = {
+                            [194384] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            },
+                            [17] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            }
+                        },
+                        ["Important"] = true,
+                        ["Enabled"] = true
+                    }
+                },
+                ["Raid"] = {
+                    ["Key Bindings"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
+                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
+                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
+                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
+                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
+                    },
+                    ["RaidBuffs"] = {
+                        ["Limit"] = 40,
+                        ["Tracked"] = {
+                            [194384] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            },
+                            [17] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            }
+                        },
+                        ["Important"] = true,
+                        ["Enabled"] = true
+                    }
+                }
+            }
+        },
         ["Seife"] = {
             ["Options"] = {
                 ["Party"] = {
@@ -480,21 +582,7 @@ local defaults =  {
                     },
                     ["RaidBuffs"] = {
                         ["Limit"] = 40,
-                        ["Tracked"] = {
-                            [194384] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "TOPRIGHT",
-                                    ["Local Point"] = "TOPRIGHT",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = 0,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = false,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 14
-                            }
-                        },
+                        ["Tracked"] = {},
 						["Important"] = true,
                         ["Enabled"] = true
                     },
@@ -510,20 +598,7 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison", "Physical" },
-                    ["Key Bindings"] = {
-                        { type = "*type1", action = "macro" },
-                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
-                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
-                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
-                        { type = "ctrl-shift-type1", action = "target" },
-                        { type = "*type2", action = "macro" },
-                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
-                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
-                        { type = "ctrl-shift-type2", action = "togglemenu" },
-                        { type = "*type3", action = "macro" },
-                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
-                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
-                    },
+                    ["Key Bindings"] = {},
                     ["LFDRole"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
@@ -622,34 +697,7 @@ local defaults =  {
                         ["Custom"] = {}
                     },
                     ["RaidBuffs"] = {
-                        ["Tracked"] = {
-                            [194384] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "TOPRIGHT",
-                                    ["Local Point"] = "TOPRIGHT",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = 0,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = false,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 14
-                            },
-                            [17] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "TOPLEFT",
-                                    ["Local Point"] = "TOPLEFT",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = 0,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = false,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 14
-                            }
-                        },
+                        ["Tracked"] = {},
                         ["Important"] = true,
                         ["Enabled"] = true
                     },
@@ -665,20 +713,7 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison", "Physical" },
-                    ["Key Bindings"] = {
-                        { type = "*type1", action = "macro" },
-                        { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
-                        { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
-                        { type = "ctrl-macrotext1", action = "/cast [@unit,help,nodead] Pain Suppression" },
-                        { type = "ctrl-shift-type1", action = "target" },
-                        { type = "*type2", action = "macro" },
-                        { type = "*macrotext2", action = "/cast [@unit,help,nodead] Power Word: Shield" },
-                        { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Power Word: Radiance" },
-                        { type = "ctrl-shift-type2", action = "togglemenu" },
-                        { type = "*type3", action = "macro" },
-                        { type = "*macrotext3", action = "/cast [@unit,help,nodead] Purify" },
-                        { type = "shift-macrotext3", action = "/cast [@unit,help,nodead] Leap of Faith" }
-                    },
+                    ["Key Bindings"] = {},
                     ["LFDRole"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
@@ -779,13 +814,13 @@ local defaults =  {
                         ["Offset X"] = 3.4875648021698,
                         ["Offset Y"] = -158.936065673828,
                     },
-                    ["Presets"] = { }
+                    ["Presets"] = {}
                 }
     		}
 	    }
 	},
 	["Characters"] = {
-        ["Aiwen-ShatteredHand"] = "Default",
+        ["Aiwen-ShatteredHand"] = "Aiwen",
         ["Seife-ShatteredHand"] = "Seife"
     }
 }

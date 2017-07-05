@@ -145,6 +145,7 @@ local function createIcon(parent, id, spellId, timer, size, priority, condition,
 	local name,_,texture = GetSpellInfo(spellId)
 
 	local icon = CreateFrame("Frame", A:GetName().."_InfoField_"..name, parent)
+	icon:SetAlpha(0)
 	icon.id = id
 	icon:SetSize(size - 1, size - 1)
 	icon:SetBackdrop({
@@ -284,7 +285,6 @@ function I:Init()
 	local field = A["Info Field"]
 	if not field then
 		field = CreateFrame("Frame", A:GetName().."_InfoField", A.frameParent)
-		field:SetAlpha(0)
 
 		field.groups = {}
 		for i = 1, tonumber(db["Limit"]) do
