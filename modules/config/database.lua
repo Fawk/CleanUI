@@ -138,6 +138,54 @@ local defaults =  {
                             }
                         }
                     }
+                },
+                ["Info Field"] = {
+                    ["Enabled"] = true,
+                    ["Limit"] = 10,
+                    ["Size"] = 32,
+                    ["Direction"] = "Right",
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Position"] = {
+                        ["Relative To"] = "Parent",
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "CENTER",
+                        ["Offset X"] = 3.4875648021698,
+                        ["Offset Y"] = -158.936065673828,
+                    },
+                    ["Presets"] = {
+                        {
+                            ["id"] = 1,
+                            ["spellId"] = 115151,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 2,
+                            ["spellId"] = 123986,
+                            ["size"] = 32,
+                            ["priority"] = 3,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 3,
+                            ["spellId"] = 205406,
+                            ["size"] = 32,
+                            ["priority"] = 4,
+                            ["condition"] = "func:trackSpellCount",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 4,
+                            ["spellId"] = 197206,
+                            ["size"] = 32,
+                            ["priority"] = 1,
+                            ["condition"] = "func:activeBuffWithStackAndCountdown",
+                            ["options"] = { "glow" }
+                        },
+                    }
                 }
             }
         },
@@ -717,6 +765,21 @@ local defaults =  {
                         ["Offset X"] = -6.56422424316406,
                         ["Offset Y"] = 144.222183227539,
                     },
+                },
+                ["Info Field"] = {
+                    ["Enabled"] = true,
+                    ["Limit"] = 10,
+                    ["Size"] = 20,
+                    ["Direction"] = "Right",
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Position"] = {
+                        ["Relative To"] = "Parent",
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "CENTER",
+                        ["Offset X"] = 3.4875648021698,
+                        ["Offset Y"] = -158.936065673828,
+                    },
+                    ["Presets"] = { }
                 }
     		}
 	    }

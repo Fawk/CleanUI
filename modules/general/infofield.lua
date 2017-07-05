@@ -1,7 +1,8 @@
 local A, L = unpack(select(2, ...))
 local LBG = LibStub("LibButtonGlow-1.0")
 local I = {}
-local builtText = A.TextBuilder
+local buildText = A.TextBuilder
+local media = LibStub("LibSharedMedia-3.0")
 
 local function createAlphaAnimation(ag, from, to, duration, onFinished)
 	local a = ag:CreateAnimation("Alpha")
@@ -17,14 +18,14 @@ local functions = {
 			return function(icon)
 				local exists = false
 				for i = 1, 40 do
-					local name,_,_,count,_,duration,_,_,_,_,spellID = UnitAura("player", index, "HELPFUL")
+					local name,_,_,count,_,duration,expires,_,_,_,spellID = UnitAura("player", i, "HELPFUL")
 					if name and duration and duration > 0 and %d == spellID then
 						exists = true
 						if icon.countdown then
-							icon.countdown:SetText(duration)
+							icon.countdown:SetText(math.floor(expires - GetTime()))
 						end
-						if icon.stack and count and count > 0 then
-							icon:evaluteStacks(count, duration)
+						if icon.stack and count and count > 1 then
+							--icon:evaluteStacks(count, duration)
 							icon.stack:SetText(count)
 						end
 					end
@@ -36,14 +37,14 @@ local functions = {
 	cooldownWithCountdown = function(spellId)
 		return ([[
 			return function(icon)
-				print(icon) -- Does this print out icon?
-				local start, duration = GetSpellCooldown(%d)
-				if start > 0 and duration > 0 then
+				local s = %d
+				local start, duration = GetSpellCooldown(s)
+				if start > 0 and duration > 1.5 and (IsSpellKnown(s) or IsSpellKnown(s, true)) then
 					local time = GetTime()
 					local current = duration - time + start
 					if current > 0.05 then
 						if icon.countdown then
-							icon.countdown:SetText(duration)
+							icon.countdown:SetText(math.floor(current + 0.5))
 						end
 						return true
 					end
@@ -52,16 +53,37 @@ local functions = {
 			end
 		]]):format(spellId)
 	end,
-	trackCharges = function(spellId)
+	trackSpellCount = function(spellId)
 		return ([[
 			return function(icon)
-				local charges, maxCharges, start, duration = GetSpellCharges(%d)
-				if charges and maxCharges > 1 then
-					icon.stack:SetText(charges)
+				local s = %d
+				local numCasts = GetSpellCount(GetSpellInfo(s))
+				if numCasts and numCasts > 0 then
+					icon.stack:SetText(numCasts)
+					return true
 				end
+				return false
 			end
 		]]):format(spellId)
 	end,
+	trackSpellCountAndSetTimer = function(spellId, timer)
+		return ([[
+			return function(icon)
+				local s, t = %d, %d
+				local numCasts = GetSpellCount(GetSpellInfo(s))
+				icon.combat = InCombatLockdown()
+				if numCasts and numCasts > 0 then
+					if icon.combat then
+						icon.combatTimer = GetTime() + t -- Fix this, should be combatTimer set after going out of combat and then reset upon entering combat again
+					end
+					icon.countdown:SetText(not icon.combat and (math.floor(icon.combatTimer - GetTime())) or "")
+					icon.stack:SetText(numCasts)
+					return true
+				end
+				return false
+			end
+		]]):format(spellId, timer)
+	end
 }
 
 local presets = {
@@ -108,7 +130,6 @@ local presets = {
 		icon.blink = ag
 		ag:Play()
 	end
-end
 }
 
 local function evaluateOptions(icon)
@@ -120,8 +141,11 @@ local function evaluateOptions(icon)
 	end
 end
 
-local function createIcon(parent, name, size, texture, priority, condition, options)
+local function createIcon(parent, id, spellId, timer, size, priority, condition, options)
+	local name,_,texture = GetSpellInfo(spellId)
+
 	local icon = CreateFrame("Frame", A:GetName().."_InfoField_"..name, parent)
+	icon.id = id
 	icon:SetSize(size - 1, size - 1)
 	icon:SetBackdrop({
 	    bgFile = media:Fetch("statusbar", "Default"),
@@ -138,12 +162,24 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 	icon.texture = icon:CreateTexture(nil, "OVERLAY")
 	icon.texture:SetTexture(texture)
 	icon.texture:SetTexCoord(0.133,0.867,0.133,0.867)
+	icon.texture:SetPoint("CENTER")
+	icon.texture:SetSize(size - 1, size - 1)
 
-	icon.countdown = buildText(icon, 12):outline():alignAll():build()
+	icon.countdown = buildText(icon, 11):outline():atCenter():x(1):build()
 	icon.stack = buildText(icon, 10):outline():atBottomRight():x(-3):y(3):build()
 
 	icon.priority = priority
-	icon.condition = assert(loadstring(condition))()
+
+	local predefined
+	string.gsub(condition, "func:%w+", function(a) 
+		predefined = string.sub(a, 6)
+	end)
+
+	if predefined then
+		icon.condition = assert(loadstring(functions[predefined](spellId, timer)))()
+	else
+		icon.condition = assert(loadstring(condition))()
+	end
 	icon.options = options
 
 	evaluateOptions(icon)
@@ -156,7 +192,7 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 				if self.preShow then
 					self:preShow()
 				end
-				self:Show()
+				self:SetAlpha(1)
 				if self.postShow then
 					self:postShow()
 				end
@@ -164,19 +200,20 @@ local function createIcon(parent, name, size, texture, priority, condition, opti
 				if self.preHide then
 					self:preHide()
 				end
-				self:Hide()
+				self:SetAlpha(0)
 			end
 			self.timer = 0
 		end
 	end)
 
-	frame.groups[priority]:add(icon)
+	return icon
 end
 
 local function alreadyCreated(groups, id)
 	for groupId, group in next, groups do
-		for i = 1, group:size() do
-			if group:get(i).id == id then
+		for i = 1, group:count() do
+			local icon = group:get(i)
+			if icon and icon.id == id then
 				return true
 			end
 		end
@@ -208,31 +245,32 @@ local function Update(field, db)
 	field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 
 	for _,preset in next, db["Presets"] do
-		if not alreadyCreated(preset.id) then
-			local name,_,texture = GetSpellInfo(preset.spellId)
-			local icon = createIcon(field, name, preset.size, texture, preset.priority, preset.condition, preset.options)
+		if not alreadyCreated(field.groups, preset.id) then
+			local icon = createIcon(field, preset.id, preset.spellId, preset.timer or 0, preset.size, preset.priority, preset.condition, preset.options)
 			field.groups[preset.priority]:add(icon)
 		end
 	end
 
 	local anchor = field
-	for groupdId, group in next, field.groups do
-		for i = 1, group:size() do
+	for groupId, group in next, field.groups do
+		for i = 1, group:count() do
 			local icon = group:get(i)
-			if db["Orientation"] == "HORIZONTAL" then
-				if db["Direction"] == "Right" then
-					icon:SetPoint("LEFT", anchor, anchor == field and "LEFT" or "RIGHT", 0, 0)
+			if icon and icon:GetAlpha() > 0 then
+				if db["Orientation"] == "HORIZONTAL" then
+					if db["Direction"] == "Right" then
+						icon:SetPoint("LEFT", anchor, anchor == field and "LEFT" or "RIGHT", anchor == field and 0 or 3, 0)
+					else
+						icon:SetPoint("RIGHT", anchor, anchor == field and "RIGHT" or "LEFT",  anchor == field and 0 or -3, 0)
+					end
 				else
-					icon:SetPoint("RIGHT", anchor, anchor == field and "RIGHT" or "LEFT", 0, 0)
+					if db["Direction"] == "Upwards" then
+						icon:SetPoint("BOTTOM", anchor, anchor == field and "BOTTOM" or "TOP", 0, anchor == field and 0 or 3)
+					else
+						icon:SetPoint("TOP", anchor, anchor == field and "TOP" or "BOTTOM", 0, 0, anchor == field and 0 or -3)
+					end
 				end
-			else
-				if db["Direction"] == "Upwards" then
-					icon:SetPoint("BOTTOM", anchor, anchor == field and "BOTTOM" or "TOP", 0, 0)
-				else
-					icon:SetPoint("TOP", anchor, anchor == field and "TOP" or "BOTTOM", 0, 0)
-				end
+				anchor = icon
 			end
-			anchor =  icon
 		end
 	end
 
@@ -245,7 +283,7 @@ function I:Init()
 
 	local field = A["Info Field"]
 	if not field then
-		field = CreateFrame("Frame", nil, A.frameParent)
+		field = CreateFrame("Frame", A:GetName().."_InfoField", A.frameParent)
 
 		field.groups = {}
 		for i = 1, tonumber(db["Limit"]) do
@@ -264,5 +302,7 @@ function I:Init()
 		A["Info Field"] = field
 	end
 
+	A:CreateMover(field, db, "Info Field")
 end
 
+A["modules"]["Info Field"] = I
