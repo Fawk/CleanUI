@@ -207,16 +207,6 @@ function Addon:OnEnable()
 	end
 
 	Addon:SetStyle()
-    
-    local minimapConfig = Addon["Profile"]["Options"]["Minimap"]
-
-	local frame = CreateFrame("Frame", nil, UIParent)
-	frame:SetAllPoints(Minimap)
-	frame:SetSize(minimapConfig.Size, minimapConfig.Size)
-
-	--local grid = Addon.Grid:parseDBGrid("Minimap", frame)
-    
-    frame:Hide()
 
 	local buildText = Addon.TextBuilder
     

@@ -114,9 +114,9 @@ function Raid:Init()
 
             function raidContainer:getMoverSize()
                 if db["Orientation"] == "VERTICAL" then
-                    return size["Width"] * unitsPerColumn + (x * (maxColumns - 1)), size["Height"] * maxColumns + (y * (unitsPerColumn - 1))
+                    return (size["Width"] * unitsPerColumn + (x * (maxColumns - 1))), (size["Height"] * maxColumns + (y * (unitsPerColumn - 1)))
                 else
-                    return size["Width"] * maxColumns + (x * (unitsPerColumn - 1)), size["Height"] * unitsPerColumn + (x * (maxColumns - 1))
+                    return (size["Width"] * maxColumns + (x * (unitsPerColumn - 1))), (size["Height"] * unitsPerColumn + (x * (maxColumns - 1)))
                 end
             end
 
