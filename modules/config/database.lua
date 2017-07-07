@@ -474,18 +474,34 @@ local defaults =  {
                             ["Font"] = "NotoBold",
                             ["Size"] = 12,
                             ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "SHADOW",
+                            ["Outline"] = "OUTLINE",
                             ["Text"] = "[name]",
                             ["Position"] = {
                                 ["Point"] = "LEFT",
                                 ["Local Point"] = "LEFT",
                                 ["Offset X"] = 5,
                                 ["Offset Y"] = 0,
-                                ["Relative To"] = "Target"
+                                ["Relative To"] = "Health"
                             },
                             ["Enabled"] = true
                         },
-                        ["Custom"] = {}
+                        ["Custom"] = {
+                            ["Health Text"] = {
+                                ["Font"] = "NotoBold",
+                                ["Size"] = 16,
+                                ["Color"] = { 1, 1, 1 },
+                                ["Outline"] = "OUTLINE",
+                                ["Text"] = "[hp:round]",
+                                ["Position"] = {
+                                    ["Point"] = "RIGHT",
+                                    ["Local Point"] = "RIGHT",
+                                    ["Offset X"] = -5,
+                                    ["Offset Y"] = -10,
+                                    ["Relative To"] = "Target"
+                                },
+                                ["Enabled"] = true
+                            } 
+                        }
                     },
                     ["HealPrediction"] = {
                         ["Texture"] = "Default2",

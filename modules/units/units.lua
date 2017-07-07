@@ -12,6 +12,42 @@ for key, obj in next, {
             end
         end]],
         events = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
+    },
+    ["hp:round"] = {
+        method = [[function(u, r)
+            if not u and not r then return end
+            if UnitExists(r or u) then
+                local h = UnitHealth(r or u)
+                if h > 100000000 then
+                    return string.format("%.2f", h/100000000).."B"
+                elseif h > 1000000 then
+                    return string.format("%.2f", h/1000000).."M"
+                elseif h > 1000 then
+                    return string.format("%.2f", h/1000).."K"
+                else
+                    return h
+                end
+            end
+        end]],
+        events = "UNIT_HEALTH_FREQUENT"
+    },
+    ["maxhp:round"] = {
+        method = [[function(u, r)
+            if not u and not r then return end
+            if UnitExists(r or u) then
+                local h = UnitHealthMax(r or u)
+                if h > 100000000 then
+                    return string.format("%.2f", h/100000000).."B"
+                elseif h > 1000000 then
+                    return string.format("%.2f", h/1000000).."M"
+                elseif h > 1000 then
+                    return string.format("%.2f", h/1000).."K"
+                else
+                    return h
+                end
+            end
+        end]],
+        events = "UNIT_MAXHEALTH"
     }
 } do
     oUF["Tags"]["Methods"][key] = obj.method
