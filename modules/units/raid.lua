@@ -98,7 +98,7 @@ function Raid:Init()
     local raidContainer = Units:Get(frameName)
     if not raidContainer then
         
-        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
+        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, 'SecureHandlerStateTemplate')
         
         raidContainer.UpdateSize = function(self, db) 
             local numGroupMembers = GetNumGroupMembers()
