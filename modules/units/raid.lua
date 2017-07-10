@@ -116,7 +116,7 @@ function Raid:Init()
                 if db["Orientation"] == "VERTICAL" then
                     return (size["Width"] * unitsPerColumn + (x * (maxColumns - 1))), (size["Height"] * maxColumns + (y * (unitsPerColumn - 1)))
                 else
-                    return (size["Width"] * maxColumns + (x * (unitsPerColumn - 1))), (size["Height"] * unitsPerColumn + (x * (maxColumns - 1)))
+                    return (size["Width"] * unitsPerColumn + (x * (unitsPerColumn - 1))), (size["Height"] * maxColumns + (x * (maxColumns - 1)))
                 end
             end
 
@@ -293,6 +293,7 @@ function Raid:Update(frame, db)
             end
         end
     })
+
 end
 
 A.modules["raid"] = Raid

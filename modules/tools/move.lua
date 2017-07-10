@@ -69,8 +69,6 @@ function A:InitMove()
 			moveFrame.affecting.OldShow = moveFrame.affecting.Show
 			moveFrame.affecting.Show = moveFrame.affecting.Hide
 		end
-
-		moveFrame:SetSize(moveFrame.affecting:GetSize())
 	end
 end
 
@@ -80,18 +78,6 @@ function A:CreateMover(frame, db, overrideName)
 	local lockedTexture = media:Fetch("texture", "locked")
 	local unLockedTexture = media:Fetch("texture", "unlocked")
 
-	if not size then
-		if frame.getMoverSize then
-			local w, h = frame:getMoverSize()
-			size = {
-				["Width"] = w,
-				["Height"] = h
-			}
-		else
-			size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
-		end
-	end
-    
     if type(size) == "number" then
         size = {
             ["Width"] = size, 
@@ -99,7 +85,19 @@ function A:CreateMover(frame, db, overrideName)
         }
     end
 
-	local moveFrame = CreateFrame("Button", name.."_Mover", A.frameParent)
+	if frame.getMoverSize then
+		local w, h = frame:getMoverSize()
+		size = {
+			["Width"] = w,
+			["Height"] = h
+		}
+	end
+
+	if not size then
+		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
+	end
+
+	local moveFrame = CreateFrame("Button", A:GetName().."_"..name.."_Mover", A.frameParent)
 	moveFrame.affecting = frame
 	moveFrame:SetBackdrop(A.enum.backdrops.editboxborder)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
@@ -153,10 +151,7 @@ function A:CreateMover(frame, db, overrideName)
                 obj[k] = v
             end
             obj["Position"] = position
-			
-			self.affecting:ClearAllPoints()
-			self.affecting:SetAllPoints(self)
-           
+
 			A.Database:Prepare(name, obj)
         else
             A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")

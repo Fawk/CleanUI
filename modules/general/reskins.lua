@@ -668,32 +668,32 @@ local function setStyle()
 		
 		kill(CharacterFrame)
 		kill(CharacterFrameBg)
-		CharacterFrame:SetSize(620, 637)
+		CharacterFrame:SetSize(588, 430)
 		
 		hooksecurefunc(CharacterFrame, "SetWidth", function(self, width)
-			if width ~= 620 then
-				self:SetWidth(620)
+			if width ~= 588 then
+				self:SetWidth(588)
 			end
 		end)
 		
 		CharacterFrame.CuiBackground = CharacterFrame:CreateTexture(nil, "BACKGROUND")
 		CharacterFrame.CuiBackground:SetPoint("CENTER")
-		CharacterFrame.CuiBackground:SetSize(1024, 1024)
-		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "PriestBackground"))
+		CharacterFrame.CuiBackground:SetSize(1024, 512)
+		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "CharacterBackground"))
 		
 		local crest = CharacterFrame:CreateTexture(nil, "OVERLAY")
-		crest:SetPoint("TOP", 0, 10)
-		crest:SetSize(256, 256)
+		crest:SetPoint("TOPRIGHT", -55, -10)
+		crest:SetSize(142, 142)
 		crest:SetTexture(media:Fetch("background", "PriestCrest"))
 		
 		CharacterFrameTitleText:SetFont(media:Fetch("font", "NotoBold"), 16, "NONE")
 		CharacterFrameTitleText:ClearAllPoints()
-		CharacterFrameTitleText:SetPoint("TOP", crest, "BOTTOM", 0, 10)
+		CharacterFrameTitleText:SetPoint("TOPLEFT", 20, -25)
 		CharacterFrameTitleText:SetShadowColor(0, 0, 0)
 		CharacterFrameTitleText:SetShadowOffset(1, -1)
 		
 		CharacterLevelText:ClearAllPoints()
-		CharacterLevelText:SetPoint("TOP", CharacterFrameTitleText, "BOTTOM", 0, 0)
+		CharacterLevelText:SetPoint("TOPLEFT", CharacterFrameTitleText, "BOTTOMLEFT", -17, 0)
 		CharacterLevelText:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
 		CharacterLevelText:SetShadowColor(0, 0, 0)
 		CharacterLevelText:SetShadowOffset(1, -1)
@@ -719,9 +719,9 @@ local function setStyle()
 
 		local statsContainer = CreateFrame("Frame", nil, CharacterFrame)
 		statsContainer:SetSize(200, 220)
-		statsContainer:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -5, 10)
+		statsContainer:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -24, 40)
 		statsContainer:SetBackdrop(backdrop(3, 1))
-		statsContainer:SetBackdropColor(.1, .1, .1, .5)
+		statsContainer:SetBackdropColor(0, 0, 0 ,0)
 		statsContainer:SetBackdropBorderColor(0, 0, 0, 0)
 		statsContainer.ag = statsContainer:CreateAnimationGroup()
 		
@@ -857,31 +857,77 @@ local function setStyle()
 		CharacterModelFrameBackgroundBotLeft:SetTexture(nil)
 		CharacterModelFrameBackgroundBotRight:SetTexture(nil)
 		CharacterModelFrameBackgroundTopRight:SetTexture(nil)
+
+		local slots = {
+			"CharacterHeadSlot",
+			"CharacterNeckSlot",
+			"CharacterShoulderSlot",
+			"CharacterBackSlot",
+			"CharacterChestSlot",
+			"CharacterShirtSlot",
+			"CharacterTabardSlot",
+			"CharacterWristSlot",
+			"CharacterHandsSlot",
+			"CharacterWaistSlot",
+			"CharacterLegsSlot",
+			"CharacterFeetSlot",
+			"CharacterFinger0Slot",
+			"CharacterFinger1Slot",
+			"CharacterTrinket0Slot",
+			"CharacterTrinket1Slot",
+			"CharacterMainHandSlot",
+			"CharacterSecondaryHandSlot"
+		}
 		
-		CharacterHeadSlotFrame:SetTexture(nil)
-		CharacterNeckSlotFrame:SetTexture(nil)
-		CharacterShoulderSlotFrame:SetTexture(nil)
-		CharacterBackSlotFrame:SetTexture(nil)
-		CharacterChestSlotFrame:SetTexture(nil)
-		CharacterShirtSlotFrame:SetTexture(nil)
-		CharacterTabardSlotFrame:SetTexture(nil)
-		CharacterWristSlotFrame:SetTexture(nil)
-		CharacterHandsSlotFrame:SetTexture(nil)
-		CharacterWaistSlotFrame:SetTexture(nil)
-		CharacterLegsSlotFrame:SetTexture(nil)
-		CharacterFeetSlotFrame:SetTexture(nil)
-		CharacterFinger0SlotFrame:SetTexture(nil)
-		CharacterFinger1SlotFrame:SetTexture(nil)
-		CharacterTrinket0SlotFrame:SetTexture(nil)
-		CharacterTrinket1SlotFrame:SetTexture(nil)
-		CharacterMainHandSlotFrame:SetTexture(nil)
-		CharacterSecondaryHandSlotFrame:SetTexture(nil)
+		for _,slot in pairs(slots) do
+
+			_G[slot]:SetWidth(_G[slot]:GetWidth() - 3)
+			_G[slot]:SetHeight(_G[slot]:GetHeight() - 3)
+			_G[slot.."Frame"]:SetTexture(nil)
+        	_G[slot]:SetBackdrop({
+	            bgFile = media:Fetch("statusbar", "Default"),
+	            tile = true,
+	            tileSize = 16,
+	            insets = {
+	                top = -1,
+	                bottom = -1,
+	                left = -1,
+	                right = -1,
+	            }
+	        })
+        	_G[slot]:SetBackdropColor(0, 0, 0)
+			_G[slot.."IconTexture"]:SetTexCoord(0.133, 0.867, 0.133, 0.867)
+			_G[slot.."NormalTexture"]:SetTexture(nil)
+			hooksecurefunc(_G[slot]["IconBorder"], "SetTexture", function(self, texture)
+				_G[slot]:SetBackdropColor(self:GetVertexColor())
+				if texture ~= nil then
+					self:SetTexture(nil)
+				end
+			end)
+
+			if not _G[slot]:IsEventRegistered("PLAYER_EQUIPMENT_CHANGED") then
+				_G[slot]:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+			end
+
+			_G[slot]:HookScript("OnEvent", function(self, e)
+				if e == "PLAYER_EQUIPMENT_CHANGED" then
+					local color = { _G[slot]["IconBorder"]:GetVertexColor() }
+					local slotId = GetInventorySlotInfo(string.sub(slot, 10))
+					local rarity = GetInventoryItemQuality("player", slotId)
+					if not rarity then
+						color = { 1, 1, 1 }
+					end
+					
+					self:SetBackdropColor(unpack(color))
+				end
+			end)
+		end
 		
 		local itemsContainer = CreateFrame("Frame", nil, CharacterFrame)
 		itemsContainer:SetSize(200, 220)
 		itemsContainer:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMLEFT", 5, 10)
 		itemsContainer:SetBackdrop(backdrop(3, 1))
-		itemsContainer:SetBackdropColor(.1, .1, .1, .5)
+		itemsContainer:SetBackdropColor(0, 0, 0, 0)
 		itemsContainer:SetBackdropBorderColor(0, 0, 0, 0)
 		
 		CharacterHeadSlot:ClearAllPoints()
@@ -901,10 +947,23 @@ local function setStyle()
 		
 		CharacterSecondaryHandSlot:ClearAllPoints()
 		CharacterSecondaryHandSlot:SetPoint("TOP", CharacterFeetSlot, "BOTTOM", 0, -2)
-		
-		kill(CharacterMainHandSlot)
-		kill(CharacterSecondaryHandSlot)
-		
+
+		for k,v in pairs({CharacterMainHandSlot:GetRegions()}) do
+			if v:GetObjectType() == "Texture" then
+				if v:GetTexture() == [[Interface\CharacterFrame\Char-Paperdoll-Parts]] then
+					v:SetTexture(nil)
+				end
+			end
+		end
+
+		for k,v in pairs({CharacterSecondaryHandSlot:GetRegions()}) do
+			if v:GetObjectType() == "Texture" then
+				if v:GetTexture() == [[Interface\CharacterFrame\Char-Paperdoll-Parts]] then
+					v:SetTexture(nil)
+				end
+			end
+		end
+
 		hooksecurefunc(CharacterModelFrameBackgroundTopLeft, "SetTexture", function(self, texture)
 			if texture ~= nil then
 				self:SetTexture(nil)
@@ -942,9 +1001,17 @@ local function setStyle()
 		PaperDollSidebarTabs.DecorLeft:SetTexture(nil)
 		PaperDollSidebarTabs.DecorRight:SetTexture(nil)
 		
-		PaperDollSidebarTab1:Hide()
-		PaperDollSidebarTab2:Hide()
+		--PaperDollSidebarTab1:Hide()
+		--PaperDollSidebarTab2:Hide()
 		--PaperDollSidebarTab3:Hide()
+
+		PaperDollSidebarTab1:ClearAllPoints()
+		PaperDollSidebarTab1:SetPoint("BOTTOMLEFT", statsContainer, "TOPLEFT", 49, -15)
+		PaperDollSidebarTab2:ClearAllPoints()
+		PaperDollSidebarTab2:SetPoint("LEFT", PaperDollSidebarTab1, "RIGHT", 0, 0)
+		PaperDollSidebarTab3:ClearAllPoints()
+		PaperDollSidebarTab3:SetPoint("LEFT", PaperDollSidebarTab2, "RIGHT", 0, 0)
+
 		
 		CharacterFrameTab1:Hide()
 		CharacterFrameTab2:Hide()
@@ -954,7 +1021,8 @@ local function setStyle()
 		--PaperDollTitlesPaneScrollChild
 		--PaperDollEquipmentManagerPaneScrollChild
 		--ReputationListScrollFrameScrollChildFrame
-		--TokenFrameContainerScrollChild
+		TokenFrameContainerScrollChild:SetHeight(400)
+		
 
 		--Extra Action Buttons
 

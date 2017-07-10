@@ -47,6 +47,8 @@ function Health(frame, db)
 				r, g, b = unpack(t)
 			end
 
+			self.colorClassNPC = true
+
 			if r then
 				self:SetStatusBarColor(r, g, b, a or 1)
 				self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
