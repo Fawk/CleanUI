@@ -23,6 +23,8 @@ end
 
 function A:InitMove()
 
+	if InCombatLockdown() then return end
+
 	A.isMovingFrames = true
 
 	if not finishFrame then

@@ -5,6 +5,7 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
+local Holder
 
 local Party = {}
 local frameName = "Party"
@@ -95,23 +96,26 @@ function Party:Init()
     local partyContainer = Units:Get(frameName)
     if not partyContainer then
         
-        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent)
+        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate")
+
+        RegisterStateDriver(partyContainer, "visibility", "[@party1,exists] show; hide")
+
+        partyContainer:Execute([[
+            Holder = self
+        ]])
         
-        partyContainer.UpdateSize = function(self, db) 
+        partyContainer:SetAttribute("UpdateSize", [[
             local x, y = db["Offset X"], db["Offset Y"]
             local w, h = size["Width"] * 5 + (x * 4), size["Height"]
             if db["Orientation"] == "VERTICAL" then
                 w = size["Width"]
                 h = size["Height"] * 5 + (y * 4)
             end
-            if InCombatLockdown() then
-                T:RunAfterCombat(function() 
-                    partyContainer:SetSize(w, h)
-                end)
-            else
-                self:SetSize(w, h)
-            end
-        end
+            self:SetSize(w, h)
+        ]])
+
+        partyContainer:SetAttribute("_onshow", partyContainer:GetAttribute("UpdateSize"))
+        partyContainer:SetAttribute("_onhide", partyContainer:GetAttribute("UpdateSize"))
 
         partyContainer.UpdateUnits = function()
             for i = 1, 5 do
@@ -128,7 +132,7 @@ function Party:Init()
         partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         partyContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:UpdateSize(db)
+            self:RunAttribute("UpdateSize")
             self:UpdateUnits()
         end)
     
@@ -163,7 +167,7 @@ function Party:Init()
     --A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
 
     Units:Position(partyContainer, db["Position"])
-    partyContainer:UpdateSize(db)
+    Holder:RunAttribute("UpdateSize")
     A:CreateMover(partyContainer, db, "Party")
 
     partyHeader:SetParent(partyContainer)

@@ -5,6 +5,7 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
+local Holder
 
 local Raid = {}
 local frameName = "Raid"
@@ -98,8 +99,32 @@ function Raid:Init()
     local raidContainer = Units:Get(frameName)
     if not raidContainer then
         
-        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, 'SecureHandlerStateTemplate')
-        
+        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate")
+
+        RegisterStateDriver(raidContainer, "visibility", "[@raid1,exists] show; hide")
+
+        raidContainer:Execute([[
+            Holder = self
+        ]])
+
+        raidContainer:SetAttribute("ContainerSize", [[
+            local numGroupMembers = GetNumGroupMembers()
+            local x, y, w, h = db["Offset X"], db["Offset Y"], 0, 0
+
+            if db["Orientation"] == "VERTICAL" then
+                w = size["Width"] * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
+                h = size["Height"] * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
+            else
+                w = size["Width"] * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
+                h = size["Height"] * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
+            end
+
+            self:SetSize(w, h)
+        ]])
+
+        raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("ContainerSize"))
+        raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("ContainerSize"))
+
         raidContainer.UpdateSize = function(self, db) 
             local numGroupMembers = GetNumGroupMembers()
             local x, y, w, h = db["Offset X"], db["Offset Y"], 0, 0
@@ -143,7 +168,7 @@ function Raid:Init()
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:UpdateSize(db)
+            self:RunAttribute("ContainerSize")
             self:UpdateUnits()
         end)
     
