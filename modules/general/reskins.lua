@@ -1022,12 +1022,13 @@ local function setStyle()
 		--PaperDollEquipmentManagerPaneScrollChild
 		--ReputationListScrollFrameScrollChildFrame
 		TokenFrameContainerScrollChild:SetHeight(400)
-		
+					
 
 		--Extra Action Buttons
 
 		local eabdb = A["Profile"]["Options"]["Extra Action Button"]
-		local button = _G["ExtraActionButton1"]
+		local button = _G["ExtraActionBarFrame"]
+		button.ignoreFramePositionManager = true
 
 		if button then
 			A:CreateMover(button, eabdb, "Extra Action Button")

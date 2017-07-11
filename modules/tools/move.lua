@@ -137,6 +137,7 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame.Apply = function(self)
 		local lp, relative, p, x, y = self:GetPoint()
 		self.affecting:SetParent(A.frameParent)
+		print(name, lp, relative and (relative:GetName() or "Unknown") or "No anchor", p, x, y)
 
         if A["Profile"]["Options"][name] then
             local position = {
