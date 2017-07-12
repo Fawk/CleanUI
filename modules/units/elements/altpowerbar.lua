@@ -6,6 +6,7 @@ function AltPowerBar(frame, db)
 
 	local mult = db["Background Multiplier"]
 	local texture = db["Texture"]
+	local size = db["Size"]
 
 	local bar = frame.AltPowerBar or (function()
 		local bar = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", frame)
@@ -15,10 +16,15 @@ function AltPowerBar(frame, db)
 			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 		end
 		return bar
-	)()
+	end)()
+
+	if not db["Enabled"] then
+		bar:Hide()
+		return
+	end
 
 	Units:Position(bar, db["Position"])
-	bar:SetSize(db["Width"] - 2, db["Height"] - 2)
+	bar:SetSize(size["Width"] - 2, size["Height"] - 2)
 	bar:SetStatusBarTexture(texture)
 	bar.bg:SetTexture(texture)
 	bar.bg:SetAllPoints(bar)

@@ -107,23 +107,24 @@ function Raid:Init()
             Holder = self
         ]])
 
-        raidContainer:SetAttribute("ContainerSize", [[
-            local numGroupMembers = GetNumGroupMembers()
-            local x, y, w, h = db["Offset X"], db["Offset Y"], 0, 0
+        raidContainer:SetAttribute("UpdateSize", ([[
+            local numGroupMembers = %d
+            local x, y, w, h, width, height, unitsPerColumn, maxColumns = %d, %d, 0, 0, %d, %d, %d, %d
 
-            if db["Orientation"] == "VERTICAL" then
-                w = size["Width"] * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
-                h = size["Height"] * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
+            if %s == "VERTICAL" then
+                w = width * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
+                h = height * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
             else
-                w = size["Width"] * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
-                h = size["Height"] * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
+                w = width * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
+                h = height * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
             end
 
-            self:SetSize(w, h)
-        ]])
+            self:SetWidth(w)
+            self:SetHeight(h)
+        ]]):format(GetNumGroupMembers(), db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns, db["Orientation"]))
 
-        raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("ContainerSize"))
-        raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("ContainerSize"))
+        raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("UpdateSize"))
+        raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("UpdateSize"))
 
         raidContainer.UpdateSize = function(self, db) 
             local numGroupMembers = GetNumGroupMembers()
@@ -168,7 +169,7 @@ function Raid:Init()
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:RunAttribute("ContainerSize")
+            self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
             self:UpdateUnits()
         end)
     
@@ -193,7 +194,7 @@ function Raid:Init()
     end
 
     Units:Position(raidContainer, db["Position"])
-    raidContainer:UpdateSize(db)
+    raidContainer:Execute([[ Holder:RunAttribute("UpdateSize") ]])
     A:CreateMover(raidContainer, db, "Raid")
 
     raidHeader:SetParent(raidContainer)

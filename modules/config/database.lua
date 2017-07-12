@@ -397,6 +397,33 @@ local defaults =  {
 						},
 						["Enabled"] = true,
 					},
+                    ["AltPowerBar"] = {
+                        ["Enabled"] = true,
+                        ["Background"] = {
+                            ["Enabled"] = true,
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Color"] = { 0, 0, 0 }
+                        },
+                        ["Position"] = {
+                            ["Point"] = "TOP",
+                            ["Local Point"] = "BOTTOM",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Player"
+                        },
+                        ["Size"] = {
+                            ["Width"] = 200,
+                            ["Height"] = 20
+                        },
+                        ["Texture"] = "Default2",
+                        ["Background Multiplier"] = 0.3,
+                        ["Hide Blizzard"] = true
+                    },
     				["Enabled"] = true
     			},
     			["Target"] = {

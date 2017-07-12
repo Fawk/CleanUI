@@ -67,10 +67,6 @@ function A:InitMove()
 		moveFrame.affecting:ClearAllPoints()
 		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 
-		if moveFrame.affecting.overrideShow then
-			moveFrame.affecting.OldShow = moveFrame.affecting.Show
-			moveFrame.affecting.Show = moveFrame.affecting.Hide
-		end
 	end
 end
 
@@ -139,7 +135,6 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame.Apply = function(self)
 		local lp, relative, p, x, y = self:GetPoint()
 		self.affecting:SetParent(A.frameParent)
-		print(name, lp, relative and (relative:GetName() or "Unknown") or "No anchor", p, x, y)
 
         if A["Profile"]["Options"][name] then
             local position = {

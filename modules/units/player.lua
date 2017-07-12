@@ -19,8 +19,6 @@ function Player:Init()
     local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
     Units:Add(frame)
 
-   	frame.overrideShow = true
-
     A:CreateMover(frame, db)
 end
 -- https://jsfiddle.net/859zu65s/

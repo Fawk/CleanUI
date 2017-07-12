@@ -5,7 +5,6 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
-local Holder
 
 local Party = {}
 local frameName = "Party"
@@ -96,7 +95,7 @@ function Party:Init()
     local partyContainer = Units:Get(frameName)
     if not partyContainer then
         
-        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate")
+        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
 
         RegisterStateDriver(partyContainer, "visibility", "[@party1,exists] show; hide")
 
@@ -104,15 +103,24 @@ function Party:Init()
             Holder = self
         ]])
         
-        partyContainer:SetAttribute("UpdateSize", [[
-            local x, y = db["Offset X"], db["Offset Y"]
-            local w, h = size["Width"] * 5 + (x * 4), size["Height"]
-            if db["Orientation"] == "VERTICAL" then
-                w = size["Width"]
-                h = size["Height"] * 5 + (y * 4)
+        partyContainer:SetAttribute("UpdateSize", ([[
+            local x, y, width, height = %d, %d, %d, %d
+            local w, h = width * 5 + (x * 4), height
+            if %s == "VERTICAL" then
+                w = width
+                h = height * 5 + (y * 4)
             end
-            self:SetSize(w, h)
-        ]])
+            self:SetWidth(w)
+            self:SetHeight(h)
+        ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], db["Orientation"]))
+
+        partyContainer.getMoverSize = function(self)
+            if db["Orientation"] == "VERTICAL" then
+                return size["Width"], (size["Height"] * 5 + (db["Offset Y"] * 4))
+            else
+                return (size["Width"] * 5 + (db["Offset X"] * 4)), size["Height"]
+            end
+        end
 
         partyContainer:SetAttribute("_onshow", partyContainer:GetAttribute("UpdateSize"))
         partyContainer:SetAttribute("_onhide", partyContainer:GetAttribute("UpdateSize"))
@@ -132,7 +140,7 @@ function Party:Init()
         partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         partyContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:RunAttribute("UpdateSize")
+            self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
             self:UpdateUnits()
         end)
     
@@ -167,7 +175,7 @@ function Party:Init()
     --A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
 
     Units:Position(partyContainer, db["Position"])
-    Holder:RunAttribute("UpdateSize")
+    partyContainer:Execute([[ Holder:RunAttribute("UpdateSize") ]])
     A:CreateMover(partyContainer, db, "Party")
 
     partyHeader:SetParent(partyContainer)
