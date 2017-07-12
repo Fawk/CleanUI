@@ -1,6 +1,31 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
+local buildText = A.TextBuilder
+
+for key, obj in next, {
+    ["altpp"] = {
+        method = [[function(u, r)
+            if not u and not r then return end
+            if UnitExists(r or u) then
+				return UnitPower(r or u, SPELL_POWER_ALTERNATE_POWER)
+            end
+        end]],
+        events = "UNIT_POWER_FREQUENT"
+    },
+    ["altppmax"] = {
+        method = [[function(u, r)
+            if not u and not r then return end
+            if UnitExists(r or u) then
+            	return UnitPowerMax(r or u, SPELL_POWER_ALTERNATE_POWER)
+            end
+        end]],
+        events = "UNIT_MAXPOWER"
+    }
+} do
+    oUF["Tags"]["Methods"][key] = obj.method
+    oUF["Tags"]["Events"][key] = obj.events
+end
 
 function AltPowerBar(frame, db)
 
@@ -10,6 +35,7 @@ function AltPowerBar(frame, db)
 
 	local bar = frame.AltPowerBar or (function()
 		local bar = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", frame)
+		bar.value = buildText(bar, 10):shadow():atCenter():build()
 		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
 		bar.OnPostUpdate = function(self, min, cur, max)
 			local r, g, b = self:GetStatusBarColor()
@@ -51,6 +77,8 @@ function AltPowerBar(frame, db)
 		PlayerPowerBarAlt:UnregisterAllEvents()
 		PlayerPowerBarAlt:SetAlpha(0)
 	end
+
+	frame:Tag(bar.value, "[altpp] / [altppmax]")
 
 	frame.AltPowerBar = bar
 end

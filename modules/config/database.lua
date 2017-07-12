@@ -192,6 +192,7 @@ local defaults =  {
                         { type = "*type2", action = "macro" },
                         { type = "*macrotext2", action = "/cast [@unit,help,nodead] Renewing Mist" },
                         { type = "shift-macrotext2", action = "/cast [@unit,help,nodead] Vivify" },
+                        { type = "ctrl-macrotext2", action = "/cast [@unit,help,nodead] Tiger's Lust" },
                         { type = "ctrl-shift-type2", action = "togglemenu" },
                         { type = "*type3", action = "macro" },
                         { type = "*macrotext3", action = "/cast [@unit,help,nodead] Detox" },
@@ -286,6 +287,54 @@ local defaults =  {
                             ["priority"] = 1,
                             ["condition"] = "func:activeBuffWithStackAndCountdown",
                             ["options"] = { "glow" }
+                        },
+                        {
+                            ["id"] = 5,
+                            ["spellId"] = 191837,
+                            ["size"] = 32,
+                            ["priority"] = 1,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 6,
+                            ["spellId"] = 122783,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 7,
+                            ["spellId"] = 115310,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 8,
+                            ["spellId"] = 198664,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 9,
+                            ["spellId"] = 196725,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
+                        },
+                        {
+                            ["id"] = 10,
+                            ["spellId"] = 197908,
+                            ["size"] = 32,
+                            ["priority"] = 2,
+                            ["condition"] = "func:cooldownWithCountdown",
+                            ["options"] = {}
                         },
                     }
                 }
@@ -548,6 +597,170 @@ local defaults =  {
                     },
                     ["Enabled"] = true
     			},
+                ["TargetTarget"] = {
+                    ["Position"] = {
+                        ["Relative To"] = "Target",
+                        ["Point"] = "BOTTOMRIGHT",
+                        ["Local Point"] = "BOTTOMLEFT",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0,
+                    },
+                    ["Health"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "TOP",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "TargetTarget"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = false,
+                            ["Match height"] = false,
+                            ["Width"] = 100,
+                            ["Height"] = 20
+                        },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2"
+                    },
+                    ["Power"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Health"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = false,
+                            ["Match height"] = false,
+                            ["Width"] = 100,
+                            ["Height"] = 5
+                        },
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2"
+                    },
+                    ["Buffs"] = {
+                        ["Enabled"] = false,
+                        ["Position"] = "ABOVE",
+                        ["Relative To"] = "TargetTarget",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0
+                    },
+                    ["Debuffs"] = {
+                        ["Enabled"] = false,
+                        ["Position"] = "ABOVE",
+                        ["Relative To"] = "Buffs",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0
+                    },
+                    ["Size"] = {
+                        ["Width"] = 100,
+                        ["Height"] = 25
+                    },
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "NotoBold",
+                            ["Size"] = 10,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "SHADOW",
+                            ["Text"] = "[name]",
+                            ["Position"] = {
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 5,
+                                ["Offset Y"] = 0,
+                                ["Relative To"] = "Health"
+                            },
+                            ["Enabled"] = true
+                        },
+                        ["Custom"] = {}
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Enabled"] = true
+                },
+                ["Pet"] = {
+                    ["Position"] = {
+                        ["Relative To"] = "Player",
+                        ["Point"] = "BOTTOMLEFT",
+                        ["Local Point"] = "BOTTOMRIGHT",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0,
+                    },
+                    ["Health"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "TOP",
+                            ["Local Point"] = "ALL",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Pet"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = false,
+                            ["Match height"] = false,
+                            ["Width"] = 100,
+                            ["Height"] = 20
+                        },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2"
+                    },
+                    ["Size"] = {
+                        ["Width"] = 100,
+                        ["Height"] = 20
+                    },
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "NotoBold",
+                            ["Size"] = 10,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "SHADOW",
+                            ["Text"] = "[name]",
+                            ["Position"] = {
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 5,
+                                ["Offset Y"] = 0,
+                                ["Relative To"] = "Health"
+                            },
+                            ["Enabled"] = true
+                        },
+                        ["Custom"] = {}
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Enabled"] = true
+                },
                 ["Party"] = {
                     ["Position"] = {
                         ["Relative To"] = "Parent",
@@ -667,10 +880,10 @@ local defaults =  {
                 ["Raid"] = {
                     ["Position"] = {
                         ["Relative To"] = "Parent",
-                        ["Point"] = "BOTTOM",
-                        ["Local Point"] = "BOTTOM",
-                        ["Offset X"] = -0.920713663101196,
-                        ["Offset Y"] = 22.3593578338623,
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = -100.29987347126007,
+                        ["Offset Y"] = -200.094223022461,
                     },
                     ["Health"] = {
                         ["Enabled"] = true,
@@ -805,22 +1018,6 @@ local defaults =  {
                         ["Offset X"] = -10,
                         ["Offset Y"] = -300,
                         ["Relative To"] = "Parent"
-                    }
-                },
-                ["Grids"] = {
-                    ["Minimap"] = {
-                        ["singleLayer"] = true,
-                        ["rows"] = {
-                            {
-                                ["columns"] = { "Artifact Power", "Time", "Gold" }
-                            },
-                            {
-                                ["columns"] = { "Gold", "Gold", "Gold" }
-                            },
-                            {
-                                ["columns"] = { "Gold", "Gold", "Gold" }
-                            }
-                        }
                     }
                 },
                 ["Cooldown bar"] = {
