@@ -126,32 +126,11 @@ function Raid:Init()
         raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("UpdateSize"))
         raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("UpdateSize"))
 
-        raidContainer.UpdateSize = function(self, db) 
-            local numGroupMembers = GetNumGroupMembers()
-            local x, y, w, h = db["Offset X"], db["Offset Y"], 0, 0
-
+        function raidContainer:getMoverSize()
             if db["Orientation"] == "VERTICAL" then
-                w = size["Width"] * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
-                h = size["Height"] * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
+                return (size["Width"] * unitsPerColumn + (x * (maxColumns - 1))), (size["Height"] * maxColumns + (y * (unitsPerColumn - 1)))
             else
-                w = size["Width"] * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
-                h = size["Height"] * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
-            end
-
-            function raidContainer:getMoverSize()
-                if db["Orientation"] == "VERTICAL" then
-                    return (size["Width"] * unitsPerColumn + (x * (maxColumns - 1))), (size["Height"] * maxColumns + (y * (unitsPerColumn - 1)))
-                else
-                    return (size["Width"] * unitsPerColumn + (x * (unitsPerColumn - 1))), (size["Height"] * maxColumns + (x * (maxColumns - 1)))
-                end
-            end
-
-            if InCombatLockdown() then
-                T:RunAfterCombat(function() 
-                    raidContainer:SetSize(w, h)
-                end)
-            else
-                self:SetSize(w, h)
+                return (size["Width"] * unitsPerColumn + (x * (unitsPerColumn - 1))), (size["Height"] * maxColumns + (x * (maxColumns - 1)))
             end
         end
 

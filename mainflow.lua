@@ -120,6 +120,13 @@ function Addon:OnInitialize()
 	SCREEN_HEIGHT = math.floor(h / uiscale)
 	SCREEN_WIDTH = math.floor(w / uiscale)
 
+	local resolution = {GetScreenResolutions()}[GetCurrentScreenResolution()]
+	local matches = {}
+	resolution:gsub("%d+", function(match) table.insert(matches, match) end)
+	
+	w, h = unpack(matches)
+	UIParent:SetScale(768 / h)
+
 	self.frameParent = CreateFrame("Frame", Addon:GetName().."_MainContainer", UIParent, 'SecureHandlerStateTemplate')
 	RegisterStateDriver(self.frameParent, "visibility", "[petbattle] hide; show")
 	self.frameParent:SetSize(UIParent:GetSize())
