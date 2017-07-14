@@ -30,7 +30,7 @@ end
 function AltPowerBar(frame, db)
 
 	local mult = db["Background Multiplier"]
-	local texture = db["Texture"]
+	local texture = media:Fetch("statusbar", db["Texture"])
 	local size = db["Size"]
 
 	local bar = frame.AltPowerBar or (function()
