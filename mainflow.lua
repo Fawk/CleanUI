@@ -120,7 +120,8 @@ function Addon:OnInitialize()
 	SCREEN_HEIGHT = math.floor(h / uiscale)
 	SCREEN_WIDTH = math.floor(w / uiscale)
 
-	local resolution = {GetScreenResolutions()}[GetCurrentScreenResolution()]
+	local resolution = {GetScreenResolutions()}
+	resolution = resolution[GetCurrentResolution()]
 	local matches = {}
 	resolution:gsub("%d+", function(match) table.insert(matches, match) end)
 	
@@ -136,11 +137,6 @@ function Addon:OnInitialize()
     self.hiddenFrame = CreateFrame("Frame")
     self.hiddenFrame:Hide()
 
-	local profile = Addon["Modules"]["Profile"]
-
-	profile:Init(Addon.db)
-	profile:Load()
-
 	Addon:Debug("Loaded")
 end
 
@@ -148,66 +144,71 @@ function Addon:OnEnable()
 
 	local E, T, Options = Addon.enum, Addon.Tools, Addon.Options
 
-	local options, playerOptions, opts, barOptions = Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable()
+	-- local options, playerOptions, opts, barOptions = Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable()
   
-  local testOption = Addon:OptionBuilder()
-                      :withId("TestId")
-                      :withName("TestName")
-                      :withType("Group")
-                      :addItem("Item")
-                      :addChildren(Addon:OrderedTable())
-                      :build()
+ --  local testOption = Addon:OptionBuilder()
+ --                      :withId("TestId")
+ --                      :withName("TestName")
+ --                      :withType("Group")
+ --                      :addItem("Item")
+ --                      :addChildren(Addon:OrderedTable())
+ --                      :build()
                       
-	barOptions:add(Options:CreateGroup(O["Player.Position"], "Position", "The position of the player health bar", 1, nil, nil, 
-		Options:PositionOptions({ 
-			O["Player.Position.LocalPoint"],
-			O["Player.Position.RelativeTo"],
-			O["Player.Position.Point"],
-			O["Player.Position.OffsetX"],
-			O["Player.Position.OffsetY"],
-		}, "player", "health bar", {{ "Player", "Player" }, { "Power", "Power" }})))
-	barOptions:add(Options:CreateGroup(O["Player.Health.Size"], "Size", "The size of the player health bar", 1, nil, nil, (function() 
-		local size = Addon:OrderedTable()
-		size:add(Options:CreateToggle(O["Player.Health.Size.MatchWidth"], "Match width", "Match width towards relative frame", E.directions.H, 1, nil))
-		size:add(Options:CreateToggle(O["Player.Health.Size.MatchHeight"], "Match height", "Match height towards relative frame", E.directions.H, 1, nil))
-		size:add(Options:CreateSlider(O["Player.Health.Size.Width"], "Width", "Set the width of the player health bar", E.directions.H, 50, 500, 250, 1, nil))
-		size:add(Options:CreateSlider(O["Player.Health.Size.Height"], "Height", "Set the height of the player health bar", E.directions.H, 1, 500, 100, 1, nil))
-		return size
-	end)()))
+	-- barOptions:add(Options:CreateGroup(O["Player.Position"], "Position", "The position of the player health bar", 1, nil, nil, 
+	-- 	Options:PositionOptions({ 
+	-- 		O["Player.Position.LocalPoint"],
+	-- 		O["Player.Position.RelativeTo"],
+	-- 		O["Player.Position.Point"],
+	-- 		O["Player.Position.OffsetX"],
+	-- 		O["Player.Position.OffsetY"],
+	-- 	}, "player", "health bar", {{ "Player", "Player" }, { "Power", "Power" }})))
+	-- barOptions:add(Options:CreateGroup(O["Player.Health.Size"], "Size", "The size of the player health bar", 1, nil, nil, (function() 
+	-- 	local size = Addon:OrderedTable()
+	-- 	size:add(Options:CreateToggle(O["Player.Health.Size.MatchWidth"], "Match width", "Match width towards relative frame", E.directions.H, 1, nil))
+	-- 	size:add(Options:CreateToggle(O["Player.Health.Size.MatchHeight"], "Match height", "Match height towards relative frame", E.directions.H, 1, nil))
+	-- 	size:add(Options:CreateSlider(O["Player.Health.Size.Width"], "Width", "Set the width of the player health bar", E.directions.H, 50, 500, 250, 1, nil))
+	-- 	size:add(Options:CreateSlider(O["Player.Health.Size.Height"], "Height", "Set the height of the player health bar", E.directions.H, 1, 500, 100, 1, nil))
+	-- 	return size
+	-- end)()))
 
-	playerOptions:add(Options:CreateGroup(O["Player.Size"], "Size", "The size of the player frame", 1, nil, nil, (function()
-		local size = Addon:OrderedTable()
-		size:add(Options:CreateSlider(O["Player.Size.Width"], "Width", "Set the width of the player frame", E.directions.H, 50, 500, 250, 1, nil))
-		size:add(Options:CreateSlider(O["Player.Size.Height"], "Height", "Set the height of the player frame", E.directions.H, 1, 500, 100, 1, nil))
-		return size
-	end)()))
-	playerOptions:add(Options:CreateGroup(O["Player.Health"], "Health", "Health bar of the player frame", 1, "dropdown", nil, barOptions))
+	-- playerOptions:add(Options:CreateGroup(O["Player.Size"], "Size", "The size of the player frame", 1, nil, nil, (function()
+	-- 	local size = Addon:OrderedTable()
+	-- 	size:add(Options:CreateSlider(O["Player.Size.Width"], "Width", "Set the width of the player frame", E.directions.H, 50, 500, 250, 1, nil))
+	-- 	size:add(Options:CreateSlider(O["Player.Size.Height"], "Height", "Set the height of the player frame", E.directions.H, 1, 500, 100, 1, nil))
+	-- 	return size
+	-- end)()))
+	-- playerOptions:add(Options:CreateGroup(O["Player.Health"], "Health", "Health bar of the player frame", 1, "dropdown", nil, barOptions))
 
-	opts:add(Options:CreateGroup(O["Player"], "Player", "This is a collection of player options", 1, "dropdown", nil, playerOptions))
-	opts:add(Options:CreateGroup(O["Minimap"], "Minimap", "This is a collection of minimap options", 1, nil, nil, (function()
-       local minimapOptions = Addon:OrderedTable()
-       minimapOptions:add(Options:CreateSlider(O["Minimap.Size"], "Size", "Set the size of the minimap", E.directions.H, E.minimap.min, E.minimap.max, 250, 1))
-       return minimapOptions
-	end)()))
+	-- opts:add(Options:CreateGroup(O["Player"], "Player", "This is a collection of player options", 1, "dropdown", nil, playerOptions))
+	-- opts:add(Options:CreateGroup(O["Minimap"], "Minimap", "This is a collection of minimap options", 1, nil, nil, (function()
+ --       local minimapOptions = Addon:OrderedTable()
+ --       minimapOptions:add(Options:CreateSlider(O["Minimap.Size"], "Size", "Set the size of the minimap", E.directions.H, E.minimap.min, E.minimap.max, 250, 1))
+ --       return minimapOptions
+	-- end)()))
 
-	options:add(Options:CreateGroup(O["Options"], "Options", "Collection of options", 1, "dropdown", nil, opts))
+	-- options:add(Options:CreateGroup(O["Options"], "Options", "Collection of options", 1, "dropdown", nil, opts))
 
-	local optionsWindow = CreateFrame("Frame", "CleanUI-OptionsWindow", UIParent)
-	optionsWindow:SetBackdrop(E.backdrops.buttonroundborder)
-	optionsWindow:SetBackdropColor(0.10, 0.10, 0.10, 1)
-	optionsWindow:SetBackdropBorderColor(0.33, 0.33, 0.33, 1)
-	optionsWindow:SetSize(550, 450)
-	optionsWindow:SetPoint(E.regions.C)
-	optionsWindow:RegisterForDrag("LeftButton")
-	optionsWindow:SetScript("OnDragStart", function(self) if self:IsMovable() then self:StartMoving() end end)
-	optionsWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-	optionsWindow:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
-	optionsWindow:SetMovable(true)
+	-- local optionsWindow = CreateFrame("Frame", "CleanUI-OptionsWindow", UIParent)
+	-- optionsWindow:SetBackdrop(E.backdrops.buttonroundborder)
+	-- optionsWindow:SetBackdropColor(0.10, 0.10, 0.10, 1)
+	-- optionsWindow:SetBackdropBorderColor(0.33, 0.33, 0.33, 1)
+	-- optionsWindow:SetSize(550, 450)
+	-- optionsWindow:SetPoint(E.regions.C)
+	-- optionsWindow:RegisterForDrag("LeftButton")
+	-- optionsWindow:SetScript("OnDragStart", function(self) if self:IsMovable() then self:StartMoving() end end)
+	-- optionsWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+	-- optionsWindow:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
+	-- optionsWindow:SetMovable(true)
 
-	optionsWindow:Hide()
+	-- optionsWindow:Hide()
 
-	local optionsContainer = self.OptionsContainer
-	optionsContainer:CreateOptions(optionsWindow, options)
+	-- local optionsContainer = self.OptionsContainer
+	-- optionsContainer:CreateOptions(optionsWindow, options)
+
+    local profile = Addon["Modules"]["Profile"]
+
+	profile:Init(Addon.db)
+	profile:Load()
 
 	for modName, module in pairs(self.modules) do
 		if module.Init then module:Init() end

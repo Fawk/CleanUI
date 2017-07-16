@@ -14,12 +14,7 @@ local function getName(n, r)
 	return n.."-"..r
 end
 
-function Profile:Load()
-	local name, realm = UnitFullName("player")
-	if not realm then
-		realm = GetRealmName()
-	end
-	name = getName(name, realm)
+function Profile:Set(name)
 	if not A.db["Characters"][name] then
 		A.db["Characters"][name] = "Default"
 		self:SetActive("Default")
@@ -27,6 +22,29 @@ function Profile:Load()
 		self:SetActive(A.db["Characters"][name])
 	end
 	self:Update(name)
+end
+
+function Profile:Load()
+	local name, realm = UnitFullName("player")
+	if not realm then
+		local f = CreateFrame("Frame")
+		f.timer = 0
+		f:SetScript("OnUpdate", function(self, elapsed)
+			self.timer = self.timer + elapsed
+			if self.timer > 0.001 then
+				name, realm = UnitFullName("player")
+				if realm then
+					name = getName(name, realm)
+					Profile:Set(name)
+					self:SetScript("OnUpdate", nil)
+				end
+				self.timer = 0
+			end
+		end)
+	else
+		name = getName(name, realm)
+		self:Set(name)
+	end
 end
 
 function Profile:SetActive(profile)

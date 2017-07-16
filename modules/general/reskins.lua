@@ -290,7 +290,7 @@ local function setStyle()
 			self:SetSize(db.Size - 3, db.Size - 3)
 			MinimapBackdrop:SetSize(db.Size, db.Size)
 		end
-		A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
+		--A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
 		Tools:HookSetPoint(Minimap, minimapConfig["Position"], minimapConfig["Size"] - 3, minimapConfig["Size"] - 3)
 
@@ -475,10 +475,12 @@ local function setStyle()
         end
         
         ObjectiveTrackerFrame:SetAlpha(0)
+        ObjectiveTrackerFrame.ignoreFramePositionManager = true
 
         local position = A["Profile"]["Options"]["Objective Tracker"]["Position"]
         local w, h = ObjectiveTrackerFrame:GetSize()
-        Tools:HookSetPoint(ObjectiveTrackerFrame, position, w, h)
+        --Tools:HookSetPoint(ObjectiveTrackerFrame, position, w, h)
+
 
         A:CreateMover(ObjectiveTrackerFrame, { 
             ["Position"] = position,
@@ -1032,7 +1034,7 @@ local function setStyle()
 
 		if button then
 			A:CreateMover(button, eabdb, "Extra Action Button")
-			A.Tools:HookSetPoint(button, eabdb["Position"], button:GetWidth(), button:GetHeight())
+			--A.Tools:HookSetPoint(button, eabdb["Position"], button:GetWidth(), button:GetHeight())
 			button:SetPoint(eabdb["Position"]["Local Point"], A.frameParent, eabdb["Position"]["Point"], eabdb["Position"]["Offset X"], eabdb["Position"]["Offset Y"])
 			button:HookScript("OnUpdate", function(self, elapsed)
 				self:SetAlpha(HasExtraActionBar() and 1 or 0)
