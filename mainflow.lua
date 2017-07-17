@@ -111,6 +111,16 @@ end
 
 Addon:Debug("Created mainflow")
 
+local function setScale()
+	local resolution = {GetScreenResolutions()}
+	resolution = resolution[GetCurrentResolution()]
+	local matches = {}
+	resolution:gsub("%d+", function(match) table.insert(matches, match) end)
+	
+	local w, h = unpack(matches)
+	UIParent:SetScale(768 / h)
+end
+
 function Addon:OnInitialize()
 
 	Addon.db = Addon.Database:CreateDatabase()
@@ -120,13 +130,7 @@ function Addon:OnInitialize()
 	SCREEN_HEIGHT = math.floor(h / uiscale)
 	SCREEN_WIDTH = math.floor(w / uiscale)
 
-	local resolution = {GetScreenResolutions()}
-	resolution = resolution[GetCurrentResolution()]
-	local matches = {}
-	resolution:gsub("%d+", function(match) table.insert(matches, match) end)
-	
-	w, h = unpack(matches)
-	UIParent:SetScale(768 / h)
+	setScale()
 
 	self.frameParent = CreateFrame("Frame", Addon:GetName().."_MainContainer", UIParent, 'SecureHandlerStateTemplate')
 	RegisterStateDriver(self.frameParent, "visibility", "[petbattle] hide; show")
@@ -143,6 +147,8 @@ end
 function Addon:OnEnable()
 
 	local E, T, Options = Addon.enum, Addon.Tools, Addon.Options
+
+	setScale()
 
 	-- local options, playerOptions, opts, barOptions = Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable()
   

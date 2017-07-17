@@ -40,6 +40,9 @@ function AltPowerBar(frame, db)
 		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
 		bar.OnPostUpdate = function(self, min, cur, max)
 			local r, g, b = self:GetStatusBarColor()
+			if r == 1 and g == 1 and b == 1 then
+				r, g, b = 0.67, 0.13, 0.13
+			end
 			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 		end
 		return bar
@@ -51,7 +54,7 @@ function AltPowerBar(frame, db)
 	end
 
 	Units:Position(bar, db["Position"])
-	bar:SetSize(size["Width"] - 2, size["Height"] - 2)
+	bar:SetSize(size["Width"], size["Height"])
 	bar:SetStatusBarTexture(texture)
 	bar.bg:SetTexture(texture)
 	bar.bg:SetAllPoints(bar)
