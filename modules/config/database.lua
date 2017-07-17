@@ -488,10 +488,21 @@ local defaults =  {
                             ["Width"] = 150,
                             ["Height"] = 15
                         }
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
                         ["Attached"] = true,
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "ClassIcons",
                             ["Point"] = "BOTTOM",
@@ -514,7 +525,8 @@ local defaults =  {
                                 ["Local Point"] = "RIGHT",
                                 ["Offset X"] = -10,
                                 ["Offset Y"] = 0, 
-                            }
+                            },
+                            ["Font Size"] = 10
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -524,7 +536,29 @@ local defaults =  {
                                 ["Local Point"] = "LEFT",
                                 ["Offset X"] = 5,
                                 ["Offset Y"] = 0, 
-                            }
+                            },
+                            ["Font Size"] = 10
+                        },
+                        ["Icon"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Size"] = 10
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
                         },
                         ["Attached"] = true,
                     },
