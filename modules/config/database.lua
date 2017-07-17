@@ -473,6 +473,61 @@ local defaults =  {
                         ["Background Multiplier"] = 0.3,
                         ["Hide Blizzard"] = true
                     },
+                    ["ClassIcons"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        }
+                        ["Attached"] = true,
+                    },
+                    ["Castbar"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "ClassIcons",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        }
+                        ["Show Icon"] = true,
+                        ["Time"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "RIGHT",
+                                ["Local Point"] = "RIGHT",
+                                ["Offset X"] = -10,
+                                ["Offset Y"] = 0, 
+                            }
+                        },
+                        ["Name"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 5,
+                                ["Offset Y"] = 0, 
+                            }
+                        },
+                        ["Attached"] = true,
+                    },
     				["Enabled"] = true
     			},
     			["Target"] = {
