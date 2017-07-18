@@ -2,6 +2,10 @@ local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 
+function string.trim()
+  return (self:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 local object = {}
 
 function object:center(x, y)
@@ -329,6 +333,7 @@ local function TextBuilder(parent, sizeInPerc)
             			local text = self:GetText()
             			self:OldSetText(text:sub(0, text:len() - 1))
 	                end
+	                self:OldSetText(text:sub(0, text:len() - 3):trim().."..")
             	elseif o.enforceW then
 
             	else
