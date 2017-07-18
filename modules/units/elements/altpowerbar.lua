@@ -38,12 +38,13 @@ function AltPowerBar(frame, db)
 		bar.value = buildText(bar, 10):shadow():atCenter():build()
 		bar.value:SetText("")
 		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
-		bar.OnPostUpdate = function(self, min, cur, max)
+		bar.PostUpdate = function(self, min, cur, max)
 			local r, g, b = self:GetStatusBarColor()
-			if r == 1 and g == 1 and b == 1 then
+			if r > 0.95 and g > 0.95 and b > 0.95 then
 				r, g, b = 0.67, 0.13, 0.13
 			end
 			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+			self:SetStatusBarColor(r, g, b)
 		end
 		return bar
 	end)()

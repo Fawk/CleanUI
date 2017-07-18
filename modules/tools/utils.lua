@@ -285,7 +285,7 @@ local function TextBuilder(parent, sizeInPerc)
 			if self.textOutline == "SHADOW" then
 				textOutline = "NONE"
 				text:SetShadowOffset(1, -1)
-				text:SetShadowColor(1, 1, 1)
+				text:SetShadowColor(0, 0, 0)
 			else
 				textOutline = self.textOutline
 			end

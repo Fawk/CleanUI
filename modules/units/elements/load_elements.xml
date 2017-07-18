@@ -6,6 +6,7 @@
     <Script file="healprediction.lua"/>
     <Script file="lfdrole.lua"/>
     <Script file="altpowerbar.lua"/>
+    <Script file="castbar.lua"/>
     <!-- etc -->
 
 </Ui>

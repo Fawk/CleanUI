@@ -487,7 +487,7 @@ local defaults =  {
                             ["Match height"] = false,
                             ["Width"] = 150,
                             ["Height"] = 15
-                        }
+                        },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
@@ -498,7 +498,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Attached"] = true,
+                        ["Attached"] = true
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
@@ -515,7 +515,7 @@ local defaults =  {
                             ["Match height"] = false,
                             ["Width"] = 150,
                             ["Height"] = 15
-                        }
+                        },
                         ["Show Icon"] = true,
                         ["Time"] = {
                             ["Enabled"] = true,

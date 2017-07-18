@@ -17,8 +17,8 @@ local function Castbar(frame, db)
 
 	local size = db["Size"]
 	local texture = media:Fetch("statusbar", db["Texture"])
-	local width = db["Match Width"] and frame:GetWidth() or db["Width"]
-	local height = db["Match Height"] and frame:GetWidth() or db["Height"]
+	local width = size["Match width"] and frame:GetWidth() or size["Width"]
+	local height = size["Match height"] and frame:GetWidth() or size["Height"]
 
 	local bar = frame.Castbar or (function()
 		local bar = CreateFrame("StatusBar", A:GetName().."_"..frame:GetName().."Castbar", frame)
@@ -36,7 +36,11 @@ local function Castbar(frame, db)
 		bar.bg:SetAllPoints()
 
 		return bar
-	end)
+	end)()
+
+	if not frame.ClassIcons then
+		db["Position"]["Relative To"] = "Parent"
+	end
 
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
@@ -48,7 +52,7 @@ local function Castbar(frame, db)
 	bar.bg:SetTexture(texture)
 	bar.Icon:SetSize(db["Icon"]["Size"], db["Icon"]["Size"])
 
-	CheckEnabled(bar.Name, db["Name"])
+	CheckEnabled(bar.Text, db["Name"])
 	CheckEnabled(bar.Time, db["Time"])
 	CheckEnabled(bar.Icon, db["Icon"])
 
