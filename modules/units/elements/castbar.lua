@@ -23,7 +23,7 @@ local function Castbar(frame, db)
 	local bar = frame.Castbar or (function()
 		local bar = CreateFrame("StatusBar", A:GetName().."_"..frame:GetName().."Castbar", frame)
 
-		local name = buildText(bar, db["Name"]["Font Size"]):shadow():build()
+		local name = buildText(bar, db["Name"]["Font Size"]):shadow():enforceHeight():build()
 		name:SetText("")
 
 		local time = buildText(bar, db["Time"]["Font Size"]):shadow():build()
@@ -35,6 +35,13 @@ local function Castbar(frame, db)
 		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
 		bar.bg:SetAllPoints()
 
+		bar:HookScript("OnShow", function(self)
+			self:SetStatusBarTexture(texture)
+			self:SetStatusBarColor(0.33, 0.33, 0.67)
+			self.bg:SetTexture(texture)
+			self.bg:SetVertexColor(0.33 * 0.33, 0.33 * 0.33, 0.67 * 0.33)
+		end)
+
 		return bar
 	end)()
 
@@ -42,15 +49,33 @@ local function Castbar(frame, db)
 		db["Position"]["Relative To"] = "Parent"
 	end
 
+	local iconDb = db["Icon"]
+
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
 	Units:Position(bar.Time, db["Time"]["Position"])
-	Units:Position(bar.Icon, db["Icon"]["Position"])
+	Units:Position(bar.Icon, iconDb["Position"])
 
 	bar:SetSize(width, height)
 	bar:SetStatusBarTexture(texture)
+	bar:SetStatusBarColor(0.33, 0.33, 0.67)
 	bar.bg:SetTexture(texture)
-	bar.Icon:SetSize(db["Icon"]["Size"], db["Icon"]["Size"])
+	bar.bg:SetVertexColor(0.33 * 0.33, 0.33 * 0.33, 0.67 * 0.33)
+
+	local iconW, iconH
+
+	if iconDb["Size"]["Match width"] then
+		iconW = width
+		iconH = width
+	elseif iconDb["Size"]["Match height"] then
+		iconH = height
+		iconW = height
+	else
+		iconW = iconDb["Size"]
+		iconH = iconDb["Size"]
+	end
+
+	bar.Icon:SetSize(iconW, iconH)
 
 	CheckEnabled(bar.Text, db["Name"])
 	CheckEnabled(bar.Time, db["Time"])

@@ -277,6 +277,16 @@ local function TextBuilder(parent, sizeInPerc)
 		return self
 	end
 
+	function o:enforceHeight()
+		self.enforceH = true
+		return self
+	end
+
+	function o:enforceWidth()
+		self.enforceW = true
+		return self
+	end
+
 	function o:build()
 		local text = self.parent:CreateFontString(nil, "OVERLAY")
 
@@ -313,28 +323,38 @@ local function TextBuilder(parent, sizeInPerc)
             self:OldSetText(value)
 
             if sizeInPerc <= 1 then
-	            if self:GetStringWidth() > parent:GetWidth() then
-	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
-	                    size = size - 1
-	                    self:SetFont(font, size, textOutline)
-	                    if size == 1 then
-	                    	return text
-	                    end
+         		if o.enforceH then
+            		self.oldText = self:GetText()
+            		while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+            			local text = self:GetText()
+            			self:OldSetText(text:sub(0, text:len() - 1))
 	                end
-	            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
-	                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
-	                    size = size - 1
-	                    self:SetFont(font, size, textOutline)
-	                    if size == 1 then
-	                    	return text
-	                    end
-	                end
-	            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
-	                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
-	                    size = size + 1
-	                    self:SetFont(font, size, textOutline)
-	                end
-	            end
+            	elseif o.enforceW then
+
+            	else
+		            if self:GetStringWidth() > parent:GetWidth() then
+		                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+		                    size = size - 1
+		                    self:SetFont(font, size, textOutline)
+		                    if size == 1 then
+		                    	return text
+		                    end
+		                end
+		            elseif self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) then
+		                while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
+		                    size = size - 1
+		                    self:SetFont(font, size, textOutline)
+		                    if size == 1 then
+		                    	return text
+		                    end
+		                end
+		            elseif self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) then
+		                while self:GetStringWidth() < (parent:GetWidth() * sizeInPerc) do
+		                    size = size + 1
+		                    self:SetFont(font, size, textOutline)
+		                end
+		            end
+		        end
 	        else
 	        	self:SetFont(font, sizeInPerc, textOutline)
 	        end

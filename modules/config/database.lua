@@ -523,7 +523,7 @@ local defaults =  {
                                 ["Relative To"] = "Parent",
                                 ["Point"] = "RIGHT",
                                 ["Local Point"] = "RIGHT",
-                                ["Offset X"] = -10,
+                                ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
                             ["Font Size"] = 10
@@ -534,10 +534,10 @@ local defaults =  {
                                 ["Relative To"] = "Parent",
                                 ["Point"] = "LEFT",
                                 ["Local Point"] = "LEFT",
-                                ["Offset X"] = 5,
+                                ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 0.7
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
@@ -548,7 +548,11 @@ local defaults =  {
                                 ["Offset X"] = 0,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Size"] = 10
+                            ["Size"] = {
+                                ["Match width"] = false,
+                                ["Match height"] = true,
+                                ["Size"] = 10
+                            }
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
