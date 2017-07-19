@@ -257,7 +257,6 @@ local defaults =  {
                     },
                     ["Presets"] = {
                         {
-                            ["id"] = 1,
                             ["spellId"] = 115151,
                             ["size"] = 32,
                             ["priority"] = 2,
@@ -273,7 +272,6 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 3,
                             ["spellId"] = 205406,
                             ["size"] = 32,
                             ["priority"] = 4,
@@ -281,7 +279,6 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 4,
                             ["spellId"] = 197206,
                             ["size"] = 32,
                             ["priority"] = 1,
@@ -289,15 +286,13 @@ local defaults =  {
                             ["options"] = { "glow" }
                         },
                         {
-                            ["id"] = 5,
                             ["spellId"] = 191837,
                             ["size"] = 32,
-                            ["priority"] = 1,
+                            ["priority"] = 2,
                             ["condition"] = "func:cooldownWithCountdown",
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 6,
                             ["spellId"] = 122783,
                             ["size"] = 32,
                             ["priority"] = 2,
@@ -305,7 +300,6 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 7,
                             ["spellId"] = 115310,
                             ["size"] = 32,
                             ["priority"] = 2,
@@ -313,7 +307,6 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 8,
                             ["spellId"] = 198664,
                             ["size"] = 32,
                             ["priority"] = 2,
@@ -321,7 +314,6 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 9,
                             ["spellId"] = 196725,
                             ["size"] = 32,
                             ["priority"] = 2,
@@ -329,12 +321,18 @@ local defaults =  {
                             ["options"] = {}
                         },
                         {
-                            ["id"] = 10,
                             ["spellId"] = 197908,
                             ["size"] = 32,
                             ["priority"] = 2,
                             ["condition"] = "func:cooldownWithCountdown",
                             ["options"] = {}
+                        },
+                        {
+                            ["spellId"] = 246328,
+                            ["size"] = 32,
+                            ["priority"] = 1,
+                            ["condition"] = "func:activeBuffWithStackAndCountdown",
+                            ["options"] = { "glow" }
                         },
                     }
                 }
@@ -502,7 +500,7 @@ local defaults =  {
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default",
+                        ["Texture"] = "Default2",
                         ["Position"] = {
                             ["Relative To"] = "ClassIcons",
                             ["Point"] = "BOTTOM",
@@ -687,6 +685,72 @@ local defaults =  {
                             ["Right"] = -1
                         },
                         ["Enabled"] = true,
+                    },
+                    ["Castbar"] = {
+                        ["Enabled"] = true,
+                        ["Texture"] = "Default2",
+                        ["Position"] = {
+                            ["Relative To"] = "ClassIcons",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Show Icon"] = true,
+                        ["Time"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "RIGHT",
+                                ["Local Point"] = "RIGHT",
+                                ["Offset X"] = -5,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 10
+                        },
+                        ["Name"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 18,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 0.7
+                        },
+                        ["Icon"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Size"] = {
+                                ["Match width"] = false,
+                                ["Match height"] = true,
+                                ["Size"] = 10
+                            }
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Attached"] = true,
                     },
                     ["Enabled"] = true
     			},

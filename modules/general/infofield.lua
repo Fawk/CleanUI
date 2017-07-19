@@ -245,9 +245,9 @@ local function Update(field, db)
 	local position = db["Position"]
 	field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 
-	for _,preset in next, db["Presets"] do
-		if not alreadyCreated(field.groups, preset.id) then
-			local icon = createIcon(field, preset.id, preset.spellId, preset.timer or 0, preset.size, preset.priority, preset.condition, preset.options)
+	for id,preset in next, db["Presets"] do
+		if not alreadyCreated(field.groups, id) then
+			local icon = createIcon(field, id, preset.spellId, preset.timer or 0, preset.size, preset.priority, preset.condition, preset.options)
 			field.groups[preset.priority]:add(icon)
 		end
 	end

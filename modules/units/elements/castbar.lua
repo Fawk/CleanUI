@@ -15,6 +15,9 @@ end
 
 local function Castbar(frame, db)
 
+	local mult = 0.33
+	local r, g, b = unpack(A.colors.castbar)
+
 	local size = db["Size"]
 	local texture = media:Fetch("statusbar", db["Texture"])
 	local width = size["Match width"] and frame:GetWidth() or size["Width"]
@@ -32,14 +35,14 @@ local function Castbar(frame, db)
 		bar.Text = name
 		bar.Time = time
 		bar.Icon = bar:CreateTexture(nil, "OVERLAY")
-		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
+		bar.bg = bar:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
 		bar:HookScript("OnShow", function(self)
 			self:SetStatusBarTexture(texture)
-			self:SetStatusBarColor(0.33, 0.33, 0.67)
+			self:SetStatusBarColor(r, g, b)
 			self.bg:SetTexture(texture)
-			self.bg:SetVertexColor(0.33 * 0.33, 0.33 * 0.33, 0.67 * 0.33)
+			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 		end)
 
 		return bar
@@ -58,9 +61,9 @@ local function Castbar(frame, db)
 
 	bar:SetSize(width, height)
 	bar:SetStatusBarTexture(texture)
-	bar:SetStatusBarColor(0.33, 0.33, 0.67)
+	bar:SetStatusBarColor(r, g, b)
 	bar.bg:SetTexture(texture)
-	bar.bg:SetVertexColor(0.33 * 0.33, 0.33 * 0.33, 0.67 * 0.33)
+	bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
 	local iconW, iconH
 

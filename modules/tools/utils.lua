@@ -329,11 +329,12 @@ local function TextBuilder(parent, sizeInPerc)
             if sizeInPerc <= 1 then
          		if o.enforceH then
             		self.oldText = self:GetText()
+            		local t = ""
             		while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
-            			local text = self:GetText()
-            			self:OldSetText(text:sub(0, text:len() - 1))
+            			t = self:GetText()
+            			self:OldSetText(t:sub(0, t:len() - 1))
 	                end
-	                self:OldSetText(text:sub(0, text:len() - 3):trim().."..")
+	                self:OldSetText((t and t ~= "") and (t:sub(0, t:len() - 3):trim().."..") or self:GetText())
             	elseif o.enforceW then
 
             	else
