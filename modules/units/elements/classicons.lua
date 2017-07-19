@@ -11,26 +11,42 @@ local UnitPowerMax = UnitPowerMax
 local _,class = UnitClass("player")
 
 local powerType = {
-	["ROGUE"] = SPELL_POWER_COMBO_POINTS,
-	["DEATHKNIGHT"] = SPELL_POWER_RUNES,
+	["ROGUE"] = {
+		isValid = function()
+			return true
+		end,
+		powerType = SPELL_POWER_COMBO_POINTS
+	},
+	["DEATHKNIGHT"] = {
+		isValid = function()
+			return true
+		end,
+		powerType = SPELL_POWER_RUNES
+	},
 	["MAGE"] = {
 		isValid = function(spec)
 			return spec == SPEC_MAGE_ARCANE
 		end,
 		powerType = SPELL_POWER_ARCANE_CHARGES
-	}
+	},
 	["DRUID"] = {
 		isValid = function(spec, form)
 			return spec == SPEC_DRUID_FERAL and form == 1
 		end,
-		SPELL_POWER_COMBO_POINTS
+		powerType = SPELL_POWER_COMBO_POINTS
+	},
 	["PALADIN"] = {
 		isValid = function(spec)
 			return spec == SPEC_PALADIN_RETRIBUTION
 		end,
 		powerType = SPELL_POWER_HOLY_POWER
-	}
-	["WARLOCK"] = SPELL_POWER_SOUL_SHARDS,
+	},
+	["WARLOCK"] = {
+		isValid = function()
+			return true
+		end,
+		powerType = SPELL_POWER_SOUL_SHARDS
+	},
 	["MONK"] = {
 		isValid = function(spec)
 			return spec == SPEC_MONK_WINDWALKER
@@ -45,13 +61,13 @@ local powerTypeForBars = {
 			return spec == SPEC_SHAMAN_ELEMENTAL or spec == SPEC_SHAMAN_ENHANCEMENT
 		end,
 		powerType = SPELL_POWER_MAELSTROM,
-	}
+	},
 	["PRIEST"] = {
 		isValid = function(spec)
 			return spec == SPEC_PRIEST_SHADOW
 		end,
 		powerType = SPELL_POWER_INSANITY
-	}
+	},
 	["DRUID"] = {
 		isValid = function(spec)
 			return spec == SPEC_DRUID_BALANCE
@@ -61,19 +77,18 @@ local powerTypeForBars = {
 }
 
 local function getBarMax()
-	return UnitPowerMax("player", powerTypeForBars[class])
+	return UnitPowerMax("player", powerTypeForBars[class].powerType)
 end
 
 local function getIconCount()
-	return UnitPowerMax("player", powerType[class])
+	return UnitPowerMax("player", powerType[class].powerType)
 end
 
-local function Update(self, event, unit, powerType, func)
+local function Update(bar, event, unit, powerType, func)
 	if(unit == 'vehicle') then
 		return
 	end
 
-	local bar = self.ClassIcons
 	local cur, max
 	if(event ~= 'ClassPowerDisable') then
 		if(unit == 'vehicle') then
@@ -86,6 +101,41 @@ local function Update(self, event, unit, powerType, func)
 		end
 	end
 	func(bar, cur, max)
+end
+
+local function buildIcons(frame, bar, size, iconCount, current)
+	local iconW = (size["Match width"] and frame:GetWidth() or size["Width"]) / iconCount
+	local iconH = (size["Match height"] and frame:GetHeight() or size["Height"])
+
+	if bar.iconCount == iconCount then return end
+
+	for i = 1, 10 do
+		if bar.icons[i] then
+			bar.icons[i]:Hide()
+		end
+	end
+
+	bar.icons = {}
+
+	local anchor = frame
+	for i = 1, getIconCount() do
+		bar.icons[i] = CreateFrame("StatusBar", "ClassPower"..i, frame)
+		bar.icons[i]:SetPoint("TOPLEFT", anchor, anchor == frame and "BOTTOMLEFT" or "TOPLEFT", iconW * (i - 1), 0)
+		bar.icons[i]:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
+		bar.icons[i]:SetMinMaxValues(0, 1)
+		bar.icons[i]:SetSize(iconW, iconH)
+		bar.icons[i]:HookScript("OnShow", function(self)
+			self:SetValue(1)
+		end)
+		bar.icons[i]:HookScript("OnHide", function(self)
+			self:SetValue(0)
+		end)
+		if i > current then
+			bar.icons[i]:Hide()
+		end
+	end
+
+	bar.iconCount = iconCount
 end
 
 local function ClassIcons(frame, db)
@@ -107,32 +157,22 @@ local function ClassIcons(frame, db)
 			local spec, form = GetSpecialization(), GetShapeshiftFormID()
 
 			if barPower and barPower.isValid(spec) then
-				self.Override = function(self, event, unit)
+				bar.Override = function(self, event, unit)
 					Update(self, event, unit, barPower.powerType, function(f, c, m)
 						f.bar:SetMinMaxValues(0, m)
 						f.bar:SetValue(c)	
 					end)
 				end
-			elseif power and power.isValid(spec, form)
-				self.Override = function(self, event, unit)
+			elseif power and power.isValid(spec, form) then
+				bar.Override = function(self, event, unit)
 					Update(self, event, unit, power.powerType, function(f, c, m)
+						buildIcons(frame, f, size, m, UnitPower("player", powerType[class].powerType))
 						for i = 1, m do
 							if(i <= c) then
 								f.icons[i]:Show()
 							else
 								f.icons[i]:Hide()
 							end
-						end
-
-						oldMax = f.__max
-						if(m ~= oldMax) then
-							if(m < oldMax) then
-								for i = m + 1, oldMax do
-									f.icons[i]:Hide()
-								end
-							end
-
-							f.__max = m
 						end
 					end)
 				end
@@ -152,44 +192,32 @@ local function ClassIcons(frame, db)
 			end)
 			frame:RegisterEvent('PLAYER_TALENT_UPDATE', function(self, event, unit)
 				bar:OverrideVisibility(self, event, unit)
-			end), true)
+			end, true)
 			frame:RegisterEvent('UPDATE_SHAPESHIFT_FORM', function(self, event, unit)
 				bar:OverrideVisibility(self, event, unit)
-			end), true)
+			end, true)
 		end
 
 		local iconCount = getIconCount()
 		if iconCount then
-
-			local iconW = (size["Match width"] and frame:GetWidth() or size["Width"]) / iconCount
-			local iconH = (size["Match height"] and frame:GetHeight() or size["Height"]) / iconCount
-
-			local anchor = frame
-			for i = 1, getIconCount() do
-				bar.icons[i] = CreateFrame("StatusBar", nil, frame)
-				bar.icons[i]:SetPoint(anchor == frame and "BOTTOMLEFT" or "TOPLEFT", anchor, "TOPLEFT", 0, 0)
-				bar.icons[i]:SetMinMaxValues(0, 1)
-				bar.icons[i]:SetSize(iconW, iconH)
-				bar.icons[i]:HookScript("OnShow", function(self)
-					self:SetValue(1)
-				end)
-				bar.icons[i]:HookScript("OnHide", function(self)
-					self:SetValue(0)
-				end)
-			end
+			buildIcons(frame, bar, size, iconCount, UnitPower("player", powerType[class].powerType))
 		end
 
 		local barW = size["Match width"] and frame:GetWidth() or size["Width"]
 		local barH = size["Match height"] and frame:GetWidth() or size["Height"]
 		
-		bar.bar:SetSize(barW barH)
+		bar.bar:SetSize(barW, barH)
 
 		return bar
 	end)()
 
 	Units:Position(bar.bar, db["Position"])
 
-	self.ClassIcons = bar
+	if bar.iconCount ~= getIconCount() then
+		buildIcons(frame, bar, size, iconCount, UnitPower("player", powerType[class].powerType))
+	end
+
+	frame.ClassIcons = bar
 end
 
 A["Elements"]["ClassIcons"] = ClassIcons

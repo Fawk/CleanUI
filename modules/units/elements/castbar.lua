@@ -54,6 +54,8 @@ local function Castbar(frame, db)
 
 	local iconDb = db["Icon"]
 
+	print(db["Position"]["Relative To"])
+
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
 	Units:Position(bar.Time, db["Time"]["Position"])
