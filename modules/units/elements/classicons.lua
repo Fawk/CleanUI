@@ -21,7 +21,8 @@ local powerType = {
 		isValid = function()
 			return true
 		end,
-		powerType = SPELL_POWER_RUNES
+		powerType = SPELL_POWER_RUNES,
+		isRunes = true
 	},
 	["MAGE"] = {
 		isValid = function(spec)
@@ -103,39 +104,54 @@ local function Update(bar, event, unit, powerType, func)
 	func(bar, cur, max)
 end
 
-local function buildIcons(frame, bar, size, iconCount, current)
+local function buildIcons(frame, bar, size, iconCount, current, isRunes)
 	local iconW = (size["Match width"] and frame:GetWidth() or size["Width"]) / iconCount
 	local iconH = (size["Match height"] and frame:GetHeight() or size["Height"])
 
-	if bar.iconCount == iconCount then return end
+	if bar.iconCount == iconCount then
 
-	for i = 1, 10 do
-		if bar.icons[i] then
-			bar.icons[i]:Hide()
+		for i = 1, bar.iconCount do
+			local icon = bar.icons[i]
+			if isRunes then
+				local start, duration, runeReady = GetRuneCooldown(1) -- FIX THIS
+				icon:SetValue()
+			end
 		end
-	end
 
-	bar.icons = {}
+	else
 
-	local anchor = frame
-	for i = 1, getIconCount() do
-		bar.icons[i] = CreateFrame("StatusBar", "ClassPower"..i, frame)
-		bar.icons[i]:SetPoint("TOPLEFT", anchor, anchor == frame and "BOTTOMLEFT" or "TOPLEFT", iconW * (i - 1), 0)
-		bar.icons[i]:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
-		bar.icons[i]:SetMinMaxValues(0, 1)
-		bar.icons[i]:SetSize(iconW, iconH)
-		bar.icons[i]:HookScript("OnShow", function(self)
-			self:SetValue(1)
-		end)
-		bar.icons[i]:HookScript("OnHide", function(self)
-			self:SetValue(0)
-		end)
-		if i > current then
-			bar.icons[i]:Hide()
+		for i = 1, 10 do
+			if bar.icons[i] then
+				bar.icons[i]:Hide()
+			end
 		end
-	end
 
-	bar.iconCount = iconCount
+		bar.icons = {}
+
+		local anchor = frame
+		for i = 1, getIconCount() do
+			bar.icons[i] = CreateFrame("StatusBar", "ClassPower"..i, frame)
+			bar.icons[i]:SetPoint("TOPLEFT", anchor, anchor == frame and "BOTTOMLEFT" or "TOPLEFT", iconW * (i - 1), 0)
+			bar.icons[i]:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
+			bar.icons[i]:SetSize(iconW, iconH)
+
+			if isRunes then
+				local start, duration, runeReady = GetRuneCooldown(1)
+				bar.icons[i]:SetMinMaxValues(0, duration)
+				bar.icons[i]:SetValue(duration)
+			else
+				bar.icons[i]:SetMinMaxValues(0, 1)
+				bar.icons[i]:SetValue(1)
+			end
+
+			if i > current then
+				bar.icons[i]:Hide()
+			end
+		end
+
+		bar.iconCount = iconCount
+
+	end
 end
 
 local function ClassIcons(frame, db)
@@ -166,7 +182,8 @@ local function ClassIcons(frame, db)
 			elseif power and power.isValid(spec, form) then
 				bar.Override = function(self, event, unit)
 					Update(self, event, unit, power.powerType, function(f, c, m)
-						buildIcons(frame, f, size, m, UnitPower("player", powerType[class].powerType))
+						local pt = powerType[class]
+						buildIcons(frame, f, size, m, UnitPower("player", pt.powerType), pt.isRunes)
 						for i = 1, m do
 							if(i <= c) then
 								f.icons[i]:Show()
@@ -178,6 +195,9 @@ local function ClassIcons(frame, db)
 				end
 			end
 
+			frame:RegisterEvent('UPDATE_POWER_RUNE', function(self, event, unit)
+				bar:Override(self, event, unit)
+			end)
 			frame:RegisterEvent('SPELLS_CHANGED', function(self, event, unit)
 				bar:OverrideVisibility(self, event, unit)
 			end, true)
@@ -214,7 +234,8 @@ local function ClassIcons(frame, db)
 	Units:Position(bar.bar, db["Position"])
 
 	if bar.iconCount ~= getIconCount() then
-		buildIcons(frame, bar, size, iconCount, UnitPower("player", powerType[class].powerType))
+		local pt = powerType[class]
+		buildIcons(frame, bar, size, iconCount, UnitPower("player", pt.powerType), pt.isRunes)
 	end
 
 	frame.ClassIcons = bar
