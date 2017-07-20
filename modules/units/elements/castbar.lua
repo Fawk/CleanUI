@@ -48,13 +48,7 @@ local function Castbar(frame, db)
 		return bar
 	end)()
 
-	if not frame.ClassIcons then
-		db["Position"]["Relative To"] = "Parent"
-	end
-
 	local iconDb = db["Icon"]
-
-	print(db["Position"]["Relative To"])
 
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
