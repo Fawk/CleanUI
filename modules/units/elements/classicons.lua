@@ -146,18 +146,6 @@ local function Update(bar, event, unit, powerType, func)
 	func(bar, cur, max)
 end
 
--- bar.power = powerType[class] or barPowerType[class]
--- bar.iconW = ...
--- bar.iconH = ...
--- bar.max = max
---
--- ...
---
--- local max = getPowerMax()
--- local current = getPowerCurrent()
---
--- UpdateIcons(bar, current, max, max ~= bar.max)
-
 local function createIcon(parent, index)
 	local icon = CreateFrame("StatusBar", T.frameName(parent.power.powerType, index), parent)
 
@@ -171,18 +159,22 @@ local function createIcon(parent, index)
 	local db = parent.db
 	local offset = db["Background"]["Offset"]
 
-	icon:SetBackdrop({
-		bgFile = media:Fetch("statusbar", "Default"),
-		tile = true,
-		tileSize = 16,
-		insets = {
-			top = offset["Top"],
-			bottom = offset["Bottom"],
-			left = offset["Left"],
-			right = offset["Right"],
-		}
-	})
-	icon:SetBackdropColor(unpack(db["Background"]["Color"]))
+	if db["Background"] and db["Background"]["Enabled"] then 
+		icon:SetBackdrop({
+			bgFile = media:Fetch("statusbar", "Default"),
+			tile = true,
+			tileSize = 16,
+			insets = {
+				top = offset["Top"],
+				bottom = offset["Bottom"],
+				left = offset["Left"],
+				right = offset["Right"],
+			}
+		})
+		icon:SetBackdropColor(unpack(db["Background"]["Color"]))
+	else
+		icon:SetBackdrop(nil)
+	end
 
 	return icon
 end
@@ -195,12 +187,10 @@ local function UpdateIcons(parent, current, max, maxChanged)
 
 		-- Create icons according to max count value
 		local frame = parent:GetParent()
-		print(frame)
 		local anchor = frame
 		for i = 1, max do
 			local icon = createIcon(parent, i)
 			icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
-			print(icon:GetPoint())
 			parent.icons[i] = icon
 			anchor = icon
 		end
@@ -263,108 +253,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 		end
 		icon:SetStatusBarColor(r, g, b)
 		icon.bg:SetVertexColor(r * .33, g * .33, b * .33)
-	end
-end
-
-local function buildIcons(frame, bar, size, iconCount, current, isRunes)
-	local iconW = ((size["Match width"] and frame:GetWidth() or size["Width"]) / iconCount) - 2
-	local iconH = (size["Match height"] and frame:GetHeight() or size["Height"]) - 2
-
-	if bar.iconCount == iconCount then
-
-		for i = 1, bar.iconCount do
-			local icon = bar.icons[i]
-			if isRunes then
-				local start, duration, runeReady = GetRuneCooldown(i)
-				if not runeReady and start and start ~= 0 then
-					icon:SetMinMaxValues(0, duration)
-					icon:SetValue(GetTime() - start)
-				else
-					icon:SetValue(duration)
-				end
-
-				local power = powerType[class]
-				local r, g, b = unpack(oUF.colors.power[power.powerType])
-
-				local spec = GetSpecializationInfo(GetSpecialization())
-				if runeColors[spec] then
-					r, g, b = unpack(runeColors[spec])
-				end
-
-				icon:SetStatusBarColor(r, g, b)
-				icon.bg:SetVertexColor(r * .33, g * .33, b * .33)
-			else
-				icon:oldShow()
-				if i > current then
-					icon:Hide()
-				else
-					icon:Show()
-				end
-			end
-		end
-
-	else
-
-		for i = 1, 10 do
-			if bar.icons[i] then
-				bar.icons[i]:Hide()
-			end
-		end
-
-		bar.icons = {}
-
-		local anchor = frame
-		for i = 1, getIconCount() do
-
-			local icon = CreateFrame("StatusBar", "ClassPower"..i, frame)
-			
-			icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
-			icon:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
-			icon:SetSize(iconW, iconH)
-
-			icon.bg = icon:CreateTexture(nil, "BORDER")
-			icon.bg:SetTexture(media:Fetch("statusbar", "Default2"))
-			icon.bg:SetAllPoints()
-
-			local power = powerType[class]
-			local r, g, b = unpack(oUF.colors.power[power.powerType])
-
-			local spec = GetSpecializationInfo(GetSpecialization())
-			if runeColors[spec] then
-				r, g, b = unpack(runeColors[spec])
-			end
-
-			icon:SetStatusBarColor(r, g, b)
-			icon.bg:SetVertexColor(r * .33, g * .33, b * .33)
-
-			if isRunes then
-				local start, duration, runeReady = GetRuneCooldown(runes[i])
-				icon:SetMinMaxValues(0, duration)
-				icon:SetValue(duration)
-			else
-				icon:SetMinMaxValues(0, 1)
-				icon:SetValue(1)
-				icon.oldHide = icon.Hide
-				icon.oldShow = icon.Show
-				icon.Hide = function(self)
-					self:SetValue(0)
-				end
-				icon.Show = function(self)
-					self:SetValue(1)
-				end
-			end
-
-			if i > current then
-				icon:Hide()
-			end
-
-			anchor = icon
-
-			bar.icons[i] = icon
-		end
-
-		bar.iconCount = iconCount
-
+		icon:Show()
 	end
 end
 
@@ -456,7 +345,6 @@ local function ClassIcons(frame, db)
 					for i = 1, getIconCount() do
 						local icon = bar.icons[i]
 						if icon then
-							if icon.oldHide then icon:oldHide() end
 							icon:Hide()
 						end
 					end
@@ -516,7 +404,6 @@ local function ClassIcons(frame, db)
 	if (not barPower or not barPower.isValid(spec)) and (not power or not power.isValid(spec)) then
 		for i = 1, 10 do
 			if bar.icons[i] then
-				bar.icons[i]:oldHide()
 				bar.icons[i]:Hide()
 			end
 		end
@@ -553,7 +440,7 @@ local function ClassIcons(frame, db)
 		end
 	else
 		bar.bar:SetBackdrop(nil)
-		for i = 1, bar.iconCount do
+		for i = 1, bar.max do
 			bar.icons[i]:SetBackdrop(nil)
 		end
 	end
