@@ -39,7 +39,7 @@ end
 
 function T:frameName(...)
 	local t = A:GetName()
-	for _,n in pairs({...})
+	for _,n in pairs({...}) do
 		t = t.."_"..n
 	end
 	return t
