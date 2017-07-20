@@ -4,6 +4,7 @@ local oUF = oUF or A.oUF
 
 local CreateFrame = CreateFrame
 local GetSpecialization = GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo
 local GetShapeshiftFormID = GetShapeshiftFormID
 local UnitClass = UnitClass
 local UnitPowerMax = UnitPowerMax
@@ -56,7 +57,7 @@ local powerType = {
 	}
 }
 
-local powerTypeForBars = {
+local barPowerType = {
 	["SHAMAN"] = {
 		isValid = function(spec) 
 			return spec == SPEC_SHAMAN_ELEMENTAL or spec == SPEC_SHAMAN_ENHANCEMENT
@@ -74,6 +75,12 @@ local powerTypeForBars = {
 			return spec == SPEC_DRUID_BALANCE
 		end,
 		powerType = SPELL_POWER_LUNAR_POWER
+	},
+	["MONK"] = {
+		isValid = function(spec)
+			return sepc == SPEC_MONK_BREWMASTER
+		end,
+		powerType = SPELL_POWER_STAGGER
 	}
 }
 
@@ -87,17 +94,37 @@ local runes = {
 }
 
 local runeColors = {
-	[250] = { .67, .13, .13 },
-	[251] = { 0, .67, .99 },
-	[252] = { 0.33, .67, .33 }
+	[1] = { .67, .13, .13 },
+	[2] = { 0, .67, .99 },
+	[3] = { 0.33, .67, .33 }
 }
 
 local function getBarMax()
-	return UnitPowerMax("player", powerTypeForBars[class].powerType)
+	return UnitPowerMax("player", barPowerType[class].powerType)
 end
 
 local function getIconCount()
 	return UnitPowerMax("player", powerType[class].powerType)
+end
+
+local function getPowerMax()
+	local p
+	if powerType[class] then
+		p = UnitPowerMax("player", powerType[class].powerType)
+	elseif barPowerType[class] then
+		p = UnitPowerMax("player", barPowerType[class].powerType)
+	end
+	return p
+end
+
+local function getPowerCurrent()
+	local p
+	if powerType[class] then
+		p = UnitPower("player", powerType[class].powerType)
+	elseif barPowerType[class] then
+		p = UnitPower("player", barPowerType[class].powerType)
+	end
+	return p
 end
 
 local function Update(bar, event, unit, powerType, func)
@@ -117,6 +144,107 @@ local function Update(bar, event, unit, powerType, func)
 		end
 	end
 	func(bar, cur, max)
+end
+
+-- bar.power = powerType[class] or barPowerType[class]
+-- bar.iconW = ...
+-- bar.iconH = ...
+-- bar.max = max
+--
+-- ...
+--
+-- local max = getPowerMax()
+-- local current = getPowerCurrent()
+--
+-- UpdateIcons(bar, current, max, max ~= bar.max)
+
+local function createIcon(parent, index)
+	local icon = CreateFrame("StatusBar", T.frameName(parent.power.powerType, index), parent)
+
+	icon:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
+	icon:SetSize(parent.iconW, parent.iconH)
+
+	icon.bg = icon:CreateTexture(nil, "BORDER")
+	icon.bg:SetTexture(media:Fetch("statusbar", "Default2"))
+	icon.bg:SetAllPoints()
+
+	return icon
+end
+
+local function UpdateIcons(parent, current, max, maxChanged)
+
+	local power = parent.power
+
+	if not parent.initiated then
+
+		-- Create icons according to max count value
+		local frame = parent:GetParent()
+		local anchor = frame
+		for i = 1, max do
+			local icon = createIcon(parent, i)
+			icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
+			parent.icons[i] = icon
+			anchor = icon
+		end
+
+		parent.initiated = true
+	end
+
+	if maxChanged then
+
+		-- Add or remove the extra icon
+		local oldMax = parent.max
+		if oldMax > max then
+			for i = 1, oldMax do
+				local icon = parent.icons[i]
+				if i > max then
+					icon:Hide()
+					parent.icons[i] = nil
+				end
+			end
+		elseif oldMax < max then
+			for i = 1, max do
+				local icon = parent.icons[i]
+				if i > oldMax then
+					local icon = createIcon(parent, i)
+					icon:SetPoint("LEFT", parent.icons[i-1], "RIGHT", 2, 0)
+					parent.icons[i] = icon
+				end
+			end
+		end
+
+		parent.max = max
+		parent:calculateSize()
+	end
+
+	for i = 1, max do
+		local icon, r, g, b = parent.icons[i]
+		if power.isRunes then
+			local start, duration, runeReady = GetRuneCooldown(i)
+			if not runeReady and start and start ~= 0 then
+				icon:SetMinMaxValues(0, duration)
+				icon:SetValue(GetTime() - start)
+			else
+				icon:SetValue(duration)
+			end
+
+			-- Update color values
+			r, g, b = runeColors[GetSpecialization()]
+		else
+			-- Update min/max values
+			icon:SetMinMaxValues(0, 1)
+
+			if current >= i then 
+				icon:SetValue(1)
+			else
+				icon:SetValue(0)
+			end
+
+			-- Update color values
+			r, g, b = oUF.color.power[power.powerType]
+		end
+		icon:SetStatusBarColor(r, g, b)
+	end
 end
 
 local function buildIcons(frame, bar, size, iconCount, current, isRunes)
@@ -226,14 +354,22 @@ local function ClassIcons(frame, db)
 
 	local size = db["Size"]
 	local spec, form = GetSpecialization(), GetShapeshiftFormID()
+	local barPower = barPowerType[class]
+	local pt = powerType[class]
 
 	local bar = frame.ClassIcons or (function()
 		local bar = CreateFrame("Frame")
 		bar.icons = {}
 		bar.bar = CreateFrame("StatusBar", "BarBar", frame)
+		bar.max = getPowerMax()
+		bar.isRunes = pt.isRunes
 
-		local barPower = powerTypeForBars[class]
-		local pt = powerType[class]
+		bar.calculateSize = function(self)
+			local iconW = ((size["Match width"] and frame:GetWidth() or size["Width"]) / self.max) - 2
+			local iconH = (size["Match height"] and frame:GetHeight() or size["Height"]) - 2
+			bar.iconW = iconW
+			bar.iconH = iconH
+		end
 
 		bar.OverrideVisibility = function(...)
 			local power = powerType[class]
@@ -257,23 +393,13 @@ local function ClassIcons(frame, db)
 					print(spec)
 					print("Should show")
 
-					buildIcons(frame, bar, size, UnitPowerMax("player", pt.powerType), UnitPower("player", pt.powerType), pt.isRunes)
+					local max = getPowerMax()
+					UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
 
 					bar.Override = function(self, event, unit)
 						Update(self, event, unit, power.powerType, function(f, c, m)
-							print(self, event, unit)
-							buildIcons(frame, f, size, m, UnitPower("player", pt.powerType), pt.isRunes)
-							for i = 1, m do
-								if(i <= c) then
-									if f.icons[i].oldShow then
-										f.icons[i]:oldShow()
-									else
-										f.icons[i]:Show()
-									end
-								else
-									f.icons[i]:Hide()
-								end
-							end
+							f.isRunes = pt.isRunes
+							UpdateIcons(f, c, m, f.max ~= m)
 						end)
 					end
 					if pt.isRunes then
@@ -295,6 +421,8 @@ local function ClassIcons(frame, db)
 						end)
 					end
 				else
+					frame:UnregisterEvent('UNIT_POWER_FREQUENT')
+					frame:UnregisterEvent('UNIT_MAXPOWER')
 					print(spec)
 					print("Should hide")
 					for i = 1, getIconCount() do
@@ -316,7 +444,8 @@ local function ClassIcons(frame, db)
 
 		local iconCount = getIconCount()
 		if iconCount then
-			buildIcons(frame, bar, size, iconCount, UnitPower("player", powerType[class].powerType))
+			local max = getPowerMax()
+			UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
 		end
 
 		local barW = size["Match width"] and frame:GetWidth() or size["Width"]
@@ -348,12 +477,14 @@ local function ClassIcons(frame, db)
 
 	Units:Position(bar.bar, db["Position"])
 
+	bar.isRunes = pt.isRunes
+
 	if bar.iconCount ~= getIconCount() then
-		local pt = powerType[class]
-		buildIcons(frame, bar, size, iconCount, UnitPower("player", pt.powerType), pt.isRunes)
+		local max = getPowerMax()
+		UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
 	end
 
-	local barPower = powerTypeForBars[class]
+	local barPower = barPowerType[class]
 	local power = powerType[class]
 
 	if (not barPower or not barPower.isValid(spec)) and (not power or not power.isValid(spec)) then

@@ -37,6 +37,14 @@ function T:tcount(tbl)
 	return i
 end
 
+function T:frameName(...)
+	local t = A:GetName()
+	for _,n in pairs({...})
+		t = t.."_"..n
+	end
+	return t
+end
+
 function T:HookSetPoint(frame, position, w, h)
 	
 	hooksecurefunc(frame, "SetPoint", function(self, lp, r, p, x, y)
