@@ -12,10 +12,6 @@ local function FinalizeMove()
 	for name, moveFrame in next, moveableFrames do
 		moveFrame:Hide()
 		moveFrame:Apply()
-
-		if moveFrame.affecting.OldShow then
-			moveFrame.affecting.Show = moveFrame.affecting.OldShow
-		end
 	end
 	finishFrame:Hide()
     A.Database:Save()
@@ -63,7 +59,6 @@ function A:InitMove()
 	for name, moveFrame in next, moveableFrames do
 		
 		moveFrame:Show()
-		moveFrame.affecting:SetParent(moveFrame.hiddenFrame)
 		moveFrame.affecting:ClearAllPoints()
 		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 
@@ -102,13 +97,6 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
 
-	local hiddenFrame = CreateFrame("Frame", nil, moveFrame)
-	hiddenFrame:SetSize(moveFrame:GetSize())
-	hiddenFrame:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
-	hiddenFrame:Hide()
-	
-	moveFrame.hiddenFrame = hiddenFrame
-
 	for i = 1, 5 do
 		if frame:GetPoint(i) then
 			moveFrame:SetPoint(frame:GetPoint(i))
@@ -138,16 +126,11 @@ function A:CreateMover(frame, db, overrideName)
 
 		--A:Debug(name, lp, relative and relative:GetName() or "Unknown", p, x, y)
 
-        if A["Profile"]["Options"][name] then
-            local position = {
-                ["Point"] = p,
-                ["Local Point"] = lp,
-                ["Offset X"] = x,
-                ["Offset Y"] = y,
-                ["Relative To"] = "Parent"
-            }
+		local adb = A["Profile"]["Options"][name]
+        if adb then
+            local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, adb["Position"]["Anchor"])
             local obj = {}
-            for k,v in next, A["Profile"]["Options"][name] do
+            for k,v in next, adb do
                 obj[k] = v
             end
             obj["Position"] = position

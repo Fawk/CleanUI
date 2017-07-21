@@ -60,6 +60,55 @@ function T:HookSetPoint(frame, position, w, h)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 end
 
+function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
+	local achor = anchor or "TOPLEFT"
+	local top, left, bottom, right, newX, newY = frame:GetTop(), frame:GetLeft(), frame:GetBottom(), frame:GetRight()
+	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
+
+	if anchor == "TOPLEFT" then
+		newX = left
+		newY = -(screenHeight - top)
+	elseif anchor == "TOPRIGHT" then
+		newX = -(screenWidth - right)
+		newY = -(screenHeight - top)
+	elseif anchor == "BOTTOMLEFT" then
+		newX = left
+		newY = -bottom
+	elseif anchor == "BOTTOMRIGHT" then
+		newX = -(screenWidth - right)
+		newY = -bottom
+	elseif anchor == "LEFT" then
+		newX = left
+		newY = 0
+	elseif anchor == "RIGHT" then
+		newX = -(screenWidth - right)
+		newY = 0
+	elseif anchor == "TOP" then
+		newX = 0
+		newY = -(screenHeight - top)
+	elseif anchor == "BOTTOM" then
+		newX = 0
+		newY = -bottom
+	elseif anchor == "CENTER" then
+		newX = 0
+		newY = 0
+	else
+		newX = left
+		newY = -(GetScreenHeight() - top)
+		anchor = "TOPLEFT"
+	end
+	
+	frame:SetPoint(anchor, relative, anchor, newX, newY)
+
+	return {
+		["Local Point"] = achor,
+		["Point"] = anchor,
+		["Relative To"] = "Parent",
+		["Offset X"] = newX,
+		["Offset Y"] = newY
+	}
+end
+
 function T:FadeIn(frame, seconds)
 	local seconds = seconds or 1
 	frame.timer = frame.timer or 0
