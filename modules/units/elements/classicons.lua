@@ -84,15 +84,6 @@ local barPowerType = {
 	}
 }
 
-local runes = {
-	[1] = 1,
-	[2] = 2,
-	[3] = 5,
-	[4] = 6,
-	[5] = 3,
-	[6] = 4
-}
-
 local runeColors = {
 	[1] = { .67, .13, .13 },
 	[2] = { 0, .67, .99 },
@@ -179,6 +170,58 @@ local function createIcon(parent, index)
 	return icon
 end
 
+local function pairsByKeys (t, f)
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+		table.sort(a, f)
+		local i = 0
+		local iter = function ()
+			i = i + 1
+			if a[i] == nil then return nil
+			else return a[i], t[a[i]]
+		end
+	end
+	return iter
+end
+
+local function tfirst(t)
+	for k,v in pairsByKeys(t) do
+		return k
+	end
+end
+
+local function OrderRunes(parent)
+	local readyRunes, notReadyRunes = {}, {}
+	local frame = parent:GetParent()
+	local anchor = frame
+	for i = 1, parent.max do
+		local icon = parent.icons[i]
+		local start,_,runeReady = GetRuneCooldown(i)
+		if runeReady then
+			table.insert(readyRunes, i)
+		else
+			notReadyRunes[start] = i
+		end
+	end
+
+	for i, realIndex in pairs(readyRunes) do
+		local icon = parent.icons[realIndex]
+		icon:SetPoint(i == 1 and "TOPLEFT" or "LEFT", i == 1 and frame or parent.icons[readyRunes[i-1]], i == 1 and "BOTTOMLEFT" or "RIGHT", i == 1 and 1 or 2, i == 1 and -1 or 0)
+	end
+
+	local first = tfirst(notReadyRunes)
+	local prev = first
+	for i, realIndex in pairsByKeys(notReadyRunes) do
+		local icon = parent.icons[realIndex]
+		if #readyRunes > 0 then
+			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and parent.icons[readyRunes[#readyRunes]] or parent.icons[prev], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 1 or 2, i == first and -1 or 0)
+		else
+			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and frame or parent.icons[prev], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 1 or 2, i == first and -1 or 0)
+		end
+		prev = i
+	end
+end
+
 local function UpdateIcons(parent, current, max, maxChanged)
 
 	local power = parent.power
@@ -200,12 +243,19 @@ local function UpdateIcons(parent, current, max, maxChanged)
 		local anchor = frame
 		for i = 1, max do
 			local icon = createIcon(parent, i)
-			icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
+			if not power.isRunes then
+				icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
+			end
 			parent.icons[i] = icon
 			anchor = icon
 		end
 
 		parent.initiated = true
+	end
+
+	-- Order runes in order of availability
+	if power.isRunes then
+		OrderRunes(parent)
 	end
 
 	if maxChanged then
