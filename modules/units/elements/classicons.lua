@@ -183,6 +183,16 @@ local function UpdateIcons(parent, current, max, maxChanged)
 
 	local power = parent.power
 
+	if not power.isValid(GetSpecialization()) then
+		for i = 1, parent.max do
+			local icon = parent.icons[i]
+			if icon then
+				icon:Hide()
+			end
+		end
+		return
+	end
+
 	if not parent.initiated then
 
 		-- Create icons according to max count value
@@ -293,6 +303,10 @@ local function ClassIcons(frame, db)
 			spec = GetSpecialization()
 			form = GetShapeshiftFormID()
 
+			barPower = barPowerType[class]
+			power = powerType[class]
+			bar.power = power
+
 			if barPower or power then
 
 				if barPower and barPower.isValid(spec) then
@@ -342,7 +356,7 @@ local function ClassIcons(frame, db)
 					frame:UnregisterEvent('UNIT_POWER_FREQUENT')
 					frame:UnregisterEvent('UNIT_MAXPOWER')
 
-					for i = 1, getIconCount() do
+					for i = 1, bar.max do
 						local icon = bar.icons[i]
 						if icon then
 							icon:Hide()
@@ -351,8 +365,8 @@ local function ClassIcons(frame, db)
 					bar.bar:Hide()
 				end
 			else
-				for i = 1, getIconCount() do
-					bar.icons[i]:oldHide()
+				for i = 1, bar.max do
+					bar.icons[i]:Hide()
 				end
 				bar.bar:Hide()
 			end
@@ -425,23 +439,29 @@ local function ClassIcons(frame, db)
 		})
 		bar.bar:SetBackdropColor(unpack(db["Background"]["Color"]))
 		for i = 1, bar.max do
-			bar.icons[i]:SetBackdrop({
-				bgFile = media:Fetch("statusbar", "Default"),
-				tile = true,
-				tileSize = 16,
-				insets = {
-					top = offset["Top"],
-					bottom = offset["Bottom"],
-					left = offset["Left"],
-					right = offset["Right"],
-				}
-			})
-			bar.icons[i]:SetBackdropColor(unpack(db["Background"]["Color"]))
+			local icon = bar.icons[i]
+			if icon then
+				icon:SetBackdrop({
+					bgFile = media:Fetch("statusbar", "Default"),
+					tile = true,
+					tileSize = 16,
+					insets = {
+						top = offset["Top"],
+						bottom = offset["Bottom"],
+						left = offset["Left"],
+						right = offset["Right"],
+					}
+				})
+				icon:SetBackdropColor(unpack(db["Background"]["Color"]))
+			end
 		end
 	else
 		bar.bar:SetBackdrop(nil)
 		for i = 1, bar.max do
-			bar.icons[i]:SetBackdrop(nil)
+			local icon = bar.icons[i]
+			if icon then
+				icon:SetBackdrop(nil)
+			end
 		end
 	end
 
