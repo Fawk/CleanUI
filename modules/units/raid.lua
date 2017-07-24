@@ -108,10 +108,11 @@ function Raid:Init()
         ]])
 
         raidContainer:SetAttribute("UpdateSize", ([[
-            local numGroupMembers = %d
-            local x, y, w, h, width, height, unitsPerColumn, maxColumns = %d, %d, 0, 0, %d, %d, %d, %d
+            local x, y, w, h, width, height, unitsPerColumn, maxColumns, orientation = ...
 
-            if %s == "VERTICAL" then
+            local numGroupMembers = self:GetAttribute("GroupMembers")
+
+            if orientation == "VERTICAL" then
                 w = width * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
                 h = height * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
             else
@@ -121,7 +122,7 @@ function Raid:Init()
 
             self:SetWidth(w)
             self:SetHeight(h)
-        ]]):format(GetNumGroupMembers(), db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns, db["Orientation"]))
+        ]])
 
         raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("UpdateSize"))
         raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("UpdateSize"))
@@ -148,7 +149,10 @@ function Raid:Init()
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
+            self:SetAttribute("GroupMembers", tostring(GetNumGroupMembers()))
+            self:Execute(([[ 
+                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d, %s) 
+            ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns, db["Orientation"]))
             self:UpdateUnits()
         end)
     

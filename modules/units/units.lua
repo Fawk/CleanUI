@@ -422,7 +422,7 @@ function Units:CreateStatusBorder(frame, name, db)
     local border = frame["StatusBorder"][name]
     if not border then
         border = CreateFrame("Frame", frame:GetName().."_"..name, frame)
-        border:SetBackdrop(A.enum.backdrops.editboxborder2)
+        border:SetBackdrop(A.enum.backdrops.statusborder)
         border:SetBackdropColor(0, 0, 0, 0)
         border:SetBackdropBorderColor(0, 0, 0, 0)
         border.timer = 0

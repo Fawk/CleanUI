@@ -72,6 +72,12 @@ local enum = {
             edgeSize = 3, 
             insets = { top = 1, bottom = 1, left = 1, right = 1 } 
         },
+        statusborder = {
+            bgFile = media:Fetch("background", "cui-default-bg"),
+            tile = true,
+            tileSize = 16,
+            insets  = { top = -1, bottom = -1, left = -1, right = -1 }
+        },
         slider = {},
         dropdown = {}
     },

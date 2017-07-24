@@ -164,16 +164,6 @@ function Party:Init()
         Units:Add(partyContainer, frameName)
     end
 
-
-    --local f = CreateFrame("Frame", A:GetName().."_Keybindings", A.frameParent)
-    --f:SetSize(250, 500)
-    --f:SetPoint("CENTER")
-    --f:SetBackdrop(E.backdrops.buttonroundborder)
-    --f:SetBackdropColor(unpack(A.colors.backdrop.default))
-    --f:SetBackdropBorderColor(unpack(A.colors.border.target))
-
-    --A.options["Keybindings"]:Init(f, "player", db["Key Bindings"])
-
     Units:Position(partyContainer, db["Position"])
     partyContainer:Execute([[ Holder:RunAttribute("UpdateSize") ]])
     A:CreateMover(partyContainer, db, "Party")
