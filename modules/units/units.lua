@@ -352,6 +352,30 @@ function Units:Position(frame, db)
         frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], db["Offset X"], db["Offset Y"])
     end
 end
+
+function Units:PlaceCastbar(frame, invalidPower, isStagger)
+    local playerDB = A["Profile"]["Options"]["Player"]
+    
+    local castbar = frame.Castbar
+    if castbar then
+
+        local cdb = playerDB["Castbar"]
+        local position = cdb["Position"]
+
+        if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
+            castbar:ClearAllPoints()
+            if invalidPower == true then
+                castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
+            elseif invalidPower == false then
+                castbar:SetPoint("TOPLEFT", frame.__castbarAnchor, "BOTTOMLEFT", 0, 0)
+            elseif invalidPower == nil and isStagger then
+                castbar:SetPoint("TOPLEFT", frame.Stagger, "BOTTOMLEFT", 0, 0)
+            else
+                castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
+            end
+        end
+    end
+end
  
 function Units:SetKeyBindings(frame, db)
     if db and frame.unit and frame:CanChangeAttribute() then

@@ -9,6 +9,9 @@ local GetShapeshiftFormID = GetShapeshiftFormID
 local UnitClass = UnitClass
 local UnitPowerMax = UnitPowerMax
 
+local INVALID_POWER = true
+local VALID_POWER = false
+
 local _,class = UnitClass("player")
 
 local powerType = {
@@ -311,15 +314,7 @@ local function ClassIcons(frame, db)
 	local power = powerType[class]
 
 	if not power or (power and not power.isValid(spec, form)) then 
-		local castbar = frame.Castbar
-		if castbar then
-			local cdb = A["Profile"]["Options"]["Player"]["Castbar"]
-			local position = cdb["Position"]
-			if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
-				castbar:ClearAllPoints()
-				castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
-			end
-		end
+		Units:PlaceCastbar(frame, INVALID_POWER)
 		return 
 	end
 
@@ -468,14 +463,9 @@ local function ClassIcons(frame, db)
 		end
 	end
 
-	local castbar = frame.Castbar
-	if castbar and power then
-		local cdb = A["Profile"]["Options"]["Player"]["Castbar"]
-		local position = cdb["Position"]
-		if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
-			castbar:ClearAllPoints()
-			castbar:SetPoint("TOPLEFT", bar.icons[1], "BOTTOMLEFT", 0, 0)
-		end
+	if power then
+		frame.__castbarAnchor = bar.icons[1]
+		Units:PlaceCastbar(frame, VALID_POWER)
 	end
 
 	frame.ClassIcons = bar
