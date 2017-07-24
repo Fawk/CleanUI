@@ -502,7 +502,7 @@ local defaults =  {
                         ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "Parent",
+                            ["Relative To"] = "ClassIcons",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
@@ -514,7 +514,6 @@ local defaults =  {
                             ["Width"] = 150,
                             ["Height"] = 15
                         },
-                        ["Show Icon"] = true,
                         ["Time"] = {
                             ["Enabled"] = true,
                             ["Position"] = {
@@ -539,13 +538,7 @@ local defaults =  {
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
-                            ["Position"] = {
-                                ["Relative To"] = "Parent",
-                                ["Point"] = "LEFT",
-                                ["Local Point"] = "LEFT",
-                                ["Offset X"] = 0,
-                                ["Offset Y"] = 0, 
-                            },
+                            ["Position"] = "LEFT",
                             ["Size"] = {
                                 ["Match width"] = false,
                                 ["Match height"] = true,
@@ -702,7 +695,6 @@ local defaults =  {
                             ["Width"] = 150,
                             ["Height"] = 15
                         },
-                        ["Show Icon"] = true,
                         ["Time"] = {
                             ["Enabled"] = true,
                             ["Position"] = {
@@ -727,13 +719,7 @@ local defaults =  {
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
-                            ["Position"] = {
-                                ["Relative To"] = "Parent",
-                                ["Point"] = "LEFT",
-                                ["Local Point"] = "LEFT",
-                                ["Offset X"] = 0,
-                                ["Offset Y"] = 0, 
-                            },
+                            ["Position"] = "LEFT",
                             ["Size"] = {
                                 ["Match width"] = false,
                                 ["Match height"] = true,

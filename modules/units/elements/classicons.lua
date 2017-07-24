@@ -33,7 +33,7 @@ local powerType = {
 	},
 	["DRUID"] = {
 		isValid = function(spec, form)
-			return spec == SPEC_DRUID_FERAL and form == 1
+			return spec == 2 and form == 1
 		end,
 		powerType = SPELL_POWER_COMBO_POINTS
 	},
@@ -57,53 +57,16 @@ local powerType = {
 	}
 }
 
-local barPowerType = {
-	["SHAMAN"] = {
-		isValid = function(spec) 
-			return spec == SPEC_SHAMAN_ELEMENTAL or spec == SPEC_SHAMAN_ENHANCEMENT
-		end,
-		powerType = SPELL_POWER_MAELSTROM,
-	},
-	["PRIEST"] = {
-		isValid = function(spec)
-			return spec == SPEC_PRIEST_SHADOW
-		end,
-		powerType = SPELL_POWER_INSANITY
-	},
-	["DRUID"] = {
-		isValid = function(spec)
-			return spec == SPEC_DRUID_BALANCE
-		end,
-		powerType = SPELL_POWER_LUNAR_POWER
-	},
-	["MONK"] = {
-		isValid = function(spec)
-			return sepc == SPEC_MONK_BREWMASTER
-		end,
-		powerType = SPELL_POWER_STAGGER
-	}
-}
-
 local runeColors = {
 	[1] = { .67, .13, .13 },
 	[2] = { 0, .67, .99 },
 	[3] = { 0.33, .67, .33 }
 }
 
-local function getBarMax()
-	return UnitPowerMax("player", barPowerType[class].powerType)
-end
-
-local function getIconCount()
-	return UnitPowerMax("player", powerType[class].powerType)
-end
-
 local function getPowerMax()
 	local p
 	if powerType[class] then
 		p = UnitPowerMax("player", powerType[class].powerType)
-	elseif barPowerType[class] then
-		p = UnitPowerMax("player", barPowerType[class].powerType)
 	end
 	return p
 end
@@ -112,8 +75,6 @@ local function getPowerCurrent()
 	local p
 	if powerType[class] then
 		p = UnitPower("player", powerType[class].powerType)
-	elseif barPowerType[class] then
-		p = UnitPower("player", barPowerType[class].powerType)
 	end
 	return p
 end
@@ -193,6 +154,7 @@ end
 local function OrderRunes(parent)
 	local readyRunes, notReadyRunes = {}, {}
 	local frame = parent:GetParent()
+
 	local anchor = frame
 	for i = 1, parent.max do
 		local icon = parent.icons[i]
@@ -200,13 +162,18 @@ local function OrderRunes(parent)
 		if runeReady then
 			table.insert(readyRunes, i)
 		else
-			notReadyRunes[start] = i
+			if notReadyRunes[start] then
+				notReadyRunes[start+1] = i
+			else
+				notReadyRunes[start] = i
+			end
 		end
+		icon:ClearAllPoints()
 	end
 
 	for i, realIndex in pairs(readyRunes) do
 		local icon = parent.icons[realIndex]
-		icon:SetPoint(i == 1 and "TOPLEFT" or "LEFT", i == 1 and frame or parent.icons[readyRunes[i-1]], i == 1 and "BOTTOMLEFT" or "RIGHT", i == 1 and 1 or 2, i == 1 and -1 or 0)
+		icon:SetPoint(i == 1 and "TOPLEFT" or "LEFT", i == 1 and frame or parent.icons[readyRunes[i-1]], i == 1 and "BOTTOMLEFT" or "RIGHT", i == 1 and 0 or 1, i == 1 and -1 or 0)
 	end
 
 	local first = tfirst(notReadyRunes)
@@ -214,9 +181,9 @@ local function OrderRunes(parent)
 	for i, realIndex in pairsByKeys(notReadyRunes) do
 		local icon = parent.icons[realIndex]
 		if #readyRunes > 0 then
-			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and parent.icons[readyRunes[#readyRunes]] or parent.icons[prev], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 1 or 2, i == first and -1 or 0)
+			icon:SetPoint("LEFT", i == first and parent.icons[readyRunes[#readyRunes]] or parent.icons[notReadyRunes[prev]], "RIGHT", 1, 0)
 		else
-			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and frame or parent.icons[prev], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 1 or 2, i == first and -1 or 0)
+			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and frame or parent.icons[notReadyRunes[prev]], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 0 or 1, i == first and -1 or 0)
 		end
 		prev = i
 	end
@@ -226,7 +193,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 
 	local power = parent.power
 
-	if not power.isValid(GetSpecialization()) then
+	if not power.isValid(GetSpecialization(), GetShapeshiftFormID()) then
 		for i = 1, parent.max do
 			local icon = parent.icons[i]
 			if icon then
@@ -244,7 +211,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 		for i = 1, max do
 			local icon = createIcon(parent, i)
 			if not power.isRunes then
-				icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", anchor == frame and 1 or 2, anchor == frame and -1 or 0)
+				icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", i == 1 and 0 or 1, anchor == frame and -1 or 0)
 			end
 			parent.icons[i] = icon
 			anchor = icon
@@ -275,7 +242,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 				local icon = parent.icons[i]
 				if i > oldMax then
 					local icon = createIcon(parent, i)
-					icon:SetPoint("LEFT", parent.icons[i-1], "RIGHT", 2, 0)
+					icon:SetPoint("LEFT", parent.icons[i-1], "RIGHT", 1, 0)
 					parent.icons[i] = icon
 				end
 			end
@@ -289,8 +256,11 @@ local function UpdateIcons(parent, current, max, maxChanged)
 		local icon, r, g, b = parent.icons[i]
 		if power.isRunes then
 			local start, duration, runeReady = GetRuneCooldown(i)
+			local minValue, maxValue = icon:GetMinMaxValues()
 			if not runeReady and start and start ~= 0 then
-				icon:SetMinMaxValues(0, duration)
+				if min ~= 0 or maxValue ~= duration then
+					icon:SetMinMaxValues(0, duration)
+				end
 				icon:SetValue(GetTime() - start)
 			else
 				icon:SetValue(duration)
@@ -299,13 +269,30 @@ local function UpdateIcons(parent, current, max, maxChanged)
 			-- Update color values
 			r, g, b = unpack(runeColors[GetSpecialization()])
 		else
-			-- Update min/max values
-			icon:SetMinMaxValues(0, 1)
+			local mod = UnitPowerDisplayMod(power.powerType)
 
-			if current >= i then
-				icon:SetValue(1)
+			-- Update min/max values
+			if mod > 1 then
+				current = UnitPower("player", power.powerType, true)
+				icon:SetMinMaxValues(0, mod)
+
+				if current >= ((i - 1) * mod) then
+					if current < ((i - 1) * mod) + mod then
+						icon:SetValue(current - (mod * (i - 1)))
+					else
+						icon:SetValue(mod)
+					end
+				else
+					icon:SetValue(0)
+				end
 			else
-				icon:SetValue(0)
+				icon:SetMinMaxValues(0, 1)
+
+				if current >= i then
+					icon:SetValue(1)
+				else
+					icon:SetValue(0)
+				end
 			end
 
 			-- Update color values
@@ -321,27 +308,38 @@ local function ClassIcons(frame, db)
 
 	local size = db["Size"]
 	local spec, form = GetSpecialization(), GetShapeshiftFormID()
-	local barPower = barPowerType[class]
 	local power = powerType[class]
+
+	if not power or (power and not power.isValid(spec, form)) then 
+		local castbar = frame.Castbar
+		if castbar then
+			local cdb = A["Profile"]["Options"]["Player"]["Castbar"]
+			local position = cdb["Position"]
+			if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
+				castbar:ClearAllPoints()
+				castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
+			end
+		end
+		return 
+	end
 
 	local bar = frame.ClassIcons or (function()
 		local bar = CreateFrame("Frame", nil, frame)
 		bar.icons = {}
-		bar.bar = CreateFrame("StatusBar", "BarBar", bar)
 		bar.max = getPowerMax()
-		bar.isRunes = power.isRunes
+		bar.isRunes = power and power.isRunes or nil
 		bar.power = power
 		bar.db = db
 
 		bar.calculateSize = function(self)
 
-			self.iconW = ((size["Match width"] and frame:GetWidth() or size["Width"]) / self.max) - 2
+			self.iconW = ((size["Match width"] and frame:GetWidth() or size["Width"]) / self.max) - 1
 			self.iconH = (size["Match height"] and frame:GetHeight() or size["Height"]) - 2
 			
 			for i = 1, self.max do
 				local icon = self.icons[i]
 				if icon then
-					icon:SetSize(self.iconW, self.iconH)
+					icon:SetSize(self.iconW + (self.max == i and 1 or 0), self.iconH)
 				end
 			end
 		end
@@ -353,141 +351,97 @@ local function ClassIcons(frame, db)
 			spec = GetSpecialization()
 			form = GetShapeshiftFormID()
 
-			barPower = barPowerType[class]
 			power = powerType[class]
 			bar.power = power
 
-			if barPower or power then
+			bar:calculateSize()
 
-				if barPower and barPower.isValid(spec) then
+			if power and power.isValid(spec, form) then
 
-					bar.bar:Show()
+				bar.power = power
 
-					bar.Override = function(self, event, unit)
-						Update(self, event, unit, barPower.powerType, function(f, c, m)
-							f.bar:SetMinMaxValues(0, m)
-							f.bar:SetValue(c)
-						end)
-					end
+				local max = getPowerMax()
+				UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
 
-				elseif power and power.isValid(spec, form) then
-
-					bar.bar:Hide()
-					bar.power = power
-
-					local max = getPowerMax()
-					UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
-
-					bar.Override = function(self, event, unit)
-						Update(self, event, unit, power.powerType, function(f, c, m)
-							f.isRunes = power.isRunes
-							UpdateIcons(f, c, m, f.max ~= m)
-						end)
-					end
-					if power.isRunes then
-						bar.timer = 0
-						bar:SetScript("OnUpdate", function(self, elapsed)
-							self.timer = self.timer + elapsed
-							if self.timer > 0.03 then
-								self:Override(event, unit)
-								self.timer = 0
-							end
-						end)
-					else
-						bar:SetScript("OnUpdate", nil)
-						frame:RegisterEvent('UNIT_POWER_FREQUENT', function(self, event, unit)
-							bar:Override(self, event, unit)
-						end)
-						frame:RegisterEvent('UNIT_MAXPOWER', function(self, event, unit)
-							bar:Override(self, event, unit)
-						end)
-					end
-				else
-					frame:UnregisterEvent('UNIT_POWER_FREQUENT')
-					frame:UnregisterEvent('UNIT_MAXPOWER')
-
-					for i = 1, bar.max do
-						local icon = bar.icons[i]
-						if icon then
-							icon:Hide()
+				bar.Override = function(self, event, unit)
+					Update(self, event, unit, power.powerType, function(f, c, m)
+						f.isRunes = power.isRunes
+						UpdateIcons(f, c, m, f.max ~= m)
+					end)
+				end
+				if power.isRunes then
+					bar.timer = 0
+					bar:SetScript("OnUpdate", function(self, elapsed)
+						self.timer = self.timer + elapsed
+						if self.timer > 0.03 then
+							self:Override(event, unit)
+							self.timer = 0
 						end
-					end
-					bar.bar:Hide()
+					end)
+				else
+					bar:SetScript("OnUpdate", nil)
+					bar:RegisterEvent('UNIT_POWER_FREQUENT')
+					bar:RegisterEvent('UNIT_MAXPOWER')
 				end
 			else
+				bar:UnregisterEvent('UNIT_POWER_FREQUENT')
+				bar:UnregisterEvent('UNIT_MAXPOWER')
+
 				for i = 1, bar.max do
-					bar.icons[i]:Hide()
+					local icon = bar.icons[i]
+					if icon then
+						icon:Hide()
+					end
 				end
-				bar.bar:Hide()
 			end
 		end
 
-		local iconCount = getIconCount()
-		if iconCount then
+		local current = getPowerCurrent()
+		if current then
 			local max = getPowerMax()
-			bar.power = power
-			UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
+			if power then
+				bar.power = power
+				UpdateIcons(bar, current, max, max ~= bar.max)
+			end
 		end
 
 		local barW = size["Match width"] and frame:GetWidth() or size["Width"]
 		local barH = size["Match height"] and frame:GetWidth() or size["Height"]
-		
-		bar.bar:SetSize(barW, barH)
 
 		return bar
 	end)()
 
-	frame:RegisterEvent('SPELLS_CHANGED', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
-	frame:RegisterEvent('UNIT_DISPLAYPOWER', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
-	frame:RegisterEvent('PLAYER_TALENT_UPDATE', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
-	frame:RegisterEvent('UPDATE_SHAPESHIFT_FORM', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
-	frame:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
-	frame:RegisterEvent('PLAYER_ENTERING_WORLD', function(self, event, unit)
-		bar:OverrideVisibility(self, event, unit)
-	end, true)
+	bar:calculateSize()
 
-	Units:Position(bar.bar, db["Position"])
+	bar:RegisterEvent('SPELLS_CHANGED')
+	bar:RegisterEvent('UNIT_DISPLAYPOWER')
+	bar:RegisterEvent('PLAYER_TALENT_UPDATE')
+	bar:RegisterEvent('UPDATE_SHAPESHIFT_FORM')
+	bar:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')
+	bar:RegisterEvent('PLAYER_ENTERING_WORLD')
 
-	bar.isRunes = power.isRunes
+	bar:SetScript("OnEvent", function(self, event, unit)
+		if event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" then
+			self:Override(self, event, unit)
+		else
+			self:OverrideVisibility(self, event, unit)
+		end
+	end)
 
-	if bar.iconCount ~= getIconCount() then
-		local max = getPowerMax()
-		UpdateIcons(bar, getPowerCurrent(), max, max ~= bar.max)
+	if power then
+		bar.isRunes = power.isRunes
 	end
 
-	if (not barPower or not barPower.isValid(spec)) and (not power or not power.isValid(spec)) then
+	if not power or not power.isValid(spec) then
 		for i = 1, 10 do
 			if bar.icons[i] then
 				bar.icons[i]:Hide()
 			end
 		end
-		bar.bar:Hide()
 	end
 
 	if db["Background"] and db["Background"]["Enabled"] then
 		local offset = db["Background"]["Offset"]
-		bar.bar:SetBackdrop({
-			bgFile = media:Fetch("statusbar", "Default"),
-			tile = true,
-			tileSize = 16,
-			insets = {
-				top = offset["Top"],
-				bottom = offset["Bottom"],
-				left = offset["Left"],
-				right = offset["Right"],
-			}
-		})
-		bar.bar:SetBackdropColor(unpack(db["Background"]["Color"]))
 		for i = 1, bar.max do
 			local icon = bar.icons[i]
 			if icon then
@@ -506,12 +460,21 @@ local function ClassIcons(frame, db)
 			end
 		end
 	else
-		bar.bar:SetBackdrop(nil)
 		for i = 1, bar.max do
 			local icon = bar.icons[i]
 			if icon then
 				icon:SetBackdrop(nil)
 			end
+		end
+	end
+
+	local castbar = frame.Castbar
+	if castbar and power then
+		local cdb = A["Profile"]["Options"]["Player"]["Castbar"]
+		local position = cdb["Position"]
+		if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
+			castbar:ClearAllPoints()
+			castbar:SetPoint("TOPLEFT", bar.icons[1], "BOTTOMLEFT", 0, 0)
 		end
 	end
 

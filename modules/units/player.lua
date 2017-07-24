@@ -75,6 +75,8 @@ function Player:Update(frame, db)
 		background:Hide()
 	end
 
+	frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(self, ...) Units:UpdateElements(self, db) end)
+
     --[[ Tags ]]--
     if not frame["Tags"] then
         frame["Tags"] = {}

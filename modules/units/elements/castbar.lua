@@ -5,6 +5,11 @@ local buildText = A.TextBuilder
 
 local CreateFrame = CreateFrame
 
+local opposite = {
+	["LEFT"] = "RIGHT",
+	["RIGHT"] = "LEFT"
+}
+
 local function CheckEnabled(e, db)
 	if not db["Enabled"] then
 		e:Hide()
@@ -48,12 +53,21 @@ local function Castbar(frame, db)
 		return bar
 	end)()
 
+	if db["Position"]["Relative To"] == "ClassIcons" and frame.unit == "player" then
+		local ci = A["Profile"]["Options"]["Player"]["ClassIcons"]
+		if not ci or not ci["Enabled"] then
+			db["Position"]["Relative To"] = "Parent"
+		end
+	end
+
 	local iconDb = db["Icon"]
 
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
 	Units:Position(bar.Time, db["Time"]["Position"])
-	Units:Position(bar.Icon, iconDb["Position"])
+
+	bar.Icon:ClearAllPoints()
+	bar.Icon:SetPoint(iconDb["Position"], bar, iconDb["Position"], 0, 0)
 
 	bar:SetSize(width, height)
 	bar:SetStatusBarTexture(texture)

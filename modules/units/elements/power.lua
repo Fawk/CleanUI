@@ -11,6 +11,7 @@ local function Power(frame, db)
 	local power = frame.Power or (function()
 
 		local power = CreateFrame("StatusBar", frame:GetName().."_Power", frame)
+
 		power:SetFrameStrata("LOW")
 		power.frequentUpdates = true
 		power.bg = power:CreateTexture(nil, "BACKGROUND")
@@ -21,7 +22,11 @@ local function Power(frame, db)
 			if colorType == "Class" then
 				power.colorClass = true
 			elseif colorType == "Power" then
-				t = A.colors.power[select(2, UnitPowerType(unit))]
+				local powerType = select(2, UnitPowerType(unit))
+				t = A.colors.power[powerType]
+				if not t then
+					t = oUF.colors.power[powerType]
+				end
 			elseif colorType == "Custom" then
 				t = db["Custom Color"]
 			end
