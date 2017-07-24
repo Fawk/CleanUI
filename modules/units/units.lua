@@ -358,19 +358,23 @@ function Units:PlaceCastbar(frame, invalidPower, isStagger)
     
     local castbar = frame.Castbar
     if castbar then
-
         local cdb = playerDB["Castbar"]
         local position = cdb["Position"]
 
         if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
-            castbar:ClearAllPoints()
-            if invalidPower == true then
+            if invalidPower == true and not isStagger then
+                castbar:ClearAllPoints()
                 castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
             elseif invalidPower == false then
+                castbar:ClearAllPoints()
                 castbar:SetPoint("TOPLEFT", frame.__castbarAnchor, "BOTTOMLEFT", 0, 0)
+                castbar.placedByClassIcons = true
             elseif invalidPower == nil and isStagger then
-                castbar:SetPoint("TOPLEFT", frame.Stagger, "BOTTOMLEFT", 0, 0)
+                castbar:ClearAllPoints()
+                castbar:SetPoint("TOPLEFT", frame.Stagger, "BOTTOMLEFT", 0, -1)
+                castbar.placedByStagger = true
             else
+                castbar:ClearAllPoints()
                 castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, 0)
             end
         end

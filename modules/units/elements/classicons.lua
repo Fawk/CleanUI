@@ -314,7 +314,11 @@ local function ClassIcons(frame, db)
 	local power = powerType[class]
 
 	if not power or (power and not power.isValid(spec, form)) then 
-		Units:PlaceCastbar(frame, INVALID_POWER)
+		if frame.Stagger and spec == 1 then
+			Units:PlaceCastbar(frame, nil, true)
+		else
+			Units:PlaceCastbar(frame, INVALID_POWER)
+		end
 		return 
 	end
 

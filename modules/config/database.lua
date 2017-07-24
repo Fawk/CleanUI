@@ -557,6 +557,34 @@ local defaults =  {
                         },
                         ["Attached"] = true,
                     },
+                    ["Stagger"] = {
+                        ["Enabled"] = true,
+                        ["Texture"] = "Default2",
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Attached"] = true
+                    },
     				["Enabled"] = true
     			},
     			["Target"] = {

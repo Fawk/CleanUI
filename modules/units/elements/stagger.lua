@@ -9,7 +9,7 @@ local function Stagger(frame, db)
 
 	local stagger = (function()
 		local stagger = CreateFrame("StatusBar", T:frameName("Stagger"), frame)
-		stagger.bg = CreateTexture(nil, "BORDER")
+		stagger.bg = stagger:CreateTexture(nil, "BORDER")
 		stagger.bg:SetAllPoints()
 		stagger.bg.multiplier = db["Background Multiplier"] or 0.3
 		return stagger
