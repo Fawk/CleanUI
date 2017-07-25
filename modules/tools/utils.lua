@@ -292,7 +292,7 @@ local function TextBuilder(parent, sizeInPerc)
 	end
 
 	function o:build()
-		local text = self.parent:CreateFontString(nil, "OVERLAY")
+		local text = self.parent:CreateFontString(nil, self.layer or "ARTWORK")
 
 		local textOutline = "NONE"
 		if self.textOutline then

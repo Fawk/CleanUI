@@ -3,6 +3,7 @@
     <Script file="reskins.lua"/>
 	<Script file="chat.lua"/>
 	<Script file="infofield.lua"/>
+	<Script file="actionbars.lua"/>
 	<!--<Script file="cooldown.lua"/>-->
 
 </Ui>
