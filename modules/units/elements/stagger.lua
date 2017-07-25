@@ -2,8 +2,17 @@ local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
+local GetSpecialization = GetSpecialization
 
 local function Stagger(frame, db)
+	local _,class = UnitClass("player")
+	if class ~= "MONK" then
+		if frame.Stagger then
+			Units:PlaceCastbar(frame, true)
+			frame.Stagger:Hide()
+		end
+		return
+	end
 
 	local size, texture = db["Size"], media:Fetch("statusbar", db["Texture"])
 

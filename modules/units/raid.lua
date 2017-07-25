@@ -99,7 +99,7 @@ function Raid:Init()
     local raidContainer = Units:Get(frameName)
     if not raidContainer then
         
-        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate")
+        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerStateTemplate")
 
         RegisterStateDriver(raidContainer, "visibility", "[@raid1,exists] show; hide")
 
@@ -107,10 +107,15 @@ function Raid:Init()
             Holder = self
         ]])
 
-        raidContainer:SetAttribute("UpdateSize", ([[
-            local x, y, w, h, width, height, unitsPerColumn, maxColumns, orientation = ...
+        raidContainer:SetAttribute("Orientation", db["Orientation"])
+        raidContainer:SetAttribute("GroupMembers", tostring(GetNumGroupMembers()))
+        raidContainer:SetAttribute("UpdateSize", [[
+            local x, y, width, height, unitsPerColumn, maxColumns = ...
 
-            local numGroupMembers = self:GetAttribute("GroupMembers")
+            local numGroupMembers = tonumber(self:GetAttribute("GroupMembers"))
+            local orientation = self:GetAttribute("Orientation")
+
+            local w, h
 
             if orientation == "VERTICAL" then
                 w = width * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
@@ -123,9 +128,6 @@ function Raid:Init()
             self:SetWidth(w)
             self:SetHeight(h)
         ]])
-
-        raidContainer:SetAttribute("_onshow", raidContainer:GetAttribute("UpdateSize"))
-        raidContainer:SetAttribute("_onhide", raidContainer:GetAttribute("UpdateSize"))
 
         function raidContainer:getMoverSize()
             if db["Orientation"] == "VERTICAL" then
@@ -149,10 +151,10 @@ function Raid:Init()
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:SetAttribute("GroupMembers", tostring(GetNumGroupMembers()))
+            self:SetAttribute("GroupMembers", GetNumGroupMembers())
             self:Execute(([[ 
-                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d, %s) 
-            ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns, db["Orientation"]))
+                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
+            ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
             self:UpdateUnits()
         end)
     
@@ -177,11 +179,13 @@ function Raid:Init()
     end
 
     Units:Position(raidContainer, db["Position"])
-    raidContainer:Execute([[ Holder:RunAttribute("UpdateSize") ]])
+    raidContainer:Execute(([[ 
+                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
+    ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
     A:CreateMover(raidContainer, db, "Raid")
 
     raidHeader:SetParent(raidContainer)
-    raidHeader:SetAllPoints()
+    raidHeader:SetPoint("TOPLEFT")
 end
  
 function Raid:Update(frame, db)
