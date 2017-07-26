@@ -20,7 +20,7 @@
 	<Inlucde file="libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
 	<Include file="libs\oUF\oUF.xml" />
 	<Include file="libs\oUF_Smooth\load.xml"/>
-	<Include file="libs\LibActionButton-1.0\LibActionButton-1.0.xml"/>
+	<Include file="libs\LibActionButton-1.0\LibActionButton-1.0.lua"/>
 	<Script file="libs\LibButtonGlow-1.0\LibButtonGlow-1.0.lua"/>
 	<Script file="mainflow.lua"/>
 

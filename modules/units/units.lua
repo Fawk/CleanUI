@@ -389,8 +389,12 @@ function Units:SetKeyBindings(frame, db)
     end
 end
 
-function Units:Tag(frame, name, db)  
+function Units:Tag(frame, name, db, framelevel)  
     local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
+
+    if framelevel then
+        tag:SetDrawLayer("OVERLAY", framelevel)
+    end
     
     tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "SHADOW" and "NONE" or db["Outline"])
     tag:ClearAllPoints()
@@ -422,7 +426,7 @@ function Units:CreateStatusBorder(frame, name, db)
     local border = frame["StatusBorder"][name]
     if not border then
         border = CreateFrame("Frame", frame:GetName().."_"..name, frame)
-        border:SetBackdrop(A.enum.backdrops.statusborder)
+        border:SetBackdrop(A.enum.backdrops.editboxborder2)
         border:SetBackdropColor(0, 0, 0, 0)
         border:SetBackdropBorderColor(0, 0, 0, 0)
         border.timer = 0

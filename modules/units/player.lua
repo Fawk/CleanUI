@@ -83,7 +83,7 @@ function Player:Update(frame, db)
     end
 
     --[[ Name ]]--
-    Units:Tag(frame, "Name", db["Tags"]["Name"])
+    Units:Tag(frame, "Name", db["Tags"]["Name"], 5)
 
     --[[ Custom ]]--
     for name, custom in next, db["Tags"]["Custom"] do

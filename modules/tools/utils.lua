@@ -291,8 +291,19 @@ local function TextBuilder(parent, sizeInPerc)
 		return self
 	end
 
+	function o:overlay()
+		self.layer = "OVERLAY"
+		return self
+	end
+
+	function o:frameLevel(level)
+		self.flevel = level
+		return self
+	end
+
 	function o:build()
 		local text = self.parent:CreateFontString(nil, self.layer or "ARTWORK")
+		text:SetDrawLayer(self.layer or "ARTWORK", self.flevel or 1)
 
 		local textOutline = "NONE"
 		if self.textOutline then

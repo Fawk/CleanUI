@@ -1,5 +1,3 @@
-BINDING_HEADER_CLEANUI = GetAddOnMetadata(..., "Title")
-
 local AddonName, Args = ...
 local media = LibStub("LibSharedMedia-3.0")
 

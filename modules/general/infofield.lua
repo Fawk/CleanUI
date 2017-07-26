@@ -145,6 +145,7 @@ local function createIcon(parent, id, spellId, timer, size, priority, condition,
 	local name,_,texture = GetSpellInfo(spellId)
 
 	local icon = CreateFrame("Frame", A:GetName().."_InfoField_"..name, parent)
+	icon:SetFrameStrata("LOW")
 	icon:SetAlpha(0)
 	icon.id = id
 	icon:SetSize(size - 1, size - 1)
@@ -160,7 +161,7 @@ local function createIcon(parent, id, spellId, timer, size, priority, condition,
         }
     })
     icon:SetBackdropColor(0, 0, 0)
-	icon.texture = icon:CreateTexture(nil, "OVERLAY")
+	icon.texture = icon:CreateTexture(nil, "ARTWORK")
 	icon.texture:SetTexture(texture)
 	icon.texture:SetTexCoord(0.133,0.867,0.133,0.867)
 	icon.texture:SetPoint("CENTER")

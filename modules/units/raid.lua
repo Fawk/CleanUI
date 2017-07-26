@@ -93,6 +93,7 @@ function Raid:Init()
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
+          self:SetFrameStrata("LOW")
         ]]):format(size["Width"], size["Height"])
     )
 
