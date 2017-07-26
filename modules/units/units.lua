@@ -391,7 +391,7 @@ end
 
 function Units:SetupKeybindings(frame, db)
     if InCombatLockdown() then return end
-
+    print(db)
     if db then
         A.modules["Actionbars"]:SetupBindings(db)
     end

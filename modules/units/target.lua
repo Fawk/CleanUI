@@ -48,7 +48,7 @@ function Target:Update(frame, db)
     frame:SetAttribute("*type1", "target")
     frame:SetAttribute("*type2", "togglemenu")
 
-    Units:SetKeyBindings(frame, db["Key Bindings"])
+    Units:SetupClickcast(frame, db["Clickcast"])
 	
 	--[[ Background ]]--
 	local background = frame.Background or CreateFrame("Frame", nil, frame)

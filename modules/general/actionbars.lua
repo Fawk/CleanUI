@@ -7,9 +7,9 @@ local LAB = LibStub("LibActionButton-1.0")
 local AB = {}
 
 local keys = {
-	["SHIFT"] = "S",
-	["CTRL"] = "C",
-	["ALT"] = "A"
+	["SHIFT"] = "s",
+	["CTRL"] = "c",
+	["ALT"] = "a"
 }
 
 function AB:Init()
@@ -18,7 +18,7 @@ function AB:Init()
 
 	local bars = {}
 
-	--[[for x = 1, 4 do
+	for x = 1, 4 do
 		local bar = CreateFrame("Frame", "Baaaaar", A.frameParent, "SecureHandlerStateTemplate")
 		bar.buttons = {}
 		for i = 1, 12 do
@@ -45,16 +45,19 @@ function AB:Init()
 		bar:SetPoint("TOP", bars[x - 1] or A.frameParent, x == 1 and "TOP" or "BOTTOM", 0, 0)
 		local w, h = bar.buttons[1]:GetSize()
 		bar:SetSize(w * #bar.buttons, h)
-	end]]
+	end
+
+	self:SetupBindings(A["Profile"]["Options"]["Key Bindings"])
 
 end
 
 function AB:SetupBindings(bindings)
-	for button, key in next, bindings do
+	for key, button in next, bindings do
 		local action = GetBindingByKey(key)
 		if action then
 			A:Debug("Overriding binding for key: "..key)
 		end
+		print(A:GetName().."_"..button)
 		SetBindingClick(key, A:GetName().."_"..button, "LEFTBUTTON")
 	end
 end

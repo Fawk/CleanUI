@@ -21,9 +21,6 @@ local defaults =  {
     ["Profiles"] = {
         ["Aiwen"] = {
             ["Options"] = {
-                ["Key Bindings"] = {
-
-                },
                 ["Party"] = {
                     ["Clickcast"] = {
                         { type = "*type1", action = "macro" },

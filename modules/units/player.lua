@@ -49,7 +49,6 @@ function Player:Update(frame, db)
     frame:SetAttribute("*type2", "togglemenu")
 
     Units:SetupClickcast(frame, db["Clickcast"])
-    Units:SetupKeybindings(frame, db["Key Bindings"])
 	
 	--[[ Background ]]--
 	local background = frame.Background or CreateFrame("Frame", nil, frame)
