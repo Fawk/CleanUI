@@ -49,4 +49,14 @@ function AB:Init()
 
 end
 
+function AB:SetupBindings(bindings)
+	for button, key in next, bindings do
+		local action = GetBindingByKey(key)
+		if action then
+			A:Debug("Overriding binding for key: "..key)
+		end
+		SetBindingClick(key, A:GetName().."_"..button, "LEFTBUTTON")
+	end
+end
+
 A["modules"]["Actionbars"] = AB

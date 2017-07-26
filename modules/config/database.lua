@@ -21,8 +21,11 @@ local defaults =  {
     ["Profiles"] = {
         ["Aiwen"] = {
             ["Options"] = {
+                ["Key Bindings"] = {
+
+                },
                 ["Party"] = {
-                    ["Key Bindings"] = {
+                    ["Clickcast"] = {
                         { type = "*type1", action = "macro" },
                         { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
                         { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
@@ -71,7 +74,7 @@ local defaults =  {
                     }
                 },
                 ["Raid"] = {
-                    ["Key Bindings"] = {
+                    ["Clickcast"] = {
                         { type = "*type1", action = "macro" },
                         { type = "*macrotext1", action = "/cast [@unit,help,nodead] Plea; [@unit,help,dead] Resurrection" },
                         { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Shadow Mend" },
@@ -123,8 +126,25 @@ local defaults =  {
         },
         ["Seife"] = {
             ["Options"] = {
+                ["Key Bindings"] = {
+                    ["1"] = "ActionBar1Button1",
+                    ["2"] = "ActionBar1Button2",
+                    ["3"] = "ActionBar1Button3",
+                    ["4"] = "ActionBar1Button4",
+                    ["5"] = "ActionBar1Button5",
+                    ["SHIFT-DOWN"] = "ActionBar1Button7",
+                    ["SHIFT-UP"] = "ActionBar1Button8",
+                    ["CTRL-DOWN"] = "ActionBar1Button9",
+                    ["CTRL-UP"] = "ActionBar1Button10",
+                    ["ALT-DOWN"] = "ActionBar1Button11",
+                    ["ALT-UP"] = "ActionBar1Button12",
+                    ["SHIFT-1"] = "ActionBar2Button1",
+                    ["SHIFT-2"] = "ActionBar2Button2",
+                    ["SHIFT-3"] = "ActionBar2Button3",
+                    ["SHIFT-4"] = "ActionBar2Button4",
+                },
                 ["Party"] = {
-                    ["Key Bindings"] = {
+                    ["Clickcast"] = {
                         { type = "*type1", action = "macro" },
                         { type = "*macrotext1", action = "/cast [@unit,help,nodead] Effuse; [@unit,help,dead] Resuscitate" },
                         { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Enveloping Mist" },
@@ -183,7 +203,7 @@ local defaults =  {
                     }
                 },
                 ["Raid"] = {
-                    ["Key Bindings"] = {
+                    ["Clickcast"] = {
                         { type = "*type1", action = "macro" },
                         { type = "*macrotext1", action = "/cast [@unit,help,nodead] Effuse; [@unit,help,dead] Resuscitate" },
                         { type = "shift-macrotext1", action = "/cast [@unit,help,nodead] Enveloping Mist" },

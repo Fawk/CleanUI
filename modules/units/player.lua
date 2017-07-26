@@ -37,7 +37,7 @@ function Player:Update(frame, db)
 		return
     end
 
-    local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
+    local position, size = db["Position"], db["Size"]
 
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
@@ -48,7 +48,8 @@ function Player:Update(frame, db)
     frame:SetAttribute("*type1", "target")
     frame:SetAttribute("*type2", "togglemenu")
 
-    Units:SetKeyBindings(frame, db["Key Bindings"])
+    Units:SetupClickcast(frame, db["Clickcast"])
+    Units:SetupKeybindings(frame, db["Key Bindings"])
 	
 	--[[ Background ]]--
 	local background = frame.Background or CreateFrame("Frame", nil, frame)

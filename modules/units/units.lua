@@ -381,11 +381,19 @@ function Units:PlaceCastbar(frame, invalidPower, isStagger)
     end
 end
  
-function Units:SetKeyBindings(frame, db)
+function Units:SetupClickcast(frame, db)
     if db and frame.unit and frame:CanChangeAttribute() then
         for _,binding in next, db do
             frame:SetAttribute(binding.type, binding.action:gsub("@unit", "@"..frame.unit))
         end
+    end
+end
+
+function Units:SetupKeybindings(frame, db)
+    if InCombatLockdown() then return end
+
+    if db then
+        A.modules["Actionbars"]:SetupBindings(db)
     end
 end
 
