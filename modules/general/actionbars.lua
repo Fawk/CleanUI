@@ -4,7 +4,9 @@ local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local LAB = LibStub("LibActionButton-1.0")
 
-local AB = {}
+local AB = {
+	bars = {}
+}
 
 local keys = {
 	["SHIFT"] = "s",
@@ -16,7 +18,6 @@ function AB:Init()
 
 	A:Debug("Actionbars Init")
 
-	local bars = {}
 
 	for x = 1, 4 do
 		local bar = CreateFrame("Frame", "Baaaaar", A.frameParent, "SecureHandlerStateTemplate")
@@ -39,10 +40,15 @@ function AB:Init()
 					self:SetText(newText)
 				end
 			end)
+
+			button.NormalTexture:SetTexture(nil)
+
+			--button:SetNormalTexture(nil)
+			--button.Border:Hide()
 			table.insert(bar.buttons, button)
 		end
-		table.insert(bars, bar)
-		bar:SetPoint("TOP", bars[x - 1] or A.frameParent, x == 1 and "TOP" or "BOTTOM", 0, 0)
+		table.insert(self.bars, bar)
+		bar:SetPoint("TOP", self.bars[x - 1] or A.frameParent, x == 1 and "TOP" or "BOTTOM", 0, 0)
 		local w, h = bar.buttons[1]:GetSize()
 		bar:SetSize(w * #bar.buttons, h)
 	end
@@ -51,14 +57,36 @@ function AB:Init()
 
 end
 
+function AB:ClearBindings()
+	for _,bar in next, self.bars do
+		ClearOverrideBindings(bar)
+	end
+end
+
 function AB:SetupBindings(bindings)
 	for key, button in next, bindings do
 		local action = GetBindingByKey(key)
 		if action then
 			A:Debug("Overriding binding for key: "..key)
 		end
-		print(A:GetName().."_"..button)
-		SetBindingClick(key, A:GetName().."_"..button, "LEFTBUTTON")
+		
+		local matches = {}
+		button:gsub("%d", function(match) table.insert(matches, match) end)
+		local barId, buttonId = unpack(matches)
+
+		local bar = self.bars[tonumber(barId)]
+		local buttonObject = bar.buttons[tonumber(buttonId)]
+
+		SetOverrideBindingClick(bar, true, key, A:GetName().."_"..button, "LEFTBUTTON")
+
+		local newText = key
+		for k, new in pairs(keys) do
+			if newText:find(k) then
+				newText = newText:gsub(k, new)
+			end
+		end
+
+		buttonObject.HotKey:SetText(newText)
 	end
 end
 
