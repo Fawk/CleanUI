@@ -43,6 +43,10 @@ function AB:Init()
 
 			button.NormalTexture:SetTexture(nil)
 
+			button:SetState(0, "action", (x - 1) * 12 + i)
+			for k = 1, 14 do
+				button:SetState(k, "action", (k - 1) * 12 + i)
+			end
 			--button:SetNormalTexture(nil)
 			--button.Border:Hide()
 			table.insert(bar.buttons, button)
