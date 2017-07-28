@@ -160,6 +160,19 @@ function T:RunAfterCombat(func)
 	end)
 end
 
+function T:RunNowOrAfterCombat(func)
+	if not InCombatLockdown() then
+		func()
+	else
+		local f = CreateFrame("Frame")
+		f:RegisterEvent("PLAYER_REGEN_ENABLED")
+		f:SetScript("OnEvent", function(self, event, ...)
+			self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+			func()
+		end)
+	end
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v

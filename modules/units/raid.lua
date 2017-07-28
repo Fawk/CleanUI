@@ -152,10 +152,12 @@ function Raid:Init()
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         raidContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:Execute(([[
-                Holder:SetAttribute("GroupMembers", %d) 
-                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
-            ]]):format(GetNumGroupMembers(), db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
+            T:RunNowOrAfterCombat(function()
+                raidContainer:Execute(([[
+                    Holder:SetAttribute("GroupMembers", %d) 
+                    Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
+                ]]):format(GetNumGroupMembers(), db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
+            end)
             self:UpdateUnits()
         end)
     
