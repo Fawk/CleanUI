@@ -93,7 +93,6 @@ function Raid:Init()
         "oUF-initialConfigFunction", ([[
           self:SetWidth(%d)
           self:SetHeight(%d)
-          self:SetFrameStrata("LOW")
         ]]):format(size["Width"], size["Height"])
     )
 
@@ -150,13 +149,14 @@ function Raid:Init()
 
         raidContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
-        raidContainer:SetScript("OnEvent", function(self, event) 
+        raidContainer:SetScript("OnEvent", function(self, event)    
             Units:DisableBlizzardRaid()
+            local numGroupMembers = GetNumGroupMembers()
             T:RunNowOrAfterCombat(function()
                 raidContainer:Execute(([[
                     Holder:SetAttribute("GroupMembers", %d) 
                     Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
-                ]]):format(GetNumGroupMembers(), db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
+                ]]):format(numGroupMembers, db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
             end)
             self:UpdateUnits()
         end)
@@ -194,15 +194,10 @@ end
 function Raid:Update(frame, db)
     if not db["Enabled"] then return end
 
-    local bindings = db["Key Bindings"]
+    T:RunNowOrAfterCombat(function() 
+        Units:SetupClickcast(frame, db["Clickcast"])
+    end)
 
-    if InCombatLockdown() then
-        T:RunAfterCombat(function() 
-            Units:SetKeyBindings(frame, bindings)
-        end)
-    else
-        Units:SetKeyBindings(frame, bindings)
-    end
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--

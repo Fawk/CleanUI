@@ -19,11 +19,15 @@ function AB:Init()
 	A:Debug("Actionbars Init")
 
 
-	for x = 1, 4 do
+	--[[for x = 1, 4 do
 		local bar = CreateFrame("Frame", "Baaaaar", A.frameParent, "SecureHandlerStateTemplate")
 		bar.buttons = {}
 		for i = 1, 12 do
-			local button = LAB:CreateButton(i, string.format("%s_ActionBar%dButton%d", A:GetName(), x, i), bar, { showGrid = true })
+			local name = string.format("%s_ActionBar%dButton%d", A:GetName(), x, i)
+			local button = LAB:CreateButton(i, name, bar, { 
+				keyBoundTarget = name,
+				showGrid = true
+			})
 			button:SetBackdrop(E.backdrops.statusborder)
 			button:SetBackdropColor(0, 0, 0)
 			button:SetPoint("LEFT", bar.buttons[i - 1] or bar, i == 1 and "LEFT" or "RIGHT", 0, 0)
@@ -39,6 +43,7 @@ function AB:Init()
 					self.shouldModify = false
 					self:SetText(newText)
 				end
+				self:Show()
 			end)
 
 			button.NormalTexture:SetTexture(nil)
@@ -57,7 +62,7 @@ function AB:Init()
 		bar:SetSize(w * #bar.buttons, h)
 	end
 
-	self:SetupBindings(A["Profile"]["Options"]["Key Bindings"])
+	self:SetupBindings(A["Profile"]["Options"]["Key Bindings"])]]
 
 end
 
@@ -75,7 +80,7 @@ function AB:SetupBindings(bindings)
 		end
 		
 		local matches = {}
-		button:gsub("%d", function(match) table.insert(matches, match) end)
+		button:gsub("%d+", function(match) table.insert(matches, match) end)
 		local barId, buttonId = unpack(matches)
 
 		local bar = self.bars[tonumber(barId)]

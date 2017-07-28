@@ -141,7 +141,9 @@ function Party:Init()
         partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
         partyContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
-            self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
+            T:RunNowOrAfterCombat(function()
+                self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
+            end)
             self:UpdateUnits()
         end)
     
@@ -178,15 +180,10 @@ end
 function Party:Update(frame, db)
     if not db["Enabled"] then return end
 
-    local bindings = db["Key Bindings"]
+    T:RunNowOrAfterCombat(function() 
+        Units:SetupClickcast(frame, db["Clickcast"])
+    end)
 
-    if InCombatLockdown() then
-        T:RunAfterCombat(function() 
-            Units:SetKeyBindings(frame, bindings)
-        end)
-    else
-        Units:SetKeyBindings(frame, bindings)
-    end
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--
