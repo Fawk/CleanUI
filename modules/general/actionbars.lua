@@ -96,6 +96,10 @@ function AB:SetupBindings(bindings)
 		end
 
 		buttonObject.HotKey:SetText(newText)
+
+		buttonObject:SetParent(bar)
+		buttonObject:Show()
+		buttonObject:SetAttribute("statehidden", nil)
 	end
 end
 

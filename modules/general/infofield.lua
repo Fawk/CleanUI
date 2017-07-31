@@ -184,6 +184,10 @@ local function createIcon(parent, id, spellId, timer, size, priority, condition,
 	end
 	icon.options = options
 
+	icon.evaluteStacks = function(self, count, duration)
+
+	end
+
 	evaluateOptions(icon)
 
 	icon.timer = 0

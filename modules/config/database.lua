@@ -351,6 +351,13 @@ local defaults =  {
                             ["condition"] = "func:activeBuffWithStackAndCountdown",
                             ["options"] = { "glow" }
                         },
+                        {
+                            ["spellId"] = 202090,
+                            ["size"] = 32,
+                            ["priority"] = 1,
+                            ["condition"] = "func:activeBuffWithStackAndCountdown",
+                            ["options"] = {}
+                        },
                     }
                 }
             }
