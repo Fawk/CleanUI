@@ -24,9 +24,13 @@ local functions = {
 						if icon.countdown then
 							icon.countdown:SetText(math.floor(expires - GetTime()))
 						end
-						if icon.stack and count and count > 1 then
-							icon:evaluteStacks(count, duration)
-							icon.stack:SetText(count)
+						if icon.stack then
+							if count and count > 1 then
+								icon:evaluteStacks(count, duration)
+								icon.stack:SetText(count)
+							else
+								icon.stack:SetText("")
+							end
 						end
 					end
 				end
