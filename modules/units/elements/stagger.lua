@@ -1,5 +1,5 @@
 local A, L = unpack(select(2, ...))
-local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local GetSpecialization = GetSpecialization
@@ -30,23 +30,7 @@ local function Stagger(frame, db)
 	stagger:SetStatusBarTexture(texture)
 	stagger.bg:SetTexture(texture)
 
-	if db["Background"] and db["Background"]["Enabled"] then
-		local offset = db["Background"]["Offset"]
-		stagger:SetBackdrop({
-			bgFile = media:Fetch("statusbar", "Default"),
-			tile = true,
-			tileSize = 16,
-			insets = {
-				top = offset["Top"],
-				bottom = offset["Bottom"],
-				left = offset["Left"],
-				right = offset["Right"],
-			}
-		})
-		stagger:SetBackdropColor(unpack(db["Background"]["Color"]))
-	else
-		stagger:SetBackdrop(nil)
-	end
+	U:CreateBackground(stagger, db, true)
 
 	Units:PlaceCastbar(frame, nil, true)
 

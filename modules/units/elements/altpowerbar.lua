@@ -1,5 +1,5 @@
 local A, L = unpack(select(2, ...))
-local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local buildText = A.TextBuilder
 
@@ -60,23 +60,7 @@ function AltPowerBar(frame, db)
 	bar.bg:SetTexture(texture)
 	bar.bg:SetAllPoints(bar)
 
-	if db["Background"] and db["Background"]["Enabled"] then
-		local offset = db["Background"]["Offset"]
-		bar:SetBackdrop({
-			bgFile = media:Fetch("statusbar", "Default"),
-			tile = true,
-			tileSize = 16,
-			insets = {
-				top = offset["Top"],
-				bottom = offset["Bottom"],
-				left = offset["Left"],
-				right = offset["Right"],
-			}
-		})
-		bar:SetBackdropColor(unpack(db["Background"]["Color"]))
-	else
-		bar:SetBackdrop(nil)
-	end
+	U:CreateBackground(bar, db, true)
 
 	if db["Hide Blizzard"] then
 		PlayerPowerBarAlt:UnregisterAllEvents()

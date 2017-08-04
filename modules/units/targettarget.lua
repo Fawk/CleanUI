@@ -30,14 +30,11 @@ end
 function TargetTarget:Update(frame, db)
 	if not db["Enabled"] then return end
 
-	--if InCombatLockdown() then
-		--T:RunAfterCombat(function()
-			--self.Update(frame, db)
-		--end)
-		--return
-   -- end
+	T:RunNowOrAfterCombat(function()
+		self.Update(frame, db)
+	end)
 
-    local position, size, bindings = db["Position"], db["Size"], db["Key Bindings"]
+    local position, size = db["Position"], db["Size"]
 
     Units:Position(frame, position)
     frame:SetSize(size["Width"], size["Height"])
@@ -48,7 +45,7 @@ function TargetTarget:Update(frame, db)
     frame:SetAttribute("*type1", "target")
     frame:SetAttribute("*type2", "togglemenu")
 
-    Units:SetKeyBindings(frame, db["Key Bindings"])
+    Units:SetupClickcast(frame, db["Clickcast"])
 	
 	--[[ Background ]]--
 	local background = frame.Background or CreateFrame("Frame", nil, frame)

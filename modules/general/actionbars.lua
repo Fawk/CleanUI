@@ -28,8 +28,8 @@ function AB:Init()
 				keyBoundTarget = name,
 				showGrid = true
 			})
-			button:SetBackdrop(E.backdrops.statusborder)
-			button:SetBackdropColor(0, 0, 0)
+			--button:SetBackdrop(E.backdrops.statusborder)
+			--button:SetBackdropColor(0, 0, 0)
 			button:SetPoint("LEFT", bar.buttons[i - 1] or bar, i == 1 and "LEFT" or "RIGHT", 0, 0)
 			hooksecurefunc(button.HotKey, "SetText", function(self, text)
 				local newText = text
@@ -41,6 +41,7 @@ function AB:Init()
 				end
 				if self.shouldModify then
 					self.shouldModify = false
+					self:SetFont(media:Fetch("font", "NotoBold"), 11, "OUTLINE")
 					self:SetText(newText)
 				end
 				self:Show()

@@ -1,5 +1,5 @@
 local A, L = unpack(select(2, ...))
-local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
 local InCombatLockdown = InCombatLockdown
@@ -216,30 +216,8 @@ function Party:Update(frame, db)
         end
     })
 
-        --[[ Background ]]--
-    local background = frame.Background or CreateFrame("Frame", nil, frame)
-    if db["Background"] and db["Background"]["Enabled"] then
-        local offset = db["Background"]["Offset"]
-        background:SetBackdrop({
-            bgFile = media:Fetch("statusbar", "Default"),
-            tile = true,
-            tileSize = 16,
-            insets = {
-                top = offset["Top"],
-                bottom = offset["Bottom"],
-                left = offset["Left"],
-                right = offset["Right"],
-            }
-        })
-        background:SetBackdropColor(unpack(db["Background"]["Color"]))
-        background:SetPoint("CENTER", frame, "CENTER", 0, 0)
-        background:SetSize(frame:GetSize())
-        background:SetFrameStrata("LOW")
-        background:SetFrameLevel(1)
-        background:Show()
-    else
-        background:Hide()
-    end
+    --[[ Background ]]--
+    U:CreateBackground(frame, db)
 
     local ignored = {
         [80354] = true,     -- Temporal Displacement

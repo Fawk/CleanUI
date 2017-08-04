@@ -818,6 +818,40 @@ local function DrawerBuilder()
     end)
 end
 
+local Utils = {}
+
+function Utils:CreateBackground(frame, db, useBackdrop)
+	if db["Background"] and db["Background"]["Enabled"] then 
+		local ref = frame
+		if not useBackdrop then
+			ref = frame.Background or CreateFrame("Frame", nil, frame)
+			ref:SetPoint("CENTER", frame, "CENTER", 0, 0)
+			ref:SetSize(frame:GetSize())
+			ref:SetFrameStrata("LOW")
+			ref:SetFrameLevel(1)
+			ref:Show()
+		end
+		ref:SetBackdrop({
+			bgFile = media:Fetch("statusbar", "Default"),
+			tile = true,
+			tileSize = 16,
+			insets = {
+				top = offset["Top"],
+				bottom = offset["Bottom"],
+				left = offset["Left"],
+				right = offset["Right"],
+			}
+		})
+		ref:SetBackdropColor(unpack(db["Background"]["Color"]))
+	else
+		ref:SetBackdrop(nil)
+		if not useBackdrop then
+			ref:Hide()
+		end
+	end
+end
+
+A.Utils = Utils
 A.TextBuilder = TextBuilder
 A.ButtonBuilder = ButtonBuilder
 A.FrameBuilder = FrameBuilder
