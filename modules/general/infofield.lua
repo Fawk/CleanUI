@@ -3,6 +3,12 @@ local LBG = LibStub("LibButtonGlow-1.0")
 local I = {}
 local buildText = A.TextBuilder
 local media = LibStub("LibSharedMedia-3.0")
+local IsSpellKnown = IsSpellKnown
+local UnitAura = UnitAura
+local GetSpellCooldown = GetSpellCooldown
+local GetSpellCount = GetSpellCount
+local GetSpellInfo = GetSpellInfo
+local InCombatLockdown = InCombatLockdown
 
 local function createAlphaAnimation(ag, from, to, duration, onFinished)
 	local a = ag:CreateAnimation("Alpha")

@@ -6,6 +6,8 @@
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 
+libs\LibStub\LibStub.lua
+libs\LibSharedMedia-3.0\lib.xml
 libs\AceLocale-3.0\AceLocale-3.0.xml
 media\load_media.xml
 locales\load_locales.xml

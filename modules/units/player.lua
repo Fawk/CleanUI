@@ -46,11 +46,11 @@ function Player:Update(frame, db)
     frame:SetAttribute("*type2", "togglemenu")
 
     Units:SetupClickcast(frame, db["Clickcast"])
-	
-	--[[ Background ]]--
-	U:CreateBackground(frame, db)
 
 	frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(self, ...) Units:UpdateElements(self, db) end)
+
+	--[[ Background ]]--
+	U:CreateBackground(frame, db)
 
     --[[ Tags ]]--
     if not frame["Tags"] then

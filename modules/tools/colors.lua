@@ -42,7 +42,8 @@ A.colors = {
 		border = { .3, .3, .6, .5 }
 	},
 	border = {
-		target = { 1, 1, 1, 0.3 }
+		target = { 1, 1, 1, 0.3 },
+		combat = { 1, 0, 0, 0.5 }
 	},
 	debuff = {
 		["Curse"] = { 200/255, 33/255, 200/255 },

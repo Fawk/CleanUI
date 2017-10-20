@@ -18,8 +18,8 @@ for key, obj in next, {
             if not u and not r then return end
             if UnitExists(r or u) then
                 local h = UnitHealth(r or u)
-                if h > 100000000 then
-                    return string.format("%.2f", h/100000000).."B"
+                if h > 1000000000 then
+                    return string.format("%.2f", h/1000000000).."B"
                 elseif h > 1000000 then
                     return string.format("%.2f", h/1000000).."M"
                 elseif h > 1000 then
@@ -36,8 +36,8 @@ for key, obj in next, {
             if not u and not r then return end
             if UnitExists(r or u) then
                 local h = UnitHealthMax(r or u)
-                if h > 100000000 then
-                    return string.format("%.2f", h/100000000).."B"
+                if h > 1000000000 then
+                    return string.format("%.2f", h/1000000000).."B"
                 elseif h > 1000000 then
                     return string.format("%.2f", h/1000000).."M"
                 elseif h > 1000 then

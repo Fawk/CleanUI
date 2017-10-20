@@ -56,6 +56,14 @@ local enum = {
             edgeSize = 4, 
             insets = { top = 5, bottom = 5, left = 5, right = 5 } 
         },
+        editboxborder3 = { 
+            bgFile = media:Fetch("background", "cui-default-bg"), 
+            tile = true, 
+            tileSize = 1, 
+            edgeFile = media:Fetch("border", "test-border"), 
+            edgeSize = 2, 
+            insets = { top = 3, bottom = 3, left = 3, right = 3 } 
+        },
         optiongroupborder = { 
             bgFile = media:Fetch("background", "cui-default-bg"), 
             tile = true, 
@@ -77,6 +85,14 @@ local enum = {
             tile = true,
             tileSize = 16,
             insets  = { top = -1, bottom = -1, left = -1, right = -1 }
+        },
+        statusborder2 = {
+            bgFile = media:Fetch("background", "cui-default-bg"),
+            tile = true,
+            tileSize = 16,
+            edgeFile = media:Fetch("border", "cui-round-border2"), 
+            edgeSize = 3, 
+            insets  = { top = -2, bottom = -2, left = -2, right = -2 }
         },
         slider = {},
         dropdown = {}

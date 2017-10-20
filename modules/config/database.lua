@@ -609,6 +609,9 @@ local defaults =  {
                         },
                         ["Attached"] = true
                     },
+                    ["Combat"] = {
+                        ["Enabled"] = true
+                    },
     				["Enabled"] = true
     			},
     			["Target"] = {
@@ -1343,7 +1346,7 @@ for profile, tbl in next, defaults["Profiles"] do
 end
 
 function Database:Prepare(type, value)
-    if not self.prepared[type] and defaults["Profiles"][A["Modules"]["Profile"]:GetActive()]["Options"][type] then
+    if not self.prepared[type] then
         self.prepared[type] = {}
     end
     self.prepared[type] = value
@@ -1359,6 +1362,9 @@ function Database:Save()
     save[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
 
     for k,v in pairs(self.prepared) do
+        if not save["Profiles"][activeProfile] then
+            save["Profiles"][activeProfile] = deepCopy(A.db["Profiles"][activeProfile])
+        end
         save["Profiles"][activeProfile]["Options"][k] = v
     end
     
