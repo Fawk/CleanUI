@@ -39,6 +39,7 @@ local function deepCopy(object)
 end
 
 function Database:New(name, defaults)
+    if not _G[name] then _G[name] = {} end
     db = merge(deepCopy(defaults), deepCopy(_G[name]))
     return db
 end
@@ -46,3 +47,5 @@ end
 function Database:Save()
     _G[name] = deepCopy(db)
 end
+
+A.dbProvider = Database

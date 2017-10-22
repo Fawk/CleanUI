@@ -23,16 +23,14 @@ function Target:Init()
 end
 -- https://jsfiddle.net/859zu65s/
 function Target:Setup(frame, db)
-    self:Update(frame, db)
+    T:RunNowOrAfterCombat(function()
+        self:Update(frame, db)
+    end)
     return frame
 end
  
 function Target:Update(frame, db)
 	if not db["Enabled"] then return end
-
-	T:RunNowOrAfterCombat(function()
-		self.Update(frame, db)
-	end)
 
     local position, size = db["Position"], db["Size"]
 
@@ -56,11 +54,11 @@ function Target:Update(frame, db)
     end
 
     --[[ Name ]]--
-    Units:Tag(frame, "Name", db["Tags"]["Name"])
+    Units:Tag(frame, "Name", db["Tags"]["Name"], 4)
 
     --[[ Custom ]]--
     for name, custom in next, db["Tags"]["Custom"] do
-        Units:Tag(frame, name, custom)
+        Units:Tag(frame, name, custom, 4)
     end
 end
 

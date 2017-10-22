@@ -121,7 +121,7 @@ end
 
 function Addon:OnInitialize()
 
-	Addon.db = Addon.Database:CreateDatabase()
+	Addon.db = Addon.dbProvider:New("CleanUI_DB", Addon.defaults)
 
 	local uiscale = GetCVar("uiscale") or 0.71
 	local h, w = GetScreenHeight() or 1080, GetScreenWidth() or 1920

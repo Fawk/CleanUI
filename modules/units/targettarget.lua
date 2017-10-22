@@ -23,16 +23,14 @@ function TargetTarget:Init()
 end
 
 function TargetTarget:Setup(frame, db)
-    self:Update(frame, db)
+	T:RunNowOrAfterCombat(function()
+		self:Update(frame, db)
+	end)
     return frame
 end
  
 function TargetTarget:Update(frame, db)
 	if not db["Enabled"] then return end
-
-	T:RunNowOrAfterCombat(function()
-		self.Update(frame, db)
-	end)
 
     local position, size = db["Position"], db["Size"]
 

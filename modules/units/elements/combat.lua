@@ -27,6 +27,8 @@ function Combat(frame, db)
 	combat:SetPoint("CENTER", frame, "CENTER", 0, 0)
 	combat:SetSize(frame:GetSize())
 
+	combat:Hide()
+
 	frame.Combat = combat
 end
 

@@ -69,6 +69,8 @@ function AltPowerBar(frame, db)
 
 	frame:Tag(bar.value, "[altpp] / [altppmax]")
 
+	bar:Hide()
+
 	frame.AltPowerBar = bar
 end
 

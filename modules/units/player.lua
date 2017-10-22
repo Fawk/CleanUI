@@ -23,16 +23,14 @@ function Player:Init()
 end
 -- https://jsfiddle.net/859zu65s/
 function Player:Setup(frame, db)
-    self:Update(frame, db)
+    T:RunNowOrAfterCombat(function()
+        self:Update(frame, db)
+    end)
     return frame
 end
  
 function Player:Update(frame, db)
 	if not db["Enabled"] then return end
-
-	T:RunNowOrAfterCombat(function()
-		self.Update(frame, db)
-	end)
 
     local position, size = db["Position"], db["Size"]
 

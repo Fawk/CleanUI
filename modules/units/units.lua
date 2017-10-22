@@ -81,7 +81,7 @@ function Units:UpdateElements(frame, db)
             end
         end
         if frame.UpdateAllElements then
-            frame:UpdateAllElements()
+            frame:UpdateAllElements("PLAYER_ENTERING_WORLD")
         end
     end
 end
@@ -398,29 +398,33 @@ function Units:SetupKeybindings(frame, db)
 end
 
 function Units:Tag(frame, name, db, framelevel)  
-    local tag = frame["Tags"][name] or frame:CreateFontString(nil, "OVERLAY")
+    local tag = frame["Tags"][name] or CreateFrame("Frame", frame:GetName().."_"..name, frame)
+    --tag:SetSize(frame:GetSize())
+
+    local fs = tag:CreateFontString(nil, "OVERLAY")
 
     if framelevel then
-        tag:SetDrawLayer("OVERLAY", framelevel)
+        print(name, framelevel)
+        tag:SetFrameLevel(framelevel)
     end
     
-    tag:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "SHADOW" and "NONE" or db["Outline"])
-    tag:ClearAllPoints()
-    tag:SetTextColor(unpack(db["Color"]))
+    fs:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "SHADOW" and "NONE" or db["Outline"])
+    fs:SetTextColor(unpack(db["Color"]))
 
     if db["Outline"] == "SHADOW" then
-        tag:SetShadowColor(0, 0, 0)
-        tag:SetShadowOffset(1, -1)
+        fs:SetShadowColor(0, 0, 0)
+        fs:SetShadowOffset(1, -1)
     end
     
+    tag:SetAllPoints()
     local position = db["Position"]
     if position["Local Point"] == "ALL" then
-        tag:SetAllPoints()
+        fs:SetAllPoints()
     else
-        tag:SetPoint(position["Local Point"], self:Translate(tag, position["Relative To"]), position["Point"], position["Offset X"], position["Offset Y"])
+        fs:SetPoint(position["Local Point"], self:Translate(tag, position["Relative To"]), position["Point"], position["Offset X"], position["Offset Y"])
     end
 
-    frame:Tag(tag, db["Text"])
+    frame:Tag(fs, db["Text"])
     frame["Tags"][name] = tag
 
    if not db["Enabled"] then tag:Hide() end

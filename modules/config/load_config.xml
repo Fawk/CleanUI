@@ -7,6 +7,7 @@
 	<Script file="widget.lua"/>
 	<Script file="grid.lua"/>
 	<!--<Script file="keybindings.lua"/>-->
+	<Script file="db.lua"/>
 
 	<!-- widgets -->
 	<Include file="widgets\load_widgets.xml"/>

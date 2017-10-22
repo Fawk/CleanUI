@@ -831,6 +831,7 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 			ref:SetFrameLevel(1)
 			ref:Show()
 		end
+		local offset = db["Background"]["Offset"]
 		ref:SetBackdrop({
 			bgFile = media:Fetch("statusbar", "Default"),
 			tile = true,
