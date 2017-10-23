@@ -81,7 +81,7 @@ function Units:UpdateElements(frame, db)
             end
         end
         if frame.UpdateAllElements then
-            frame:UpdateAllElements("PLAYER_ENTERING_WORLD")
+            frame:UpdateAllElements("OnUpdate")
         end
     end
 end
@@ -418,6 +418,8 @@ function Units:Tag(frame, name, db, framelevel)
     else
         fs:SetPoint(position["Local Point"], self:Translate(tag, position["Relative To"]), position["Point"], position["Offset X"], position["Offset Y"])
     end
+
+    tag.text = fs
 
     frame:Tag(fs, db["Text"])
     frame["Tags"][name] = tag

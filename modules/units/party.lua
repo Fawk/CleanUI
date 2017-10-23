@@ -11,7 +11,7 @@ local frameName = "Party"
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
-		frame["Tags"][tag]:SetTextColor(unpack(color))
+		frame["Tags"][tag].text:SetTextColor(unpack(color))
 	end
 end
 
@@ -228,7 +228,8 @@ function Party:Update(frame, db)
         [123981] = true,    -- Perdition
         [113942] = true,    -- Demonic Gateway
         [233375] = true,    -- Gaze of Aman'Thul
-        [95809] = true      -- Insanity 
+        [95809] = true,     -- Insanity
+        [71041] = true      -- Dungeon Deserter
     }
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
