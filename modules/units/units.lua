@@ -149,7 +149,6 @@ local important = {
                     end
                 end
                 if debuff.cd.cooldownText then
-                    local media = LibStub("LibSharedMedia-3.0")
                     debuff.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), db["Cooldown Numbers Text Size"], "OUTLINE")
                 end
                 if count > 0 then
@@ -255,7 +254,6 @@ local important = {
 				end
 			end
 			if obj.cd.cooldownText then
-				local media = LibStub("LibSharedMedia-3.0")
 				obj.cd.cooldownText:SetFont(media:Fetch("font", "NotoBold"), obj.cdTextSize, "OUTLINE")
                 obj.cd.cooldownText:ClearAllPoints()
                 obj.cd.cooldownText:SetPoint("CENTER", 2, 0)
@@ -399,12 +397,9 @@ end
 
 function Units:Tag(frame, name, db, framelevel)  
     local tag = frame["Tags"][name] or CreateFrame("Frame", frame:GetName().."_"..name, frame)
-    --tag:SetSize(frame:GetSize())
-
     local fs = tag:CreateFontString(nil, "OVERLAY")
 
     if framelevel then
-        print(name, framelevel)
         tag:SetFrameLevel(framelevel)
     end
     

@@ -27,13 +27,13 @@ for key, obj in next, {
     oUF["Tags"]["Events"][key] = obj.events
 end
 
-function AltPowerBar(frame, db)
+function AlternativePower(frame, db)
 
 	local mult = db["Background Multiplier"]
 	local texture = media:Fetch("statusbar", db["Texture"])
 	local size = db["Size"]
 
-	local bar = frame.AltPowerBar or (function()
+	local bar = frame.AlternativePower or (function()
 		local bar = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", frame)
 		bar.value = buildText(bar, 10):shadow():atCenter():build()
 		bar.value:SetText("")
@@ -71,7 +71,7 @@ function AltPowerBar(frame, db)
 
 	bar:Hide()
 
-	frame.AltPowerBar = bar
+	frame.AlternativePower = bar
 end
 
-A["Elements"]["AltPowerBar"] = AltPowerBar
+A["Elements"]["AlternativePower"] = AlternativePower

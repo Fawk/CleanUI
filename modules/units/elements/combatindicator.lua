@@ -2,9 +2,9 @@ local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 
-function Combat(frame, db)
+function CombatIndicator(frame, db)
 
-	local combat = frame.Combat or (function()
+	local combat = frame.CombatIndicator or (function()
 		local combat = CreateFrame("Frame", "Combat", frame)
 		combat:SetBackdrop({
 			bgFile = media:Fetch("statusbar", "Default"),
@@ -29,8 +29,8 @@ function Combat(frame, db)
 
 	combat:Hide()
 
-	frame.Combat = combat
+	frame.CombatIndicator = combat
 end
 
-A["Elements"]["Combat"] = Combat
+A["Elements"]["CombatIndicator"] = CombatIndicator
 

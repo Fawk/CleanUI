@@ -266,7 +266,7 @@ local defaults =  {
                         },
                         ["Attached"] = true
                     },
-                    ["Combat"] = {
+                    ["CombatIndicator"] = {
                         ["Enabled"] = true
                     },
     				["Enabled"] = true

@@ -418,6 +418,7 @@ local function ClassIcons(frame, db)
 	bar:RegisterEvent('UPDATE_SHAPESHIFT_FORM')
 	bar:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')
 	bar:RegisterEvent('PLAYER_ENTERING_WORLD')
+	bar:RegisterEvent('ZONE_CHANGED_NEW_AREA')
 
 	bar:SetScript("OnEvent", function(self, event, unit)
 		if event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" then

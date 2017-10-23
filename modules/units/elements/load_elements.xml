@@ -9,7 +9,7 @@
     <Script file="classicons.lua"/>
     <Script file="castbar.lua"/>
     <Script file="stagger.lua"/>
-    <Script file="combat.lua"/>
+    <Script file="combatindicator.lua"/>
     <!-- etc -->
 
 </Ui>
