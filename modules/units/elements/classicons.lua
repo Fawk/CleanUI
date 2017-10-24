@@ -299,7 +299,11 @@ local function UpdateIcons(parent, current, max, maxChanged)
 			end
 
 			-- Update color values
-			r, g, b = unpack(oUF.colors.power[power.powerType])
+			if A.colors.power[power.powerType] then
+				r, g, b = unpack(A.colors.power[power.powerType])
+			else
+				r, g, b = unpack(oUF.colors.power[power.powerType])
+			end
 		end
 		icon:SetStatusBarColor(r, g, b)
 		icon.bg:SetVertexColor(r * .33, g * .33, b * .33)
@@ -354,6 +358,8 @@ local function ClassIcons(frame, db)
 			bar.power = power
 
 			bar:calculateSize()
+
+			print("power valid:", power.isValid(spec, form))
 
 			if power and power.isValid(spec, form) then
 

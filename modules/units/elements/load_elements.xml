@@ -4,8 +4,8 @@
     <Script file="power.lua"/>
     <Script file="raidbuffs.lua"/>
     <Script file="healprediction.lua"/>
-    <Script file="lfdrole.lua"/>
-    <Script file="altpowerbar.lua"/>
+    <Script file="grouproleindicator.lua"/>
+    <Script file="alternativepower.lua"/>
     <Script file="classicons.lua"/>
     <Script file="castbar.lua"/>
     <Script file="stagger.lua"/>
