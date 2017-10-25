@@ -390,6 +390,17 @@ local function FrameBuilder(parent)
 	setmetatable(o, object)
 	o.frame = CreateFrame("Frame", nil, parent)
 
+	function o:actAsTextureTowards(textureKey, layer)
+		self.frame[textureKey] = self.frame:CreateTexture(nil, layer or "OVERLAY")
+		self.frame.SetTexCoord = function(self, ...)
+			return self[textureKey]:SetTexCoord(...)
+		end
+		self.frame.SetTexture = function(self, tex)
+			return self[textureKey]:SetTexture(tex)
+		end
+		return self
+	end
+
 	function o:backdrop(bd, bdColor, borderColor)
 		self.frame:SetBackdrop(bd)
 		self.frame:SetBackdropColor(unpack(bdColor))
