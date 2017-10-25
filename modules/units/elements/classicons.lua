@@ -359,7 +359,7 @@ local function ClassIcons(frame, db)
 
 			bar:calculateSize()
 
-			print("power valid:", power.isValid(spec, form))
+			A:Debug("power valid:", power.isValid(spec, form))
 
 			if power and power.isValid(spec, form) then
 
