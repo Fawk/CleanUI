@@ -397,7 +397,7 @@ end
 
 function Units:Tag(frame, name, db, framelevel)  
     local tag = frame["Tags"][name] or CreateFrame("Frame", frame:GetName().."_"..name, frame)
-    local fs = tag:CreateFontString(nil, "OVERLAY")
+    local fs = tag.text or tag:CreateFontString(nil, "OVERLAY")
 
     if framelevel then
         tag:SetFrameLevel(framelevel)

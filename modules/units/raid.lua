@@ -12,7 +12,7 @@ local frameName = "Raid"
 
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
-		frame["Tags"][tag]:SetTextColor(unpack(color))
+		frame["Tags"][tag].text:SetTextColor(unpack(color))
 	end
 end
 
