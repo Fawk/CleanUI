@@ -94,7 +94,7 @@ function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 		newY = 0
 	else
 		newX = left
-		newY = -(GetScreenHeight() - top)
+		newY = -(screenHeight - top)
 		anchor = "TOPLEFT"
 	end
 	
