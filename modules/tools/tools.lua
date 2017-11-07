@@ -45,6 +45,17 @@ function T:frameName(...)
 	return t
 end
 
+T.reversedPoints = {
+	["LEFT"] = "RIGHT",
+	["RIGHT"] = "LEFT",
+	["TOPLEFT"] = "TOPRIGHT",
+	["TOPRIGHT"] = "TOPLEFT",
+	["TOP"] = "BOTTOM",
+	["BOTTOM"] = "TOP",
+	["BOTTOMLEFT"] = "BOTTOMRIGHT",
+	["BOTTOMRIGHT"] = "BOTTOMLEFT"
+}
+
 function T:HookSetPoint(frame, position, w, h)
 	
 	hooksecurefunc(frame, "SetPoint", function(self, lp, r, p, x, y)

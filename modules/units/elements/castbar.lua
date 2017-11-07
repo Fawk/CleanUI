@@ -61,20 +61,6 @@ local function Castbar(frame, db)
 	end
 
 	local iconDb = db["Icon"]
-
-	Units:Position(bar, db["Position"])
-	Units:Position(bar.Text, db["Name"]["Position"])
-	Units:Position(bar.Time, db["Time"]["Position"])
-
-	bar.Icon:ClearAllPoints()
-	bar.Icon:SetPoint(iconDb["Position"], bar, iconDb["Position"], 0, 0)
-
-	bar:SetSize(width, height)
-	bar:SetStatusBarTexture(texture)
-	bar:SetStatusBarColor(r, g, b)
-	bar.bg:SetTexture(texture)
-	bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
-
 	local iconW, iconH
 
 	if iconDb["Size"]["Match width"] then
@@ -89,6 +75,37 @@ local function Castbar(frame, db)
 	end
 
 	bar.Icon:SetSize(iconW, iconH)
+
+	local pos = {
+		["Local Point"] = db["Position"]["Local Point"],
+		["Point"] = db["Position"]["Point"],
+		["Offset X"] = db["Position"]["Offset X"],
+		["Offset Y"] = db["Position"]["Offset Y"],
+		["Relative To"] = db["Position"]["Relative To"]
+	}
+
+	if iconDb["Enabled"] then
+		local p = iconDb["Position"]
+		if p == "LEFT" then
+			pos["Offset X"] = pos["Offset X"] + iconW
+		elseif p == "RIGHT" then
+			pos["Offset X"] = pos["Offset X"] - iconW
+		end
+		width = width - iconW
+	end
+
+	Units:Position(bar, pos)
+	Units:Position(bar.Text, db["Name"]["Position"])
+	Units:Position(bar.Time, db["Time"]["Position"])
+
+	bar.Icon:ClearAllPoints()
+	bar.Icon:SetPoint(T.reversedPoints[iconDb["Position"]], bar, iconDb["Position"], 0, 0)
+
+	bar:SetSize(width, height)
+	bar:SetStatusBarTexture(texture)
+	bar:SetStatusBarColor(r, g, b)
+	bar.bg:SetTexture(texture)
+	bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
 	CheckEnabled(bar.Text, db["Name"])
 	CheckEnabled(bar.Time, db["Time"])
