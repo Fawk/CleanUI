@@ -40,6 +40,7 @@ local function Castbar(frame, db)
 		bar.Text = name
 		bar.Time = time
 		bar.Icon = bar:CreateTexture(nil, "OVERLAY")
+		bar.Icon:SetTexCoord(0.133,0.867,0.133,0.867)
 		bar.bg = bar:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
@@ -61,7 +62,7 @@ local function Castbar(frame, db)
 	end
 
 	local iconDb = db["Icon"]
-	local iconW, iconH
+	local iconW, iconH, iconX, iconY
 
 	if iconDb["Size"]["Match width"] then
 		iconW = width
@@ -85,13 +86,51 @@ local function Castbar(frame, db)
 	}
 
 	if iconDb["Enabled"] then
-		local p = iconDb["Position"]
+		local p, f = iconDb["Position"], { x = 0, y = 0 }
 		if p == "LEFT" then
 			pos["Offset X"] = pos["Offset X"] + iconW
+			f.x = iconW
 		elseif p == "RIGHT" then
 			pos["Offset X"] = pos["Offset X"] - iconW
+			f.x = -iconW
 		end
 		width = width - iconW
+
+		if iconDb["Background"]["Enabled"] then
+
+			bar.Icon:SetSize(iconW - 1, iconH)
+
+			width = width + 1
+			pos["Offset X"] = pos["Offset X"] - 1
+			f.x = f.x - 1
+
+			local bg = bar.Icon.bg or CreateFrame("Frame", nil, bar)
+			local offset = iconDb["Background"]["Offset"]
+			bg:SetFrameStrata("LOW")
+			bg:SetFrameLevel(2)
+			bg:SetSize(iconW - 1, iconH)
+			bg:ClearAllPoints()
+			bg:SetPoint("CENTER", bar.Icon, "CENTER", 0, 0)
+			bg:SetBackdrop({
+				bgFile = media:Fetch("statusbar", "Default"),
+				tile = true,
+				tileSize = 16,
+				insets = {
+					top = offset["Top"],
+					bottom = offset["Bottom"],
+					left = offset["Left"],
+					right = offset["Right"],
+				}
+			})
+			bg:SetBackdropColor(unpack(iconDb["Background"]["Color"]))
+			bar.Icon.bg = bg
+		else
+			if bar.Icon.bg then
+				bar.Icon.bg:Hide()
+			end
+		end
+
+		bar.iconFix = f
 	end
 
 	Units:Position(bar, pos)
@@ -99,7 +138,7 @@ local function Castbar(frame, db)
 	Units:Position(bar.Time, db["Time"]["Position"])
 
 	bar.Icon:ClearAllPoints()
-	bar.Icon:SetPoint(T.reversedPoints[iconDb["Position"]], bar, iconDb["Position"], 0, 0)
+	bar.Icon:SetPoint(T.reversedPoints[iconDb["Position"]], bar, iconDb["Position"], iconX or 0, iconY or 0)
 
 	bar:SetSize(width, height)
 	bar:SetStatusBarTexture(texture)

@@ -224,6 +224,16 @@ local defaults =  {
                                 ["Match width"] = false,
                                 ["Match height"] = true,
                                 ["Size"] = 10
+                            },
+                            ["Background"] = {
+                                ["Color"] = { 0, 0, 0 },
+                                ["Offset"] = {
+                                    ["Top"] = -1,
+                                    ["Bottom"] = -1,
+                                    ["Left"] = -1,
+                                    ["Right"] = -1
+                                },
+                                ["Enabled"] = true
                             }
                         },
                         ["Background"] = {
@@ -405,7 +415,7 @@ local defaults =  {
                             ["Match width"] = true,
                             ["Match height"] = false,
                             ["Width"] = 150,
-                            ["Height"] = 15
+                            ["Height"] = 16
                         },
                         ["Time"] = {
                             ["Enabled"] = true,
@@ -436,6 +446,16 @@ local defaults =  {
                                 ["Match width"] = false,
                                 ["Match height"] = true,
                                 ["Size"] = 10
+                            },
+                            ["Background"] = {
+                                ["Color"] = { 0, 0, 0 },
+                                ["Offset"] = {
+                                    ["Top"] = -1,
+                                    ["Bottom"] = -1,
+                                    ["Left"] = -1,
+                                    ["Right"] = -1
+                                },
+                                ["Enabled"] = true
                             }
                         },
                         ["Background"] = {
