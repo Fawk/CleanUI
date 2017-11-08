@@ -54,6 +54,8 @@ local function Castbar(frame, db)
 		return bar
 	end)()
 
+	bar:SetSize(width, height)
+
 	local iconW, iconH, iconX, iconY
 	local iconDb = db["Icon"]
 
@@ -70,32 +72,34 @@ local function Castbar(frame, db)
 			iconH = iconDb["Size"]
 		end
 
+		bar.Icon:SetSize(iconW, iconH)
 		T:Background(bar, iconDb, bar.Icon, false)
 	end
 
-	bar.oldSetPoint = bar.SetPoint
-	bar.SetPoint = function(self, lp, r, p, x, y)
-		if iconDb["Enabled"] then
-			self.Icon:SetPoint(lp, r, p, x, y - 1)
-			local p = iconDb["Position"]
-			if p == "LEFT" then
-				bar:oldSetPoint("LEFT", bar.Icon, "RIGHT", 0, 0)
-			elseif p == "RIGHT" then
-				bar:oldSetPoint("RIGHT", bar.Icon, "LEFT", 0, 0)
+	if not bar.setup then
+		bar.oldSetPoint = bar.SetPoint
+		bar.SetPoint = function(self, lp, r, p, x, y)
+			if iconDb["Enabled"] then
+				self.Icon:SetPoint(lp, r == self.Icon and self.Icon:GetParent():GetParent() or r, p, x or 0, (y or 0) - 1)
+				local p = iconDb["Position"]
+				if p == "LEFT" then
+					bar:oldSetPoint("LEFT", bar.Icon, "RIGHT", 0, 0)
+				elseif p == "RIGHT" then
+					bar:oldSetPoint("RIGHT", bar.Icon, "LEFT", 0, 0)
+				end
+				width = (size["Match width"] and frame:GetWidth() or size["Width"]) - iconW
+			else
+				bar:oldSetPoint(lp, r, p, x, y)
 			end
-			width = (size["Match width"] and frame:GetWidth() or size["Width"]) - iconW
-		else
-			bar:oldSetPoint(lp, r, p, x, y)
+			bar:SetSize(width, height)
 		end
+		bar.setup = true
 	end
-
-	bar.Icon:SetSize(iconW, iconH)
 
 	Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
 	Units:Position(bar.Time, db["Time"]["Position"])
 
-	bar:SetSize(width, height)
 	bar:SetStatusBarTexture(texture)
 	bar:SetStatusBarColor(r, g, b)
 	bar.bg:SetTexture(texture)

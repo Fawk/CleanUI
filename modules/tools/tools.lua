@@ -59,15 +59,19 @@ T.reversedPoints = {
 function T:Background(frame, db, anchor, isBackdrop)
 	if db["Background"] and db["Background"]["Enabled"] then
 
-		local target = isBackdrop and frame or (frame.bg or (function() 
+		local target = isBackdrop and frame or (anchor.bg or (function() 
 			local f = CreateFrame("Frame", nil, frame)
 			f:SetFrameStrata("LOW")
 			f:SetFrameLevel(2)
 			f:SetPoint("CENTER", anchor or frame, "CENTER")
-			f:SetSize(anhor:GetSize() or frame:GetSize())
-			frame.bg = f
-			return frame.bg
-		)())
+			local width, height = anchor:GetSize()
+			if not width then
+				width, height = frame:GetSize()
+			end
+			f:SetSize(width, height)
+			anchor.bg = f
+			return anchor.bg
+		end)())
 
 		local offset = db["Background"]["Offset"]
 		target:SetBackdrop({
