@@ -89,7 +89,7 @@ local function Castbar(frame, db)
 				end
 				width = (size["Match width"] and frame:GetWidth() or size["Width"]) - iconW
 			else
-				bar:oldSetPoint(lp, r, p, x, y)
+				bar:oldSetPoint(lp, r, p, x or 0, (y or 0) - 1)
 			end
 			bar:SetSize(width, height)
 		end
