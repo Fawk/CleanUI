@@ -56,6 +56,37 @@ T.reversedPoints = {
 	["BOTTOMRIGHT"] = "BOTTOMLEFT"
 }
 
+function T:Background(frame, db, anchor, isBackdrop)
+	if db["Background"] and db["Background"]["Enabled"] then
+
+		local target = isBackdrop and frame or (frame.bg or (function() 
+			local f = CreateFrame("Frame", nil, frame)
+			f:SetFrameStrata("LOW")
+			f:SetFrameLevel(2)
+			f:SetPoint("CENTER", anchor or frame, "CENTER")
+			f:SetSize(anhor:GetSize() or frame:GetSize())
+			frame.bg = f
+			return frame.bg
+		)())
+
+		local offset = db["Background"]["Offset"]
+		target:SetBackdrop({
+			bgFile = media:Fetch("statusbar", "Default"),
+			tile = true,
+			tileSize = 16,
+			insets = {
+				top = offset["Top"],
+				bottom = offset["Bottom"],
+				left = offset["Left"],
+				right = offset["Right"],
+			}
+		})
+		target:SetBackdropColor(unpack(db["Background"]["Color"]))
+	else
+		target:SetBackdrop(nil)
+	end
+end
+
 function T:HookSetPoint(frame, position, w, h)
 	
 	hooksecurefunc(frame, "SetPoint", function(self, lp, r, p, x, y)
