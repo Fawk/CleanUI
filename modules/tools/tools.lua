@@ -219,6 +219,16 @@ function T:RunNowOrAfterCombat(func)
 	end
 end
 
+function T:Switch(m, ...)
+	local t = {...}
+	for i,v in next, t do
+		if v == m then
+			t[next(t, i)]()
+			return
+		end
+	end
+end
+
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do
         to[k] = v

@@ -74,18 +74,36 @@ local defaults =  {
                         ["Texture"] = "Default2"
     				},
     				["Buffs"] = {
-    					["Enabled"] = false,
-    					["Position"] = "ABOVE",
-    					["Relative To"] = "Player",
-    					["Offset X"] = 0,
-    					["Offset Y"] = 0
+    					["Enabled"] = true,
+    					["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+    					["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        }
     				},
     				["Debuffs"] = {
-    					["Enabled"] = false,
-    					["Position"] = "ABOVE",
-    					["Relative To"] = "Buffs",
-    					["Offset X"] = 0,
-    					["Offset Y"] = 0
+                        ["Enabled"] = false,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Health"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+                        ["Attached"] = true,
     				},
     				["Size"] = {
     					["Width"] = 200,
