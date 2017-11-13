@@ -63,8 +63,13 @@ local Buffs = function(frame, db)
 
 					button.bar:ClearAllPoints()
 					button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
-					T:Background(button.bar, db, button.bar, true)
-					T:Background(button, db, button, true)
+					
+					local background = CreateFrame("Frame", nil, button)
+					background:SetPoint("LEFT")
+					background:SetSize(width + sizex, sizey)
+					background:SetFrameLevel(button:GetFrameLevel() - 1)
+
+					T:Background(background, db, true)
 
 					T:Switch(growth,
 						"Upwards", function() 
@@ -112,27 +117,27 @@ local Buffs = function(frame, db)
 				end)
 			end
 
-			buffs.PostUpdateIcon = function(u, b, index, p)
-				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(b, p, "HELPFUL")
-				if index.bar then
+			buffs.PostUpdateIcon = function(element, unit, button, index)
+				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
+				if button.bar then
 
 					if db["Blacklist"][spellID] then
-						index:Hide()
+						button:Hide()
 						return
 					end
 
-					index:Show()
+					button:Show()
 
-					index.bar.name:SetText(name)
+					button.bar.name:SetText(name)
 					if duration == 0 then
-						index.bar:SetMinMaxValues(0, 1)
-						index.bar:SetValue(1)
-						index.bar.time:SetText("")
+						button.bar:SetMinMaxValues(0, 1)
+						button.bar:SetValue(1)
+						button.bar.time:SetText("")
 					else
 						local timeLeft = expiration - GetTime()
-						index.bar:SetMinMaxValues(0, duration)
-						index.bar:SetValue(timeLeft)
-						index.bar.time:SetText(T:timeString(timeLeft))
+						button.bar:SetMinMaxValues(0, duration)
+						button.bar:SetValue(timeLeft)
+						button.bar.time:SetText(T:timeString(timeLeft))
 					end
 				end
 			end
