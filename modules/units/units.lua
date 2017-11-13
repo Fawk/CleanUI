@@ -19,7 +19,7 @@ for key, obj in next, {
             if UnitExists(r or u) then
                 local h = UnitHealth(r or u)
                 if h > 1000000000 then
-                    return string.format("%.2f", h/1000000000).."B"
+                        return string.format("%.2f", h/1000000000).."B"
                 elseif h > 1000000 then
                     return string.format("%.2f", h/1000000).."M"
                 elseif h > 1000 then
@@ -393,7 +393,7 @@ function Units:SetupKeybindings(frame, db)
 end
 
 function Units:Tag(frame, name, db, framelevel)  
-    local tag = frame["Tags"][name] or CreateFrame("Frame", frame:GetName().."_"..name, frame)
+    local tag = frame["Tags"][name] or CreateFrame("Frame", T:frameName(frame:GetName(), name), frame)
     local fs = tag.text or tag:CreateFontString(nil, "OVERLAY")
 
     if framelevel then

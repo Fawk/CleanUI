@@ -841,6 +841,7 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 			ref:SetFrameStrata("LOW")
 			ref:SetFrameLevel(1)
 			ref:Show()
+			frame.Background = ref
 		end
 		local offset = db["Background"]["Offset"]
 		ref:SetBackdrop({

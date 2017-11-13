@@ -45,6 +45,15 @@ function T:frameName(...)
 	return t
 end
 
+function T:timeString(time)
+	if time > 3600 then
+		return string.format("%.0f%s", time/3600, "h")
+	elseif time > 60 then
+		return string.format("%.0f%s", time/60, "m")
+	end
+	return string.format("%.1f%s", time, "s")
+end
+
 T.reversedPoints = {
 	["LEFT"] = "RIGHT",
 	["RIGHT"] = "LEFT",
@@ -74,17 +83,19 @@ function T:Background(frame, db, anchor, isBackdrop)
 		end)())
 
 		local offset = db["Background"]["Offset"]
-		target:SetBackdrop({
-			bgFile = media:Fetch("statusbar", "Default"),
-			tile = true,
-			tileSize = 16,
-			insets = {
-				top = offset["Top"],
-				bottom = offset["Bottom"],
-				left = offset["Left"],
-				right = offset["Right"],
-			}
-		})
+		if not target:GetBackdrop() then
+			target:SetBackdrop({
+				bgFile = media:Fetch("statusbar", "Default"),
+				tile = true,
+				tileSize = 16,
+				insets = {
+					top = offset["Top"],
+					bottom = offset["Bottom"],
+					left = offset["Left"],
+					right = offset["Right"],
+				}
+			})
+		end
 		target:SetBackdropColor(unpack(db["Background"]["Color"]))
 	else
 		target:SetBackdrop(nil)

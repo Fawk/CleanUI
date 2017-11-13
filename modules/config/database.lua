@@ -90,6 +90,19 @@ local defaults =  {
                             ["Match height"] = false,
                             ["Width"] = 16,
                             ["Height"] = 16
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Blacklist"] = {
+
                         }
     				},
     				["Debuffs"] = {
@@ -99,11 +112,30 @@ local defaults =  {
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = -1,
-                            ["Relative To"] = "Health"
+                            ["Relative To"] = "Parent"
                         },
                         ["Style"] = "Bar",
                         ["Growth"] = "Upwards",
-                        ["Attached"] = true,
+                        ["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Blacklist"] = {
+
+                        }
     				},
     				["Size"] = {
     					["Width"] = 200,
@@ -352,18 +384,64 @@ local defaults =  {
                         ["Texture"] = "Default2"
     				},
     				["Buffs"] = {
-    					["Enabled"] = false,
-    					["Position"] = "ABOVE",
-    					["Relative To"] = "Player",
-    					["Offset X"] = 0,
-    					["Offset Y"] = 0
+                        ["Enabled"] = false,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+                        ["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Blacklist"] = {}
     				},
     				["Debuffs"] = {
-    					["Enabled"] = false,
-    					["Position"] = "ABOVE",
-    					["Relative To"] = "Buffs",
-    					["Offset X"] = 0,
-    					["Offset Y"] = 0
+                        ["Enabled"] = false,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+                        ["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Blacklist"] = {}
     				},
     				["Size"] = {
     					["Width"] = 200,
@@ -544,17 +622,41 @@ local defaults =  {
                     },
                     ["Buffs"] = {
                         ["Enabled"] = false,
-                        ["Position"] = "ABOVE",
-                        ["Relative To"] = "TargetTarget",
-                        ["Offset X"] = 0,
-                        ["Offset Y"] = 0
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+                        ["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        }
                     },
                     ["Debuffs"] = {
                         ["Enabled"] = false,
-                        ["Position"] = "ABOVE",
-                        ["Relative To"] = "Buffs",
-                        ["Offset X"] = 0,
-                        ["Offset Y"] = 0
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
+                        ["Attached"] = "TOP",
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 16,
+                            ["Height"] = 16
+                        }
                     },
                     ["Size"] = {
                         ["Width"] = 100,
@@ -773,10 +875,10 @@ local defaults =  {
                 ["Raid"] = {
                     ["Position"] = {
                         ["Relative To"] = "Parent",
-                        ["Point"] = "CENTER",
+                        ["Point"] = "TOPLEFT",
                         ["Local Point"] = "TOPLEFT",
-                        ["Offset X"] = -100.29987347126007,
-                        ["Offset Y"] = -200.094223022461,
+                        ["Offset X"] = 1117.7001953125,
+                        ["Offset Y"] = -899.094360351563,
                     },
                     ["Health"] = {
                         ["Enabled"] = true,
