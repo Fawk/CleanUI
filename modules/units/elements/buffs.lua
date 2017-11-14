@@ -64,12 +64,14 @@ local Buffs = function(frame, db)
 					button.bar:ClearAllPoints()
 					button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
 					
-					local background = CreateFrame("Frame", nil, button)
+					local background = button.background or CreateFrame("Frame", nil, button)
 					background:SetPoint("LEFT")
-					background:SetSize(width + sizex, sizey)
+					background:SetSize(width, sizey)
 					background:SetFrameLevel(button:GetFrameLevel() - 1)
 
-					T:Background(background, db, true)
+					button.background = background
+
+					T:Background(background, db, nil, true)
 
 					T:Switch(growth,
 						"Upwards", function() 

@@ -127,6 +127,11 @@ function A:CreateMover(frame, db, overrideName)
 		--A:Debug(name, lp, relative and relative:GetName() or "Unknown", p, x, y)
 
 		local adb = A["Profile"]["Options"][name]
+		if not adb then
+			if A["Profile"]["Options"]["Player"][name] then
+				adb = A["Profile"]["Options"]["Player"][name]
+			end
+		end
         if adb then
             local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, adb["Position"]["Anchor"])
             local obj = {}
@@ -135,7 +140,7 @@ function A:CreateMover(frame, db, overrideName)
             end
             obj["Position"] = position
 
-			A.Database:Prepare(name, obj)
+			A.dbProvider:Save()
         else
             A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
         end

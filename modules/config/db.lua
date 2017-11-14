@@ -4,6 +4,7 @@ local Database = {}
 local _G = _G
 local setmetatable = setmetatable
 local db
+local dbName = nil
 
 local function merge(t1, t2)
     for k,v in pairs(t2) do
@@ -39,13 +40,14 @@ local function deepCopy(object)
 end
 
 function Database:New(name, defaults)
-    if not _G[name] then _G[name] = {} end
-    db = merge(deepCopy(defaults), deepCopy(_G[name]))
+    dbName = name
+    if not _G[dbName] then _G[dbName] = {} end
+    db = merge(deepCopy(defaults), deepCopy(_G[dbName]))
     return db
 end
 
 function Database:Save()
-    _G[name] = deepCopy(db)
+    _G[dbName] = deepCopy(db)
 end
 
 A.dbProvider = Database

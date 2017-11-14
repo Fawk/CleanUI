@@ -175,7 +175,7 @@ local defaults =  {
 						},
 						["Enabled"] = true,
 					},
-                    ["AltPowerBar"] = {
+                    ["AlternativePower"] = {
                         ["Enabled"] = true,
                         ["Background"] = {
                             ["Enabled"] = true,
@@ -188,11 +188,11 @@ local defaults =  {
                             ["Color"] = { 0, 0, 0 }
                         },
                         ["Position"] = {
-                            ["Point"] = "TOP",
-                            ["Local Point"] = "BOTTOM",
-                            ["Offset X"] = 0,
-                            ["Offset Y"] = 0,
-                            ["Relative To"] = "Player"
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 300,
+                            ["Offset Y"] = 400,
+                            ["Relative To"] = "Parent"
                         },
                         ["Size"] = {
                             ["Width"] = 200,

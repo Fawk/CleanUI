@@ -119,7 +119,7 @@ end
 
 function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 	local achor = anchor or "TOPLEFT"
-	local top, left, bottom, right, newX, newY = frame:GetTop(), frame:GetLeft(), frame:GetBottom(), frame:GetRight()
+	local top, left, bottom, right, newX, newY = frame:GetTop() or 0, frame:GetLeft() or 0, frame:GetBottom() or 0, frame:GetRight() or 0
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
 	if anchor == "TOPLEFT" then

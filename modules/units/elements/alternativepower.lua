@@ -55,6 +55,7 @@ function AlternativePower(frame, db)
 	end
 
 	Units:Position(bar, db["Position"])
+	A:CreateMover(bar, db, "AlternativePower")
 	bar:SetSize(size["Width"], size["Height"])
 	bar:SetStatusBarTexture(texture)
 	bar.bg:SetTexture(texture)
