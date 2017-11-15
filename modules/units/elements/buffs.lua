@@ -123,24 +123,37 @@ local Buffs = function(frame, db)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
 				if button.bar then
 
-					if db["Blacklist"][spellID] then
+					if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
+						button:Hide()
+						return
+					elseif db["Whitelist"]["Enabled"] and not db["Whitelist"]["Ids"][spellID] then
 						button:Hide()
 						return
 					end
-
-					button:Show()
 
 					button.bar.name:SetText(name)
 					if duration == 0 then
 						button.bar:SetMinMaxValues(0, 1)
 						button.bar:SetValue(1)
 						button.bar.time:SetText("")
+						if db["Hide zero duration"] then
+							button:Hide()
+							return
+						end
 					else
 						local timeLeft = expiration - GetTime()
 						button.bar:SetMinMaxValues(0, duration)
 						button.bar:SetValue(timeLeft)
 						button.bar.time:SetText(T:timeString(timeLeft))
 					end
+
+					if not button.count.init then
+						button.count.init = true
+						button.count = buildText(button, 9):outline():atCenter():build()
+					end
+					
+					button.count:SetText(count > 0 and count or "")
+					button:Show()
 				end
 			end
 		end)

@@ -102,7 +102,12 @@ local defaults =  {
                             ["Enabled"] = true,
                         },
                         ["Blacklist"] = {
-
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
                         }
     				},
     				["Debuffs"] = {
@@ -134,7 +139,12 @@ local defaults =  {
                             ["Enabled"] = true,
                         },
                         ["Blacklist"] = {
-
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
                         }
     				},
     				["Size"] = {
@@ -411,7 +421,14 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Blacklist"] = {}
+                        ["Blacklist"] = {
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
+                        }
     				},
     				["Debuffs"] = {
                         ["Enabled"] = false,
@@ -441,7 +458,14 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Blacklist"] = {}
+                        ["Blacklist"] = {
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
+                        }
     				},
     				["Size"] = {
     					["Width"] = 200,
