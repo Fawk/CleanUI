@@ -30,6 +30,13 @@ local Buffs = function(frame, db)
 			local height = size["Match height"] and frame:GetHeight() or size["Height"]
 
 			buffs.disableCooldown = true
+			buffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
+				if db["Blacklist"]["Enabled"] then
+					return not db["Blacklist"]["Ids"][spellID]
+				elseif db["Whitelist"]["Enabled"] then
+					return db["Whitelist"]["Ids"][spellID]
+				end
+			end
 
 			buffs.SetPosition = function(element, from, to)
 				local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
@@ -50,6 +57,18 @@ local Buffs = function(frame, db)
 						button.bar.bg:SetTexture(media:Fetch("statusbar", "Default2"))
 						button.bar.bg:SetVertexColor(0.3 * .3, 0.6 * .3, 0.8 * .3)
 						button.bar.bg:SetAllPoints()
+
+						button:SetScript("OnClick", function(self, button, down)
+							if not down and IsShiftKeyDown() and IsAltKeyDown() and IsControlKeyDown() and button == "RightButton" then
+								if db["Blacklist"]["Enabled"] then
+									db["Blacklist"]["Ids"][self.spellID] = true
+								elseif db["Whitelist"]["Enabled"] then
+									table.remove(db["Whitelist"]["Ids"], self.spellID)
+								end
+								A.dbProvider:Save()
+								buffs:ForceUpdate()
+							end
+						end)
 
 						local name = buildText(button.bar, 0.7):enforceHeight():shadow():atLeft():x(3):build()
 						name:SetJustifyH("LEFT")
@@ -110,11 +129,17 @@ local Buffs = function(frame, db)
 			if not buffs.updateFrame then
 				buffs.updateFrame = CreateFrame("Frame")
 				buffs.updateFrame.timer = 0
+				buffs.updateFrame.garbage = 0
 				buffs.updateFrame:SetScript("OnUpdate", function(self, elapsed)
 					self.timer = self.timer + elapsed
+					self.garbage = self.garbage + elapsed
 					if self.timer > 0.03 then
 						buffs:ForceUpdate()
 						self.timer = 0
+					end
+					if self.garbage > 3 then
+						collectgarbage("collect");
+						self.garbage = 0
 					end
 				end)
 			end
@@ -130,6 +155,8 @@ local Buffs = function(frame, db)
 						button:Hide()
 						return
 					end
+
+					button.spellID = spellID
 
 					button.bar.name:SetText(name)
 					if duration == 0 then
@@ -149,7 +176,7 @@ local Buffs = function(frame, db)
 
 					if not button.count.init then
 						button.count.init = true
-						button.count = buildText(button, 9):outline():atCenter():build()
+						button.count = button.count or buildText(button, 9):outline():atCenter():build()
 					end
 					
 					button.count:SetText(count > 0 and count or "")

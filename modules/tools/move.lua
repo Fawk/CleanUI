@@ -177,6 +177,31 @@ end
 
 SLASH_CLEANUI1 = '/cui'
 function SlashCmdList.CLEANUI(msg, editbox)
+	local words = {}
+	for word in string.gmatch(msg, "%S+") do
+	   table.insert(words, word)
+	end
+
+	local b = A["Profile"]["Options"]["Player"]["Buffs"]
+	local listName = b["Blacklist"]["Enabled"] and "Blacklist" or "Whitelist"
+
+	if words[1] == "add" then
+		local spellId = words[2]
+		b[listName]["Ids"][spellId] = true
+		A.dbProvider:Save()
+	end
+
+	if words[1] == "list" then
+		A:Debug(listName.." for buffs:")
+		if T:tcount(b[listName]["Ids"]) > 0 then
+			for k,_ in pairs(b[listName]["Ids"]) do
+				A:Debug(k, GetSpellInfo(k))
+			end
+		else
+			A:Debug("EMPTY")
+		end
+	end
+
     if msg == "move" then
        A:InitMove() 
     end

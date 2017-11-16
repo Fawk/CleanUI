@@ -661,6 +661,14 @@ local defaults =  {
                             ["Match height"] = false,
                             ["Width"] = 16,
                             ["Height"] = 16
+                        },
+                        ["Blacklist"] = {
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
                         }
                     },
                     ["Debuffs"] = {
@@ -680,6 +688,14 @@ local defaults =  {
                             ["Match height"] = false,
                             ["Width"] = 16,
                             ["Height"] = 16
+                        },
+                        ["Blacklist"] = {
+                            ["Enabled"] = true,
+                            ["Ids"] = {}
+                        },
+                        ["Whitelist"] = {
+                            ["Enabled"] = false,
+                            ["Ids"] = {}
                         }
                     },
                     ["Size"] = {
