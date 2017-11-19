@@ -201,8 +201,8 @@ local defaults =  {
                             ["Point"] = "TOPLEFT",
                             ["Local Point"] = "TOPLEFT",
                             ["Offset X"] = 300,
-                            ["Offset Y"] = 400,
-                            ["Relative To"] = "Parent"
+                            ["Offset Y"] = -400,
+                            ["Relative To"] = "FrameParent"
                         },
                         ["Size"] = {
                             ["Width"] = 200,
@@ -798,7 +798,7 @@ local defaults =  {
                 },
                 ["Party"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = -1.29987347126007,
@@ -914,7 +914,7 @@ local defaults =  {
                 },
                 ["Raid"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "TOPLEFT",
                         ["Local Point"] = "TOPLEFT",
                         ["Offset X"] = 1117.7001953125,
@@ -1034,7 +1034,7 @@ local defaults =  {
     					["Local Point"] = "TOPRIGHT",
     					["Offset X"] = 0,
     					["Offset Y"] = 0,
-    					["Relative To"] = "Parent"
+    					["Relative To"] = "FrameParent"
     				}
     			},
                 ["Vehicle Seat Indicator"] = {
@@ -1043,7 +1043,7 @@ local defaults =  {
                         ["Local Point"] = "TOPLEFT",
                         ["Offset X"] = 100,
                         ["Offset Y"] = -100,
-                        ["Relative To"] = "Parent"
+                        ["Relative To"] = "FrameParent"
                     }
                 },
                 ["Objective Tracker"] = {
@@ -1052,12 +1052,12 @@ local defaults =  {
                         ["Local Point"] = "TOPRIGHT",
                         ["Offset X"] = -10,
                         ["Offset Y"] = -300,
-                        ["Relative To"] = "Parent"
+                        ["Relative To"] = "FrameParent"
                     }
                 },
                 ["Cooldown bar"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = 3.4875648021698,
@@ -1069,7 +1069,7 @@ local defaults =  {
 				},
                 ["Extra Action Button"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "BOTTOM",
                         ["Local Point"] = "BOTTOM",
                         ["Offset X"] = -6.56422424316406,
@@ -1083,13 +1083,64 @@ local defaults =  {
                     ["Direction"] = "Right",
                     ["Orientation"] = "HORIZONTAL",
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = 3.4875648021698,
                         ["Offset Y"] = -158.936065673828,
                     },
                     ["Presets"] = {}
+                },
+                ["Talking Head Frame"] = {
+                     ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 10,
+                        ["Offset Y"] = -10,
+                    }
+                },
+                ["Actionbars"] = {
+                    [1] = { 
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 500,
+                            ["Offset Y"] = -50,
+                        }
+                    },
+                    [2] = { 
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 500,
+                            ["Offset Y"] = -83,
+                        }
+                    },
+                    [3] = { 
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 500,
+                            ["Offset Y"] = -116,
+                        }
+                    },
+                    [4] = { 
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 500,
+                            ["Offset Y"] = -149,
+                        }
+                    }
                 }
     		}
 	    }

@@ -616,6 +616,23 @@ local function setStyle()
         }, "Vehicle Seat Indicator")
    	end
 
+   	-- TalkingHeadFrame
+   	do
+   		--[[hooksecurefunc("TalkingHeadFrame_OnShow", function()
+	    	local position = A["Profile"]["Options"]["Talking Head Frame"]["Position"]
+	    	local w, h = _G["TalkingHeadFrame"]:GetSize()
+	    	Tools:HookSetPoint(_G["TalkingHeadFrame"], position, w, h)
+
+	        A:CreateMover(_G["TalkingHeadFrame"], { 
+	            ["Position"] = position,
+	            ["Size"] = {
+	                ["Width"] = w,
+	                ["Height"] = h
+	            }
+	        }, "Talking Head Frame")
+	    end)]]
+   	end
+
 	--Blizzard windows
 	do
 		--GameMenuFrame

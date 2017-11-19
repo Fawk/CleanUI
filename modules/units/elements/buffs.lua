@@ -176,7 +176,10 @@ local Buffs = function(frame, db)
 
 					if not button.count.init then
 						button.count.init = true
+						button.count:SetFontObject(nil)
+						button.count:Hide()
 						button.count = button.count or buildText(button, 9):outline():atCenter():build()
+						button.count:SetJustifyH("CENTER")
 					end
 					
 					button.count:SetText(count > 0 and count or "")

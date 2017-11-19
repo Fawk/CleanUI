@@ -39,7 +39,7 @@ A.colors = {
 		healAbsorb = { .7, .7, 1, .5 }
 	},
 	moving = {
-		backdrop = { .1, .1, .1, .5 },
+		backdrop = { .1, .1, .1, .7 },
 		border = { .3, .3, .6, .5 }
 	},
 	border = {

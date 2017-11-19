@@ -336,6 +336,8 @@ function Units:Translate(frame, relative)
         return parent
     elseif relative:equals(parent:GetName(), "Parent") then
         return parent
+    elseif relative:equals(parent:GetName(), "FrameParent") then
+        return A["Frameparent"]
     else
         A:Debug("Could not find relative frame '", relative, "' for frame '", name or "Unknown", "' using Frameparent.")
         return A["Frameparent"]

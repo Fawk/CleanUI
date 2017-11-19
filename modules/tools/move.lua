@@ -14,7 +14,7 @@ local function FinalizeMove()
 		moveFrame:Apply()
 	end
 	finishFrame:Hide()
-    A.Database:Save()
+    A.dbProvider:Save()
 end
 
 function A:InitMove()
@@ -96,6 +96,7 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
+	moveFrame:SetFrameLevel(8)
 
 	for i = 1, 5 do
 		if frame:GetPoint(i) then
@@ -126,24 +127,17 @@ function A:CreateMover(frame, db, overrideName)
 
 		--A:Debug(name, lp, relative and relative:GetName() or "Unknown", p, x, y)
 
-		local adb = A["Profile"]["Options"][name]
-		if not adb then
-			if A["Profile"]["Options"]["Player"][name] then
-				adb = A["Profile"]["Options"]["Player"][name]
-			end
-		end
-        if adb then
-            local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, adb["Position"]["Anchor"])
-            local obj = {}
-            for k,v in next, adb do
-                obj[k] = v
-            end
-            obj["Position"] = position
-
-			A.dbProvider:Save()
-        else
-            A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
-        end
+		-- local adb = A["Profile"]["Options"][name]
+		-- if not adb then
+		-- 	if A["Profile"]["Options"]["Player"][name] then
+		-- 		adb = A["Profile"]["Options"]["Player"][name]
+		-- 	end
+		-- end
+        -- if adb then
+        db["Position"] = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db["Position"]["Anchor"])
+        -- else
+        --     A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
+        -- end
         
 	end
 	moveFrame:Hide()
@@ -177,29 +171,8 @@ end
 
 SLASH_CLEANUI1 = '/cui'
 function SlashCmdList.CLEANUI(msg, editbox)
-	local words = {}
-	for word in string.gmatch(msg, "%S+") do
-	   table.insert(words, word)
-	end
-
-	local b = A["Profile"]["Options"]["Player"]["Buffs"]
-	local listName = b["Blacklist"]["Enabled"] and "Blacklist" or "Whitelist"
-
-	if words[1] == "add" then
-		local spellId = words[2]
-		b[listName]["Ids"][spellId] = true
-		A.dbProvider:Save()
-	end
-
-	if words[1] == "list" then
-		A:Debug(listName.." for buffs:")
-		if T:tcount(b[listName]["Ids"]) > 0 then
-			for k,_ in pairs(b[listName]["Ids"]) do
-				A:Debug(k, GetSpellInfo(k))
-			end
-		else
-			A:Debug("EMPTY")
-		end
+	if msg == "bind" then
+		A["modules"]["Actionbars"]:BindingMode()
 	end
 
     if msg == "move" then
