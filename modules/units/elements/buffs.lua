@@ -174,14 +174,14 @@ local Buffs = function(frame, db)
 						button.bar.time:SetText(T:timeString(timeLeft))
 					end
 
-					if not button.count.init then
-						button.count.init = true
-						button.count:SetFontObject(nil)
+					if not button.initCount then
+						button.initCount = true
 						button.count:Hide()
-						button.count = button.count or buildText(button, 9):outline():atCenter():build()
+						button.count = buildText(button, 11):outline():atCenter():build()
+						button.count:Show()
 						button.count:SetJustifyH("CENTER")
 					end
-					
+
 					button.count:SetText(count > 0 and count or "")
 					button:Show()
 				end
