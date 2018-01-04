@@ -1,5 +1,4 @@
-local A, L = unpack(select(2, ...))
-local E = A.enum
+local AddonName, Args = ...
 
 local OT = {}
 
@@ -111,7 +110,7 @@ function OT:getChildByKey(key, value)
 end
 
 function OT:getBy(key, value, steps)
-	local result, parents = A:OrderedTable(), A:OrderedTable()
+	local result, parents = Args:OrderedTable(), Args:OrderedTable()
 	--search(result, self.e, key, value, steps, parents)
     return result:count() ~= 0 and (result:count() == 1 and result:get(1) or result) or nil
 end
@@ -156,7 +155,7 @@ function OT:isSize(size)
 	return self:count() == size
 end
 
-function A:OrderedTable(s)
+function Args:OrderedTable(s)
 
 	local opt = { 
 		e = {},
@@ -171,10 +170,10 @@ function A:OrderedTable(s)
 	return opt
 end
 
-function A:Option(builder)
+function Args:Option(builder)
   local opt = {
-    children = A:OrderedTable(),
-    items = A:OrderedTable(),
+    children = Args:OrderedTable(),
+    items = Args:OrderedTable(),
     isGroup = function() return self.children:count() > 0 end,
     getChildren = function() return self.children end,
     getItems = function() return self.items end,
@@ -227,7 +226,7 @@ function A:Option(builder)
 	return opt
 end
 
-function A:OptionBuilder()
+function Args:OptionBuilder()
   local opt = {
     children = A:OrderedTable(),
     items = A:OrderedTable(),

@@ -182,7 +182,7 @@ local Buffs = function(frame, db)
 						button.count:SetJustifyH("CENTER")
 					end
 
-					button.count:SetText(count > 0 and count or "")
+					button.count:SetText(duration > 0 and (count > 0 and count or "") or "")
 					button:Show()
 				end
 			end
@@ -191,4 +191,4 @@ local Buffs = function(frame, db)
 	frame.Buffs = buffs
 end
 
-A["Elements"]["Buffs"] = Buffs
+A["Elements"]:add({ name = "Buffs", func = Buffs })

@@ -23,4 +23,4 @@ function GroupRoleIndicator(frame, db)
 	frame.GroupRoleIndicator = role
 end
 
-A["Elements"]["GroupRoleIndicator"] = GroupRoleIndicator
+A["Elements"]:add({ name = "GroupRoleIndicator", func = GroupRoleIndicator })

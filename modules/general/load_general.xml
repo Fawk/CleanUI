@@ -4,6 +4,10 @@
 	<Script file="chat.lua"/>
 	<Script file="infofield.lua"/>
 	<Script file="actionbars.lua"/>
+	<Script file="experience.lua"/>
+    <Script file="artifact.lua"/>
+    <Script file="reputation.lua"/>
+    <Script file="vehicle.lua"/>
 	<!--<Script file="cooldown.lua"/>-->
 
 </Ui>

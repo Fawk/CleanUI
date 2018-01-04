@@ -68,4 +68,4 @@ local function Power(frame, db)
 	frame.Power = power
 end
 
-A["Elements"]["Power"] = Power
+A["Elements"]:add({ name = "Power", func = Power })

@@ -32,5 +32,5 @@ function CombatIndicator(frame, db)
 	frame.CombatIndicator = combat
 end
 
-A["Elements"]["CombatIndicator"] = CombatIndicator
+A["Elements"]:add({ name = "CombatIndicator", func = CombatIndicator })
 

@@ -50,11 +50,11 @@ local function HealPredictionPostUpdate(self, unit, my, all, absorb, healAbsorb)
 	previous = Update(frame, previous, self.healAbsorbBar, healAbsorb)
 end
 
-function HealPrediction(frame, db)
+function HealthPrediction(frame, db)
 
 	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
-	local healPrediction = frame.HealPrediction or (function()
+	local healPrediction = frame.HealthPrediction or (function()
 		
 		local healPrediction, my, all, absorb, healAbsorb = {}, CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame), CreateFrame("StatusBar", nil, frame)
 		
@@ -98,8 +98,8 @@ function HealPrediction(frame, db)
 	healPrediction.otherBar:SetStatusBarTexture(texture)
 	healPrediction.absorbBar:SetStatusBarTexture(texture)
 	healPrediction.healAbsorbBar:SetStatusBarTexture(texture)
-	
-	frame.HealPrediction = healPrediction
+
+	frame.HealthPrediction = healPrediction
 end
 
-A["Elements"]["HealPrediction"] = HealPrediction
+A["Elements"]:add({ name = "HealthPrediction", func = HealthPrediction })

@@ -75,4 +75,4 @@ function AlternativePower(frame, db)
 	frame.AlternativePower = bar
 end
 
-A["Elements"]["AlternativePower"] = AlternativePower
+A["Elements"]:add({ name = "AlternativePower", func = AlternativePower })

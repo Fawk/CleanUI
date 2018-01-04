@@ -6,9 +6,9 @@
     <Script file="healprediction.lua"/>
     <Script file="grouproleindicator.lua"/>
     <Script file="alternativepower.lua"/>
-    <Script file="classicons.lua"/>
     <Script file="castbar.lua"/>
     <Script file="stagger.lua"/>
+    <Script file="classicons.lua"/>
     <Script file="combatindicator.lua"/>
     <Script file="buffs.lua"/>
     <!-- etc -->

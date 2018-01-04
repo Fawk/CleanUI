@@ -2,7 +2,6 @@
     
     <Script file="colors.lua"/>
     <Script file="enum.lua"/>
-    <Script file="ordered_table.lua"/>
 	<Script file="tools.lua"/>
 	<Script file="utils.lua"/>
 	<Script file="move.lua"/>

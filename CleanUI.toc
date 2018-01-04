@@ -1,6 +1,6 @@
 ## Interface: 60200
 ## Title: |cFFCCCCCCCleanUI|r
-## Author: Xiang (Shattered Hand-EU)
+## Author: Aiwen (Shattered Hand-EU)
 ## Version: 0.1a
 ## SavedVariables: CleanUI_DB
 ## Notes: Clean and simple UI alternative

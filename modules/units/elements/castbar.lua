@@ -96,7 +96,7 @@ local function Castbar(frame, db)
 		bar.setup = true
 	end
 
-	Units:Position(bar, db["Position"])
+	--Units:Position(bar, db["Position"])
 	Units:Position(bar.Text, db["Name"]["Position"])
 	Units:Position(bar.Time, db["Time"]["Position"])
 
@@ -116,4 +116,4 @@ local function Castbar(frame, db)
 	Units:PlaceCastbar(frame, true)
 end
 
-A["Elements"]["Castbar"] = Castbar
+A["Elements"]:add({ name = "Castbar", func = Castbar })

@@ -3,8 +3,12 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon["Modules"], Addon["Elements"], Addon.options = {}, {}, {}, {}
-Addon.debugging = true
+Addon.frames, Addon["Modules"], Addon.options = {}, {}, {}
+Addon.debugging = false
+
+Addon.OrderedTable = Args.OrderedTable
+
+Addon["Elements"] = Args:OrderedTable()
 
 Addon.oUF = Args.oUF or oUF
 local oUF = Addon.oUF
@@ -147,6 +151,30 @@ function Addon:OnEnable()
 	local E, T, Options = Addon.enum, Addon.Tools, Addon.Options
 
 	setScale()
+
+    -- local functions = {
+    --     "SetQuestCurrency",
+    --     "SetQuestLogCurrency",
+    --     "SetQuestItem",
+    --     "SetQuestLogSpecialItem",
+    -- }
+
+    -- UnitIsQuestBoss
+
+    -- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory, isHidden = GetQuestLogTitle(questIndex)
+
+    -- for _,func in next, functions do
+    --     hooksecurefunc(GameTooltip, func, function(self, ...)
+    --         print(func, self, unpack({ ... }))
+    --     end)
+    -- end
+
+    -- local f = CreateFrame("Frame")
+    -- f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+    -- f:SetScript("OnEvent", function(self, event, ...)
+    --     print(event, unpack({...}))
+    --     print(GameTooltip:GetUnit())
+    -- end)
 
 	-- local options, playerOptions, opts, barOptions = Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable()
   

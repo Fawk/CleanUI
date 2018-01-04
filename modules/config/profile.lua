@@ -21,7 +21,7 @@ function Profile:Set(name)
 	else
 		self:SetActive(A.db["Characters"][name])
 	end
-	self:Update(name)
+	A.dbProvider:Save()
 end
 
 function Profile:Load()
@@ -38,16 +38,6 @@ end
 
 function Profile:GetActive()
 	return activeProfile
-end
-
-function Profile:Update(name)
-	if name then
-		A.db["Characters"][name] = profiles[name]
-	else
-		for name, profile in pairs(profiles) do
-			A.db["Characters"][name] = profile
-		end
-	end
 end
 
 function Profile:Copy(name)

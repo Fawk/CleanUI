@@ -66,7 +66,10 @@ end
  
 function Units:UpdateElements(frame, db)
     if db then
-        for name, func in next, A["Elements"] do
+        for i = 1, A["Elements"]:count() do
+            local tbl = A["Elements"]:get(i)
+            local name = tbl.name
+            local func = tbl.func
             if db[name] then
                 if db[name]["Enabled"] then
                     if frame.EnableElement then
@@ -318,12 +321,22 @@ function Units:UpdateImportantElements(frame, db)
         end
     end
 end
+
+local function getElementByName(t, n)
+    for i = 1, t:count() do
+        local t2 = t:get(i)
+        if t2.name and t2.name == n then
+            return true
+        end
+    end
+    return false
+end
  
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
     if units[relative] then
         return units[relative]
-    elseif A["Elements"][relative] then
+    elseif getElementByName(A["Elements"], relative) then
         if frame[relative] then
             return frame[relative]
         elseif parent[relative] then
@@ -331,7 +344,7 @@ function Units:Translate(frame, relative)
         else
             return parent
         end
-    elseif A["Elements"][name] then
+    elseif getElementByName(A["Elements"], name) then
         A:Debug("Could not find relative frame '", relative, "' for element '", name or "Unknown", "', using parent.")
         return parent
     elseif relative:equals(parent:GetName(), "Parent") then
@@ -355,25 +368,29 @@ end
 
 function Units:PlaceCastbar(frame, invalidPower, isStagger)
     local playerDB = A["Profile"]["Options"]["Player"]
-    
+
     local castbar = frame.Castbar
     if castbar then
-        local cdb = playerDB["Castbar"]
-        local position = cdb["Position"]
+        if frame.unit == "player" then 
+            local cdb = playerDB["Castbar"]
+            local position = cdb["Position"]
 
-        if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
-            local anchor = frame
-            castbar:ClearAllPoints()
-            if invalidPower == true and not isStagger then
-                anchor = frame
-            elseif invalidPower == false then
-                anchor = frame.__castbarAnchor
-                castbar.placedByClassIcons = true
-            elseif invalidPower == nil and isStagger then
-                anchor = frame.Stagger
-                castbar.placedByStagger = true
+            if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
+                local anchor = frame
+                castbar:ClearAllPoints()
+                if invalidPower == true and not isStagger then
+                    anchor = frame
+                elseif invalidPower == false then
+                    anchor = frame.__castbarAnchor
+                    castbar.placedByClassIcons = true
+                elseif invalidPower == nil and isStagger then
+                    anchor = frame.Stagger
+                    castbar.placedByStagger = true
+                end
+                castbar:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
             end
-            castbar:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
+        else
+            castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT")
         end
     end
 end
@@ -381,14 +398,14 @@ end
 function Units:SetupClickcast(frame, db)
     if db and frame.unit and frame:CanChangeAttribute() then
         for _,binding in next, db do
-            frame:SetAttribute(binding.type, binding.action:gsub("@unit", "@"..frame.unit))
+            local f, t = binding.action:gsub("@unit", "@mouseover")
+            frame:SetAttribute(binding.type, f)
         end
     end
 end
 
 function Units:SetupKeybindings(frame, db)
     if InCombatLockdown() then return end
-    print(db)
     if db then
         A.modules["Actionbars"]:SetupBindings(db)
     end

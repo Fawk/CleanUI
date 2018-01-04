@@ -80,4 +80,4 @@ function Health(frame, db)
 	frame.Health = health
 end 
 
-A["Elements"]["Health"] = Health
+A["Elements"]:add({ name = "Health", func = Health })

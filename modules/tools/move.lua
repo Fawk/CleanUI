@@ -8,13 +8,13 @@ local moveableFrames = {}
 local finishFrame
 
 local function FinalizeMove()
-	A.isMovingFrames = false
 	for name, moveFrame in next, moveableFrames do
 		moveFrame:Hide()
 		moveFrame:Apply()
 	end
 	finishFrame:Hide()
     A.dbProvider:Save()
+	A.isMovingFrames = false
 end
 
 function A:InitMove()
@@ -59,6 +59,11 @@ function A:InitMove()
 	for name, moveFrame in next, moveableFrames do
 		
 		moveFrame:Show()
+        moveFrame:ClearAllPoints()
+
+        local lp, r, p, x, y = moveFrame.affecting:GetPoint()
+
+        moveFrame:SetPoint(lp, A.frameParent, p, x, y)
 		moveFrame.affecting:ClearAllPoints()
 		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 
@@ -98,11 +103,10 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetSize(size["Width"], size["Height"])
 	moveFrame:SetFrameLevel(8)
 
-	for i = 1, 5 do
-		if frame:GetPoint(i) then
-			moveFrame:SetPoint(frame:GetPoint(i))
-		end
-	end
+    local lp, r, p, x, y = frame:GetPoint(1)
+    if lp ~= nil then
+    	moveFrame:SetPoint(lp, A.frameParent, p, x, y)
+    end
 
 	moveFrame:EnableMouse(true)
 	moveFrame.moveAble = true
@@ -125,20 +129,9 @@ function A:CreateMover(frame, db, overrideName)
 		local lp, relative, p, x, y = self:GetPoint()
 		self.affecting:SetParent(A.frameParent)
 
-		--A:Debug(name, lp, relative and relative:GetName() or "Unknown", p, x, y)
-
-		-- local adb = A["Profile"]["Options"][name]
-		-- if not adb then
-		-- 	if A["Profile"]["Options"]["Player"][name] then
-		-- 		adb = A["Profile"]["Options"]["Player"][name]
-		-- 	end
-		-- end
-        -- if adb then
-        db["Position"] = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db["Position"]["Anchor"])
-        -- else
-        --     A:Debug("Database entry for moveable frame: "..name.." does not exist, please add!")
-        -- end
-        
+        local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db["Position"]["Anchor"])
+        --A:Debug(name, position["Local Point"], position["Point"], position["Offset X"], position["Offset Y"])
+        db["Position"] = position
 	end
 	moveFrame:Hide()
 

@@ -37,4 +37,4 @@ local function Stagger(frame, db)
 	frame.Stagger = stagger
 end
 
-A["Elements"]["Stagger"] = Stagger
+A["Elements"]:add({ name = "Stagger", func = Stagger })

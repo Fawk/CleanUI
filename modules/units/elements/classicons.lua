@@ -102,7 +102,7 @@ local function Update(bar, event, unit, powerType, func)
 end
 
 local function createIcon(parent, index)
-	local icon = CreateFrame("StatusBar", T.frameName(parent.power.powerType, index), parent)
+	local icon = CreateFrame("StatusBar", T:frameName("ClassIcons", index), parent)
 
 	icon:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
 	icon:SetSize(parent.iconW, parent.iconH)
@@ -154,6 +154,10 @@ local function tfirst(t)
 	end
 end
 
+local function tfirstValue(t)
+	return #t > 1 and t[1] or nil
+end
+
 local function OrderRunes(parent)
 	local readyRunes, notReadyRunes = {}, {}
 	local frame = parent:GetParent()
@@ -179,16 +183,30 @@ local function OrderRunes(parent)
 		icon:SetPoint(i == 1 and "TOPLEFT" or "LEFT", i == 1 and frame or parent.icons[readyRunes[i-1]], i == 1 and "BOTTOMLEFT" or "RIGHT", i == 1 and 0 or 1, i == 1 and -1 or 0)
 	end
 
+	local oldIndex = parent.realIndex
+
 	local first = tfirst(notReadyRunes)
 	local prev = first
 	for i, realIndex in pairsByKeys(notReadyRunes) do
 		local icon = parent.icons[realIndex]
+		if i == first then
+			parent.realIndex = realIndex
+		end
 		if #readyRunes > 0 then
 			icon:SetPoint("LEFT", i == first and parent.icons[readyRunes[#readyRunes]] or parent.icons[notReadyRunes[prev]], "RIGHT", 1, 0)
 		else
 			icon:SetPoint(i == first and "TOPLEFT" or "LEFT", i == first and frame or parent.icons[notReadyRunes[prev]], i == first and "BOTTOMLEFT" or "RIGHT", i == first and 0 or 1, i == first and -1 or 0)
 		end
 		prev = i
+	end
+
+	if #readyRunes > 0 then
+		parent.realIndex = tfirstValue(readyRunes)
+	end
+
+	if parent.realIndex ~= oldIndex then
+		frame.__castbarAnchor = parent.icons[parent.realIndex or 1]
+		Units:PlaceCastbar(frame, VALID_POWER)
 	end
 end
 
@@ -317,7 +335,7 @@ local function ClassIcons(frame, db)
 	local spec, form = GetSpecialization(), GetShapeshiftFormID()
 	local power = powerType[class]
 
-	if not power or (power and not power.isValid(spec, form)) then 
+	if not power or (power and not power.isValid(spec, form)) then
 		if frame.Stagger and spec == 1 then
 			Units:PlaceCastbar(frame, nil, true)
 		else
@@ -474,12 +492,12 @@ local function ClassIcons(frame, db)
 		end
 	end
 
-	if power then
-		frame.__castbarAnchor = bar.icons[1]
+	if power and power.isValid(spec, form) then
+		frame.__castbarAnchor = bar.icons[bar.realIndex or 1]
 		Units:PlaceCastbar(frame, VALID_POWER)
 	end
 
 	frame.ClassIcons = bar
 end
 
-A["Elements"]["ClassIcons"] = ClassIcons
+A["Elements"]:add({ name = "ClassIcons", func = ClassIcons })

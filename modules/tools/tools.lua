@@ -21,6 +21,45 @@ setmetatable(Controls, P)
 setmetatable(Backdrops, P)
 setmetatable(Textures, P)
 
+function T:rgbToHex(rgb)
+    local hexadecimal = ''
+
+    for key, value in pairs(rgb) do
+        if value < 1 then value = value * 255 end
+        local hex = ''
+
+        while(value > 0)do
+            local index = math.fmod(value, 16) + 1
+            value = math.floor(value / 16)
+            hex = string.sub('0123456789ABCDEF', index, index) .. hex           
+        end
+
+        if(string.len(hex) == 0)then
+            hex = '00'
+
+        elseif(string.len(hex) == 1)then
+            hex = '0' .. hex
+        end
+
+        hexadecimal = hexadecimal .. hex
+    end
+
+    return hexadecimal
+end
+
+function T:split(s, delimiter)
+  local result = { }
+  local from  = 1
+  local delim_from, delim_to = string.find( s, delimiter, from  )
+  while delim_from do
+    table.insert( result, string.sub( s, from , delim_from-1 ) )
+    from  = delim_to + 1
+    delim_from, delim_to = string.find( s, delimiter, from  )
+  end
+  table.insert( result, string.sub( s, from  ) )
+  return result
+end
+
 function string.equals(self, ...)
    local match = false
    for _,value in next, { ... } do
@@ -228,6 +267,19 @@ function T:RunNowOrAfterCombat(func)
 			func()
 		end)
 	end
+end
+
+function T:delayedCall(func, delay)
+    local f = CreateFrame("Frame")
+    f.timer = 0
+    f:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = self.timer + elapsed
+        if self.timer >= delay then
+            func()
+            self:SetScript("OnUpdate", nil)
+            self:Hide()
+        end
+    end)
 end
 
 function T:Switch(m, ...)

@@ -3,7 +3,8 @@ local A, L = unpack(select(2, ...))
 local _G, E, media = _G, A.enum, LibStub("LibSharedMedia-3.0")
 local iconLib = LibStub("LibDBIcon-1.0", true)
 local Tools = A.Tools
-
+local buildText = A.TextBuilder
+local oUF = oUF or A.oUF
 
 local backdrops = { "DropDownList1MenuBackdrop", "DropDownList2MenuBackdrop", "GameTooltip", "GameMenuFrame" }
 local shoppingTexts = {
@@ -292,14 +293,31 @@ local function setStyle()
 		end
 		--A["OptionsContainer"]:GetOption("Minimap"):AddSubscriber(Minimap)
 
-		Tools:HookSetPoint(Minimap, minimapConfig["Position"], minimapConfig["Size"] - 3, minimapConfig["Size"] - 3)
+
+
+		local position = minimapConfig["Position"]
+
+		MinimapCluster:ClearAllPoints()
+		MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		MinimapCluster:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
+		Minimap:SetSize(MinimapCluster:GetSize())
+
+		Minimap:ClearAllPoints()
+		Minimap:SetAllPoints(MinimapCluster)
+
+		hooksecurefunc(MinimapCluster, "SetPoint", function(self, lp, r, p, x, y)
+			if r == UIParent then return end;
+
+		end)
 
 		Minimap:SetMinResize(E.minimap.min, E.minimap.min)
 		Minimap:SetMaxResize(E.minimap.max, E.minimap.max)
 
-        A:CreateMover(Minimap, minimapConfig, "Minimap")
+		MinimapCluster.ignoreFramePositionManager = true
+		Minimap.ignoreFramePositionManager = true
 
-		Minimap:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
+        A:CreateMover(MinimapCluster, minimapConfig, "Minimap")
+
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))
 		Minimap:SetArchBlobRingScalar(0)
 		Minimap:SetArchBlobRingAlpha(0)
@@ -477,18 +495,30 @@ local function setStyle()
         ObjectiveTrackerFrame:SetAlpha(0)
         ObjectiveTrackerFrame.ignoreFramePositionManager = true
 
-        local position = A["Profile"]["Options"]["Objective Tracker"]["Position"]
-        local w, h = ObjectiveTrackerFrame:GetSize()
-        --Tools:HookSetPoint(ObjectiveTrackerFrame, position, w, h)
+        local db = A["Profile"]["Options"]["Objective Tracker"]
+        local size = db["Size"]
+        local position = db["Position"]
 
+        ObjectiveTrackerFrame:SetSize(size["Width"], size["Height"])
 
-        A:CreateMover(ObjectiveTrackerFrame, { 
-            ["Position"] = position,
-            ["Size"] = {
-                ["Width"] = w,
-                ["Height"] = h
-            }
-        }, "Objective Tracker")
+        ObjectiveTrackerFrame:ClearAllPoints()
+        ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+
+        hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(self, lp, r, p, x, y)
+    		if r ~= A.frameParent then
+    			if (r.GetName and r:GetName():find("Mover")) then return end;
+			    self:ClearAllPoints()
+	    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+	    	end
+        end)
+
+        hooksecurefunc(ObjectiveTrackerFrame, "SetParent", function(self, parent)
+        	if parent ~= A.frameParent then
+        		self:SetParent(A.frameParent)
+        	end
+        end)
+
+        A:CreateMover(ObjectiveTrackerFrame, db, "Objective Tracker")
 
         local ff = CreateFrame("Frame")
         ff.timer = 0
@@ -528,7 +558,7 @@ local function setStyle()
                 self.timer = 0
             end
         end)
-        
+
         hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
             local item = block.itemButton
             if item and not item.skinned then
@@ -668,54 +698,243 @@ local function setStyle()
 		--Character Info
 		kill(PaperDollFrame)
 
+ 		-- Hide and create own window
+
+		local db = A["Profile"]["Options"]["Character Info"]
+
+		if db and not db["Enabled"] then
+	 		hooksecurefunc("ToggleCharacter", function()
+				HideUIPanel(CharacterFrame)
+
+				local position = db["Position"]
+
+				if not A.frames.character then
+
+					local charFrame = CreateFrame("Frame", Tools:frameName("CleanUI_Character Info"), A.frameParent)
+					charFrame:SetFrameStrata("HIGH")
+					charFrame:SetClampedToScreen(true)
+					charFrame:SetSize(346, 512)
+					charFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+					charFrame.Toggle = function(self)
+						if self:IsShown() then
+							self:Hide()
+						else
+							self:Show()
+						end
+					end
+
+					charFrame.moveAble = true
+					charFrame:SetMovable(charFrame.moveAble)
+					charFrame:RegisterForDrag("LeftButton")
+
+					local background = charFrame:CreateTexture(nil, "BACKGROUND")
+					background:SetPoint("CENTER")
+					background:SetSize(512, 512)
+					background:SetTexture(media:Fetch("background", "cui-alliance-char-background"))
+
+					charFrame.background = background
+
+					-- Lets add all the important stuff, name, title, level, class, model, a button or two for the drawers, animation dropdown?, information to the drawers (item slots, stats, reputation, currencies, equipment sets etc.)
+
+					local textBackground = CreateFrame("Frame", nil, charFrame)
+					textBackground:SetFrameLevel(4)
+					textBackground:SetSize(309, 51)
+					textBackground:SetPoint("TOP", 0, -17)
+
+					textBackground.texture = textBackground:CreateTexture(nil)
+					textBackground.texture:SetAllPoints()
+					textBackground.texture:SetTexture(media:Fetch("background", "cui-default-bg"))
+					textBackground.texture:SetVertexColor(17/255, 17/255, 17/255, 0.8)
+
+					textBackground:SetScript("OnMouseDown", function(self, button)
+						if charFrame.moveAble then
+							charFrame:StartMoving()
+						end
+					end)
+
+					textBackground:SetScript("OnMouseUp", function(self, button)
+						if charFrame.moveAble then
+							charFrame:StopMovingOrSizing()
+							local lp, r, p, x, y = charFrame:GetPoint()
+							db["Position"] = Tools:TranslatePosition(charFrame, lp, A.frameParent, p, x, y)
+							A.dbProvider:Save()
+						end   
+					end)
+
+					charFrame.textBackground = textBackground
+
+					local name = buildText(textBackground, 13):atTopLeft():x(13):y(-13):build()
+					name:SetText(UnitName("player").." "..(GetTitleName(GetCurrentTitle()) or ""))
+					
+					charFrame.name = name
+
+					local level = buildText(textBackground, 13):atTopLeft():againstBottomLeft():alignWith(name):build()
+					level:SetTextColor(1, 0.82, 0)
+					level:SetText("Level "..UnitLevel("player"))
+
+					charFrame.level = level
+
+					local class = buildText(textBackground, 13):rightOf(level):x(3):build()
+					class:SetTextColor(unpack(oUF.colors.class[select(2, UnitClass("player"))]))
+					class:SetText(UnitClass("player"))
+
+					charFrame.class = class
+
+					local model = CreateFrame("PlayerModel", nil, charFrame, "ModelWithControlsTemplate")
+					model:SetFrameLevel(3)
+					model:SetSize(346, 508)
+					model:SetPoint("CENTER")
+					model:SetUnit("player")
+					model:SetPosition(0, 0, -0.3)
+					model:SetScript("OnLoad", function(self)
+						Model_OnLoad(self, MODELFRAME_MAX_PLAYER_ZOOM, nil, nil, CharacterModelFrame_OnMouseUp);
+					end)
+
+					charFrame.model = model
+
+					local slots = {
+						"CharacterHeadSlot",
+						"CharacterNeckSlot",
+						"CharacterShoulderSlot",
+						"CharacterBackSlot",
+						"CharacterChestSlot",
+						"CharacterShirtSlot",
+						"CharacterTabardSlot",
+						"CharacterWristSlot",
+						"CharacterHandsSlot",
+						"CharacterWaistSlot",
+						"CharacterLegsSlot",
+						"CharacterFeetSlot",
+						"CharacterFinger0Slot",
+						"CharacterFinger1Slot",
+						"CharacterTrinket0Slot",
+						"CharacterTrinket1Slot",
+						"CharacterMainHandSlot",
+						"CharacterSecondaryHandSlot"
+					}
+
+					local slotSize = 40
+
+					local items = CreateFrame("Frame", nil, charFrame)
+					items:SetSize(((#slots / 6) * slotSize) + 6, ((#slots / 3) * slotSize) + 6)
+					items:SetPoint("RIGHT", charFrame, "LEFT", 0, 0)
+					items:SetBackdrop(backdrop(3, 1))
+					items:SetBackdropColor(17/255, 17/255, 17/255, 1)
+					items:SetBackdropBorderColor(0, 0, 0, 1)
+					items.buttons = {}
+
+					local function getSlotAnchorInfo(index)
+						local lp, r, p, x, y = "TOPLEFT", nil, "BOTTOMLEFT", 0, 0
+						if index == 1 then 
+							r = items
+							lp = "TOPLEFT"
+							p = "TOPLEFT"
+							x = 3
+							y = -3
+						else
+							r = items.buttons[index - 1]
+							if index == 7 or index == 13 or index == 20 then
+								r = items.buttons[index - 6]
+								p = "TOPRIGHT"
+							end
+						end
+						return lp, r, p, x, y
+					end
+
+					for i,slot in next, slots do
+						local button = CreateFrame("Button", slot, items, "PaperDollItemSlotButtonTemplate")
+						button:SetSize(slotSize - 2, slotSize - 2)
+						button:SetBackdrop({
+							bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
+							edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
+							edgeSize = 1,
+							insets = {
+								top = -1,
+								left = -1,
+								bottom = -1,
+								right = -1
+							}
+						})
+
+						button:SetBackdropBorderColor(1, 1, 1)
+						button:SetBackdropColor(0, 0, 0, 0)
+						
+						local lp, r, p, x, y = getSlotAnchorInfo(i)
+						button:SetPoint(lp, r, p, x, y)
+						button.IconBorder:SetTexture(nil)
+						button.icon:SetTexCoord(0.133, 0.867, 0.133, 0.867)
+
+						for _,region in next, { button:GetRegions() } do
+							if region.GetObjectType and region:GetObjectType() == "Texture" and region:GetName() ~= nil and region:GetName():find("NormalTexture") then
+								region:SetTexture(nil)
+							end
+						end
+
+						items.buttons[i] = button
+					end
+
+					charFrame:RegisterEvent("UNIT_NAME")
+					charFrame:RegisterEvent("PLAYER_LEVEL_UP")
+					charFrame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
+					charFrame:SetScript("OnEvent", function(self, event, ...)
+						local arg1, arg2, arg3, arg4, arg5 = ...
+
+						Tools:Switch(event, 
+							"UNIT_NAME", function()
+								if arg1 == "player" then return end;
+								self.name:SetText(UnitName(arg1).." "..(GetTitleName(GetCurrentTitle()) or ""))
+							end,
+							"PLAYER_LEVEL_UP", function()
+								self.level:SetText("Level "..UnitLevel("player"))
+							end,
+							"PLAYER_EQUIPMENT_CHANGED", function()
+								self.model:SetUnit("player")
+								self.model:SetPosition(0, 0, 0)
+								self.model:SetPosition(0, 0, -0.13)
+							end)
+					end)
+
+					A.frames.character = charFrame
+				else
+					A.frames.character:Toggle()
+					A.frames.character.model:SetPosition(0, 0, -0.13)
+				end
+	 		end)
+	 	end
+
 		CharacterFrame:EnableMouse(true)
 		CharacterFrame.moveAble = true
 		CharacterFrame:SetMovable(CharacterFrame)
 		CharacterFrame:RegisterForDrag("LeftButton")
-
-		CharacterFrame:SetScript("OnMouseDown", function(self, button)
-			if self.moveAble then
-				self:StartMoving()
-			end
-		end)
-
-		CharacterFrame:SetScript("OnMouseUp", function(self, button)
-			if self.moveAble then
-				self:StopMovingOrSizing()
-			end   
-		end)
+		CharacterFrame.ignoreFramePositionManager = true
+		CharacterFrame:SetClampedToScreen(true)
 		
 		kill(CharacterFrame)
 		kill(CharacterFrameBg)
-		CharacterFrame:SetSize(588, 430)
+		CharacterFrame:SetSize(346, 512)
 		
 		hooksecurefunc(CharacterFrame, "SetWidth", function(self, width)
-			if width ~= 588 then
-				self:SetWidth(588)
+			if width ~= 346 then
+				self:SetWidth(346)
 			end
 		end)
 		
 		CharacterFrame.CuiBackground = CharacterFrame:CreateTexture(nil, "BACKGROUND")
 		CharacterFrame.CuiBackground:SetPoint("CENTER")
-		CharacterFrame.CuiBackground:SetSize(1024, 512)
-		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "CharacterBackground"))
+		CharacterFrame.CuiBackground:SetSize(512, 512)
+		CharacterFrame.CuiBackground:SetTexture(media:Fetch("background", "cui-alliance-char-background"))
 		
-		local crest = CharacterFrame:CreateTexture(nil, "OVERLAY")
-		crest:SetPoint("TOPRIGHT", -55, -10)
-		crest:SetSize(142, 142)
-		crest:SetTexture(media:Fetch("background", "PriestCrest"))
-		
-		CharacterFrameTitleText:SetFont(media:Fetch("font", "NotoBold"), 16, "NONE")
+		CharacterFrameTitleText:SetFont(media:Fetch("font", "NotoBold"), 13, "NONE")
 		CharacterFrameTitleText:ClearAllPoints()
-		CharacterFrameTitleText:SetPoint("TOPLEFT", 20, -25)
-		CharacterFrameTitleText:SetShadowColor(0, 0, 0)
-		CharacterFrameTitleText:SetShadowOffset(1, -1)
+		CharacterFrameTitleText:SetPoint("TOPLEFT", 30, -30)
+		--CharacterFrameTitleText:SetShadowColor(0, 0, 0)
+		--CharacterFrameTitleText:SetShadowOffset(1, -1)
 		
 		CharacterLevelText:ClearAllPoints()
-		CharacterLevelText:SetPoint("TOPLEFT", CharacterFrameTitleText, "BOTTOMLEFT", -17, 0)
-		CharacterLevelText:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
-		CharacterLevelText:SetShadowColor(0, 0, 0)
-		CharacterLevelText:SetShadowOffset(1, -1)
+		CharacterLevelText:SetPoint("TOPLEFT", CharacterFrameTitleText, "BOTTOMLEFT", -16, 5)
+		CharacterLevelText:SetFont(media:Fetch("font", "NotoBold"), 13, "NONE")
+		--CharacterLevelText:SetShadowColor(0, 0, 0)
+		--CharacterLevelText:SetShadowOffset(1, -1)
 		
 		CharacterFramePortrait:Hide()
 		CharacterStatsPane.ItemLevelCategory.oldShow = CharacterStatsPane.ItemLevelCategory.Show
@@ -858,9 +1077,9 @@ local function setStyle()
 			end
 		end)
 		
-		CharacterModelFrame:SetSize(250, 350)
+		CharacterModelFrame:SetSize(346, 430)
 		CharacterModelFrame:ClearAllPoints()
-		CharacterModelFrame:SetPoint("BOTTOM", 0, 10)
+		CharacterModelFrame:SetPoint("BOTTOM", -1, 2)
 		
 		CharacterFrameInsetInsetLeftBorder:SetTexture(nil)
 		CharacterFrameInsetInsetBotLeftCorner:SetTexture(nil)

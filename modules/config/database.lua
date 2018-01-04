@@ -169,7 +169,7 @@ local defaults =  {
                         },
                         ["Custom"] = {}
                     },
-                    ["HealPrediction"] = {
+                    ["HealthPrediction"] = {
                         ["Texture"] = "Default2",
                         ["MaxOverflow"] = 1,
                         ["FrequentUpdates"] = true,
@@ -505,7 +505,7 @@ local defaults =  {
                             } 
                         }
                     },
-                    ["HealPrediction"] = {
+                    ["HealthPrediction"] = {
                         ["Texture"] = "Default2",
                         ["MaxOverflow"] = 1,
                         ["FrequentUpdates"] = true,
@@ -600,7 +600,7 @@ local defaults =  {
                         ["Offset X"] = 0,
                         ["Offset Y"] = 0,
                     },
-                    ["Health"] = {
+                        ["Health"] = {
                         ["Enabled"] = true,
                         ["Position"] = {
                             ["Point"] = "TOP",
@@ -797,6 +797,20 @@ local defaults =  {
                     ["Enabled"] = true
                 },
                 ["Party"] = {
+                    ["Clickcast"] = {
+                        { type = "*type1", action = "macro" },
+                        { type = "*macrotext1", action = "/cast [@mouseover,help,nodead] Effuse; [@mouseover,help,dead] Resuscitate" },
+                        { type = "shift-macrotext1", action = "/cast [@mouseover,help,nodead] Enveloping Mist" },
+                        { type = "ctrl-macrotext1", action = "/cast [@mouseover,help,nodead] Life Cocoon" },
+                        { type = "ctrl-shift-type1", action = "target" },
+                        { type = "*type2", action = "macro" },
+                        { type = "*macrotext2", action = "/cast [@mouseover,help,nodead] Renewing Mist" },
+                        { type = "shift-macrotext2", action = "/cast [@mouseover,help,nodead] Vivify" },
+                        { type = "ctrl-shift-type2", action = "togglemenu" },
+                        { type = "*type3", action = "macro" },
+                        { type = "*macrotext3", action = "/cast [@mouseover,help,nodead] Detox" },
+                        { type = "shift-macrotext3", action = "/cast [@mouseover,help,nodead] Sheilun's Gift" }
+                    },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
@@ -873,11 +887,51 @@ local defaults =  {
                     },
                     ["RaidBuffs"] = {
                         ["Limit"] = 40,
-                        ["Tracked"] = {},
+                        ["Tracked"] = {
+                            [119611] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOPRIGHT",
+                                    ["Local Point"] = "TOPRIGHT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 16
+                            },
+                            [116849] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "TOP",
+                                    ["Local Point"] = "TOP",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = -5,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = true,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 16
+                            },
+                            [191840] = {
+                                ["Own Only"] = true,
+                                ["Position"] = {
+                                    ["Point"] = "LEFT",
+                                    ["Local Point"] = "LEFT",
+                                    ["Offset X"] = 0,
+                                    ["Offset Y"] = 0,
+                                    ["Relative To"] = "Parent"
+                                },
+                                ["Hide Countdown Numbers"] = false,
+                                ["Cooldown Numbers Text Size"] = 9,
+                                ["Size"] = 14
+                            }
+                        },
 						["Important"] = true,
                         ["Enabled"] = true
                     },
-                    ["HealPrediction"] = {
+                    ["HealthPrediction"] = {
                         ["Texture"] = "Default2",
                         ["MaxOverflow"] = 1,
                         ["FrequentUpdates"] = true,
@@ -889,7 +943,6 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
-                    ["Key Bindings"] = {},
                     ["GroupRoleIndicator"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
@@ -992,7 +1045,7 @@ local defaults =  {
                         ["Important"] = true,
                         ["Enabled"] = true
                     },
-                    ["HealPrediction"] = {
+                    ["HealthPrediction"] = {
                         ["Texture"] = "Default2",
                         ["MaxOverflow"] = 1,
                         ["FrequentUpdates"] = true,
@@ -1004,8 +1057,7 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
-                    ["Key Bindings"] = {},
-                    ["LFDRole"] = {
+                    ["GroupRoleIndicator"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
                             ["Local Point"] = "TOPLEFT",
@@ -1028,7 +1080,7 @@ local defaults =  {
                     ["Enabled"] = true
                 },
     			["Minimap"] = {
-    				["Size"] = 150,
+    				["Size"] = 200,
     				["Position"] = {
     					["Point"] = "TOPRIGHT",
     					["Local Point"] = "TOPRIGHT",
@@ -1053,6 +1105,10 @@ local defaults =  {
                         ["Offset X"] = -10,
                         ["Offset Y"] = -300,
                         ["Relative To"] = "FrameParent"
+                    },
+                    ["Size"] = {
+                        ["Width"] = 250,
+                        ["Height"] = 800
                     }
                 },
                 ["Cooldown bar"] = {
@@ -1109,7 +1165,10 @@ local defaults =  {
                             ["Local Point"] = "TOPLEFT",
                             ["Offset X"] = 500,
                             ["Offset Y"] = -50,
-                        }
+                        },
+                        ["Icon Size"] = 24,
+                        ["Vertical Limit"] = 12,
+                        ["Horizontal Limit"] = 1
                     },
                     [2] = { 
                         ["Enabled"] = true,
@@ -1119,7 +1178,10 @@ local defaults =  {
                             ["Local Point"] = "TOPLEFT",
                             ["Offset X"] = 500,
                             ["Offset Y"] = -83,
-                        }
+                        },
+                        ["Icon Size"] = 32,
+                        ["Vertical Limit"] = 12,
+                        ["Horizontal Limit"] = 1
                     },
                     [3] = { 
                         ["Enabled"] = true,
@@ -1129,7 +1191,10 @@ local defaults =  {
                             ["Local Point"] = "TOPLEFT",
                             ["Offset X"] = 500,
                             ["Offset Y"] = -116,
-                        }
+                        },
+                        ["Icon Size"] = 32,
+                        ["Vertical Limit"] = 12,
+                        ["Horizontal Limit"] = 1
                     },
                     [4] = { 
                         ["Enabled"] = true,
@@ -1139,8 +1204,152 @@ local defaults =  {
                             ["Local Point"] = "TOPLEFT",
                             ["Offset X"] = 500,
                             ["Offset Y"] = -149,
-                        }
+                        },
+                        ["Icon Size"] = 32,
+                        ["Vertical Limit"] = 12,
+                        ["Horizontal Limit"] = 1
+                    },
+                    [5] = { 
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "TOPLEFT",
+                            ["Local Point"] = "TOPLEFT",
+                            ["Offset X"] = 500,
+                            ["Offset Y"] = -186,
+                        },
+                        ["Icon Size"] = 32,
+                        ["Vertical Limit"] = 12,
+                        ["Horizontal Limit"] = 1
                     }
+                },
+                ["Experience Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 500,
+                        ["Offset Y"] = -50,
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Size"] = {
+                        ["Width"] = 250,
+                        ["Height"] = 25
+                    },
+                    ["Background Multiplier"] = 0.33,
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Reversed"] = false,
+                    ["Texture"] = "Default2",
+                    ["Color"] = { 0.8, 0, 0.4 }
+                },
+                ["Reputation Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 500,
+                        ["Offset Y"] = -250,
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Size"] = {
+                        ["Width"] = 500,
+                        ["Height"] = 25
+                    },
+                    ["Background Multiplier"] = 0.33,
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Reversed"] = false,
+                    ["Texture"] = "Default2"
+                },
+                ["Artifact Power Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 500,
+                        ["Offset Y"] = -50,
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Size"] = {
+                        ["Width"] = 500,
+                        ["Height"] = 25
+                    },
+                    ["Background Multiplier"] = 0.33,
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Reversed"] = false,
+                    ["Texture"] = "Default2",
+                    ["Color"] = { 0.90196, 0.8, 0.50196 }
+                },
+                ["Vehicle Leave Button"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 1200,
+                        ["Offset Y"] = -500,
+                    },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Size"] = 48,
+                },
+                ["Character Info"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 100,
+                        ["Offset Y"] = -500,
+                    },
+                },
+                ["Key Bindings"] = {
+                    ["1"] = "CleanUI_ActionBar1Button1",
+                    ["2"] = "CleanUI_ActionBar1Button2",
+                    ["3"] = "CleanUI_ActionBar1Button3",
+                    ["4"] = "CleanUI_ActionBar1Button4",
+                    ["5"] = "CleanUI_ActionBar1Button5",
+                    ["6"] = "CleanUI_ActionBar1Button6",
+                    ["7"] = "CleanUI_ActionBar1Button7",
+                    ["8"] = "CleanUI_ActionBar1Button8",
+                    ["9"] = "CleanUI_ActionBar1Button9"
                 }
     		}
 	    }

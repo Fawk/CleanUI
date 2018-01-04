@@ -6,6 +6,8 @@ local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
 
+local init = false
+
 local Party = {}
 local frameName = "Party"
 
@@ -71,6 +73,16 @@ function Party:Init()
     end)
     oUF:SetActiveStyle(frameName)
 -- https://jsfiddle.net/gb3ka3re/
+
+    local initString = [[
+          self:SetWidth(%d);
+          self:SetHeight(%d);
+    ]]
+
+    for _,binding in next, db["Clickcast"] do
+        initString = initString..'\nself:SetAttribute("'..binding.type..'","'..binding.action..'");'
+    end
+
     local partyHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
@@ -86,11 +98,7 @@ function Party:Init()
         "columnAnchorPoint",  anchorPoint,
         "groupBy", "ASSIGNEDROLE",
         "groupingOrder", "TANK,HEALER,DAMAGER",
-        "oUF-initialConfigFunction", ([[
-          self:SetWidth(%d)
-          self:SetHeight(%d)
-          self:SetFrameStrata("LOW")
-        ]]):format(size["Width"], size["Height"])
+        "oUF-initialConfigFunction", (initString):format(size["Width"], size["Height"])
     )
 
     local partyContainer = Units:Get(frameName)
@@ -139,6 +147,7 @@ function Party:Init()
 
         partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
         partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
+        partyContainer:RegisterEvent("PLAYER_LOGIN")
         partyContainer:SetScript("OnEvent", function(self, event) 
             Units:DisableBlizzardRaid()
             T:RunNowOrAfterCombat(function()
@@ -156,6 +165,12 @@ function Party:Init()
                 for i = 1, 5 do
                     local uf = partyHeader:GetAttribute("child"..i)
                     if uf and uf.unit then
+                        if not init then
+                            init = true
+                            uf:RegisterForClicks("AnyUp")
+                            uf.unit = uf:GetAttribute("unit")
+                            Party:Update(uf, db)
+                        end
                         Visibility(uf)
 						Units:UpdateImportantElements(uf, db)
                     end
