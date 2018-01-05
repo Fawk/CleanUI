@@ -165,8 +165,8 @@ function Party:Init()
                 for i = 1, 5 do
                     local uf = partyHeader:GetAttribute("child"..i)
                     if uf and uf.unit then
-                        if not init then
-                            init = true
+                        if not uf.init then
+                            uf.init = true
                             uf:RegisterForClicks("AnyUp")
                             uf.unit = uf:GetAttribute("unit")
                             Party:Update(uf, db)
