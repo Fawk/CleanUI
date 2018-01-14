@@ -25,10 +25,18 @@ local function text(xp, xpmax)
 end
 
 local function sizeRestedBar(experience, width)
+
+    experience.restedBar:SetPoint("TOPLEFT", experience:GetStatusBarTexture(), "TOPRIGHT")
+    experience.restedBar:SetPoint("BOTTOMLEFT", experience:GetStatusBarTexture(), "BOTTOMLEFT")
+
     local xp, xpMax, restXp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion() or 0
     if restXp > (xpMax - xp) then
+        experience.restedBar:Show()
         experience.restedBar:SetWidth((1 - (xp / xpMax)) * width)
     else
+        if restXp == 0 then
+            experience.restedBar:Hide()
+        end
         experience.restedBar:SetWidth((restXp / xpMax) * width)
     end 
 end
@@ -51,10 +59,16 @@ function E:Init()
                     self:SetValue(xp)
                     self:SetMinMaxValues(0, xpMax)
                     self.text:SetText(text(xp, xpMax))
+                    sizeRestedBar(self, db["Size"]["Width"])
                 end,
                 "UPDATE_EXHAUSTION", function()
-                    sizeRestedBar(experience, db["Size"]["Width"])
+                    sizeRestedBar(self, db["Size"]["Width"])
                 end)
+
+            if (UnitLevel("player") == GetMaxPlayerLevel()) or IsXPUserDisabled() then
+                self:Hide()
+            end
+
 		end)
         experience:SetScript("OnEnter", function(self, userMoved)
             if userMoved then 

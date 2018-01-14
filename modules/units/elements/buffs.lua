@@ -182,7 +182,7 @@ local Buffs = function(frame, db)
 						button.count:SetJustifyH("CENTER")
 					end
 
-					button.count:SetText(duration > 0 and (count > 0 and count or "") or "")
+					button.count:SetText(count > 1 and count or "")
 					button:Show()
 				end
 			end
