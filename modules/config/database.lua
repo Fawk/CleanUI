@@ -119,9 +119,9 @@ local defaults =  {
                             ["Offset Y"] = -1,
                             ["Relative To"] = "Parent"
                         },
-                        ["Style"] = "Bar",
-                        ["Growth"] = "Upwards",
-                        ["Attached"] = "TOP",
+                        ["Style"] = "Icon",
+                        ["Growth"] = "Left",
+                        ["Attached"] = "LEFT",
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
@@ -439,9 +439,9 @@ local defaults =  {
                             ["Offset Y"] = -1,
                             ["Relative To"] = "Parent"
                         },
-                        ["Style"] = "Bar",
-                        ["Growth"] = "Upwards",
-                        ["Attached"] = "TOP",
+                        ["Style"] = "Icon",
+                        ["Growth"] = "Right",
+                        ["Attached"] = "RIGHT",
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,

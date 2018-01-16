@@ -3,21 +3,21 @@ local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0
 local oUF = oUF or A.oUF
 local buildText = A.TextBuilder
 
-local Buffs = function(frame, db)
+local Debuffs = function(frame, db)
 
 	local growth, attached, style, size = db["Growth"], db["Attached"], db["Style"], db["Size"]
-	local buffs = frame.Buffs or (function()
-		local buffs = CreateFrame("Frame", T:frameName("Buffs"), frame)
-		buffs:SetSize(frame:GetWidth(), 300)
-		buffs:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 1)
-		return buffs
+	local debuffs = frame.Debuffs or (function()
+		local debuffs = CreateFrame("Frame", T:frameName("Debuffs"), frame)
+		debuffs:SetSize(frame:GetWidth(), 300)
+		debuffs:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 1)
+		return debuffs
 	end)()
 
 	if attached ~= false then
-		buffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, 0)
+		debuffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, 0)
 	else
-		A:CreateMover(buffs, db, "Buffs")
-		Units:Position(buffs, db["Position"])
+		A:CreateMover(debuffs, db, "Debuffs")
+		Units:Position(debuffs, db["Position"])
 	end
 
 	T:Switch(style, 
@@ -25,7 +25,7 @@ local Buffs = function(frame, db)
 			local width = size["Width"]
 			local height = size["Height"]
 			
-			buffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
+			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
 					return not db["Blacklist"]["Ids"][spellID]
 				elseif db["Whitelist"]["Enabled"] then
@@ -33,7 +33,7 @@ local Buffs = function(frame, db)
 				end
 			end
 
-			buffs.SetPosition = function(element, from, to)
+			debuffs.SetPosition = function(element, from, to)
 				local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
 				local sizey = (element.size or 16) + (element['spacing-y'] or element.spacing or 0)
 				local x, y = 0, 0
@@ -46,7 +46,7 @@ local Buffs = function(frame, db)
 					button:ClearAllPoints()
 					button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
 
-					local anchor = i == 1 and buffs or element[i - 1]
+					local anchor = i == 1 and debuffs or element[i - 1]
 					local lp, p = "LEFT", "RIGHT"
 
 					T:Switch(growth,
@@ -64,7 +64,7 @@ local Buffs = function(frame, db)
 				end
 			end
 
-			buffs.PostUpdateIcon = function(element, unit, button, index)
+			debuffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
 
 				if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
@@ -95,8 +95,8 @@ local Buffs = function(frame, db)
 			local width = size["Match width"] and frame:GetWidth() or size["Width"]
 			local height = size["Match height"] and frame:GetHeight() or size["Height"]
 
-			buffs.disableCooldown = true
-			buffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
+			debuffs.disableCooldown = true
+			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
 					return not db["Blacklist"]["Ids"][spellID]
 				elseif db["Whitelist"]["Enabled"] then
@@ -104,7 +104,7 @@ local Buffs = function(frame, db)
 				end
 			end
 
-			buffs.SetPosition = function(element, from, to)
+			debuffs.SetPosition = function(element, from, to)
 				local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
 				local sizey = (element.size or 16) + (element['spacing-y'] or element.spacing or 0)
 				local anchor = element.initialAnchor or 'BOTTOMLEFT'
@@ -192,15 +192,15 @@ local Buffs = function(frame, db)
 				end
 			end
 
-			if not buffs.updateFrame then
-				buffs.updateFrame = CreateFrame("Frame")
-				buffs.updateFrame.timer = 0
-				buffs.updateFrame.garbage = 0
-				buffs.updateFrame:SetScript("OnUpdate", function(self, elapsed)
+			if not debuffs.updateFrame then
+				debuffs.updateFrame = CreateFrame("Frame")
+				debuffs.updateFrame.timer = 0
+				debuffs.updateFrame.garbage = 0
+				debuffs.updateFrame:SetScript("OnUpdate", function(self, elapsed)
 					self.timer = self.timer + elapsed
 					self.garbage = self.garbage + elapsed
 					if self.timer > 0.03 then
-						buffs:ForceUpdate()
+						debuffs:ForceUpdate()
 						self.timer = 0
 					end
 					if self.garbage > 3 then
@@ -210,7 +210,7 @@ local Buffs = function(frame, db)
 				end)
 			end
 
-			buffs.PostUpdateIcon = function(element, unit, button, index)
+			debuffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
 				if button.bar then
 
@@ -254,7 +254,7 @@ local Buffs = function(frame, db)
 			end
 		end)
 
-	frame.Buffs = buffs
+	frame.Debuffs = debuffs
 end
 
-A["Elements"]:add({ name = "Buffs", func = Buffs })
+A["Elements"]:add({ name = "Debuffs", func = Debuffs })

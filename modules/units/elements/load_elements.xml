@@ -11,6 +11,7 @@
     <Script file="classicons.lua"/>
     <Script file="combatindicator.lua"/>
     <Script file="buffs.lua"/>
+    <Script file="debuffs.lua"/>
     <!-- etc -->
 
 </Ui>
