@@ -9,12 +9,11 @@ local Debuffs = function(frame, db)
 	local debuffs = frame.Debuffs or (function()
 		local debuffs = CreateFrame("Frame", T:frameName("Debuffs"), frame)
 		debuffs:SetSize(frame:GetWidth(), 300)
-		debuffs:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 1)
 		return debuffs
 	end)()
 
 	if attached ~= false then
-		debuffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, 0)
+		debuffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, style == "Bar" and 1 or 0)
 	else
 		A:CreateMover(debuffs, db, "Debuffs")
 		Units:Position(debuffs, db["Position"])
@@ -24,7 +23,7 @@ local Debuffs = function(frame, db)
 		"Icon", function()
 			local width = size["Width"]
 			local height = size["Height"]
-			
+
 			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
 					return not db["Blacklist"]["Ids"][spellID]
@@ -52,20 +51,29 @@ local Debuffs = function(frame, db)
 					T:Switch(growth,
 						"Upwards", function()
 							lp, p = "BOTTOM", "TOP"
+							if i == 1 then p = "BOTTOM" end
 						end,
 						"Downwards", function() 
 							lp, p = "TOP", "BOTTOM"
+							if i == 1 then p = "TOP" end
 						end,
 						"Left", function()
 							lp, p = "RIGHT", "LEFT"
+							if i == 1 then p = "RIGHT" end
+						end,
+						"Right", function()
+							lp, p = "LEFT", "RIGHT"
+							if i == 1 then p = "LEFT" end
 						end)
 
 					button:SetPoint(lp, anchor, p, x, y)
 				end
 			end
 
+			debuffs:SetSize(width * 5, height * 2)
+
 			debuffs.PostUpdateIcon = function(element, unit, button, index)
-				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
+				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
 
 				if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
 					button:Hide()
@@ -84,6 +92,8 @@ local Debuffs = function(frame, db)
 					button.count:Show()
 					button.count:SetJustifyH("CENTER")
 				end
+
+				-- FIX COOLDOWN TEXT
 
 				button.count:SetText(count > 1 and count or "")
 				button:Show()
@@ -211,7 +221,7 @@ local Debuffs = function(frame, db)
 			end
 
 			debuffs.PostUpdateIcon = function(element, unit, button, index)
-				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
+				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
 				if button.bar then
 
 					if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
@@ -234,10 +244,10 @@ local Debuffs = function(frame, db)
 							return
 						end
 					else
-						local timeLeft = expiration - GetTime()
-						button.bar:SetMinMaxValues(0, duration)
-						button.bar:SetValue(timeLeft)
-						button.bar.time:SetText(T:timeString(timeLeft))
+						local timeLeft = (expiration or 0) - GetTime()
+						button.bar:SetMinMaxValues(0, duration or 1)
+						button.bar:SetValue(timeLeft < 0 and 1 or timeLeft)
+						button.bar.time:SetText(timeLeft < 0 and "" or T:timeString(timeLeft))
 					end
 
 					if not button.initCount then
@@ -248,7 +258,7 @@ local Debuffs = function(frame, db)
 						button.count:SetJustifyH("CENTER")
 					end
 
-					button.count:SetText(count > 1 and count or "")
+					button.count:SetText((count or 0) > 1 and count or "")
 					button:Show()
 				end
 			end

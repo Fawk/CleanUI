@@ -402,9 +402,9 @@ local defaults =  {
                             ["Offset Y"] = -1,
                             ["Relative To"] = "Parent"
                         },
-                        ["Style"] = "Bar",
-                        ["Growth"] = "Upwards",
-                        ["Attached"] = "TOP",
+                        ["Style"] = "Icon",
+                        ["Growth"] = "Right",
+                        ["Attached"] = "RIGHT",
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
@@ -431,7 +431,7 @@ local defaults =  {
                         }
     				},
     				["Debuffs"] = {
-                        ["Enabled"] = false,
+                        ["Enabled"] = true,
                         ["Position"] = {
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
@@ -439,9 +439,9 @@ local defaults =  {
                             ["Offset Y"] = -1,
                             ["Relative To"] = "Parent"
                         },
-                        ["Style"] = "Icon",
-                        ["Growth"] = "Right",
-                        ["Attached"] = "RIGHT",
+                        ["Attached"] = "TOP",
+                        ["Style"] = "Bar",
+                        ["Growth"] = "Upwards",
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,

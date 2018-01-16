@@ -9,12 +9,11 @@ local Buffs = function(frame, db)
 	local buffs = frame.Buffs or (function()
 		local buffs = CreateFrame("Frame", T:frameName("Buffs"), frame)
 		buffs:SetSize(frame:GetWidth(), 300)
-		buffs:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 1)
 		return buffs
 	end)()
 
 	if attached ~= false then
-		buffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, 0)
+		buffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, style == "Bar" and 1 or 0)
 	else
 		A:CreateMover(buffs, db, "Buffs")
 		Units:Position(buffs, db["Position"])
@@ -52,17 +51,26 @@ local Buffs = function(frame, db)
 					T:Switch(growth,
 						"Upwards", function()
 							lp, p = "BOTTOM", "TOP"
+							if i == 1 then p = "BOTTOM" end
 						end,
 						"Downwards", function() 
 							lp, p = "TOP", "BOTTOM"
+							if i == 1 then p = "TOP" end
 						end,
 						"Left", function()
 							lp, p = "RIGHT", "LEFT"
+							if i == 1 then p = "RIGHT" end
+						end,
+						"Right", function()
+							lp, p = "LEFT", "RIGHT"
+							if i == 1 then p = "LEFT" end
 						end)
 
 					button:SetPoint(lp, anchor, p, x, y)
 				end
 			end
+
+			buffs:SetSize(width * 5, height * 2)
 
 			buffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
