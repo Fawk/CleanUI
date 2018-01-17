@@ -12,16 +12,16 @@ local AB = {
 }
 
 local keys = {
-	["SHIFT"] = "s",
-	["CTRL"] = "c",
-	["ALT"] = "a",
-	["MOUSEWHEELUP"] = "MWU",
-	["MOUSEWHEELDOWN"] = "MWD",
-	["BUTTON3"] = "MMB",
-	["BUTTON4"] = "MB4",
-	["BUTTON5"] = "MB5",
-	["LeftButton"] = "LMB",
-	["RightButton"] = "RMB"
+	["SHIFT"] = "S",
+	["CTRL"] = "C",
+	["ALT"] = "A",
+	["MOUSEWHEELUP"] = "WU",
+	["MOUSEWHEELDOWN"] = "WD",
+	["BUTTON3"] = "MB",
+	["BUTTON4"] = "M4",
+	["BUTTON5"] = "M5",
+	["LeftButton"] = "LB",
+	["RightButton"] = "RB"
 }
 
 local mousewheel = {
@@ -57,9 +57,9 @@ end
 
 local function addModifier(key)
 	local modifier = ""
-	if IsShiftKeyDown() then modifier = "SHIFT-" end
-	if IsAltKeyDown() then modifier = "ALT-"..modifier end
-	if IsControlKeyDown() then modifier = "CTRL-"..modifier end
+	if IsShiftKeyDown() then modifier = "SHIFT" end
+	if IsAltKeyDown() then modifier = "ALT"..modifier end
+	if IsControlKeyDown() then modifier = "CTRL"..modifier end
 	return modifier..key
 end
 
@@ -150,7 +150,8 @@ function AB:Init()
 						button:SetPoint(i == 1 and "TOPLEFT" or "LEFT", bar.buttons[i - 1] or bar, i == 1 and "TOPLEFT" or "RIGHT", i == 1 and 0 or 1, 0)
 					end
 
-					button.HotKey:SetFont(media:Fetch("font", "NotoBold"), 11, "OUTLINE")
+					button.HotKey:SetWidth(size)
+					button.HotKey:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 					button.HotKey:SetTextColor(1, 1, 1)
 					hooksecurefunc(button.HotKey, "SetTextColor", function(self, r, g, b)
 						if r ~= 1 or g ~= 1 or b ~= 1 then
@@ -160,7 +161,7 @@ function AB:Init()
 					button.HotKey:ClearAllPoints()
 					button.HotKey:SetPoint("TOPRIGHT", button, "TOPRIGHT", -1, -3)
 					hooksecurefunc(button.HotKey, "SetText", function(self, text)
-						local newText = text
+						local newText = text:gsub("-", "")
 						for key, new in pairs(keys) do
 							if text:find(key) then
 								newText = newText:gsub(key, new)
@@ -169,13 +170,13 @@ function AB:Init()
 						end
 						if self.shouldModify then
 							self.shouldModify = false
-							self:SetFont(media:Fetch("font", "NotoBold"), 11, "OUTLINE")
+							self:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 							self:SetText(newText)
 						end
 						self:Show()
 					end)
 
-					button.Count:SetFont(media:Fetch("font", "NotoBold"), 11, "OUTLINE")
+					button.Count:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 					button.Name:SetFont(media:Fetch("font", "NotoBold"), 9, "OUTLINE")
 					button.Name:SetJustifyH("CENTER")
 					button.Name:ClearAllPoints()
@@ -336,7 +337,7 @@ function AB:SetupBindings(bindings)
 
 				SetOverrideBindingClick(bar, true, key, button, "LEFTBUTTON")
 
-				local newText = key
+				local newText = key:gsub("-", "")
 				for k, new in pairs(keys) do
 					if newText:find(k) then
 						newText = newText:gsub(k, new)

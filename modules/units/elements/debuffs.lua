@@ -24,6 +24,14 @@ local Debuffs = function(frame, db)
 			local width = size["Width"]
 			local height = size["Height"]
 
+			if growth == "Left" then
+				debuffs['growth-x'] = "LEFT"
+				debuffs.initialAnchor = "BOTTOMRIGHT"
+			elseif growth == "Right" then
+				debuffs['growth-x'] = "RIGHT"
+				debuffs.initialAnchor = "BOTTOMLEFT"
+			end
+
 			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
 					return not db["Blacklist"]["Ids"][spellID]
@@ -32,45 +40,7 @@ local Debuffs = function(frame, db)
 				end
 			end
 
-			debuffs.SetPosition = function(element, from, to)
-				local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
-				local sizey = (element.size or 16) + (element['spacing-y'] or element.spacing or 0)
-				local x, y = 0, 0
-
-				for i = from, to do
-
-					local button = element[i]
-					if(not button) then break end
-					
-					button:ClearAllPoints()
-					button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
-
-					local anchor = i == 1 and debuffs or element[i - 1]
-					local lp, p = "LEFT", "RIGHT"
-
-					T:Switch(growth,
-						"Upwards", function()
-							lp, p = "BOTTOM", "TOP"
-							if i == 1 then p = "BOTTOM" end
-						end,
-						"Downwards", function() 
-							lp, p = "TOP", "BOTTOM"
-							if i == 1 then p = "TOP" end
-						end,
-						"Left", function()
-							lp, p = "RIGHT", "LEFT"
-							if i == 1 then p = "RIGHT" end
-						end,
-						"Right", function()
-							lp, p = "LEFT", "RIGHT"
-							if i == 1 then p = "LEFT" end
-						end)
-
-					button:SetPoint(lp, anchor, p, x, y)
-				end
-			end
-
-			debuffs:SetSize(width * 5, height * 2)
+			debuffs:SetSize(width * (db["Limit X"] or 5), height * (db["Limit Y"] or 2))
 
 			debuffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
@@ -85,15 +55,34 @@ local Debuffs = function(frame, db)
 
 				button.spellID = spellID
 
+				local background = button.background or CreateFrame("Frame", nil, button)
+				background:SetPoint("CENTER")
+				background:SetSize(button:GetSize())
+				background:SetFrameLevel(button:GetFrameLevel() - 1)
+
+				button.background = background
+
+				T:Background(background, db, nil, true)
+
+				button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
+
 				if not button.initCount then
 					button.initCount = true
 					button.count:Hide()
-					button.count = buildText(button, 11):outline():atCenter():build()
+					button.count = buildText(button, 10):outline():atCenter():build()
 					button.count:Show()
 					button.count:SetJustifyH("CENTER")
 				end
 
-				-- FIX COOLDOWN TEXT
+				if not button.fixcd then
+					button.fixcd = true
+					for _,region in pairs({ button.cd:GetRegions() }) do
+						if region.GetObjectType and region:GetObjectType() == "FontString" then
+							region:SetFont(media:Fetch("font", "Default"), 8, "OUTLINE")
+							region:SetJustifyH("CENTER")
+						end
+					end
+				end
 
 				button.count:SetText(count > 1 and count or "")
 				button:Show()
