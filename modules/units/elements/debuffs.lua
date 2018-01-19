@@ -34,7 +34,7 @@ local Debuffs = function(frame, db)
 
 			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
-					return not db["Blacklist"]["Ids"][spellID]
+					return not db["Blacklist"]["Ids"][spellID] and caster == "player"
 				elseif db["Whitelist"]["Enabled"] then
 					return db["Whitelist"]["Ids"][spellID]
 				end
@@ -97,7 +97,7 @@ local Debuffs = function(frame, db)
 			debuffs.disableCooldown = true
 			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
-					return not db["Blacklist"]["Ids"][spellID]
+					return not db["Blacklist"]["Ids"][spellID] and caster == "player"
 				elseif db["Whitelist"]["Enabled"] then
 					return db["Whitelist"]["Ids"][spellID]
 				end
@@ -217,6 +217,11 @@ local Debuffs = function(frame, db)
 						button:Hide()
 						return
 					elseif db["Whitelist"]["Enabled"] and not db["Whitelist"]["Ids"][spellID] then
+						button:Hide()
+						return
+					end
+
+					if caster ~= "player" then
 						button:Hide()
 						return
 					end
