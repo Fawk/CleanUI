@@ -57,9 +57,9 @@ end
 
 local function addModifier(key)
 	local modifier = ""
-	if IsShiftKeyDown() then modifier = "SHIFT" end
-	if IsAltKeyDown() then modifier = "ALT"..modifier end
-	if IsControlKeyDown() then modifier = "CTRL"..modifier end
+	if IsShiftKeyDown() then modifier = "SHIFT-" end
+	if IsAltKeyDown() then modifier = "ALT-"..modifier end
+	if IsControlKeyDown() then modifier = "CTRL-"..modifier end
 	return modifier..key
 end
 

@@ -12,8 +12,20 @@ local Buffs = function(frame, db)
 		return buffs
 	end)()
 
+	local x, y = 0, 0
+	if style == "Bar" then
+		if growth == "Left" or growth == "Right" then
+			x = 1
+		else
+			y = 1
+		end
+	elseif style == "Icon" then
+		x = 1
+		y = 1
+	end
+
 	if attached ~= false then
-		buffs:SetPoint(T.reversedPoints[attached], frame, attached, 1, 1)
+		buffs:SetPoint(T.reversedPoints[attached], frame, attached, x, y)
 	else
 		A:CreateMover(buffs, db, "Buffs")
 		Units:Position(buffs, db["Position"])

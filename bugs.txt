@@ -1,3 +1,1 @@
-problem med att binda knapp + kombination efter varandra, ex: Q, S-Q
-
-clickcast funkar inte vid login, behöver reload
+﻿clickcast funkar inte vid login, behöver reload

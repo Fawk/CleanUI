@@ -2,6 +2,7 @@ local A, L = unpack(select(2, ...))
 local GetUnitName = GetUnitName
 local Profile, profiles = {}, {}
 local activeProfile = nil
+local currentCharacter = nil
 
 function Profile:Init(db)
 	for name, profile in pairs(db["Profiles"]) do
@@ -21,6 +22,7 @@ function Profile:Set(name)
 	else
 		self:SetActive(A.db["Characters"][name])
 	end
+	currentCharacter = name
 	A.dbProvider:Save()
 end
 
@@ -40,10 +42,23 @@ function Profile:GetActive()
 	return activeProfile
 end
 
+local function copyOfName(name)
+	return name.." (Copy)"
+end
+
 function Profile:Copy(name)
 	local profile = profiles[name]
-	A.db["Profiles"][name] = A.db["Profiles"][profile]
-	A.db["Characters"][name] = name
+	local newName = copyOfName(name)
+	A.db["Profiles"][newName] = A.db["Profiles"][profile]
+	A.db["Characters"][currentCharacter] = newName
+end
+
+function Profile:Rename(name)
+	if activeProfile == name then
+		
+	else
+
+	end
 end
 
 A["Modules"]["Profile"] = Profile
