@@ -10,6 +10,8 @@ local Holder
 local Raid = {}
 local frameName = "Raid"
 
+Raid.updateFuncs = A:OrderedTable()
+
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
 		frame["Tags"][tag].text:SetTextColor(unpack(color))
@@ -161,22 +163,19 @@ function Raid:Init()
     raidContainer:UpdateUnits()
 
     raidContainer.timer = 0
-    raidContainer:SetScript("OnUpdate", function(self, elapsed)
-        self.timer = self.timer + elapsed
-        if self.timer > 0.10 then
-            for i = 1, 40 do
-                local uf = raidHeader:GetAttribute("child"..i)
-                if uf and uf.unit then
-                    Visibility(uf)
-                    Units:UpdateImportantElements(uf, db)
-                end
+    raidContainer.Update = function(self, elapsed)
+        for i = 1, 40 do
+            local uf = raidHeader:GetAttribute("child"..i)
+            if uf and uf.unit then
+                Visibility(uf)
+                Units:UpdateImportantElements(uf, db)
             end
-            self.timer = 0
-        end
+        end      
     end)
 
+    self.updateFuncs:add(raidContainer.Update)
+
     Units:Add(raidContainer, frameName)
-    
 
     Units:Position(raidContainer, db["Position"])
     raidContainer:Execute(([[ 
@@ -186,6 +185,12 @@ function Raid:Init()
 
     raidHeader:SetParent(raidContainer)
     raidHeader:SetPoint("TOPLEFT")
+end
+
+function Raid:Trigger()
+    for _,updateFunc in next, updateFuncs do
+        updateFunc()
+    end
 end
  
 function Raid:Update(frame, db)
@@ -215,17 +220,15 @@ function Raid:Update(frame, db)
         ["FrameLevel"] = 5,
         ["Color"] = A.colors.border.target, 
         ["Condition"] = function(self, elapsed)
-            self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
-                if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
-                    self:SetAlpha(1)
-                else
-                    self:SetAlpha(0)
-                end
-                self.timer = 0
+            if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
+                self:SetAlpha(1)
+            else
+                self:SetAlpha(0)
             end
         end
     })
+
+    self.updateFuncs:add(frame["StatusBorder"]["Targeted"]["Condition"])
 
         --[[ Background ]]--
     frame.Background = frame.Background or CreateFrame("Frame", frame:GetName().."_Background", frame)
@@ -267,40 +270,38 @@ function Raid:Update(frame, db)
         ["Enabled"] = db["Show Debuff Border"],
         ["FrameLevel"] = 6,
         ["Condition"] = function(self, elapsed) 
-            self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
-                local debuffs, count = {}, 0
-                for k,v in next, db["Debuff Order"] do
-                    debuffs[v] = false
-                    count = count + 1
-                end
-                for index = 1, 40 do
-                    if self and self.unit then
-                        name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
-                        if name and not ignored[spellID] then
-                            if(duration and duration > 0) then
-                                if dtype then
-                                    debuffs[dtype] = true
-                                end
+            local debuffs, count = {}, 0
+            for k,v in next, db["Debuff Order"] do
+                debuffs[v] = false
+                count = count + 1
+            end
+            for index = 1, 40 do
+                if self and self.unit then
+                    name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
+                    if name and not ignored[spellID] then
+                        if(duration and duration > 0) then
+                            if dtype then
+                                debuffs[dtype] = true
                             end
                         end
                     end
                 end
-
-                local active = 0
-                for i = count, 1, -1 do
-                    local name = db["Debuff Order"][i]
-                    if debuffs[name] then
-                        self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))
-                        active = 1
-                    end
-                end
-
-                self:SetAlpha(active)
-                self.timer = 0
             end
+
+            local active = 0
+            for i = count, 1, -1 do
+                local name = db["Debuff Order"][i]
+                if debuffs[name] then
+                    self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))
+                    active = 1
+                end
+            end
+
+            self:SetAlpha(active)           
         end
     })
+
+    self.updateFuncs:add(frame["StatusBorder"]["Debuff"]["Condition"])
 
 end
 

@@ -11,6 +11,8 @@ local init = false
 local Party = {}
 local frameName = "Party"
 
+Party.updateFuncs = A:OrderedTable()
+
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
 		frame["Tags"][tag].text:SetTextColor(unpack(color))
@@ -155,26 +157,23 @@ function Party:Init()
 
     partyContainer:UpdateUnits()
 
-    partyContainer.timer = 0
-    partyContainer:SetScript("OnUpdate", function(self, elapsed)
-        self.timer = self.timer + elapsed
-        if self.timer > 0.10 then
-            for i = 1, 5 do
-                local uf = partyHeader:GetAttribute("child"..i)
-                if uf and uf.unit then
-                    if not uf.init then
-                        uf.init = true
-                        uf:RegisterForClicks("AnyUp")
-                        uf.unit = uf:GetAttribute("unit")
-                        Party:Update(uf, db)
-                    end
-                    Visibility(uf)
-					Units:UpdateImportantElements(uf, db)
+    partyContainer.Update = function(self, elapsed)
+        for i = 1, 5 do
+            local uf = partyHeader:GetAttribute("child"..i)
+            if uf and uf.unit then
+                if not uf.init then
+                    uf.init = true
+                    uf:RegisterForClicks("AnyUp")
+                    uf.unit = uf:GetAttribute("unit")
+                    Party:Update(uf, db)
                 end
+                Visibility(uf)
+				Units:UpdateImportantElements(uf, db)
             end
-            self.timer = 0
         end
     end)
+
+    self.updateFuncs:add(partyContainer.Update)
 
     Units:Add(partyContainer, frameName)
 
@@ -186,6 +185,12 @@ function Party:Init()
     partyHeader:SetAllPoints()
     
     Units:DisableBlizzardRaid()
+end
+
+function Party:Trigger(db)
+    for _,updateFunc in next, self.updateFuncs do
+        updateFunc()
+    end
 end
  
 function Party:Update(frame, db)
@@ -215,17 +220,15 @@ function Party:Update(frame, db)
         ["FrameLevel"] = 5,
         ["Color"] = A.colors.border.target, 
         ["Condition"] = function(self, elapsed)
-            self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
-                if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
-                    self:SetAlpha(1)
-                else
-                    self:SetAlpha(0)
-                end
-                self.timer = 0
+            if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
+                self:SetAlpha(1)
+            else
+                self:SetAlpha(0)
             end
         end
     })
+
+    self.updateFuncs:add(frame["StausBorder"]["Targeted"]["Condition"])
 
     --[[ Background ]]--
     U:CreateBackground(frame, db)
@@ -242,42 +245,41 @@ function Party:Update(frame, db)
         [95809] = true,     -- Insanity
         [71041] = true      -- Dungeon Deserter
     }
+    
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
         ["FrameLevel"] = 6,
         ["Condition"] = function(self, elapsed) 
-            self.timer = self.timer + elapsed
-            if self.timer > 0.05 then
-                local debuffs, count = {}, 0
-                for k,v in next, db["Debuff Order"] do
-                    debuffs[v] = false
-                    count = count + 1
-                end
-                for index = 1, 40 do
-                    if self and self.unit then
-                        name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
-                        if name and not ignored[spellID] then
-                            if(duration and duration > 0) then
-                                debuffs[dtype or "Physical"] = true
-                            end
+            local debuffs, count = {}, 0
+            for k,v in next, db["Debuff Order"] do
+                debuffs[v] = false
+                count = count + 1
+            end
+            for index = 1, 40 do
+                if self and self.unit then
+                    name,_,_,_,dtype,duration,_,_,_,_,spellID = UnitAura(self.unit, index, "HARMFUL")
+                    if name and not ignored[spellID] then
+                        if(duration and duration > 0) then
+                            debuffs[dtype or "Physical"] = true
                         end
                     end
                 end
-
-                local active = 0
-                for i = count, 1, -1 do
-                    local name = db["Debuff Order"][i]
-                    if debuffs[name] then
-                        self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))
-                        active = 1
-                    end
-                end
-
-                self:SetAlpha(active)
-                self.timer = 0
             end
+
+            local active = 0
+            for i = count, 1, -1 do
+                local name = db["Debuff Order"][i]
+                if debuffs[name] then
+                    self:SetBackdropBorderColor(unpack(A.colors.debuff[name]))
+                    active = 1
+                end
+            end
+
+            self:SetAlpha(active)
         end
     })
+
+    self.updateFuncs:add(frame["StausBorder"]["Debuff"]["Condition"])
 end
 
 A.modules["party"] = Party

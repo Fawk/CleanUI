@@ -29,6 +29,14 @@ function TargetTarget:Setup(frame, db)
     return frame
 end
  
+function TargetTarget:Trigger()
+	local frame = Units:Get(frameName)
+	if frame then
+		if frame.Buffs then frame.Buffs:ForceUpdate() end
+		if frame.Debuffs then frame.Debuffs:ForceUpdate() end
+	end
+end
+
 function TargetTarget:Update(frame, db)
 	if not db["Enabled"] then return end
 

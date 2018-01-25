@@ -191,24 +191,6 @@ local Debuffs = function(frame, db)
 				end
 			end
 
-			if not debuffs.updateFrame then
-				debuffs.updateFrame = CreateFrame("Frame")
-				debuffs.updateFrame.timer = 0
-				debuffs.updateFrame.garbage = 0
-				debuffs.updateFrame:SetScript("OnUpdate", function(self, elapsed)
-					self.timer = self.timer + elapsed
-					self.garbage = self.garbage + elapsed
-					if self.timer > 0.03 then
-						debuffs:ForceUpdate()
-						self.timer = 0
-					end
-					if self.garbage > 3 then
-						collectgarbage("collect");
-						self.garbage = 0
-					end
-				end)
-			end
-
 			debuffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
 				if button.bar then

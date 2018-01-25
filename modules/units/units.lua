@@ -467,7 +467,6 @@ function Units:CreateStatusBorder(frame, name, db)
         border:SetFrameStrata(db["Framestrata"] or "LOW")
         border:SetFrameLevel(db["FrameLevel"])
         border:SetAllPoints()
-        border:SetScript("OnUpdate", db["Condition"])
         border:SetAlpha(0)
         border:Show()
     end

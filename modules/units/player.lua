@@ -28,6 +28,15 @@ function Player:Setup(frame, db)
     end)
     return frame
 end
+
+function Player:Trigger()
+	local frame = Units:Get(frameName)
+	if frame then
+		if frame.Buffs then frame.Buffs:ForceUpdate() end -- TODO: This is way too often and could be improved, fix this for all units
+		if frame.Debuffs then frame.Debuffs:ForceUpdate() end
+		if frame.ClassIcons then frame.ClassIcons:ForceUpdate() end
+	end
+end
  
 function Player:Update(frame, db)
 	if not db["Enabled"] then return end

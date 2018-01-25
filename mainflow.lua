@@ -270,10 +270,17 @@ function Addon:OnEnable()
 end
 
 function Addon:Update()
-	for key, frame in pairs(self.frames) do
-		frame:UpdateFrame()
+	for key, module in pairs(self.modules) do
+		module:Trigger()
 	end
 end
+
+local frame = CreateFrame("Frame")
+frame:SetScript("OnUpdate", function(self, ...)
+	Addon:Update()
+	collectgarbage("collect");
+end)
+
 
 function Addon:OnDisable()
 

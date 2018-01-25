@@ -393,14 +393,7 @@ local function ClassIcons(frame, db)
 					end)
 				end
 				if power.isRunes then
-					bar.timer = 0
-					bar:SetScript("OnUpdate", function(self, elapsed)
-						self.timer = self.timer + elapsed
-						if self.timer > 0.03 then
-							self:Override(event, unit)
-							self.timer = 0
-						end
-					end)
+
 				else
 					bar:SetScript("OnUpdate", nil)
 					bar:RegisterEvent('UNIT_POWER_FREQUENT')
@@ -494,6 +487,12 @@ local function ClassIcons(frame, db)
 	if power and power.isValid(spec, form) then
 		frame.__castbarAnchor = bar.icons[bar.realIndex or 1]
 		Units:PlaceCastbar(frame, VALID_POWER)
+	end
+
+	bar.ForceUpdate = function(self)
+		if self.isRunes then
+			self:Override(nil, "player")
+		end
 	end
 
 	frame.ClassIcons = bar

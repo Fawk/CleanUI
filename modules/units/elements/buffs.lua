@@ -197,24 +197,6 @@ local Buffs = function(frame, db)
 				end
 			end
 
-			if not buffs.updateFrame then
-				buffs.updateFrame = CreateFrame("Frame")
-				buffs.updateFrame.timer = 0
-				buffs.updateFrame.garbage = 0
-				buffs.updateFrame:SetScript("OnUpdate", function(self, elapsed)
-					self.timer = self.timer + elapsed
-					self.garbage = self.garbage + elapsed
-					if self.timer > 0.03 then
-						buffs:ForceUpdate()
-						self.timer = 0
-					end
-					if self.garbage > 3 then
-						collectgarbage("collect");
-						self.garbage = 0
-					end
-				end)
-			end
-
 			buffs.PostUpdateIcon = function(element, unit, button, index)
 				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HELPFUL")
 				if button.bar then
