@@ -3,7 +3,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon["Modules"], Addon.options = {}, {}, {}
+Addon.frames, Addon.modules, Addon.options = {}, {}, {}
 Addon.debugging = false
 
 Addon.OrderedTable = Args.OrderedTable
@@ -125,7 +125,7 @@ end
 
 function Addon:OnInitialize()
 
-	Addon.db = Addon.dbProvider:New("CleanUI_DB", Addon.defaults)
+	self.db = self.dbProvider:New("CleanUI_DB", self.defaults)
 
 	local uiscale = GetCVar("uiscale") or 0.71
 	local h, w = GetScreenHeight() or 1080, GetScreenWidth() or 1920
@@ -143,12 +143,12 @@ function Addon:OnInitialize()
     self.hiddenFrame = CreateFrame("Frame")
     self.hiddenFrame:Hide()
 
-	Addon:Debug("Loaded")
+	self:Debug("Loaded")
 end
 
 function Addon:OnEnable()
 
-	local E, T, Options = Addon.enum, Addon.Tools, Addon.Options
+	local E, T, Options = self.enum, self.Tools, self.Options
 
 	setScale()
 
@@ -237,18 +237,18 @@ function Addon:OnEnable()
 	-- local optionsContainer = self.OptionsContainer
 	-- optionsContainer:CreateOptions(optionsWindow, options)
 
-    local profile = Addon["Modules"]["Profile"]
+    local profile = self.modules["Profile"]
 
-	profile:Init(Addon.db)
+	profile:Init(self.db)
 	profile:Load()
 
 	for modName, module in pairs(self.modules) do
 		if module.Init then module:Init() end
 	end
 
-	Addon:SetStyle()
+	self:SetStyle()
 
-	local buildText = Addon.TextBuilder
+	local buildText = self.TextBuilder
     
 	local function constructControl(type, desc, optionsParent, relative)
 		local control = CreateFrame(type, nil, optionsParent)

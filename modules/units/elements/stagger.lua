@@ -16,7 +16,7 @@ local function Stagger(frame, db)
 
 	local size, texture = db["Size"], media:Fetch("statusbar", db["Texture"])
 
-	local stagger = (function()
+	local stagger = frame.Stagger or (function()
 		local stagger = CreateFrame("StatusBar", T:frameName("Stagger"), frame)
 		stagger.bg = stagger:CreateTexture(nil, "BORDER")
 		stagger.bg:SetAllPoints()

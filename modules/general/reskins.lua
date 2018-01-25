@@ -155,7 +155,7 @@ local function setStyle()
 					tab.text:SetFont(font(10))
 					tab.text:SetTextColor(1, 1, 1)
 					hooksecurefunc(tab.text, "SetTextColor", function(t, r, g, b, a)
-					if r ~= 1 or g ~= 1 or b ~= 1 then
+						if r ~= 1 or g ~= 1 or b ~= 1 then
 							t:SetTextColor(1, 1, 1)
 						end
 					end)

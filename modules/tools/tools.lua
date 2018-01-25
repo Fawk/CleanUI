@@ -21,6 +21,12 @@ setmetatable(Controls, P)
 setmetatable(Backdrops, P)
 setmetatable(Textures, P)
 
+function T:getWords(input)
+    local matches = {}
+    for m in input:gmatch("[a-zA-Z0-9%(%)]+") do table.insert(matches, m) end
+    return unpack(matches)
+end
+
 function T:rgbToHex(rgb)
     local hexadecimal = ''
 

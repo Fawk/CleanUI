@@ -230,7 +230,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 		local frame = parent:GetParent()
 		local anchor = frame
 		for i = 1, max do
-			local icon = createIcon(parent, i)
+			local icon = parent.icons[i] or createIcon(parent, i)
 			if not power.isRunes then
 				icon:SetPoint(anchor == frame and "TOPLEFT" or "LEFT", anchor, anchor == frame and "BOTTOMLEFT" or "RIGHT", i == 1 and 0 or 1, anchor == frame and -1 or 0)
 			end
@@ -262,7 +262,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 			for i = 1, max do
 				local icon = parent.icons[i]
 				if i > oldMax then
-					local icon = createIcon(parent, i)
+					local icon = parent.icons[i] or createIcon(parent, i)
 					icon:SetPoint("LEFT", parent.icons[i-1], "RIGHT", 1, 0)
 					parent.icons[i] = icon
 				end
@@ -442,7 +442,6 @@ local function ClassIcons(frame, db)
 	bar:RegisterEvent('UPDATE_SHAPESHIFT_FORM')
 	bar:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')
 	bar:RegisterEvent('PLAYER_ENTERING_WORLD')
-	bar:RegisterEvent('ZONE_CHANGED_NEW_AREA')
 
 	bar:SetScript("OnEvent", function(self, event, unit)
 		if event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" then

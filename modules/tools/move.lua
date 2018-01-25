@@ -164,16 +164,30 @@ end
 
 SLASH_CLEANUI1 = '/cui'
 function SlashCmdList.CLEANUI(msg, editbox)
-	if msg == "bind" then
+    local command, arg1, arg2, arg3, arg4, arg5 = T:getWords(msg)
+	
+    if command == "bind" then
 		A["modules"]["Actionbars"]:BindingMode()
 	end
 
-    if msg == "move" then
+    if command == "move" then
        A:InitMove() 
     end
     
-    if msg == "finish" then
+    if command == "finish" then
        FinalizeMove() 
+    end
+
+    if command == "copyProfile" then
+        A["modules"]["Profile"]:Copy(arg1)
+    end
+
+    if command == "renameProfile" then
+        A["modules"]["Profile"]:Rename(arg1, arg2)
+    end
+
+    if command == "changeProfile" then
+        A["modules"]["Profile"]:Change(arg1)
     end
 end
 

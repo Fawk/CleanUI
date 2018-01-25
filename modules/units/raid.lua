@@ -96,90 +96,87 @@ function Raid:Init()
         ]]):format(size["Width"], size["Height"])
     )
 
-    local raidContainer = Units:Get(frameName)
-    if not raidContainer then
-        
-        raidContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerStateTemplate")
+    local raidContainer = Units:Get(frameName) or CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerStateTemplate")
 
-        RegisterStateDriver(raidContainer, "visibility", "[@raid1,exists] show; hide")
+    RegisterStateDriver(raidContainer, "visibility", "[@raid1,exists] show; hide")
 
-        raidContainer:Execute([[
-            Holder = self
-        ]])
+    raidContainer:Execute([[
+        Holder = self
+    ]])
 
-        raidContainer:SetAttribute("Orientation", db["Orientation"])
-        raidContainer:SetAttribute("GroupMembers", tostring(GetNumGroupMembers()))
-        raidContainer:SetAttribute("UpdateSize", [[
-            local x, y, width, height, unitsPerColumn, maxColumns = ...
+    raidContainer:SetAttribute("Orientation", db["Orientation"])
+    raidContainer:SetAttribute("GroupMembers", tostring(GetNumGroupMembers()))
+    raidContainer:SetAttribute("UpdateSize", [[
+        local x, y, width, height, unitsPerColumn, maxColumns = ...
 
-            local numGroupMembers = tonumber(self:GetAttribute("GroupMembers"))
-            local orientation = self:GetAttribute("Orientation")
+        local numGroupMembers = tonumber(self:GetAttribute("GroupMembers"))
+        local orientation = self:GetAttribute("Orientation")
 
-            local w, h
+        local w, h
 
-            if orientation == "VERTICAL" then
-                w = width * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
-                h = height * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
-            else
-                w = width * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
-                h = height * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
-            end
-
-            self:SetWidth(w)
-            self:SetHeight(h)
-        ]])
-
-        function raidContainer:getMoverSize()
-            if db["Orientation"] == "VERTICAL" then
-                return (size["Width"] * unitsPerColumn + (db["Offset X"] * (maxColumns - 1))), (size["Height"] * maxColumns + (db["Offset Y"] * (unitsPerColumn - 1)))
-            else
-                return (size["Width"] * unitsPerColumn + (db["Offset X"] * (unitsPerColumn - 1))), (size["Height"] * maxColumns + (db["Offset X"] * (maxColumns - 1)))
-            end
+        if orientation == "VERTICAL" then
+            w = width * math.ceil(unitsPerColumn / numGroupMembers) + (x * (maxColumns - 1))
+            h = height * (numGroupMembers < 5 and numGroupMembers or 5) + (y * (unitsPerColumn - 1))    
+        else
+            w = width * (numGroupMembers < 5 and numGroupMembers or 5) + (x * (unitsPerColumn - 1)) 
+            h = height * math.ceil(numGroupMembers / unitsPerColumn) + (x * (maxColumns - 1)) 
         end
 
-        raidContainer.UpdateUnits = function(self)
+        self:SetWidth(w)
+        self:SetHeight(h)
+    ]])
+
+    function raidContainer:getMoverSize()
+        if db["Orientation"] == "VERTICAL" then
+            return (size["Width"] * unitsPerColumn + (db["Offset X"] * (maxColumns - 1))), (size["Height"] * maxColumns + (db["Offset Y"] * (unitsPerColumn - 1)))
+        else
+            return (size["Width"] * unitsPerColumn + (db["Offset X"] * (unitsPerColumn - 1))), (size["Height"] * maxColumns + (db["Offset X"] * (maxColumns - 1)))
+        end
+    end
+
+    raidContainer.UpdateUnits = function(self)
+        for i = 1, 40 do
+            local uf = raidHeader:GetAttribute("child"..i)
+            if not uf then break end
+            uf:RegisterForClicks("AnyUp")
+            uf.unit = uf:GetAttribute("unit")
+            Raid:Update(uf, db)
+        end
+    end
+
+    raidContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
+    raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
+    raidContainer:SetScript("OnEvent", function(self, event)    
+        Units:DisableBlizzardRaid()
+        local numGroupMembers = GetNumGroupMembers()
+        T:RunNowOrAfterCombat(function()
+            raidContainer:Execute(([[
+                Holder:SetAttribute("GroupMembers", %d) 
+                Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
+            ]]):format(numGroupMembers, db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
+        end)
+        self:UpdateUnits()
+    end)
+
+    raidContainer:UpdateUnits()
+
+    raidContainer.timer = 0
+    raidContainer:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = self.timer + elapsed
+        if self.timer > 0.10 then
             for i = 1, 40 do
                 local uf = raidHeader:GetAttribute("child"..i)
-                if not uf then break end
-                uf:RegisterForClicks("AnyUp")
-                uf.unit = uf:GetAttribute("unit")
-                Raid:Update(uf, db)
-            end
-        end
-
-        raidContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
-        raidContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
-        raidContainer:SetScript("OnEvent", function(self, event)    
-            Units:DisableBlizzardRaid()
-            local numGroupMembers = GetNumGroupMembers()
-            T:RunNowOrAfterCombat(function()
-                raidContainer:Execute(([[
-                    Holder:SetAttribute("GroupMembers", %d) 
-                    Holder:RunAttribute("UpdateSize", %d, %d, %d, %d, %d, %d) 
-                ]]):format(numGroupMembers, db["Offset X"], db["Offset Y"], size["Width"], size["Height"], unitsPerColumn, maxColumns))
-            end)
-            self:UpdateUnits()
-        end)
-    
-        raidContainer:UpdateUnits()
-    
-        raidContainer.timer = 0
-        raidContainer:SetScript("OnUpdate", function(self, elapsed)
-            self.timer = self.timer + elapsed
-            if self.timer > 0.10 then
-                for i = 1, 40 do
-                    local uf = raidHeader:GetAttribute("child"..i)
-                    if uf and uf.unit then
-                        Visibility(uf)
-                        Units:UpdateImportantElements(uf, db)
-                    end
+                if uf and uf.unit then
+                    Visibility(uf)
+                    Units:UpdateImportantElements(uf, db)
                 end
-                self.timer = 0
             end
-        end)
+            self.timer = 0
+        end
+    end)
 
-        Units:Add(raidContainer, frameName)
-    end
+    Units:Add(raidContainer, frameName)
+    
 
     Units:Position(raidContainer, db["Position"])
     raidContainer:Execute(([[ 

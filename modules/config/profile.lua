@@ -23,7 +23,8 @@ local function deepCopy(object)
 end
 
 function Profile:Init(db)
-	for name, profile in pairs(db["Profiles"]) do
+	local _db = db or A.db
+	for name, profile in pairs(_db["Profiles"]) do
 		A:Debug("Profile:", name, "loaded!")
 		profiles[name] = profile
 	end
@@ -61,21 +62,36 @@ function Profile:GetActive()
 end
 
 local function copyOfName(name)
-	return name.." (Copy)"
+	return name.."(Copy)"
 end
 
 function Profile:Copy(name)
 	local profile = profiles[name]
 	local newName = copyOfName(name)
 	
-	A.db["Profiles"][newName] = deepCopy(A.db["Profiles"][profile])
+	A.db["Profiles"][newName] = deepCopy(profile)
 	A.db["Characters"][currentCharacter] = newName
 
 	self:Init(A.db)
 	A.dbProvider:Save()
 end
 
+local function removeEmptyProfiles(db)
+	local newTbl = {}
+	for k, v in next, db do
+		if v ~= nil then
+			newTbl[k] = v
+		end
+	end
+	db = newTbl
+end
+
 function Profile:Rename(name, newName)
+	if name == "Default" then
+		error("You cannot rename the Default profile.")
+		return
+	end
+
 	if activeProfile == name then
 		A.db["Profiles"][newName] = deepCopy(A["Profile"])
 	else
@@ -87,6 +103,9 @@ function Profile:Rename(name, newName)
 			A.db["Characters"][char] = newName
 		end
 	end
+
+	A.db["Profiles"][name] = nil
+	removeEmptyProfiles(A.db["Profiles"])
 
 	self:Init(A.db)
 	self:SetActive(newName)
@@ -101,4 +120,5 @@ function Profile:Change(name)
 	A.dbProvider:Save()
 end
 
-A["Modules"]["Profile"] = Profile
+A.modules["Profile"] = Profile
+

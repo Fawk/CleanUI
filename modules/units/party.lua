@@ -101,86 +101,82 @@ function Party:Init()
         "oUF-initialConfigFunction", (initString):format(size["Width"], size["Height"])
     )
 
-    local partyContainer = Units:Get(frameName)
-    if not partyContainer then
-        
-        partyContainer = CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
+    local partyContainer = Units:Get(frameName) or CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
 
-        RegisterStateDriver(partyContainer, "visibility", "[@party1,exists] show; hide")
+    RegisterStateDriver(partyContainer, "visibility", "[@party1,exists] show; hide")
 
-        partyContainer:Execute([[
-            Holder = self
-        ]])
-        
-        partyContainer:SetAttribute("UpdateSize", ([[
-            local x, y, width, height = %d, %d, %d, %d
-            local w, h = width * 5 + (x * 4), height
-            if %s == "VERTICAL" then
-                w = width
-                h = height * 5 + (y * 4)
-            end
-            self:SetWidth(w)
-            self:SetHeight(h)
-        ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], db["Orientation"]))
+    partyContainer:Execute([[
+        Holder = self
+    ]])
+    
+    partyContainer:SetAttribute("UpdateSize", ([[
+        local x, y, width, height = %d, %d, %d, %d
+        local w, h = width * 5 + (x * 4), height
+        if %s == "VERTICAL" then
+            w = width
+            h = height * 5 + (y * 4)
+        end
+        self:SetWidth(w)
+        self:SetHeight(h)
+    ]]):format(db["Offset X"], db["Offset Y"], size["Width"], size["Height"], db["Orientation"]))
 
-        partyContainer.getMoverSize = function(self)
-            if db["Orientation"] == "VERTICAL" then
-                return size["Width"], (size["Height"] * 5 + (db["Offset Y"] * 4))
-            else
-                return (size["Width"] * 5 + (db["Offset X"] * 4)), size["Height"]
+    partyContainer.getMoverSize = function(self)
+        if db["Orientation"] == "VERTICAL" then
+            return size["Width"], (size["Height"] * 5 + (db["Offset Y"] * 4))
+        else
+            return (size["Width"] * 5 + (db["Offset X"] * 4)), size["Height"]
+        end
+    end
+
+    partyContainer:SetAttribute("_onshow", partyContainer:GetAttribute("UpdateSize"))
+    partyContainer:SetAttribute("_onhide", partyContainer:GetAttribute("UpdateSize"))
+
+    partyContainer.UpdateUnits = function()
+        for i = 1, 5 do
+            local uf = partyHeader:GetAttribute("child"..i)
+            if uf then
+                uf:RegisterForClicks("AnyUp")
+                uf.unit = uf:GetAttribute("unit")
+                Party:Update(uf, db)
             end
         end
+    end
 
-        partyContainer:SetAttribute("_onshow", partyContainer:GetAttribute("UpdateSize"))
-        partyContainer:SetAttribute("_onhide", partyContainer:GetAttribute("UpdateSize"))
+    partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
+    partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
+    partyContainer:RegisterEvent("PLAYER_LOGIN")
+    partyContainer:SetScript("OnEvent", function(self, event) 
+        Units:DisableBlizzardRaid()
+        T:RunNowOrAfterCombat(function()
+            self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
+        end)
+        self:UpdateUnits()
+    end)
 
-        partyContainer.UpdateUnits = function()
+    partyContainer:UpdateUnits()
+
+    partyContainer.timer = 0
+    partyContainer:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = self.timer + elapsed
+        if self.timer > 0.10 then
             for i = 1, 5 do
                 local uf = partyHeader:GetAttribute("child"..i)
-                if uf then
-                    uf:RegisterForClicks("AnyUp")
-                    uf.unit = uf:GetAttribute("unit")
-                    Party:Update(uf, db)
-                end
-            end
-        end
-
-        partyContainer:RegisterEvent("GROUP_ROSTER_UPDATE")
-        partyContainer:RegisterEvent("UNIT_EXITED_VEHICLE")
-        partyContainer:RegisterEvent("PLAYER_LOGIN")
-        partyContainer:SetScript("OnEvent", function(self, event) 
-            Units:DisableBlizzardRaid()
-            T:RunNowOrAfterCombat(function()
-                self:Execute([[ Holder:RunAttribute("UpdateSize") ]])
-            end)
-            self:UpdateUnits()
-        end)
-    
-        partyContainer:UpdateUnits()
-    
-        partyContainer.timer = 0
-        partyContainer:SetScript("OnUpdate", function(self, elapsed)
-            self.timer = self.timer + elapsed
-            if self.timer > 0.10 then
-                for i = 1, 5 do
-                    local uf = partyHeader:GetAttribute("child"..i)
-                    if uf and uf.unit then
-                        if not uf.init then
-                            uf.init = true
-                            uf:RegisterForClicks("AnyUp")
-                            uf.unit = uf:GetAttribute("unit")
-                            Party:Update(uf, db)
-                        end
-                        Visibility(uf)
-						Units:UpdateImportantElements(uf, db)
+                if uf and uf.unit then
+                    if not uf.init then
+                        uf.init = true
+                        uf:RegisterForClicks("AnyUp")
+                        uf.unit = uf:GetAttribute("unit")
+                        Party:Update(uf, db)
                     end
+                    Visibility(uf)
+					Units:UpdateImportantElements(uf, db)
                 end
-                self.timer = 0
             end
-        end)
+            self.timer = 0
+        end
+    end)
 
-        Units:Add(partyContainer, frameName)
-    end
+    Units:Add(partyContainer, frameName)
 
     Units:Position(partyContainer, db["Position"])
     partyContainer:Execute([[ Holder:RunAttribute("UpdateSize") ]])
