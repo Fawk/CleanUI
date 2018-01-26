@@ -171,7 +171,7 @@ function Party:Init()
 				Units:UpdateImportantElements(uf, db)
             end
         end
-    end)
+    end
 
     self.updateFuncs:add(partyContainer.Update)
 
@@ -188,7 +188,8 @@ function Party:Init()
 end
 
 function Party:Trigger(db)
-    for _,updateFunc in next, self.updateFuncs do
+    for i = 1, self.updateFuncs:count() do
+        local updateFunc = self.updateFuncs:get(i)
         updateFunc()
     end
 end
@@ -228,7 +229,7 @@ function Party:Update(frame, db)
         end
     })
 
-    self.updateFuncs:add(frame["StausBorder"]["Targeted"]["Condition"])
+    self.updateFuncs:add(frame["StatusBorder"]["Targeted"]["Condition"])
 
     --[[ Background ]]--
     U:CreateBackground(frame, db)
@@ -279,7 +280,7 @@ function Party:Update(frame, db)
         end
     })
 
-    self.updateFuncs:add(frame["StausBorder"]["Debuff"]["Condition"])
+    self.updateFuncs:add(frame["StatusBorder"]["Debuff"]["Condition"])
 end
 
 A.modules["party"] = Party

@@ -171,7 +171,7 @@ function Raid:Init()
                 Units:UpdateImportantElements(uf, db)
             end
         end      
-    end)
+    end
 
     self.updateFuncs:add(raidContainer.Update)
 
@@ -188,8 +188,11 @@ function Raid:Init()
 end
 
 function Raid:Trigger()
-    for _,updateFunc in next, updateFuncs do
-        updateFunc()
+    for i = 1, self.updateFuncs:count() do
+        local updateFunc = self.updateFuncs:get(i)
+        if updateFunc then
+            updateFunc()
+        end
     end
 end
  

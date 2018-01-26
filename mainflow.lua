@@ -271,14 +271,19 @@ end
 
 function Addon:Update()
 	for key, module in pairs(self.modules) do
-		module:Trigger()
+		if module.Trigger then module:Trigger() end
 	end
 end
 
 local frame = CreateFrame("Frame")
-frame:SetScript("OnUpdate", function(self, ...)
+frame.collect = 0
+frame:SetScript("OnUpdate", function(self, elapsed)
 	Addon:Update()
-	collectgarbage("collect");
+    self.collect = self.collect + elapsed
+    if self.collect > 3 then
+        self.collect = 0
+    	collectgarbage("collect");
+    end
 end)
 
 
