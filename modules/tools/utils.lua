@@ -177,6 +177,18 @@ end
 
 object.__index = object
 
+local widget = setmetatable({}, object)
+function widget:desc(text)
+	self._desc = text
+	return self
+end
+function widget:name(text)
+	self._name = text
+	return self
+end
+
+widget.__index = object
+
 local points = {
 	["atC"] = E.regions.C,
 	["atT"] = E.regions.T,
@@ -432,7 +444,7 @@ local function ButtonBuilder(parent)
 		parent = parent
 	}
 
-	setmetatable(o, object)
+	setmetatable(o, widget)
 	o.button = CreateFrame("Button", nil, parent)
 
 	o.button.parent = parent
@@ -487,7 +499,7 @@ local function EditBoxBuilder(parent)
 		parent = parent
 	}
 
-	setmetatable(o, object)
+	setmetatable(o, widget)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
 	o.textbox.parent = parent
@@ -534,7 +546,7 @@ local function DropdownBuilder(parent)
 		items = A:OrderedTable()
 	}
 
-	setmetatable(o, object)
+	setmetatable(o, widget)
 	o.dropdown = CreateFrame("Frame", nil, parent)
 	o.dropdown.items = A:OrderedTable()
 
@@ -614,6 +626,90 @@ local function DropdownBuilder(parent)
 		end
 
 		return self.dropdown
+	end
+end
+
+function A:ColorBuilder(parent)
+	local o = {
+		parent = parent,
+	}
+
+	setmetatable(o, widget)
+	o.color = CreateFrame("Button", nil, parent)
+
+	o.color.parent = parent
+	o.color.active = true
+
+	o.color.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+
+	o.color.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
+    o.color.GetColor = function(self) return self.r, self.g, self.b, self.a end
+    o.color.SetColor = function(self, r, g, b, a) 
+        self.r = r 
+        self.g = g
+        self.b = b
+        self.a = a
+        self:SetBackdropColor(self.r, self.g, self.b, self.a)
+    end
+
+    color:SetColor(optionValue.r, optionValue.g, optionValue.b, optionValue.a)
+
+	o.color:SetScript("OnClick", function(self, button, down)
+		if button == "LeftButton" and not down then
+			HideUIPanel(ColorPickerFrame)
+
+	        ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
+	        ColorPickerFrame:SetFrameLevel(self:GetFrameLevel() + 10)
+	        ColorPickerFrame:SetClampedToScreen(true)
+
+	        ColorPickerFrame.func = function()
+	            local r, g, b = ColorPickerFrame:GetColorRGB()
+	            local a = 1 - OpacitySliderFrame:GetValue()
+	            color:SetColor(r, g, b, a)
+	        end
+
+	        ColorPickerFrame.hasOpacity = true
+	        ColorPickerFrame.opacityFunc = function()
+	            local r, g, b = ColorPickerFrame:GetColorRGB()
+	            local a = 1 - OpacitySliderFrame:GetValue()
+	            if ColorPickerFrame.ColorSwatch then 
+	                ColorPickerFrame.ColorSwatch:SetVertexColor(1, 1, 1, a)
+	            end
+	        end
+
+	        ColorPickerFrame.cancelFunc = function()
+	            local r, g, b = ColorPickerFrame:GetColorRGB()
+	            local a = 1 - OpacitySliderFrame:GetValue()
+	            color:SetColor(r, g, b, a)
+	        end
+
+	        local r, g, b, a = self.r, self.g, self.b, self.a
+	        ColorPickerFrame.opacity = 1 - (a or 0)
+
+	        ColorPickerFrame:SetColorRGB(r, g, b)
+
+	        ColorPickerOkayButton:HookScript("OnClick", function() 
+	            A.dbProvider:Save()
+	        end)
+
+	        ShowUIPanel(ColorPickerFrame)
+	    end
+	end)
+
+	function o:build()
+		setPoints(self, self.color)
+		self.color:SetSize(self.w, self.h)
+		self.color:SetBackdropBorderColor(0.67, 0.67, 0.67, 1)
+
+		local title = A:TextBuilder(self.color, 10):rightOf(self.color)
+
+		return self.color
 	end
 end
 
