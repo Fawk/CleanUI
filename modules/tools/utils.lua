@@ -160,8 +160,18 @@ function object:leftOf(relative)
 	return self
 end
 function object:size(w, h)
-	self.w = w
-	self.h = h
+	if not h then
+		local relative = w or self.parent
+		self.w = relative:GetWidth()
+		self.h = relative:GetHeight()
+	else
+		self.w = w
+		self.h = h
+	end
+	return self
+end
+function object:activeCondition(func)
+	self.activeCond = func
 	return self
 end
 
@@ -425,6 +435,17 @@ local function ButtonBuilder(parent)
 	setmetatable(o, object)
 	o.button = CreateFrame("Button", nil, parent)
 
+	o.button.parent = parent
+	o.button.active = true
+
+	o.button.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+	o.button.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
 	function o:build()
 		setPoints(self, self.button)
 		self.button:SetSize(self.w or 0, self.h or 0)
@@ -469,6 +490,18 @@ local function EditBoxBuilder(parent)
 	setmetatable(o, object)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
+	o.textbox.parent = parent
+	o.textbox.active = true
+
+	o.textbox.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+
+	o.textbox.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
 	function o:onTextChanged(func)
 		self.textbox:SetScript("OnTextChanged", func)
 		return self
@@ -505,6 +538,18 @@ local function DropdownBuilder(parent)
 	o.dropdown = CreateFrame("Frame", nil, parent)
 	o.dropdown.items = A:OrderedTable()
 
+	o.dropdown.parent = parent
+	o.dropdown.active = true
+
+	o.dropdown.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+
+	o.dropdown.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
 	function o:addItem(item)
 		local count = self.items:count()
 		local relative = self.items:getRelative(self.dropdown)
@@ -522,11 +567,29 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:onClick(func)
+		self.dropdown:SetScript("OnClick", func)
+		return self
+	end
+
 	function o:backdrop(bd, bdColor, borderColor)
 		self.dropdown:SetBackdrop(bd)
 		self.dropdown:SetBackdropColor(unpack(bdColor))
-		self.dropdown:SetBackdropColor(unpack(borderColor))
+		self.dropdown:SetBackdropBorderColor(unpack(borderColor))
 		return self
+	end
+
+	function o:button(position, normal, pushed, disabled)
+		local b = self.dropdown.button or CreateFrame("Button", nil, self.dropdown)
+		local lp, p, x, y
+		if type(position) == "table" then
+			lp = position["Local Point"]
+			p = position["Point"]
+			x = position["Offset X"]
+			y = position["Offset Y"]
+		end
+		b:SetPoint(T.reversedPoints[lp or position], self.dropdown, p or position, x or 0, y or 0)
+		self.dropdown.button = b
 	end
 
 	function o:build()
@@ -538,7 +601,9 @@ local function DropdownBuilder(parent)
 			
 			local buttonBuilder = A:ButtonBuilder(self.dropdown):onClick(function(self, b, down)
 				if b == "LeftButton" and not down then
-					o:itemClick(self)
+					if self.dropdown.active then
+						o:itemClick(self)
+					end
 				end
 			end):below(item.relative):build()
 
@@ -546,6 +611,63 @@ local function DropdownBuilder(parent)
 			button:SetText(item.name)
 
 			self.dropdown.items:add(button)
+		end
+
+		return self.dropdown
+	end
+end
+
+function A:GroupBuilder(parent)
+	local o = {
+		parent = parent,
+		children = A:OrderedTable()
+	}
+
+	setmetatable(o, object)
+	o.group = CreateFrame("Frame", nil, parent)
+	o.group.children = A:OrderedTable()
+
+	o.group.parent = parent
+	o.group.active = true
+
+	o.group.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+		for i = 1, self.children:count() do
+			local child = self.children:get(i)
+			child:SetActive(self.active)
+		end
+	end
+
+	o.group.IsActive = function(self)
+		return (parent.IsActive and parent:IsActive() or true) and self.active
+	end
+
+	function o:addChild(child)
+		local count = self.children:count()
+		local relative = self.children:getRelative(self.group)
+		if type(child) ~= "table" then
+			self.children:add({ name = child, relative = relative })
+		else
+			child.relative = relative
+			self.children:add(child)
+		end
+		return self
+	end
+
+	function o:backdrop(bd, bdColor, borderColor)
+		self.dropdown:SetBackdrop(bd)
+		self.dropdown:SetBackdropColor(unpack(bdColor))
+		self.dropdown:SetBackdropBorderColor(unpack(borderColor))
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.group)
+		self.group:SetSize(self.w, self.h)
+
+		for i = 1, self.children:count() do
+			self.dropdown.children:add(button)
 		end
 
 		return self.dropdown
