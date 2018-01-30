@@ -267,6 +267,8 @@ function Addon:OnEnable()
 
 		return control
 	end
+
+	collectgarbage("collect");
 end
 
 function Addon:Update()

@@ -1266,6 +1266,166 @@ local defaults =  {
                     },
                     ["Enabled"] = true
                 },
+                ["Boss"] = {
+                    ["Clickcast"] = {},
+                    ["Position"] = {
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "TOPRIGHT",
+                        ["Local Point"] = "TOPRIGHT",
+                        ["Offset X"] = -250,
+                        ["Offset Y"] = -200
+                    },
+                    ["Size"] = {
+                        ["Width"] = 150,
+                        ["Height"] = 50
+                    },
+                    ["Health"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "TOP",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0,
+                            ["Relative To"] = "Parent"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 35
+                        },
+                        ["Color By"] = "Gradient",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "VERTICAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2"
+                    },
+                    ["Power"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = -1,
+                            ["Relative To"] = "Health"
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Color By"] = "Power",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2"
+                    },
+                    ["Orientation"] = "HORIZONTAL",
+                    ["Tags"] = {
+                        ["Name"] = {
+                            ["Font"] = "NotoBold",
+                            ["Size"] = 12,
+                            ["Color"] = { 1, 1, 1 },
+                            ["Outline"] = "SHADOW",
+                            ["Text"] = "[3charname]",
+                            ["Position"] = {
+                                ["Point"] = "ALL",
+                                ["Local Point"] = "ALL",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0,
+                                ["Relative To"] = "Parent"
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Custom"] = {}
+                    },
+                    ["Offset X"] = 2,
+                    ["Offset Y"] = 0,
+                    ["Highlight Target"] = true,
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0 },
+                        ["Offset"] = {
+                            ["Top"] = -1,
+                            ["Bottom"] = -1,
+                            ["Left"] = -1,
+                            ["Right"] = -1
+                        },
+                        ["Enabled"] = true,
+                    },
+                    ["Castbar"] = {
+                        ["Enabled"] = true,
+                        ["Texture"] = "Default2",
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Time"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "RIGHT",
+                                ["Local Point"] = "RIGHT",
+                                ["Offset X"] = -5,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 10
+                        },
+                        ["Name"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 18,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 0.7
+                        },
+                        ["Icon"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = "LEFT",
+                            ["Size"] = {
+                                ["Match width"] = false,
+                                ["Match height"] = true,
+                                ["Size"] = 10
+                            },
+                            ["Background"] = {
+                                ["Color"] = { 0, 0, 0 },
+                                ["Offset"] = {
+                                    ["Top"] = -1,
+                                    ["Bottom"] = -1,
+                                    ["Left"] = -1,
+                                    ["Right"] = -1
+                                },
+                                ["Enabled"] = true
+                            }
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Attached"] = true,
+                    },
+                    ["Enabled"] = true
+                },
     			["Minimap"] = {
     				["Size"] = 200,
     				["Position"] = {
