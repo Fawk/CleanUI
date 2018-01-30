@@ -8,6 +8,7 @@
     <Script file="artifact.lua"/>
     <Script file="reputation.lua"/>
     <Script file="vehicle.lua"/>
+    <Script file="petbar.lua"/>
 	<!--<Script file="cooldown.lua"/>-->
 
 </Ui>

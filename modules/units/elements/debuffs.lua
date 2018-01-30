@@ -7,7 +7,7 @@ local Debuffs = function(frame, db)
 
 	local growth, attached, style, size = db["Growth"], db["Attached"], db["Style"], db["Size"]
 	local debuffs = frame.Debuffs or (function()
-		local debuffs = CreateFrame("Frame", T:frameName("Debuffs"), frame)
+		local debuffs = CreateFrame("Frame", T:frameName(frame.unit, "Debuffs"), frame)
 		debuffs:SetSize(frame:GetWidth(), 300)
 		return debuffs
 	end)()

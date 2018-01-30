@@ -102,6 +102,8 @@ local function setStyle()
 		end
 	end
 
+	--ChallengerKeyStoneFrame:SetFrameStrata("HIGH")
+
 	--Chat
 	do
 		CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA = 1.0;
@@ -165,7 +167,7 @@ local function setStyle()
 					for i = 1, editbox:GetNumRegions() do
 						local region = select(i, editbox:GetRegions())
 						if region:GetObjectType() == "Texture" then 
-							if region:GetTexture() ~= "Color-ffffffff" then
+							if region:GetTexture() ~= "Color-ffffffff-CSimpleTexture" then
 								region:SetTexture(nil)
 							end
 						end

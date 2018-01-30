@@ -190,7 +190,7 @@ end
 function Party:Trigger(db)
     for i = 1, self.updateFuncs:count() do
         local updateFunc = self.updateFuncs:get(i)
-        updateFunc()
+        if updateFunc then updateFunc() end
     end
 end
  

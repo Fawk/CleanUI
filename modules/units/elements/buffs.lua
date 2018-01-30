@@ -7,7 +7,7 @@ local Buffs = function(frame, db)
 
 	local growth, attached, style, size = db["Growth"], db["Attached"], db["Style"], db["Size"]
 	local buffs = frame.Buffs or (function()
-		local buffs = CreateFrame("Frame", T:frameName("Buffs"), frame)
+		local buffs = CreateFrame("Frame", T:frameName(frame.unit, "Buffs"), frame)
 		buffs:SetSize(frame:GetWidth(), 300)
 		return buffs
 	end)()
