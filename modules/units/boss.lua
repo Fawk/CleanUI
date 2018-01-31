@@ -6,12 +6,12 @@ local Boss = {}
 local frameName = "Boss"
 Boss.updateFuncs = A:OrderedTable()
 
+local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES
+
 function Boss:Init()
 
 	local db = A["Profile"]["Options"][frameName]
 	local size = db["Size"]
-    local castbar = db["Castbar"]
-    local castbarEnabled = castbar["Enabled"]
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
         Boss:Setup(frame, db)
@@ -30,18 +30,17 @@ function Boss:Init()
     for i = 1, MAX_BOSS_FRAMES do
         local frame = self.container.frames[i] or oUF:Spawn(frameName..i, frameName..i)
         local anchor = self.container.frames[i - 1] or self.container
-        local lp, p = "TOP", "BOTTOM"
-        local x, y = db["Offset X"], db["Offset Y"]
+        local first = anchor == self.container
 
         if db["Orientation"] == "HORIZONTAL" then
             lp = "LEFT"
-            p = anchor == self.container and T.reversedPoints["RIGHT"] or "RIGHT"
+            p = T.reversedPoints[first and "RIGHT" or "LEFT"]
         else
             lp = "TOP"
-            p = anchor == self.container and T.reversedPoints["BOTTOM"] or "BOTTOM"
+            p = T.reversedPoints[first and "BOTTOM" or "TOP"]
         end
 
-        frame:SetPoint(lp, anchor, p, x, y)
+        frame:SetPoint(lp, anchor, p, db["Offset X"], db["Offset Y"])
         
         self.container.frames[i] = frame
         self:Update(frame, db)
@@ -56,7 +55,13 @@ function Boss:Setup(frame, db)
 end
 
 function Boss:Trigger()
-
+    for i = 1, MAX_BOSS_FRAMES do
+        local frame = self.container.frames[i]
+        if frame then
+            if frame.Buffs then frame.Buffs:ForceUpdate() end -- TODO: This is way too often and could be improved, fix this for all units
+            if frame.Debuffs then frame.Debuffs:ForceUpdate() end
+        end
+    end
 end
 
 function Boss:Update(frame, db)
@@ -66,9 +71,7 @@ function Boss:Update(frame, db)
         Units:SetupClickcast(frame, db["Clickcast"])
     end)
 
-    local position, size = db["Position"], db["Size"]
-
-    frame:SetSize(size["Width"], size["Height"])
+    frame:SetSize(db["Size"]["Width"], db["Size"]["Height"])
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--
@@ -89,7 +92,7 @@ function Boss:Update(frame, db)
         ["FrameLevel"] = 5,
         ["Color"] = A.colors.border.target, 
         ["Condition"] = function(self, elapsed)
-            if self and self.unit and UnitExists("target") and GetUnitName(self.unit, true) == GetUnitName("target", true) then
+            if self and self.unit and UnitExists("target") and UnitIsUnit(self.unit, "target") then
                 self:SetAlpha(1)
             else
                 self:SetAlpha(0)
