@@ -365,7 +365,11 @@ local function TextBuilder(parent, sizeInPerc)
             		local t = ""
             		while self:GetStringWidth() > (parent:GetWidth() * sizeInPerc) do
             			t = self:GetText()
-            			self:OldSetText(t:sub(0, t:len() - 1))
+            			if t then
+            				self:OldSetText(t:sub(0, t:len() - 1))
+            			else
+            				break
+            			end
 	                end
 	                self:OldSetText((t and t ~= "") and (t:sub(0, t:len() - 3):trim().."..") or self:GetText())
             	elseif o.enforceW then

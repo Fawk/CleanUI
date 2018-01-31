@@ -4,48 +4,48 @@ local oUF = oUF or A.oUF
 
 local Boss = {}
 local frameName = "Boss"
-Boss.frames = A:OrderedTable()
+Boss.updateFuncs = A:OrderedTable()
 
 function Boss:Init()
 
-	local db = A["Profile"]["Options"]["Boss Header"]
+	local db = A["Profile"]["Options"][frameName]
 	local size = db["Size"]
+    local castbar = db["Castbar"]
+    local castbarEnabled = castbar["Enabled"]
 
     oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
         Boss:Setup(frame, db)
     end)
     oUF:SetActiveStyle(frameName)
 
-    local header = oUF:SpawnHeader(
-        T:frameName("Boss Header"),
-        nil,
-        "[@boss1,exists] show; hide",
-        "showPlayer",         false,
-        "showSolo",           true,
-        "showParty",          true,
-        "showRaid",			  true,
-        "point",              point,
-        "yOffset",            db["Offset Y"],
-        "xOffset",            db["Offset X"],
-        "maxColumns",         maxColumns,
-        "unitsPerColumn",     unitsPerColumn,
-        "columnAnchorPoint",  anchorPoint,
-        "oUF-initialConfigFunction", [[
-        	self:SetWidth(%d)
-        	self:SetHeight(%d)
-        ]]:format(size["Width"], size["Height"])
-    )
-
-    self.container = self.container or CreateFrame("Frame", T:frameName("Boss Container"), A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
+    self.container = self.container or Units:Get(frameName) or CreateFrame("Frame", T:frameName("Boss Container"), A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
     self.container:SetSize(size["Width"], size["Height"])
 
     RegisterStateDriver(self.container, "visibility", "[@boss1,exists] show; hide")
+    Units:Position(self.container, db["Position"])
 
+	Units:Add(self.container, frameName)
+
+    self.container.frames = self.container.frames or {}
     for i = 1, MAX_BOSS_FRAMES do
-	    local frame = Units:Get(frameName..i) or oUF:Spawn(frameName..i, frameName..i)
-	    Units:Add(frame)
-	end
-end
+        local frame = self.container.frames[i] or oUF:Spawn(frameName..i, frameName..i)
+        local anchor = self.container.frames[i - 1] or self.container
+        local lp, p = "TOP", "BOTTOM"
+        local x, y = db["Offset X"], db["Offset Y"]
+
+        if db["Orientation"] == "HORIZONTAL" then
+            lp = "LEFT"
+            p = anchor == self.container and T.reversedPoints["RIGHT"] or "RIGHT"
+        else
+            lp = "TOP"
+            p = anchor == self.container and T.reversedPoints["BOTTOM"] or "BOTTOM"
+        end
+
+        frame:SetPoint(lp, anchor, p, x, y)
+        
+        self.container.frames[i] = frame
+        self:Update(frame, db)
+    end
 
     A:CreateMover(self.container, db, "Boss Header")
 end
@@ -57,14 +57,6 @@ end
 
 function Boss:Trigger()
 
-	for i = 1, MAX_BOSS_FRAMES do
-		local frame = Units:Get(frameName..i)
-		if frame then
-			if frame.Buffs then frame.Buffs:ForceUpdate() end -- TODO: This is way too often and could be improved, fix this for all units
-			if frame.Debuffs then frame.Debuffs:ForceUpdate() end
-			if frame.ClassIcons then frame.ClassIcons:ForceUpdate() end
-		end
-	end
 end
 
 function Boss:Update(frame, db)
@@ -74,6 +66,9 @@ function Boss:Update(frame, db)
         Units:SetupClickcast(frame, db["Clickcast"])
     end)
 
+    local position, size = db["Position"], db["Size"]
+
+    frame:SetSize(size["Width"], size["Height"])
     Units:UpdateElements(frame, db)
 
     --[[ Tags ]]--

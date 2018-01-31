@@ -1323,14 +1323,14 @@ local defaults =  {
                         ["Reversed"] = false,
                         ["Texture"] = "Default2"
                     },
-                    ["Orientation"] = "HORIZONTAL",
+                    ["Orientation"] = "VERTICAL",
                     ["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "NotoBold",
-                            ["Size"] = 12,
+                            ["Size"] = 10,
                             ["Color"] = { 1, 1, 1 },
                             ["Outline"] = "SHADOW",
-                            ["Text"] = "[3charname]",
+                            ["Text"] = "[name]",
                             ["Position"] = {
                                 ["Point"] = "ALL",
                                 ["Local Point"] = "ALL",
