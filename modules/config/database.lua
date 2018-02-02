@@ -1297,7 +1297,7 @@ local defaults =  {
                         ["Color By"] = "Gradient",
                         ["Custom Color"] = { 1, 1, 1 },
                         ["Background Multiplier"] = 0.33,
-                        ["Orientation"] = "VERTICAL",
+                        ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
                         ["Texture"] = "Default2"
                     },
