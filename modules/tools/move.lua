@@ -6,6 +6,7 @@ local CreateFrame = CreateFrame
 local InCombatLockdown = InCombatLockdown
 local moveableFrames = {}
 local finishFrame
+local grid
 
 local function FinalizeMove()
 	for name, moveFrame in next, moveableFrames do
@@ -13,6 +14,7 @@ local function FinalizeMove()
 		moveFrame:Apply()
 	end
 	finishFrame:Hide()
+	grid:Hide()
     A.dbProvider:Save()
 	A.isMovingFrames = false
 end
@@ -55,6 +57,25 @@ function A:InitMove()
 			FinalizeMove()
 		end)
 	end
+
+	if not grid then
+		grid = CreateFrame("Frame", T:frameName("MoveGrid"), A.frameParent)
+		grid:SetPoint("CENTER")
+		grid:SetSize(A.frameParent:GetSize())
+		grid:SetFrameStrata("HIGH")
+		grid:SetFrameLevel(100)
+		grid.vertical = grid:CreateTexture(nil, "OVERLAY")
+		grid.vertical:SetSize(1, grid:GetHeight())
+		grid.vertical:SetTexture(1,1,1,1)
+		grid.vertical:SetPoint("CENTER")
+		grid.horizontal = grid:CreateTexture(nil, "OVERLAY")
+		grid.horizontal:SetSize(grid:GetWidth(), 1)
+		grid.horizontal:SetTexture(1,1,1,1)
+		grid.horizontal:SetPoint("CENTER")
+	end
+
+	finishFrame:Show()
+	grid:Show()
 
 	for name, moveFrame in next, moveableFrames do
 		

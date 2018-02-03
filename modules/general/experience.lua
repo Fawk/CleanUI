@@ -102,7 +102,10 @@ function E:Init()
     local r, g, b = unpack(db["Color"])
 
     experience:ClearAllPoints()
-	experience:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+    
+    local x, y = position["Offset X"], position["Offset Y"]
+
+    experience:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
 	experience:SetSize(size["Width"], size["Height"])
 	experience:SetStatusBarTexture(texture)
     experience:SetStatusBarColor(r, g, b)

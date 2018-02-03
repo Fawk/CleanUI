@@ -67,7 +67,10 @@ local function setup(name, artifact, db)
     artifact.nextCost = nextCost
 
     artifact:ClearAllPoints()
-    artifact:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+
+    local x, y = position["Offset X"], position["Offset Y"]
+
+    artifact:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
     artifact:SetSize(size["Width"], size["Height"])
     artifact:SetStatusBarTexture(texture)
     artifact:SetStatusBarColor(r, g, b)

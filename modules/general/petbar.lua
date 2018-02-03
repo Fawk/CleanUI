@@ -32,8 +32,6 @@ end
 
 function PetBar:Init()
 
-    if not UnitExists("pet") then return end
-
     local bar = CreateFrame("Frame", T:frameName("PetBar"), A.frameParent, "SecureHandlerStateTemplate")
 
     local db = A["Profile"]["Options"]["Pet Bar"]
@@ -182,9 +180,13 @@ function PetBar:Init()
     bar.getMoverSize = function(self)
         return self:GetSize()
     end
+
+    RegisterStateDriver(bar, "visibility", "[@pet,exists] show; hide")
     
     local position = db["Position"]
-    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+    local x, y = position["Offset X"], position["Offset Y"]
+
+    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
 
     A:CreateMover(bar, db, "PetBar")
 end

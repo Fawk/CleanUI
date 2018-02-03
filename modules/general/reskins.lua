@@ -298,9 +298,10 @@ local function setStyle()
 
 
 		local position = minimapConfig["Position"]
+		local x, y = position["Offset X"], position["Offset Y"]
 
 		MinimapCluster:ClearAllPoints()
-		MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
 		MinimapCluster:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetSize(MinimapCluster:GetSize())
 
@@ -501,16 +502,18 @@ local function setStyle()
         local size = db["Size"]
         local position = db["Position"]
 
+        local x, y = position["Offset X"], position["Offset Y"]
+
         ObjectiveTrackerFrame:SetSize(size["Width"], size["Height"])
 
         ObjectiveTrackerFrame:ClearAllPoints()
-        ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+        ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
 
-        hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(self, lp, r, p, x, y)
+        hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(self, lp, r, p, x1, y2)
     		if r ~= A.frameParent then
     			if (r.GetName and r:GetName():find("Mover")) then return end;
 			    self:ClearAllPoints()
-	    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+	    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
 	    	end
         end)
 
@@ -712,11 +715,13 @@ local function setStyle()
 
 				if not A.frames.character then
 
+					local x, y = position["Offset X"], position["Offset Y"]
+
 					local charFrame = CreateFrame("Frame", Tools:frameName("CleanUI_Character Info"), A.frameParent)
 					charFrame:SetFrameStrata("HIGH")
 					charFrame:SetClampedToScreen(true)
 					charFrame:SetSize(346, 512)
-					charFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+					charFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
 					charFrame.Toggle = function(self)
 						if self:IsShown() then
 							self:Hide()
@@ -1267,12 +1272,15 @@ local function setStyle()
 		--Extra Action Buttons
 
 		local eabdb = A["Profile"]["Options"]["Extra Action Button"]
+		local position = eabdb["Position"]
 		local button = _G["ExtraActionBarFrame"]
 		button.ignoreFramePositionManager = true
 
+		local x, y = position["Offset X"], position["Offset Y"]
+
 		if button then
 			A:CreateMover(button, eabdb, "Extra Action Button")
-			button:SetPoint(eabdb["Position"]["Local Point"], A.frameParent, eabdb["Position"]["Point"], eabdb["Position"]["Offset X"], eabdb["Position"]["Offset Y"])
+			button:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
 			button:SetParent(A.frameParent)
 		end
 

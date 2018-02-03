@@ -120,6 +120,8 @@ local function setScale()
 	resolution:gsub("%d+", function(match) table.insert(matches, match) end)
 	
 	local w, h = unpack(matches)
+	SCREEN_HEIGHT = h
+	SCREEN_WIDTH = w
 	UIParent:SetScale(768 / h)
 end
 
@@ -139,6 +141,7 @@ function Addon:OnInitialize()
 	self.frameParent:SetSize(UIParent:GetSize())
 	self.frameParent:SetFrameLevel(UIParent:GetFrameLevel())
 	self.frameParent:SetAllPoints(UIParent)
+	--self.frameParent:SetScale(UIParent:GetScale())
     
     self.hiddenFrame = CreateFrame("Frame")
     self.hiddenFrame:Hide()

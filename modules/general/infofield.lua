@@ -10,6 +10,8 @@ local GetSpellCount = GetSpellCount
 local GetSpellInfo = GetSpellInfo
 local InCombatLockdown = InCombatLockdown
 
+local T = A.Tools
+
 local function createAlphaAnimation(ag, from, to, duration, onFinished)
 	local a = ag:CreateAnimation("Alpha")
 	a:SetFromAlpha(from)
@@ -258,7 +260,9 @@ local function Update(field, db)
 	field:SetSize(w, h)
 
 	local position = db["Position"]
-	field:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+    local x, y = position["Offset X"], position["Offset Y"]
+
+    field:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
 
 	for id,preset in next, db["Presets"] do
 		if not alreadyCreated(field.groups, id) then
