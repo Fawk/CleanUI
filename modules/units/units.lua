@@ -470,6 +470,7 @@ function Units:CreateStatusBorder(frame, name, db)
         border:Hide()
     else
         border.unit = frame.unit or frame:GetAttribute("unit")
+        border:SetScript("OnUpdate", db["Condition"])
         border:SetBackdropBorderColor(unpack(db["Color"] or { 0, 0, 0, 0 }))
         border:SetFrameStrata(db["Framestrata"] or "LOW")
         border:SetFrameLevel(db["FrameLevel"])

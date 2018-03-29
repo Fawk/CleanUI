@@ -246,7 +246,7 @@ function Party:Update(frame, db)
         [95809] = true,     -- Insanity
         [71041] = true      -- Dungeon Deserter
     }
-    
+
     Units:CreateStatusBorder(frame, "Debuff", {
         ["Enabled"] = db["Show Debuff Border"],
         ["FrameLevel"] = 6,
