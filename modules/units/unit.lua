@@ -22,9 +22,21 @@ function Unit:Update(...)
 
     elseif (event == UnitEvent.UPDATE_POWER) then
 
-    elseif (event == UnitEvent.UPDATE_BUFFS)      = 3,
-    UnitEvent.UPDATE_DEBUFF     = 4,
-    UnitEvent.UPDATE_CLICKCAST  = 5,
+    elseif (event == UnitEvent.UPDATE_BUFFS) then
+
+    elseif (event == UnitEvent.UPDATE_DEBUFF) then
+    
+    elseif (event == UnitEvent.UPDATE_CLICKCAST) then
+        if arg2 and self.id and self:CanChangeAttribute() then
+            for _,binding in next, arg2 do
+                local f, t = binding.action:gsub("@unit", "@mouseover")
+                self:SetAttribute(binding.type, f)
+            end
+        end
+        if (self.OnClickCast) then
+            self:OnClickCast(arg2)
+        end
+    end
 
     if (self.AfterUpdate) then
         self:AfterUpdate(...)
