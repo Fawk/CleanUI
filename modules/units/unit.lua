@@ -2,6 +2,7 @@ local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
+local UnitHealth = UnitHealth
 
 local Unit = {}
 
@@ -19,7 +20,14 @@ function Unit:Update(...)
             self:OnIdentifier(previous)
         end
     elseif (event == UnitEvent.UPDATE_HEALTH) then
+        self.previousHealth = self.currentHealth
+        self.previousMaxHealth = self.currentMaxHealth
+        self.currentHealth = UnitHealth(self.id)
+        self.currentMaxHealth = UnitHealthMax(self.id)
 
+        if (self.OnHealth) then
+            self:OnHealth(...)
+        end
     elseif (event == UnitEvent.UPDATE_POWER) then
 
     elseif (event == UnitEvent.UPDATE_BUFFS) then
@@ -27,7 +35,7 @@ function Unit:Update(...)
     elseif (event == UnitEvent.UPDATE_DEBUFF) then
     
     elseif (event == UnitEvent.UPDATE_CLICKCAST) then
-        if arg2 and self.id and self:CanChangeAttribute() then
+        if (arg2 and self.id and self:CanChangeAttribute()) then
             for _,binding in next, arg2 do
                 local f, t = binding.action:gsub("@unit", "@mouseover")
                 self:SetAttribute(binding.type, f)
