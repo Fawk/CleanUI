@@ -6,7 +6,29 @@ local InCombatLockdown = InCombatLockdown
 
 local Player = {}
 local frameName = "Player"
- 
+
+oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
+    Player:Setup(frame, db)
+end)
+oUF:SetActiveStyle(frameName)
+
+local NewPlayer = Units:Get(frameName) or A:CreateUnit(frameName)
+
+function NewPlayer:Init()
+
+    self:RegisterEvent("UNIT_HEALTH_FREQUENT")
+    self:RegisterEvent("UNIT_MAXHEALTH")
+    self:RegisterEvent("UNIT_POWER_FREQUENT")
+    self:RegisterEvent("UNIT_MAXPOWER")
+
+    self:SetScript("OnEvent", self.Update)
+end
+
+function NewPlayer:Update(...)
+    local event = ...
+    if 
+end
+
 function Player:Init()
 
 	local db = A["Profile"]["Options"][frameName]

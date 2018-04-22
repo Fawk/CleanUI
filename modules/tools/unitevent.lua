@@ -5,6 +5,6 @@ UnitEvent = {
     UPDATE_HEALTH     = 1,
     UPDATE_POWER      = 2,
     UPDATE_BUFFS      = 3,
-    UPDATE_DEBUFF     = 4,
+    UPDATE_DEBUFFS    = 4,
     UPDATE_CLICKCAST  = 5,
 }

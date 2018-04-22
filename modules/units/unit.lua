@@ -3,19 +3,69 @@ local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
+local UnitPower = UnitPower
+local UnitPowerType = UnitPowerType
+local UnitBuff = UnitBuff
+local UnitDebuff = UnitDebuff
+local SecureButton_GetUnit = SecureButton_GetUnit
+local SecureButton_GetModifiedUnit = SecureButton_GetModifiedUnit
 
-local Unit = {}
+-- name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
+local function fetchAuraData(func, tbl, id)
+    for i = 1, 40 do
+        local aura = {func(id, i)}
+        if (aura[1]) then
+            if (aura[8] == id) then
+                tbl.own[aura[11]] = aura[6] > 0 and aura or nil
+            else
+                tbl.others[aura[11]] = aura[6] > 0 and aura or nil
+            end
+        end
+    end
+end
+
+local UnitFrame = {
+    __call = function(self, ...)
+        local id = ...
+        setmetatable(self, oUF:Spawn(id, id))
+        return self
+    end
+}
+
+function UnitFrame:Init()
+
+end
+
+function UnitFrame:Update(...)
+
+end
+
+local Unit = {
+    __call = function(self, ...)
+        local id = ...
+        setmetatable(self, UnitFrame(id))
+        return self
+    end
+}
+
+function A:CreateUnit(id)
+    return setmetatable({ id = id, super = Unit }, Unit(id))
+end
 
 function Unit:Init()
 
 end
 
 function Unit:Update(...)
+    UnitFrame:Update(...)
+
     local event, arg2, arg3, arg4, arg5 = ...
     
     if (event == UnitEvent.UPDATE_IDENTIFIER) then
         local previous = self.id
-        self.id = arg2
+        local realUnit, modUnit = SecureButton_GetUnit(self), SecureButton_GetModifiedUnit(self)
+        self.id = realUnit
+        self.modId = modUnit
         if (self.OnIdentifier) then
             self:OnIdentifier(previous)
         end
@@ -29,11 +79,30 @@ function Unit:Update(...)
             self:OnHealth(...)
         end
     elseif (event == UnitEvent.UPDATE_POWER) then
+        self.previousPower = self.currentPower
+        self.previousMaxPower = self.currentMaxPower
 
+        local powerType, powerToken, altR, altG, altB = UnitPowerType(self.id)
+        self.currentPower = UnitPower(self.id, powerType)
+        self.currentMaxPower = UnitPowerMax(self.id, powerType)
+        
+        if (self.OnPower) then
+            self:OnPower(...)
+        end
     elseif (event == UnitEvent.UPDATE_BUFFS) then
+        if (not self.buffs) then self.buffs = {} end
+        fetchAuraData(UnitBuff, self.buffs, self.id)
 
-    elseif (event == UnitEvent.UPDATE_DEBUFF) then
-    
+        if (self.OnBuffs) then
+            self:OnBuffs(...)
+        end
+    elseif (event == UnitEvent.UPDATE_DEBUFFS) then
+        if (not self.debuffs) then self.debuffs = {} end
+        fetchAuraData(UnitDebuff, self.debuffs, self.id)
+
+        if (self.OnDebuffs) then
+            self:OnDebuffs(...)
+        end
     elseif (event == UnitEvent.UPDATE_CLICKCAST) then
         if (arg2 and self.id and self:CanChangeAttribute()) then
             for _,binding in next, arg2 do
