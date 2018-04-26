@@ -24,13 +24,7 @@ local function fetchAuraData(func, tbl, id)
     end
 end
 
-local UnitFrame = {
-    __call = function(self, ...)
-        local id = ...
-        setmetatable(self, oUF:Spawn(id, id))
-        return self
-    end
-}
+local UnitFrame = {}
 
 function UnitFrame:Init()
 
@@ -40,16 +34,14 @@ function UnitFrame:Update(...)
 
 end
 
-local Unit = {
-    __call = function(self, ...)
-        local id = ...
-        setmetatable(self, UnitFrame(id))
-        return self
-    end
-}
+local Unit = {}
 
 function A:CreateUnit(id)
-    return setmetatable({ id = id, super = Unit }, Unit(id))
+    local unit = oUF:Spawn(id, id)
+    unit.super = Unit
+    unit.id = id
+
+    return unit
 end
 
 function Unit:Init()
@@ -58,10 +50,11 @@ end
 
 function Unit:Update(...)
     UnitFrame:Update(...)
-
-    local event, arg2, arg3, arg4, arg5 = ...
     
+    local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+
     if (event == UnitEvent.UPDATE_IDENTIFIER) then
+
         local previous = self.id
         local realUnit, modUnit = SecureButton_GetUnit(self), SecureButton_GetModifiedUnit(self)
         self.id = realUnit
@@ -113,6 +106,58 @@ function Unit:Update(...)
         if (self.OnClickCast) then
             self:OnClickCast(arg2)
         end
+    elseif (event == UnitEvent.UPDATE_HEAL_PREDICTION) then
+        
+        local myIncomingHeal = UnitGetIncomingHeals(self.id, 'player') or 0
+        local allIncomingHeal = UnitGetIncomingHeals(self.id) or 0
+        local absorb = UnitGetTotalAbsorbs(self.id) or 0
+        local healAbsorb = UnitGetTotalHealAbsorbs(self.id) or 0
+        local health, maxHealth = UnitHealth(self.id), UnitHealthMax(self.id)
+
+        local hasOverHealAbsorb = false
+        if(health < healAbsorb) then
+            hasOverHealAbsorb = true
+            healAbsorb = health
+        end
+
+        local maxOverflow = 1.2
+
+        if(health - healAbsorb + allIncomingHeal > maxHealth * maxOverflow) then
+            allIncomingHeal = maxHealth * maxOverflow - health + healAbsorb
+        end
+
+        local otherIncomingHeal = 0
+        if(allIncomingHeal < myIncomingHeal) then
+            myIncomingHeal = allIncomingHeal
+        else
+            otherIncomingHeal = allIncomingHeal - myIncomingHeal
+        end
+
+        local hasOverAbsorb = false
+        if(health - healAbsorb + allIncomingHeal + absorb >= maxHealth or health + absorb >= maxHealth) then
+            if(absorb > 0) then
+                hasOverAbsorb = true
+            end
+
+            if(allIncomingHeal > healAbsorb) then
+                absorb = math.max(0, maxHealth - (health - healAbsorb + allIncomingHeal))
+            else
+                absorb = math.max(0, maxHealth - health)
+            end
+        end
+
+        if(healAbsorb > allIncomingHeal) then
+            healAbsorb = healAbsorb - allIncomingHeal
+        else
+            healAbsorb = 0
+        end
+
+        self.myIncomingHeal = myIncomingHeal
+        self.otherIncomingHeal = otherIncomingHeal
+        self.absorb = absorb
+        self.healAbsorb = healAbsorb
+        self.hasOverAbsorb = hasOverAbsorb
+        self.hasOverHealAbsorb = hasOverHealAbsorb
     end
 
     if (self.AfterUpdate) then

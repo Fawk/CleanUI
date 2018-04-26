@@ -262,7 +262,7 @@ local function Update(field, db)
 	local position = db["Position"]
     local x, y = position["Offset X"], position["Offset Y"]
 
-    field:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
+    field:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 
 	for id,preset in next, db["Presets"] do
 		if not alreadyCreated(field.groups, id) then

@@ -2,6 +2,55 @@ local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
+local T = A.Tools
+
+local function Update2(health, previous, current, amount)
+
+	local orientation, reversed, width, height = health:GetOrientation(), health:GetReverseFill(), health:GetWidth(), health:GetHeight()
+	
+	if amount == 0 then 
+		current:Hide()
+		return previous
+	end
+	
+	current:ClearAllPoints()
+	
+	if orientation == "HORIZONTAL" then
+		current:SetWidth(width)
+		if reversed then
+			current:SetPoint("TOPRIGHT", previous, "TOPLEFT")
+			current:SetPoint("BOTTOMRIGHT", previous, "BOTTOMLEFT")
+		else
+			current:SetPoint("TOPLEFT", previous, "TOPRIGHT")
+			current:SetPoint("BOTTOMLEFT", previous, "BOTTOMRIGHT")	
+		end
+	else
+		current:SetHeight(height)
+		if reversed then
+			current:SetPoint("TOPLEFT", previous, "BOTTOMLEFT")
+			current:SetPoint("TOPRIGHT", previous, "BOTTOMRIGHT")
+		else
+			current:SetPoint("BOTTOMLEFT", previous, "TOPLEFT")
+			current:SetPoint("BOTTOMRIGHT", previous, "TOPRIGHT")		
+		end
+	end
+	
+	current:SetOrientation(orientation)
+	current:SetReverseFill(reversed)
+	
+	return current:GetStatusBarTexture()
+end
+
+local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb)
+	local frame = self:GetParent()
+	local health = frame.orderedElements:getChildByKey("key", "Health").element
+	local previous = health:GetStatusBarTexture()
+
+	previous = Update2(health, previous, self.myBar, my)
+	previous = Update2(health, previous, self.otherBar, all)
+	previous = Update2(health, previous, self.absorbBar, absorb)
+	previous = Update2(health, previous, self.healAbsorbBar, healAbsorb)
+end
 
 local function Update(frame, previous, current, amount)
 
@@ -48,6 +97,125 @@ local function HealPredictionPostUpdate(self, unit, my, all, absorb, healAbsorb)
 	previous = Update(frame, previous, self.otherBar, all)
 	previous = Update(frame, previous, self.absorbBar, absorb)
 	previous = Update(frame, previous, self.healAbsorbBar, healAbsorb)
+end
+
+local elementName = "HealthPrediction"
+
+local _HealthPrediction = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
+A["Shared Elements"]:add(_HealthPrediction)
+
+function _HealthPrediction:Init(parent)
+
+	local db = A["Profile"]["Options"][parent:GetName()][elementName]
+
+	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
+
+	local healPrediction = parent.orderedElements:getChildByKey("key", elementName)
+	if (not healPrediction) then
+
+		self:SetParent(parent)
+		
+		local my = CreateFrame("StatusBar", nil, parent)
+		local all = CreateFrame("StatusBar", nil, parent)
+		local absorb = CreateFrame("StatusBar", nil, parent)
+		local healAbsorb = CreateFrame("StatusBar", nil, parent)
+		local overAbsorb = CreateFrame("StatusBar", nil, parent)
+		local overHealAbsorb = CreateFrame("StatusBar", nil, parent)
+
+		my:Hide()
+		all:Hide()
+		absorb:Hide()
+		healAbsorb:Hide()
+		
+		local health = parent.orderedElements:getChildByKey("key", "Health")
+		if health then
+			my:SetParent(health.element)
+			all:SetParent(health.element)
+			absorb:SetParent(health.element)
+			healAbsorb:SetParent(health.element)
+		end
+
+		self.myBar = my
+		self.otherBar = all
+		self.absorbBar = absorb
+		self.healAbsorbBar = healAbsorb
+		self.overAbsorb = overAbsorb
+		self.overHealAbsorb = overHealAbsorb
+
+		self.tags = A:OrderedTable()
+
+		self:RegisterEvent("UNIT_HEALTH_FREQUENT")
+	    self:RegisterEvent("UNIT_MAXHEALTH")
+	    self:RegisterEvent("UNIT_HEAL_PREDICTION")
+		self:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
+		self:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
+	    self:SetScript("OnEvent", self.Update)
+	end
+
+	self:Update(UnitEvent.UPDATE_DB, db)
+	self:Update(UnitEvent.UPDATE_TEXTS)
+	self:Update("UNIT_HEALTH_FREQUENT")
+
+	parent.orderedElements:add({ key = elementName, element = self })
+end
+
+function _HealthPrediction:Update(...)
+	local parent = self:GetParent()
+	local event, arg1, arg2, arg3, arg4, arg5 = ...
+
+	if (event == UnitEvent.UPDATE_DB) then
+	
+		local db = arg1
+		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
+
+		self.maxOverflow = db["MaxOverflow"]
+		self.frequentUpdates = db["FrequentUpdates"]
+		
+		self.myBar:SetStatusBarTexture(texture)
+		self.otherBar:SetStatusBarTexture(texture)
+		self.absorbBar:SetStatusBarTexture(texture)
+		self.healAbsorbBar:SetStatusBarTexture(texture)
+		
+		self.myBar:SetStatusBarColor(unpack(A.colors.healPrediction.my))
+		self.otherBar:SetStatusBarColor(unpack(A.colors.healPrediction.all))
+		self.absorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.absorb))
+		self.healAbsorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.healAbsorb))
+
+	elseif (event == UnitEvent.UPDATE_TEXTS) then
+
+	else
+		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
+
+		if(parent.hasOverAbsorb) then
+			self.overAbsorb:Show()
+		else
+			self.overAbsorb:Hide()
+		end
+
+		if(parent.hasOverHealAbsorb) then
+			self.overHealAbsorb:Show()
+		else
+			self.overHealAbsorb:Hide()
+		end
+
+		self.myBar:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.myBar:SetValue(parent.myIncomingHeal)
+		self.myBar:Show()
+
+		self.otherBar:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.otherBar:SetValue(parent.otherIncomingHeal)
+		self.otherBar:Show()
+
+		self.absorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.absorbBar:SetValue(parent.absorb)
+		self.absorbBar:Show()
+
+		self.healAbsorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.healAbsorbBar:SetValue(parent.healAbsorb)
+		self.healAbsorbBar:Show()
+
+		HealPredictionPostUpdate2(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
+	end
 end
 
 function HealthPrediction(frame, db)

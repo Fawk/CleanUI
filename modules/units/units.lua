@@ -366,7 +366,8 @@ function Units:Position(frame, db)
         if db["Relative To"] == "FrameParent" then
             local scale = UIParent:GetScale()
             scale = 1
-            frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x < 1 and ((x * SCREEN_WIDTH) * scale) or x, y < 1 and ((y * SCREEN_HEIGHT) * scale) or y)
+            --frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x < 1 and ((x * SCREEN_WIDTH) * scale) or x, y < 1 and ((y * SCREEN_HEIGHT) * scale) or y)
+            frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
         else
         frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
         end

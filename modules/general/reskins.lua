@@ -301,7 +301,7 @@ local function setStyle()
 		local x, y = position["Offset X"], position["Offset Y"]
 
 		MinimapCluster:ClearAllPoints()
-		MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
+		MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 		MinimapCluster:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
 		Minimap:SetSize(MinimapCluster:GetSize())
 
@@ -507,13 +507,13 @@ local function setStyle()
         ObjectiveTrackerFrame:SetSize(size["Width"], size["Height"])
 
         ObjectiveTrackerFrame:ClearAllPoints()
-        ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
+        ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 
         hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(self, lp, r, p, x1, y2)
     		if r ~= A.frameParent then
     			if (r.GetName and r:GetName():find("Mover")) then return end;
 			    self:ClearAllPoints()
-	    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
+	    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 	    	end
         end)
 
@@ -721,7 +721,7 @@ local function setStyle()
 					charFrame:SetFrameStrata("HIGH")
 					charFrame:SetClampedToScreen(true)
 					charFrame:SetSize(346, 512)
-					charFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
+					charFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 					charFrame.Toggle = function(self)
 						if self:IsShown() then
 							self:Hide()
@@ -1280,7 +1280,7 @@ local function setStyle()
 
 		if button then
 			A:CreateMover(button, eabdb, "Extra Action Button")
-			button:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and Tools:GetWidth(x) or x, y < 1 and Tools:GetHeight(y) or y)
+			button:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 			button:SetParent(A.frameParent)
 		end
 

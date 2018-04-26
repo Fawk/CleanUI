@@ -52,7 +52,7 @@ function V:Init()
     vehicle:SetSize(size, size)
     local x, y = position["Offset X"], position["Offset Y"]
 
-    vehicle:SetPoint(position["Local Point"], A.frameParent, position["Point"], x < 1 and T:GetWidth(x) or x, y < 1 and T:GetHeight(y) or y)
+    vehicle:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 
     T:Background(vehicle, db, vehicle, false)
 

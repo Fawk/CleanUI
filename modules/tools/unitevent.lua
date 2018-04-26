@@ -7,4 +7,6 @@ UnitEvent = {
     UPDATE_BUFFS      = 3,
     UPDATE_DEBUFFS    = 4,
     UPDATE_CLICKCAST  = 5,
+    UPDATE_TEXTS      = 6,
+    UPDATE_DB         = 7,
 }

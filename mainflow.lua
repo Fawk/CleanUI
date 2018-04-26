@@ -4,11 +4,12 @@ local media = LibStub("LibSharedMedia-3.0")
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
 Addon.frames, Addon.modules, Addon.options = {}, {}, {}
-Addon.debugging = false
+Addon.debugging = true
 
 Addon.OrderedTable = Args.OrderedTable
 
 Addon["Elements"] = Args:OrderedTable()
+Addon["Shared Elements"] = Args:OrderedTable()
 
 Addon.oUF = Args.oUF or oUF
 local oUF = Addon.oUF
@@ -151,7 +152,7 @@ end
 
 function Addon:OnEnable()
 
-	local E, T, Options = self.enum, self.Tools, self.Options
+	local E, T, Options, Units = self.enum, self.Tools, self.Options, self.Units
 
 	setScale()
 
@@ -246,7 +247,16 @@ function Addon:OnEnable()
 	profile:Load()
 
 	for modName, module in pairs(self.modules) do
-		if module.Init then module:Init() end
+		if module.Init then 
+            local unit = module:Init() 
+            if (unit) then
+                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
+                Units:Add(unit)
+                Addon["Shared Elements"]:foreach(function(element)
+                    element:Init(unit)
+                end)
+            end
+        end
 	end
 
 	self:SetStyle()

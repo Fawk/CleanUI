@@ -1,4 +1,4 @@
-local A, L = unpack(select(2, ...))
+    local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 
 A:Debug("Loading tools")
@@ -165,24 +165,10 @@ function T:HookSetPoint(frame, position, w, h)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
 end
 
-function T:GetWidth(perc)
-	local scale = UIParent:GetScale()
-	scale = 1
-	return (GetScreenWidth() * perc) * scale
-end
-
-function T:GetHeight(perc)
-	local scale = UIParent:GetScale()
-	scale = 1
-	return (GetScreenHeight() * perc) * scale
-end
-
 function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 	local achor = anchor or "TOPLEFT"
 	local top, left, bottom, right, newX, newY = frame:GetTop() or 0, frame:GetLeft() or 0, frame:GetBottom() or 0, frame:GetRight() or 0
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
-
-	-- TODO: Implement percental values instead to support multiple resolutions
 
 	if anchor == "TOPLEFT" then
 		newX = left
@@ -217,13 +203,10 @@ function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 		anchor = "TOPLEFT"
 	end
 
-	newX = newX / screenWidth
-	newY = newY / screenHeight
-	
-	frame:SetPoint(anchor, relative, anchor, newX < 1 and self:GetWidth(newX) or newX, newY < 1 and self:GetHeight(newY) or newY)
+	frame:SetPoint(anchor, relative, anchor, newX, newY)
 
 	return {
-		["Local Point"] = achor,
+		["Local Point"] = anchor,
 		["Point"] = anchor,
 		["Relative To"] = "FrameParent",
 		["Offset X"] = newX,

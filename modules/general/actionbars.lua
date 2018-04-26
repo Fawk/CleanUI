@@ -249,7 +249,7 @@ function AB:Init()
 		
 		local position = db["Position"]
 	    local x1, y1 = position["Offset X"], position["Offset Y"]
-	    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x1 < 1 and T:GetWidth(x1) or x1, y1 < 1 and T:GetHeight(y1) or y1)
+	    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x1, y1)
 
 		A:CreateMover(bar, db, "ActionBar"..x)
 	end

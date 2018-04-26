@@ -10,6 +10,96 @@ local UnitIsConnected = UnitIsConnected
 local UnitClass = UnitClass
 local UnitInRange = UnitInRange
 
+string.replace = function(self, t, r)
+   local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
+   return self:gsub(format, r)
+end
+
+local elementName = "Health"
+
+local NewHealth = CreateFrame("StatusBar", T:frameName(elementName), A.frameParent)
+A["Shared Elements"]:add(NewHealth)
+
+function NewHealth:Init(parent)
+
+	local db = A["Profile"]["Options"][parent:GetName()][elementName]
+
+	local health = parent.orderedElements:getChildByKey("key", elementName)
+	if (not health) then
+
+		self:SetParent(parent)
+		self:SetFrameStrata("LOW")
+		self.bg = self:CreateTexture(nil, "BACKGROUND")
+
+		self.tags = A:OrderedTable()
+
+		self:RegisterEvent("UNIT_HEALTH_FREQUENT")
+	    self:RegisterEvent("UNIT_MAXHEALTH")
+	    self:SetScript("OnEvent", self.Update)
+	end
+
+	self:Update(UnitEvent.UPDATE_DB, db)
+	self:Update(UnitEvent.UPDATE_TEXTS)
+	self:Update("UNIT_HEALTH_FREQUENT")
+
+	parent.orderedElements:add({ key = elementName, element = self })
+end
+
+function NewHealth:Disable(parent)
+	self:Hide()
+	self:UnregisterAllEvents()
+	parent.orderedElements:remove(self)
+end
+
+function NewHealth:Update(...)
+	local parent = self:GetParent()
+	local event, arg1, arg2, arg3, arg4, arg5 = ...
+
+	if (event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH") then
+		parent:Update(UnitEvent.UPDATE_HEALTH)
+	  	self:SetValue(parent.currentHealth)
+	  	self:SetMinMaxValues(0, parent.currentMaxHealth)
+	elseif (event == UnitEvent.UPDATE_TEXTS) then
+		parent:Update(UnitEvent.UPDATE_HEALTH)
+		self.tags:foreach(function(tag)
+			tag:SetText(tag.format
+				:replace("[hp]", parent.currentHealth)
+			    :replace("[maxhp]", parent.currentMaxHealth)
+			    :replace("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
+			)
+		end)
+	elseif (event == UnitEvent.UPDATE_DB) then
+		
+		local db = arg1
+
+		Units:Position(self, db["Position"])
+
+		local texture = media:Fetch("statusbar", db["Texture"])
+		local size = db["Size"]
+
+		self:SetOrientation(db["Orientation"])
+		self:SetReverseFill(db["Reversed"])
+		self:SetStatusBarTexture(texture)
+		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
+		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		self.bg:ClearAllPoints()
+		self.bg:SetAllPoints()
+		self.bg:SetTexture(texture)
+
+		self:SetStatusBarColor(.5, 1, .5, 1)
+		self.bg:SetVertexColor(.5 * .3, .5 * .3, .5 * .3, 1)
+
+		self.tags:foreach(function(tag)
+			tag:Hide()
+		end)
+
+		local tags = db["Tags"] or {}
+		for _,tag in next, tags do
+			self.tags:add(tag)
+		end
+	end
+end
+
 function Health(frame, db)
 
 	local health = frame.Health or (function()
@@ -78,6 +168,6 @@ function Health(frame, db)
 	end
 
 	frame.Health = health
-end 
+end
 
 A["Elements"]:add({ name = "Health", func = Health })

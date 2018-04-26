@@ -7,26 +7,61 @@ local InCombatLockdown = InCombatLockdown
 local Player = {}
 local frameName = "Player"
 
-oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-    Player:Setup(frame, db)
-end)
-oUF:SetActiveStyle(frameName)
-
-local NewPlayer = Units:Get(frameName) or A:CreateUnit(frameName)
+local NewPlayer = {}
 
 function NewPlayer:Init()
 
-    self:RegisterEvent("UNIT_HEALTH_FREQUENT")
-    self:RegisterEvent("UNIT_MAXHEALTH")
-    self:RegisterEvent("UNIT_POWER_FREQUENT")
-    self:RegisterEvent("UNIT_MAXPOWER")
+    local db = A["Profile"]["Options"][frameName]
 
-    self:SetScript("OnEvent", self.Update)
+    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
+        NewPlayer:Update(frame, UnitEvent.UPDATE_DB, db)
+    end)
+    oUF:SetActiveStyle(frameName)
+
+    local frame = Units:Get(frameName) or A:CreateUnit(frameName)
+    frame.orderedElements = A:OrderedTable()
+
+    A:CreateMover(frame, db)
+
+    frame.Update = function(self, ...)
+        NewPlayer:Update(self, ...)
+    end
+
+    frame:Update(UnitEvent.UPDATE_DB, db)
+
+    return frame
 end
 
 function NewPlayer:Update(...)
-    local event = ...
-    if 
+    local self, event, arg2, arg3, arg4, arg5 = ...
+
+    if (self.super) then
+        self.super:Update(...)
+
+        -- Update player specific things based on the event
+        if (event == UnitEvent.UPDATE_DB) then
+            
+            local db = arg2
+            local position, size = db["Position"], db["Size"]
+
+            Units:Position(self, position)
+            self:SetSize(size["Width"], size["Height"])
+
+            --[[ Bindings ]]--
+            self:RegisterForClicks("AnyUp")
+            self:SetAttribute("*type1", "target")
+            self:SetAttribute("*type2", "togglemenu")
+
+            Units:SetupClickcast(self, db["Clickcast"])
+
+            --[[ Background ]]--
+            U:CreateBackground(self, db)
+
+            self.orderedElements:foreach(function(obj)
+                obj.element:Update(event, db)
+            end)
+        end
+    end
 end
 
 function Player:Init()
@@ -95,4 +130,4 @@ function Player:Update(frame, db)
     end
 end
 
-A.modules["player"] = Player
+A.modules["player"] = NewPlayer

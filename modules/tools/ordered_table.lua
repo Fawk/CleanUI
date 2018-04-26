@@ -115,6 +115,12 @@ function OT:getBy(key, value, steps)
     return result:count() ~= 0 and (result:count() == 1 and result:get(1) or result) or nil
 end
 
+function OT:foreach(func)
+  for i = 1, self.c do
+    func(self.e[i])
+  end
+end
+
 function OT:get(i)
 	return self.e[i]
 end
