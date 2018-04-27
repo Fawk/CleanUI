@@ -101,19 +101,22 @@ end
 
 local elementName = "HealthPrediction"
 
-local _HealthPrediction = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
+local _HealthPrediction = { name = elementName }
 A["Shared Elements"]:add(_HealthPrediction)
 
 function _HealthPrediction:Init(parent)
 
-	local db = A["Profile"]["Options"][parent:GetName()][elementName]
+	local parentName = parent:GetName()
+	local db = A["Profile"]["Options"][parentName][elementName]
 
 	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
 	local healPrediction = parent.orderedElements:getChildByKey("key", elementName)
 	if (not healPrediction) then
 
-		self:SetParent(parent)
+		healPrediction = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
+
+		healPrediction:SetParent(parent)
 		
 		local my = CreateFrame("StatusBar", nil, parent)
 		local all = CreateFrame("StatusBar", nil, parent)
@@ -135,33 +138,41 @@ function _HealthPrediction:Init(parent)
 			healAbsorb:SetParent(health.element)
 		end
 
-		self.myBar = my
-		self.otherBar = all
-		self.absorbBar = absorb
-		self.healAbsorbBar = healAbsorb
-		self.overAbsorb = overAbsorb
-		self.overHealAbsorb = overHealAbsorb
+		healPrediction.myBar = my
+		healPrediction.otherBar = all
+		healPrediction.absorbBar = absorb
+		healPrediction.healAbsorbBar = healAbsorb
+		healPrediction.overAbsorb = overAbsorb
+		healPrediction.overHealAbsorb = overHealAbsorb
 
-		self.tags = A:OrderedTable()
+		healPrediction.tags = A:OrderedTable()
 
-		self:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	    self:RegisterEvent("UNIT_MAXHEALTH")
-	    self:RegisterEvent("UNIT_HEAL_PREDICTION")
-		self:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
-		self:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
-	    self:SetScript("OnEvent", self.Update)
+	    healPrediction.Update = function(self, event, ...)
+	    	_HealthPrediction:Update(self, event, ...)
+		end
+
+		healPrediction:RegisterEvent("UNIT_HEALTH_FREQUENT")
+	    healPrediction:RegisterEvent("UNIT_MAXHEALTH")
+	    healPrediction:RegisterEvent("UNIT_HEAL_PREDICTION")
+		healPrediction:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
+		healPrediction:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
+	    healPrediction:SetScript("OnEvent", function(self, event, ...)
+	    	self:Update(event, ...)
+		end)
+
 	end
 
-	self:Update(UnitEvent.UPDATE_DB, db)
-	self:Update(UnitEvent.UPDATE_TEXTS)
-	self:Update("UNIT_HEALTH_FREQUENT")
+	healPrediction:Update(UnitEvent.UPDATE_DB, db)
+	healPrediction:Update(UnitEvent.UPDATE_TEXTS)
+	healPrediction:Update("UNIT_HEALTH_FREQUENT")
 
-	parent.orderedElements:add({ key = elementName, element = self })
+	parent.orderedElements:add({ key = elementName, element = healPrediction })
 end
 
 function _HealthPrediction:Update(...)
-	local parent = self:GetParent()
-	local event, arg1, arg2, arg3, arg4, arg5 = ...
+
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+	local parent = self:GetParent()		
 
 	if (event == UnitEvent.UPDATE_DB) then
 	

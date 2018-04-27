@@ -17,32 +17,41 @@ end
 
 local elementName = "Health"
 
-local NewHealth = CreateFrame("StatusBar", T:frameName(elementName), A.frameParent)
+local NewHealth = { name = elementName }
 A["Shared Elements"]:add(NewHealth)
 
 function NewHealth:Init(parent)
 
-	local db = A["Profile"]["Options"][parent:GetName()][elementName]
+	local parentName = parent:GetName()
+	local db = A["Profile"]["Options"][parentName][elementName]
 
 	local health = parent.orderedElements:getChildByKey("key", elementName)
 	if (not health) then
 
-		self:SetParent(parent)
-		self:SetFrameStrata("LOW")
-		self.bg = self:CreateTexture(nil, "BACKGROUND")
+		health = CreateFrame("StatusBar", T:frameName(parentName, elementName), A.frameParent)
 
-		self.tags = A:OrderedTable()
+		health:SetParent(parent)
+		health:SetFrameStrata("LOW")
+		health.bg = health:CreateTexture(nil, "BACKGROUND")
 
-		self:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	    self:RegisterEvent("UNIT_MAXHEALTH")
-	    self:SetScript("OnEvent", self.Update)
+		health.tags = A:OrderedTable()
+
+	    health.Update = function(self, event, ...)
+	    	NewHealth:Update(self, event, ...)
+	   	end
+
+		health:RegisterEvent("UNIT_HEALTH_FREQUENT")
+	    health:RegisterEvent("UNIT_MAXHEALTH")
+	    health:SetScript("OnEvent", function(self, event, ...)
+	    	self:Update(event, ...)
+	    end)
 	end
 
-	self:Update(UnitEvent.UPDATE_DB, db)
-	self:Update(UnitEvent.UPDATE_TEXTS)
-	self:Update("UNIT_HEALTH_FREQUENT")
+	health:Update(UnitEvent.UPDATE_DB, db)
+	health:Update(UnitEvent.UPDATE_TEXTS)
+	health:Update("UNIT_HEALTH_FREQUENT")
 
-	parent.orderedElements:add({ key = elementName, element = self })
+	parent.orderedElements:add({ key = elementName, element = health })
 end
 
 function NewHealth:Disable(parent)
@@ -52,13 +61,14 @@ function NewHealth:Disable(parent)
 end
 
 function NewHealth:Update(...)
+	
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
-	local event, arg1, arg2, arg3, arg4, arg5 = ...
 
 	if (event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH") then
 		parent:Update(UnitEvent.UPDATE_HEALTH)
+		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
-	  	self:SetMinMaxValues(0, parent.currentMaxHealth)
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
 		parent:Update(UnitEvent.UPDATE_HEALTH)
 		self.tags:foreach(function(tag)
@@ -69,6 +79,8 @@ function NewHealth:Update(...)
 			)
 		end)
 	elseif (event == UnitEvent.UPDATE_DB) then
+
+		self:Update("UNIT_HEALTH_FREQUENT")
 		
 		local db = arg1
 

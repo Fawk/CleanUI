@@ -20,6 +20,12 @@ function NewPlayer:Init()
 
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
     frame.orderedElements = A:OrderedTable()
+    frame:SetScript("OnShow", function(self)
+        self:Update(UnitEvent.UPDATE_DB, db)
+    end)
+    frame:RegisterEvent("PLAYER_ENTERING_WORLD", function(self)
+        self:Update(UnitEvent.UPDATE_DB, db)
+    end)
 
     A:CreateMover(frame, db)
 
@@ -58,7 +64,7 @@ function NewPlayer:Update(...)
             U:CreateBackground(self, db)
 
             self.orderedElements:foreach(function(obj)
-                obj.element:Update(event, db)
+                obj.element:Update(event, db[obj.key])
             end)
         end
     end
@@ -130,4 +136,4 @@ function Player:Update(frame, db)
     end
 end
 
-A.modules["player"] = NewPlayer
+A.modules["player"] = Player

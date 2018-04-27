@@ -253,6 +253,7 @@ function Addon:OnEnable()
                 unit:Update(UnitEvent.UPDATE_IDENTIFIER)
                 Units:Add(unit)
                 Addon["Shared Elements"]:foreach(function(element)
+                    print("Shared mainflow: ", element.name)
                     element:Init(unit)
                 end)
             end
