@@ -41,7 +41,7 @@ local function Update2(health, previous, current, amount)
 	return current:GetStatusBarTexture()
 end
 
-local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb)
+local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb, overAbsorb, overHealAbsorb)
 	local frame = self:GetParent()
 	local health = frame.orderedElements:getChildByKey("key", "Health").element
 	local previous = health:GetStatusBarTexture()
@@ -50,6 +50,8 @@ local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb)
 	previous = Update2(health, previous, self.otherBar, all)
 	previous = Update2(health, previous, self.absorbBar, absorb)
 	previous = Update2(health, previous, self.healAbsorbBar, healAbsorb)
+	previous = Update2(health, previous, self.overAbsorb, healAbsorb)
+	previous = Update2(health, previous, self.overHealAbsorb, overHealAbsorb)
 end
 
 local function Update(frame, previous, current, amount)
@@ -186,11 +188,15 @@ function _HealthPrediction:Update(...)
 		self.otherBar:SetStatusBarTexture(texture)
 		self.absorbBar:SetStatusBarTexture(texture)
 		self.healAbsorbBar:SetStatusBarTexture(texture)
+		self.overAbsorb:SetStatusBarTexture(texture)
+		self.overHealAbsorb:SetStatusBarTexture(texture)
 		
 		self.myBar:SetStatusBarColor(unpack(A.colors.healPrediction.my))
 		self.otherBar:SetStatusBarColor(unpack(A.colors.healPrediction.all))
 		self.absorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.absorb))
 		self.healAbsorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.healAbsorb))
+		self.overAbsorb:SetStatusBarColor(unpack(A.colors.healPrediction.overAbsorb))
+		self.overHealAbsorb:SetStatusBarColor(unpack(A.colors.healPrediction.overHealAbsorb))
 
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
 
@@ -225,7 +231,16 @@ function _HealthPrediction:Update(...)
 		self.healAbsorbBar:SetValue(parent.healAbsorb)
 		self.healAbsorbBar:Show()
 
-		HealPredictionPostUpdate2(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
+		self.overAbsorb:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.overAbsorb:SetValue(parent.overAbsorb)
+		self.overAbsorb:Show()
+
+		self.overHealAbsorb:SetMinMaxValues(0, parent.currentMaxHealth)
+		self.overHealAbsorb:SetValue(parent.overHealAbsorb)
+		self.overHealAbsorb:Show()
+
+
+		HealPredictionPostUpdate2(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb, parent.overAbsorb, parent.overHealAbsorb)
 	end
 end
 

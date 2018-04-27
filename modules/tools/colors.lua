@@ -37,6 +37,8 @@ A.colors = {
 		all = { 0, .631, .557, .5 },
 		absorb = { .7, .7, 1, .5 },
 		healAbsorb = { .7, .7, 1, .5 }
+		overAbsorb = { 1, 1, .5, .5 }
+		overHealAbsorb = { 1, .7, .7, .5 }
 	},
 	moving = {
 		backdrop = { .1, .1, .1, .7 },
