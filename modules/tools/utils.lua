@@ -1054,8 +1054,8 @@ end
 local Utils = {}
 
 function Utils:CreateBackground(frame, db, useBackdrop)
+	local ref = frame
 	if db["Background"] and db["Background"]["Enabled"] then 
-		local ref = frame
 		if not useBackdrop then
 			ref = frame.Background or CreateFrame("Frame", nil, frame)
 			ref:SetPoint("CENTER", frame, "CENTER", 0, 0)
@@ -1080,9 +1080,6 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 		ref:SetBackdropColor(unpack(db["Background"]["Color"]))
 	else
 		ref:SetBackdrop(nil)
-		if not useBackdrop then
-			ref:Hide()
-		end
 	end
 end
 

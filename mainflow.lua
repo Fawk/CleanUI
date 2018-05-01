@@ -4,7 +4,7 @@ local media = LibStub("LibSharedMedia-3.0")
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
 Addon.frames, Addon.modules, Addon.options = {}, {}, {}
-Addon.debugging = true
+Addon.debugging = false
 
 Addon.OrderedTable = Args.OrderedTable
 
@@ -253,7 +253,6 @@ function Addon:OnEnable()
                 unit:Update(UnitEvent.UPDATE_IDENTIFIER)
                 Units:Add(unit)
                 Addon["Shared Elements"]:foreach(function(element)
-                    print("Shared mainflow: ", element.name)
                     element:Init(unit)
                 end)
             end

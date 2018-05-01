@@ -78,6 +78,9 @@ function Unit:Update(...)
         local powerType, powerToken, altR, altG, altB = UnitPowerType(self.id)
         self.currentPower = UnitPower(self.id, powerType)
         self.currentMaxPower = UnitPowerMax(self.id, powerType)
+
+        self.powerType = powerType
+        self.powerToken = powerToken
         
         if (self.OnPower) then
             self:OnPower(...)

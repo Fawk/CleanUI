@@ -79,6 +79,11 @@ function string.equals(self, ...)
    return match
 end
 
+function string.replace(self, t, r)
+   local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
+   return self:gsub(format, r)
+end
+
 function T:tcount(tbl)
 	local i = 0
 	for k,v in pairs(tbl) do i=i+1 end

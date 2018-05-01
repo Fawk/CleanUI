@@ -336,6 +336,12 @@ function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
     if units[relative] then
         return units[relative]
+    elseif parent.orderedElements then 
+        local k = parent.orderedElements:getChildByKey("key", relative)
+        if (k) then
+            return k.element
+        end
+        return parent
     elseif getElementByName(A["Elements"], relative) then
         if frame[relative] then
             return frame[relative]

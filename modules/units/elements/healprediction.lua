@@ -41,7 +41,7 @@ local function Update2(health, previous, current, amount)
 	return current:GetStatusBarTexture()
 end
 
-local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb, overAbsorb, overHealAbsorb)
+local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb)
 	local frame = self:GetParent()
 	local health = frame.orderedElements:getChildByKey("key", "Health").element
 	local previous = health:GetStatusBarTexture()
@@ -50,8 +50,6 @@ local function HealPredictionPostUpdate2(self, my, all, absorb, healAbsorb, over
 	previous = Update2(health, previous, self.otherBar, all)
 	previous = Update2(health, previous, self.absorbBar, absorb)
 	previous = Update2(health, previous, self.healAbsorbBar, healAbsorb)
-	previous = Update2(health, previous, self.overAbsorb, healAbsorb)
-	previous = Update2(health, previous, self.overHealAbsorb, overHealAbsorb)
 end
 
 local function Update(frame, previous, current, amount)
@@ -124,8 +122,6 @@ function _HealthPrediction:Init(parent)
 		local all = CreateFrame("StatusBar", nil, parent)
 		local absorb = CreateFrame("StatusBar", nil, parent)
 		local healAbsorb = CreateFrame("StatusBar", nil, parent)
-		local overAbsorb = CreateFrame("StatusBar", nil, parent)
-		local overHealAbsorb = CreateFrame("StatusBar", nil, parent)
 
 		my:Hide()
 		all:Hide()
@@ -138,14 +134,30 @@ function _HealthPrediction:Init(parent)
 			all:SetParent(health.element)
 			absorb:SetParent(health.element)
 			healAbsorb:SetParent(health.element)
-		end
+
+		    local overAbsorb = health.element:CreateTexture(nil, "OVERLAY")
+		    overAbsorb:SetPoint('TOP')
+		    overAbsorb:SetPoint('BOTTOM')
+		    overAbsorb:SetPoint('LEFT', health.element, 'RIGHT')
+		    overAbsorb:SetWidth(10)
+
+			local overHealAbsorb = health.element:CreateTexture(nil, "OVERLAY")
+		    overHealAbsorb:SetPoint('TOP')
+		    overHealAbsorb:SetPoint('BOTTOM')
+		    overHealAbsorb:SetPoint('RIGHT', health.element, 'LEFT')
+		    overHealAbsorb:SetWidth(10)
+
+		    overAbsorb:Hide()
+		    overHealAbsorb:Hide()
+
+		    healPrediction.overAbsorb = overAbsorb
+			healPrediction.overHealAbsorb = overHealAbsorb
+	    end
 
 		healPrediction.myBar = my
 		healPrediction.otherBar = all
 		healPrediction.absorbBar = absorb
 		healPrediction.healAbsorbBar = healAbsorb
-		healPrediction.overAbsorb = overAbsorb
-		healPrediction.overHealAbsorb = overHealAbsorb
 
 		healPrediction.tags = A:OrderedTable()
 
@@ -161,7 +173,8 @@ function _HealthPrediction:Init(parent)
 	    healPrediction:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 		end)
-
+	else
+		healPrediction = healPrediction.element
 	end
 
 	healPrediction:Update(UnitEvent.UPDATE_DB, db)
@@ -188,28 +201,24 @@ function _HealthPrediction:Update(...)
 		self.otherBar:SetStatusBarTexture(texture)
 		self.absorbBar:SetStatusBarTexture(texture)
 		self.healAbsorbBar:SetStatusBarTexture(texture)
-		self.overAbsorb:SetStatusBarTexture(texture)
-		self.overHealAbsorb:SetStatusBarTexture(texture)
 		
 		self.myBar:SetStatusBarColor(unpack(A.colors.healPrediction.my))
 		self.otherBar:SetStatusBarColor(unpack(A.colors.healPrediction.all))
 		self.absorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.absorb))
 		self.healAbsorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.healAbsorb))
-		self.overAbsorb:SetStatusBarColor(unpack(A.colors.healPrediction.overAbsorb))
-		self.overHealAbsorb:SetStatusBarColor(unpack(A.colors.healPrediction.overHealAbsorb))
 
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
 
 	else
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 
-		if(parent.hasOverAbsorb) then
+		if(parent.hasOverAbsorb and self.overAbsorb) then
 			self.overAbsorb:Show()
 		else
 			self.overAbsorb:Hide()
 		end
 
-		if(parent.hasOverHealAbsorb) then
+		if(parent.hasOverHealAbsorb and self.overHealAbsorb) then
 			self.overHealAbsorb:Show()
 		else
 			self.overHealAbsorb:Hide()
@@ -231,16 +240,7 @@ function _HealthPrediction:Update(...)
 		self.healAbsorbBar:SetValue(parent.healAbsorb)
 		self.healAbsorbBar:Show()
 
-		self.overAbsorb:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.overAbsorb:SetValue(parent.overAbsorb)
-		self.overAbsorb:Show()
-
-		self.overHealAbsorb:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.overHealAbsorb:SetValue(parent.overHealAbsorb)
-		self.overHealAbsorb:Show()
-
-
-		HealPredictionPostUpdate2(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb, parent.overAbsorb, parent.overHealAbsorb)
+		HealPredictionPostUpdate2(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
 	end
 end
 
