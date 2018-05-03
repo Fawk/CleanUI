@@ -379,7 +379,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
     				},
     				["Power"] = {
     					["Enabled"] = true,
@@ -610,7 +620,7 @@ local defaults =  {
                         ["Offset X"] = 0,
                         ["Offset Y"] = 0,
                     },
-                        ["Health"] = {
+                    ["Health"] = {
                         ["Enabled"] = true,
                         ["Position"] = {
                             ["Point"] = "TOP",
@@ -630,7 +640,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -784,7 +804,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "VERTICAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -939,7 +969,8 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "VERTICAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -1309,7 +1340,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Power"] = {
                         ["Enabled"] = true,

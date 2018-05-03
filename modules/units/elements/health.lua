@@ -105,7 +105,8 @@ function NewHealth:Init(parent)
 	local parentName = parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
 
-	local health = parent.orderedElements:getChildByKey("key", elementName)
+	local tbl =  parent.orderedElements:getChildByKey("key", elementName)
+	local health = tbl and tbl.element or nil
 	if (not health) then
 
 		health = CreateFrame("StatusBar", T:frameName(parentName, elementName), A.frameParent)

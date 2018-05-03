@@ -282,7 +282,7 @@ end
 
 local function TextBuilder(parent, sizeInPerc)
 	local o = {
-		size = size,
+		sizeInPerc = sizeInPerc,
 		parent = parent
 	}
 

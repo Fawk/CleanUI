@@ -111,7 +111,8 @@ function _HealthPrediction:Init(parent)
 
 	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
-	local healPrediction = parent.orderedElements:getChildByKey("key", elementName)
+	local tbl =  parent.orderedElements:getChildByKey("key", elementName)
+	local healPrediction = tbl and tbl.element or nil
 	if (not healPrediction) then
 
 		healPrediction = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
@@ -173,8 +174,6 @@ function _HealthPrediction:Init(parent)
 	    healPrediction:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 		end)
-	else
-		healPrediction = healPrediction.element
 	end
 
 	healPrediction:Update(UnitEvent.UPDATE_DB, db)
