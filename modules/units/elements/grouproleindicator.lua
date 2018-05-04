@@ -4,6 +4,7 @@ local Units = A.Units
 local buildText = A.TextBuilder
 local CreateFrame = CreateFrame
 local GetTexCoordsForRoleSmallCircle = GetTexCoordsForRoleSmallCircle
+local T = A.Tools
 
 local elementName = "GroupRoleIndicator"
 local Role = { name = elementName }

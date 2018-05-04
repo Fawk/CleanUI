@@ -91,7 +91,7 @@ function PetBar:Init()
                 button.HotKey:SetPoint("TOPRIGHT", button, "TOPRIGHT", -1, -3)
                 hooksecurefunc(button.HotKey, "SetText", function(self, text)
                     local newText = text:gsub("-", "")
-                    for key, new in pairs(keys) do
+                    for key, new in pairs((keys or {})) do
                         if text:find(key) then
                             newText = newText:gsub(key, new)
                             self.shouldModify = true
