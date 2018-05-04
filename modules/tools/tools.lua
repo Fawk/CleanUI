@@ -118,6 +118,18 @@ T.reversedPoints = {
 	["BOTTOMRIGHT"] = "BOTTOMLEFT"
 }
 
+T.points = {
+	["LEFT"] = "LEFT",
+	["RIGHT"] = "RIGHT",
+	["TOPLEFT"] = "TOPLEFT",
+	["TOPRIGHT"] = "TOPRIGHT",
+	["TOP"] = "TOP",
+	["BOTTOM"] = "BOTTOM",
+	["BOTTOMLEFT"] = "BOTTOMLEFT",
+	["BOTTOMRIGHT"] = "BOTTOMRIGHT",
+	["CENTER"] = "CENTER"
+}
+
 function T:Background(frame, db, anchor, isBackdrop)
 	if db["Background"] and db["Background"]["Enabled"] then
 

@@ -302,14 +302,18 @@ local tags = {
 	}
 }
 
-local function registerEvents(textObj)
+local function registerEvents(textObj, init)
 	local hasEvents = false
+	local newText = textObj.tag
 	for tag, tbl in next, tags do
-		if (textObj.tag:find("%["..tag.."%]")) then
+		if (newText:find("%["..tag.."%]")) then
 			for _,event in next, tbl.events do 
 				textObj:RegisterEvent(event)
 			end
 			hasEvents = true
+			if (init) then
+				newText = newText:replace("["..tag.."]", tbl:func())
+			end
 		end
 	end
 
@@ -322,6 +326,8 @@ local function registerEvents(textObj)
 			self:SetText(newText)
 		end)
 	end
+
+	self:SetText(newText)	
 end
 
 local function TextBuilder(parent, sizeInPerc)
@@ -386,7 +392,7 @@ local function TextBuilder(parent, sizeInPerc)
 		text.tag = nil
 		text.SetTag = function(self, tag)
 			self.tag = tag
-			registerEvents(self)
+			registerEvents(self, true)
 		end
         text.OldSetText = text.SetText
         text.SetText = function(self, value)
