@@ -280,6 +280,50 @@ local function setPoints(o, frame)
 	end
 end
 
+local function shortenValue(value, decimals)
+    if value > 1e9 then
+        return string.format("%."..decimals.."f", value/1e9).."B"
+    elseif value > 1e6 then
+        return string.format("%."..decimals.."f", value/1e6).."M"
+    elseif value > 1e3 then
+        return string.format("%."..decimals.."f", value/1e3).."K"
+    else
+        return value
+    end
+end
+
+local tags = {
+	["health:deficit"] = {
+		events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH" },
+		func = function(self)
+			local health = self.parent.currentMaxHealth - self.parent.currentHealth
+			return health > 0 and string.format("-%d", shortenValue(health, 0)) or ""
+		end
+	}
+}
+
+local function registerEvents(textObj)
+	local hasEvents = false
+	for tag, tbl in next, tags do
+		if (textObj.tag:find("%["..tag.."%]")) then
+			for _,event in next, tbl.events do 
+				textObj:RegisterEvent(event)
+			end
+			hasEvents = true
+		end
+	end
+
+	if (hasEvents) then
+		textObj:SetScript("OnEvent", function(self, event, ...)
+			local newText = self.tag
+			for tag, tbl in next, tags do
+				newText = newText:replace("["..tag.."]", tbl:func())
+			end
+			self:SetText(newText)
+		end)
+	end
+end
+
 local function TextBuilder(parent, sizeInPerc)
 	local o = {
 		sizeInPerc = sizeInPerc,
@@ -339,6 +383,11 @@ local function TextBuilder(parent, sizeInPerc)
 		end
 
 		setPoints(self, text)
+		text.tag = nil
+		text.SetTag = function(self, tag)
+			self.tag = tag
+			registerEvents(self)
+		end
         text.OldSetText = text.SetText
         text.SetText = function(self, value)
             local isSpecial, font, size = false, nil, 10
