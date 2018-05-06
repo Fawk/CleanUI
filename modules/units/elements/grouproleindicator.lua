@@ -58,7 +58,7 @@ function Role:Update(...)
         self.texture:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])
         self.texture:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
         self.text:Hide()
-    elseif (style == "Letter") then
+    elseif (style == "Letter" or style == "Text") then
         local textStyle = db["Text style"]
         local builder = buildText(self, db["Text size"]):alignAll()
         if (textStyle == "Outline") then
@@ -69,7 +69,7 @@ function Role:Update(...)
             builder:shadow()
         end
         self.text = builder:build()
-        self.text:SetText(role:sub(1, 1))
+        self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
         self.text:SetTextColor(unpack(db["Text Color"]))
         self.texture:Hide()
     elseif (style == "Custom Texture") then
