@@ -1,17 +1,21 @@
 local A, L = unpack(select(2, ...))
-local media = LibStub("LibSharedMedia-3.0")
-local buildText = A.TextBuilder
+local GetScreenWidth = GetScreenWidth
+local GetScreenHeight = GetScreenHeight
+local CreateFrame = CreateFrame
 
-local function fix(tbl)
-    for k,v in next, tbl do
-        if v.children then
-            v["*"] = tbl
-            fix(v.children)
-            v.children["*"] = v
-        else
-            v["*"] = tbl
-        end
-    end
+local mt = { 
+    __index = function(tbl, k, v) 
+        return tbl.children[k]
+    end 
+}
+
+local function fix(t)
+   for _,v in next, t do
+      if type(v) == "table" and v.children then
+          fix(v.children)
+          setmetatable(v, mt)
+      end
+   end    
 end
 
 local function createDropdownTable(...)
@@ -63,20 +67,20 @@ function A:ConstructPreferences(db)
     					-- },
          --                ["Color By"] = "Gradient",
          --                ["Custom Color"] = { 1, 1, 1 },
-                        -- ["Background Multiplier"] = 0.33,
-                        -- ["Orientation"] = "HORIZONTAL",
-                        -- ["Reversed"] = false,
-                        -- ["Texture"] = "Default2",
-                        -- ["Missing Health Bar"] = {
-                        --     ["Enabled"] = false,
-                        --     ["Custom Color"] = {
-                        --         0.5, -- [1]
-                        --         0.5, -- [2]
-                        --         0.5, -- [3]
-                        --         1, -- [4]
-                        --     },
-                        --     ["Color By"] = "Custom",
-                        -- }
+         --                ["Background Multiplier"] = 0.33,
+         --                ["Orientation"] = "HORIZONTAL",
+         --                ["Reversed"] = false,
+         --                ["Texture"] = "Default2",
+         --                ["Missing Health Bar"] = {
+         --                    ["Enabled"] = false,
+         --                    ["Custom Color"] = {
+         --                        0.5, -- [1]
+         --                        0.5, -- [2]
+         --                        0.5, -- [3]
+         --                        1, -- [4]
+         --                    },
+         --                    ["Color By"] = "Custom",
+         --                }
 	
 	-- Construct the table used
 	local prefs = {
@@ -97,9 +101,9 @@ function A:ConstructPreferences(db)
                         end,
                         get = function() return db["Player"]["Enabled"] end
                     },
-					type = "group",
-					children = {
-						["Health"] = {
+                    type = "group",
+                    children = {
+                        ["Health"] = {
                             ["Enabled"] = {
                                 type = "checkbox",
                                 set = function(self, value)
@@ -155,7 +159,7 @@ function A:ConstructPreferences(db)
 											get = function()
 												return db["Player"]["Health"]["Size"]["Match width"]
 											end
-										},
+										}
 			    						["Match height"] = {
 			    							type = "checkbox",
 											set = function(self, value)
@@ -166,7 +170,7 @@ function A:ConstructPreferences(db)
 											end											
 										},
 			    						["Width"] = {
-			    							["Enabled"] = function(self) return not prefs["Player"].children["Health"].children["Size"].children["Match width"]:get() end,
+			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match width"]:get() end
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
@@ -178,7 +182,7 @@ function A:ConstructPreferences(db)
 											end		
 			    						},
 			    						["Height"] = {
-			    							["Enabled"] = function(self) return not prefs["Player"].children["Health"].children["Size"].children["Match height"]:get() end,
+			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match height"]:get() end
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenHeight(),
@@ -252,7 +256,7 @@ function A:ConstructPreferences(db)
                                     type = "group",
                                     children = {
                                         ["Custom Color"] = {
-                                            ["Enabled"] = function(self) return prefs["Player"].children["Health"].children["Missing Health Bar"].children["Color By"]:get() == "Custom" end,
+                                            ["Enabled"] = function(self) return prefs["Player"]["Health"]["Missing Health Bar"]["Color By"]:get() == "Custom" end,
                                             type = "color",
                                             get = function() return db["Player"]["Health"]["Missing Health Bar"]["Custom Color"] end,
                                             set = function(self, value)
@@ -269,7 +273,7 @@ function A:ConstructPreferences(db)
                                         }
                                     }
                                 }
-                            }
+							}
 						},
 						["Power"] = {
                             ["Enabled"] = {
@@ -338,7 +342,7 @@ function A:ConstructPreferences(db)
                                             end                                         
                                         },
                                         ["Width"] = {
-                                            ["Enabled"] = function(self) return not prefs["Player"].children["Power"].children["Size"].children["Match width"]:get() end,
+                                            ["Enabled"] = function(self) return not prefs["Player"]"Power"]["Size"]["Match width"]:get() end,
                                             type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
@@ -350,7 +354,7 @@ function A:ConstructPreferences(db)
                                             end     
                                         },
                                         ["Height"] = {
-                                            ["Enabled"] = function(self) return not prefs["Player"].children["Power"].children["Size"].children["Match height"]:get() end,
+                                            ["Enabled"] = function(self) return not prefs["Player"]["Power"]["Size"]["Match height"]:get() end,
                                             type = "number",
                                             min = 1,
                                             max = GetScreenHeight(),
@@ -424,7 +428,7 @@ function A:ConstructPreferences(db)
                                     type = "group",
                                     children = {
                                         ["Custom Color"] = {
-                                            ["Enabled"] = function(self) return prefs["Player"].children["Power"].children["Missing Power Bar"].children["Color By"]:get() == "Custom" end,
+                                            ["Enabled"] = function(self) return prefs["Player"]["Power"]["Missing Power Bar"]["Color By"]:get() == "Custom" end,
                                             type = "color",
                                             get = function() return db["Player"]["Power"]["Missing Power Bar"]["Custom Color"] end,
                                             set = function(self, value)
@@ -492,7 +496,8 @@ function A:ConstructPreferences(db)
 		}
 	}
 
-	--fix(prefs)
+    setmetatable(prefs, mt)
+    fix(prefs)
 
     -- Use table to construct the visual widgets and bind everything together
     -- Make sure every widgets various SetValue functions is calling UnitEvent.UPDATE_DB for everything
@@ -509,5 +514,4 @@ function A:ConstructPreferences(db)
             constructGroup(frame, frame, name, child)
         end
     end
-
 end
