@@ -95,7 +95,7 @@ function A:ConstructPreferences(db)
 			children = {
 				["Player"] = {
                     ["Enabled"] = {
-                        type = "checkbox",
+                        type = "toggle",
                         set = function(self, value)
                             db["Player"]["Enabled"] = value
                         end,
@@ -105,7 +105,7 @@ function A:ConstructPreferences(db)
                     children = {
                         ["Health"] = {
                             ["Enabled"] = {
-                                type = "checkbox",
+                                type = "toggle",
                                 set = function(self, value)
                                     db["Player"]["Health"]["Enabled"] = value
                                 end,
@@ -152,16 +152,16 @@ function A:ConstructPreferences(db)
 									type = "group",
 									children = {
 										["Match width"] = {
-											type = "checkbox",
+											type = "toggle",
 											set = function(self, value)
 												db["Player"]["Health"]["Size"]["Match width"] = value
 											end,
 											get = function()
 												return db["Player"]["Health"]["Size"]["Match width"]
 											end
-										}
+										},
 			    						["Match height"] = {
-			    							type = "checkbox",
+			    							type = "toggle",
 											set = function(self, value)
 												db["Player"]["Health"]["Size"]["Match height"] = value
 											end,
@@ -170,7 +170,7 @@ function A:ConstructPreferences(db)
 											end											
 										},
 			    						["Width"] = {
-			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match width"]:get() end
+			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match width"]:get() end,
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
@@ -182,7 +182,7 @@ function A:ConstructPreferences(db)
 											end		
 			    						},
 			    						["Height"] = {
-			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match height"]:get() end
+			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match height"]:get() end,
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenHeight(),
@@ -231,7 +231,7 @@ function A:ConstructPreferences(db)
                                     end 
                                 },
                                 ["Reversed"] = {
-                                    type = "checkbox",
+                                    type = "toggle",
                                     get = function() return db["Player"]["Health"]["Reversed"] end,
                                     set = function(self, value)
                                         db["Player"]["Health"]["Reversed"] = value
@@ -247,7 +247,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Missing Health Bar"] = {
                                     ["Enabled"] = {
-                                        type = "checkbox",
+                                        type = "toggle",
                                         set = function(self, value)
                                             db["Player"]["Health"]["Missing Health Bar"]["Enabled"] = value
                                         end,
@@ -277,7 +277,7 @@ function A:ConstructPreferences(db)
 						},
 						["Power"] = {
                             ["Enabled"] = {
-                                type = "checkbox",
+                                type = "toggle",
                                 set = function(self, value)
                                     db["Player"]["Power"]["Enabled"] = value
                                 end,
@@ -324,7 +324,7 @@ function A:ConstructPreferences(db)
                                     type = "group",
                                     children = {
                                         ["Match width"] = {
-                                            type = "checkbox",
+                                            type = "toggle",
                                             set = function(self, value)
                                                 db["Player"]["Power"]["Size"]["Match width"] = value
                                             end,
@@ -333,7 +333,7 @@ function A:ConstructPreferences(db)
                                             end
                                         },
                                         ["Match height"] = {
-                                            type = "checkbox",
+                                            type = "toggle",
                                             set = function(self, value)
                                                 db["Player"]["Power"]["Size"]["Match height"] = value
                                             end,
@@ -342,7 +342,7 @@ function A:ConstructPreferences(db)
                                             end                                         
                                         },
                                         ["Width"] = {
-                                            ["Enabled"] = function(self) return not prefs["Player"]"Power"]["Size"]["Match width"]:get() end,
+                                            ["Enabled"] = function(self) return not prefs["Player"]["Power"]["Size"]["Match width"]:get() end,
                                             type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
@@ -403,7 +403,7 @@ function A:ConstructPreferences(db)
                                     end 
                                 },
                                 ["Reversed"] = {
-                                    type = "checkbox",
+                                    type = "toggle",
                                     get = function() return db["Player"]["Power"]["Reversed"] end,
                                     set = function(self, value)
                                         db["Player"]["Power"]["Reversed"] = value
@@ -419,7 +419,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Missing Power Bar"] = {
                                     ["Enabled"] = {
-                                        type = "checkbox",
+                                        type = "toggle",
                                         set = function(self, value)
                                             db["Player"]["Power"]["Missing Power Bar"]["Enabled"] = value
                                         end,
