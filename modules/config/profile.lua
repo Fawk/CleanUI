@@ -66,6 +66,10 @@ local function copyOfName(name)
 end
 
 function Profile:Copy(name)
+	if not name then
+		name = activeProfile
+	end
+
 	local profile = profiles[name]
 	local newName = copyOfName(name)
 	

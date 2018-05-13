@@ -3,6 +3,12 @@ local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 local CreateFrame = CreateFrame
 
+local buildText = A.TextBuilder
+local buildButton = A.ButtonBuilder
+local buildDropdown = A.DropdownBuilder
+
+local media = LibStub("LibSharedMedia-3.0")
+
 local mt = { 
     __index = function(tbl, k, v) 
         return tbl.children[k]
@@ -504,14 +510,90 @@ function A:ConstructPreferences(db)
     -- Also redraw the preferences to make sure that all dependencies go through between them, eg. enabled because something else is enabled
 
     local frame = CreateFrame("Frame", "Preferences", A.frameParent)
-    frame:SetSize(500, 500)
+    frame:SetSize(753, 500)
     frame:SetPoint("CENTER")
     frame:SetBackdrop(A.enum.backdrops.editbox)
-    frame:SetBackdropColor(0, 0, 0, 0.7)
+    frame:SetBackdropColor(0, 0, 0, 0.75)
 
+    local detailFrame = CreateFrame("Frame", nil, frame)
+    detailFrame:SetSize(497, 465)
+    detailFrame:SetPoint("BOTTOMRIGHT", -3, 3)
+    detailFrame:SetBackdrop(A.enum.backdrops.editbox)
+    detailFrame:SetBackdropColor(28/255, 28/255, 28/255, 0.5)
+
+    local count = 1
+    local buttons = {}
     for name, child in next, prefs do
-        if (child.type == "group") then
-            constructGroup(frame, frame, name, child)
+        -- Construct list of names with onClick for replacement of first dropdown
+        local builder
+        if (count == 1) then
+            builder = buildButton(frame):atTopLeft():x(3):y(-3)
+        else
+            builder = buildButton(buttons[count - 1]):below(buttons[count -1]):y(-3)
         end
+
+        local color = { 123/255, 132/255, 132/255, .25 }
+        if (count % 2 == 0) then
+            color = { 0, 0, 0, 0 }
+        end
+
+        local button = builder
+        :backdrop(A.enum.backdrops.editbox, color, { 0, 0, 0, 0 })
+        :size(247, 25)
+        :onClick(function(self)
+            -- Create first dropdown with children
+            if (frame.firstDropdown) then
+                frame.firstDropdown:Hide()
+            end
+
+            if (frame.secondDropdown) then
+                frame.secondDropdown:Hide()
+            end
+
+            local ddbuilder1 = buildDropdown(frame):size(247, 25):rightOf(buttons[1]):x(3)
+            :onClick(function(self, item)
+                -- Nothing
+            end)
+            :onItemClick(function(self, item)
+                -- Construct new second dropdown
+            end)
+            :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+
+            for k,v in next, child.children do
+                v.name = k
+                ddbuilder1:addItem(v)
+            end
+
+            local dropdown1 = ddbuilder1:build()
+
+            frame.firstDropdown = dropdown1
+
+            local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(dropdown1):x(3)
+            :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+
+            local firstChild = A.Tools.Table:first(child.children)
+            if (firstChild.children) then
+                for k,v in next, firstChild.children do
+                    v.name = k
+                    ddbuilder2:addItem(v)
+                end
+            end
+            
+            local dropdown2 = ddbuilder2:build() --more stuff needed here
+
+            dropdown1.secondDropdown = dropdown2
+
+            frame.secondDropdown = dropdown2
+        end)
+        :build()
+
+        button:SetFrameLevel(3)
+
+        local text = buildText(button, 14):atLeft():x(6):outline():build()
+        text:SetText(name)
+
+        --constructGroup(frame, frame, name, child)
+        buttons[count] = button
+        count = count + 1
     end
 end

@@ -77,8 +77,8 @@ function OT:remove(t)
 end
 
 function OT:getRelative(default)
-  local count = self.items:count()
-  return count == 0 and default or self.items:get(count-1)
+  local count = self:count()
+  return count == 0 and default or self:get(count)
 end
 
 local function search(result, tbl, key, value, steps, parents)

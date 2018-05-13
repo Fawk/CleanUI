@@ -499,6 +499,7 @@ local function FrameBuilder(parent)
 end
 
 local function ButtonBuilder(parent)
+
 	local o = {
 		parent = parent
 	}
@@ -546,7 +547,7 @@ local function ButtonBuilder(parent)
 	function o:backdrop(bd, bdColor, borderColor)
 		self.button:SetBackdrop(bd)
 		self.button:SetBackdropColor(unpack(bdColor))
-		self.button:SetBackdropColor(unpack(borderColor))
+		self.button:SetBackdropBorderColor(unpack(borderColor))
 		return self
 	end
 
@@ -606,11 +607,13 @@ local function DropdownBuilder(parent)
 	}
 
 	setmetatable(o, widget)
-	o.dropdown = CreateFrame("Frame", nil, parent)
+	o.dropdown = CreateFrame("Button", nil, parent)
 	o.dropdown.items = A:OrderedTable()
 
 	o.dropdown.parent = parent
 	o.dropdown.active = true
+	o.dropdown.selected = nil
+	o.dropdown.open = false
 
 	o.dropdown.SetActive = function(self, boolean)
 		self.active = boolean
@@ -622,8 +625,8 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:addItem(item)
-		local count = self.items:count()
 		local relative = self.items:getRelative(self.dropdown)
+
 		if type(item) ~= "table" then
 			self.items:add({ name = item, relative = relative })
 		else
@@ -634,19 +637,48 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:onItemClick(func)
-		self.itemClick = func
+		self.itemClick = function(self, item, button)
+			self.dropdown.selected = button
+			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
+			func(item)
+		end
 		return self
 	end
 
 	function o:onClick(func)
-		self.dropdown:SetScript("OnClick", func)
+		self.dropdown:SetScript("OnClick", function(self, b, down)
+			if b == "LeftButton" and not down then
+				if (self.active) then
+
+					self.selected:ClearAllPoints()
+					self.selected:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+
+					self.items:foreach(function(item)
+						if (self.open) then
+							item:Hide()
+						else
+							item:Show()
+						end
+					end)
+					self.open = not self.open
+
+					if (self.open) then
+						self.selected:Hide()
+					else
+						self.selected:Show()	
+					end
+
+					func(self)
+				end
+			end
+		end)
 		return self
 	end
 
 	function o:backdrop(bd, bdColor, borderColor)
-		self.dropdown:SetBackdrop(bd)
-		self.dropdown:SetBackdropColor(unpack(bdColor))
-		self.dropdown:SetBackdropBorderColor(unpack(borderColor))
+		self.dropdown.bd = bd
+		self.dropdown.bdColor = bdColor
+		self.dropdown.borderColor = borderColor
 		return self
 	end
 
@@ -669,23 +701,44 @@ local function DropdownBuilder(parent)
 
 		for i = 1, self.items:count() do
 			local item = self.items:get(i)
-			
-			local buttonBuilder = A:ButtonBuilder(self.dropdown):onClick(function(self, b, down)
+
+			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
+			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
+			:onClick(function(self, b, down)
 				if b == "LeftButton" and not down then
-					if self.dropdown.active then
-						o:itemClick(self)
+					if o.dropdown.active then
+						o:itemClick(item, self)
 					end
 				end
-			end):below(item.relative):build()
+			end)
 
+			if (item.relative == self.dropdown) then
+				builder:atTopLeft()
+			else
+				item.relative = self.dropdown.items:get(i-1)
+				builder:below(item.relative) -- This is not necessarily a frame that that be used in SetPoint -- investigate!!
+			end
+
+			local button = builder:build()
+
+			button.item = item
 			button.name = item.name
-			button:SetText(item.name)
+			button.text = A.TextBuilder(button, 14):atLeft():x(6):outline():build()
+			button.text:SetText(button.name)
+
+			if (i > 1) then
+				button:Hide()
+			end
 
 			self.dropdown.items:add(button)
 		end
 
+		self.dropdown.selected = self.dropdown.items:get(1)
+
 		return self.dropdown
 	end
+
+	return o
 end
 
 function A:ColorBuilder(parent)

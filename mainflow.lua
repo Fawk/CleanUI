@@ -4,7 +4,7 @@ local media = LibStub("LibSharedMedia-3.0")
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
 Addon.frames, Addon.modules, Addon.options = {}, {}, {}
-Addon.debugging = false
+Addon.debugging = true
 
 Addon.OrderedTable = Args.OrderedTable
 
@@ -248,7 +248,7 @@ function Addon:OnEnable()
 
 	for modName, module in pairs(self.modules) do
 		if module.Init then 
-            local unit = module:Init() 
+	            local unit = module:Init() 
             if (unit) then
                 unit:Update(UnitEvent.UPDATE_IDENTIFIER)
                 Units:Add(unit)
@@ -281,7 +281,7 @@ function Addon:OnEnable()
 		return control
 	end
 
-    --Addon:ConstructPreferences(Addon["Profile"]["Options"])
+    Addon:ConstructPreferences(Addon["Profile"]["Options"])
 
 	collectgarbage("collect");
 end
