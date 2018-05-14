@@ -551,11 +551,37 @@ function A:ConstructPreferences(db)
             end
 
             local ddbuilder1 = buildDropdown(frame):size(247, 25):rightOf(buttons[1]):x(3)
-            :onClick(function(self, item)
+            :onClick(function(self)
                 -- Nothing
             end)
-            :onItemClick(function(self, item)
+            :onItemClick(function(button, dropdown)
                 -- Construct new second dropdown
+                print("Constructing new dropdown for: ", button.name, button.item)
+                frame.secondDropdown:Hide()
+                
+                local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(dropdown):x(3)
+                :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+                :onClick(function(self)
+                    -- Nothing
+                end)
+                :onItemClick(function(button, dropdown)
+                    for k,v in next, (button.item.children or {}) do
+                        print(k, v.type)
+                    end
+                end)
+
+                if (button.item.children) then
+                    for k,v in next, button.item.children do
+                        v.name = k
+                        ddbuilder2:addItem(v)
+                    end
+                end
+                local dropdown2 = ddbuilder2:build()
+                frame.secondDropdown = dropdown2
+
+                if (not button.item.children) then
+                    dropdown2:Hide()
+                end
             end)
             :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
 
@@ -572,7 +598,7 @@ function A:ConstructPreferences(db)
             :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
 
             local firstChild = A.Tools.Table:first(child.children)
-            if (firstChild.children) then
+            if (firstChild and firstChild.children) then
                 for k,v in next, firstChild.children do
                     v.name = k
                     ddbuilder2:addItem(v)
@@ -581,7 +607,9 @@ function A:ConstructPreferences(db)
             
             local dropdown2 = ddbuilder2:build() --more stuff needed here
 
-            dropdown1.secondDropdown = dropdown2
+            if (not firstChild or not firstChild.children) then
+                dropdown2:Hide()
+            end
 
             frame.secondDropdown = dropdown2
         end)

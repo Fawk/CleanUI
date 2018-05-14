@@ -625,22 +625,16 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:addItem(item)
-		local relative = self.items:getRelative(self.dropdown)
-
-		if type(item) ~= "table" then
-			self.items:add({ name = item, relative = relative })
-		else
-			item.relative = relative
-			self.items:add(item)
-		end
+		self.items:add(item)
 		return self
 	end
 
 	function o:onItemClick(func)
 		self.itemClick = function(self, item, button)
-			self.dropdown.selected = button
+			self.dropdown.selected = button.index
+			self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
-			func(item)
+			func(button, self.dropdown)
 		end
 		return self
 	end
@@ -650,9 +644,6 @@ local function DropdownBuilder(parent)
 			if b == "LeftButton" and not down then
 				if (self.active) then
 
-					self.selected:ClearAllPoints()
-					self.selected:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-
 					self.items:foreach(function(item)
 						if (self.open) then
 							item:Hide()
@@ -661,12 +652,6 @@ local function DropdownBuilder(parent)
 						end
 					end)
 					self.open = not self.open
-
-					if (self.open) then
-						self.selected:Hide()
-					else
-						self.selected:Show()	
-					end
 
 					func(self)
 				end
@@ -699,8 +684,20 @@ local function DropdownBuilder(parent)
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
 
-		for i = 1, self.items:count() do
-			local item = self.items:get(i)
+		self.dropdown.selected = 1
+		local selectedButton = A.ButtonBuilder(self.dropdown)
+			:size(self.w, self.h)
+			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
+			:atTopLeft()
+			:onClick(function(self, b, d)
+				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
+			end)
+			:build()
+		selectedButton.text = A.TextBuilder(selectedButton, 14):atLeft():x(6):outline():build()
+
+		self.items:foreach(function(item)
+
+			local relative = self.dropdown.items:getRelative(self.dropdown.selectedButton)
 
 			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
 			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
@@ -712,28 +709,29 @@ local function DropdownBuilder(parent)
 				end
 			end)
 
-			if (item.relative == self.dropdown) then
-				builder:atTopLeft()
-			else
-				item.relative = self.dropdown.items:get(i-1)
-				builder:below(item.relative) -- This is not necessarily a frame that that be used in SetPoint -- investigate!!
-			end
+			builder:below(relative)
 
 			local button = builder:build()
-
 			button.item = item
-			button.name = item.name
+
+			if (type(item) == "table") then
+				button.name = item.name
+			else
+				button.name = item
+			end
+
 			button.text = A.TextBuilder(button, 14):atLeft():x(6):outline():build()
 			button.text:SetText(button.name)
 
-			if (i > 1) then
-				button:Hide()
-			end
+			button:Hide()
 
 			self.dropdown.items:add(button)
-		end
+		end)
 
-		self.dropdown.selected = self.dropdown.items:get(1)
+		local current = self.dropdown.items:get(self.dropdown.selected)
+		selectedButton.text:SetText(current and current.name or "")
+
+		self.dropdown.selectedButton = selectedButton
 
 		return self.dropdown
 	end
