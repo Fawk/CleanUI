@@ -823,6 +823,95 @@ function A:ColorBuilder(parent)
 	end
 end
 
+local function ToggleBuilder(parent)
+	local o = {
+		parent = parent,
+	}
+
+	setmetatable(o, widget)
+	o.toggle = CreateFrame("Button", nil, parent)
+
+	o.toggle.parent = parent
+	o.toggle.active = true
+	o.toggle.checked = false
+
+	o.toggle.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+
+	o.toggle.SetValue = function(self, checked)
+		self.checked = checked
+		self.block:ClearAllPoints()
+		self.text:ClearAllPoints()
+
+		if (self.checked) then
+			self.block:SetPoint("RIGHT", self, "RIGHT", 0, 0)
+			self.text:SetPoint("LEFT", self, "LEFT", 2, 0)
+			self.text:SetText(self.onText)
+		else
+			self.block:SetPoint("LEFT", self, "LEFT", 0, 0)
+			self.text:SetPoint("RIGHT", self, "RIGHT", 0, 0)
+			self.text:SetText(self.offText)
+		end
+	end
+
+	o.toggle.GetValue = function(self)
+		return self.checked
+	end
+
+	o.toggle.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
+	function o:onClick(func)
+		self.click = function(self, button, down)
+			if button == "LeftButton" and not down then
+				if (self.active) then
+					self:SetValue(not self.checked)
+					func(self)
+				end
+		    end
+		end
+		return self
+	end
+
+	function o:texts(onText, offText)
+		self.onText = onText
+		self.offText = offText
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.toggle)
+
+		self.toggle:SetSize(40, 15)
+		self.toggle:SetScript("OnClick", self.click)
+		self.toggle:SetFrameLevel(5)
+
+		self.toggle.block = A.ButtonBuilder(self.toggle):atRight():size(15, 15)
+		   :backdrop(A.enum.backdrops.editbox, { .5, .5, .5, 0.8 }, { 0, 0, 0 })
+		   :onClick(function() 
+		   		o.toggle:GetScript("OnClick")(o.toggle, "LeftButton", false)
+		   end)
+		   :build()
+
+		self.toggle.path = A.ButtonBuilder(self.toggle):alignAll()
+		   :backdrop(A.enum.backdrops.editbox, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0 }):build()
+		self.toggle.path:SetFrameLevel(4)
+
+		self.toggle.onText = self.onText
+		self.toggle.offText = self.offText
+		
+		self.toggle.text = A.TextBuilder(self.toggle, 10):size(20, 15):atLeft():outline():overlay():frameLevel(5):x(2):build()
+		self.toggle.text:SetText(self.toggle.onText)
+
+		return self.toggle
+	end
+
+	return o
+end
+
 function A:GroupBuilder(parent)
 	local o = {
 		parent = parent,
@@ -1196,3 +1285,4 @@ A.FrameBuilder = FrameBuilder
 A.EditBoxBuilder = EditBoxBuilder
 A.DrawerBuilder = DrawerBuilder
 A.DropdownBuilder = DropdownBuilder
+A.ToggleBuilder = ToggleBuilder

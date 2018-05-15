@@ -570,6 +570,17 @@ function A:ConstructPreferences(db)
                     end
                 end)
 
+                local enabled = button.item["Enabled"]
+                if (enabled) then
+                    local toggle = A.ToggleBuilder(dropdown):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
+                        enabled:set(self.checked)
+                    end):build()
+
+                    toggle:SetValue(enabled:get())
+
+                    dropdown.enabledToggle = toggle
+                end
+
                 if (button.item.children) then
                     for k,v in next, button.item.children do
                         v.name = k
@@ -591,6 +602,17 @@ function A:ConstructPreferences(db)
             end
 
             local dropdown1 = ddbuilder1:build()
+
+            local enabled = child["Enabled"]
+            if (enabled) then
+                local toggle = A.ToggleBuilder(dropdown1):onClick(function(self)
+                    enabled:set(self.checked)
+                end):build()
+
+                toggle:SetValue(enabled:get())
+
+                dropdown1.enabledToggle = toggle
+            end
 
             frame.firstDropdown = dropdown1
 
