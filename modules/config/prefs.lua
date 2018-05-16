@@ -565,13 +565,35 @@ function A:ConstructPreferences(db)
                     -- Nothing
                 end)
                 :onItemClick(function(button, dropdown)
-                    for k,v in next, (button.item.children or {}) do
-                        print(k, v.type)
+
+                    if (dropdown.enabledToggle) then
+                        dropdown.enabledToggle:Hide()
                     end
+
+                    local enabled = button.item["Enabled"]
+                    if (enabled) then
+                        local toggle = A.ToggleBuilder(dropdown):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
+                            enabled:set(self.checked)
+                        end):build()
+
+                        toggle:SetValue(enabled:get())
+
+                        dropdown.enabledToggle = toggle
+                    end
+
+                    for k,v in next, (button.item.children or {}) do
+                        
+                    end
+
                 end)
 
                 local enabled = button.item["Enabled"]
                 if (enabled) then
+
+                    if (dropdown.enabledToggle) then
+                        dropdown.enabledToggle:Hide()
+                    end
+
                     local toggle = A.ToggleBuilder(dropdown):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
                         enabled:set(self.checked)
                     end):build()
@@ -605,6 +627,11 @@ function A:ConstructPreferences(db)
 
             local enabled = child["Enabled"]
             if (enabled) then
+                
+                if (dropdown1.enabledToggle) then
+                    dropdown1.enabledToggle:Hide()
+                end
+
                 local toggle = A.ToggleBuilder(dropdown1):onClick(function(self)
                     enabled:set(self.checked)
                 end):build()
@@ -624,6 +651,23 @@ function A:ConstructPreferences(db)
                 for k,v in next, firstChild.children do
                     v.name = k
                     ddbuilder2:addItem(v)
+                end
+
+                local first = A.Tools.Table:first(firstChild.children)
+                local enabled2 = first["Enabled"]
+                if (enabled2) then
+
+                    if (dropdown2.enabledToggle) then
+                        dropdown2.enabledToggle:Hide()
+                    end
+
+                    local toggle2 = A.ToggleBuilder(dropdown2):onClick(function(self)
+                        enabled2:set(self.checked)
+                    end):build()
+
+                    toggle2:SetValue(enabled:get())
+
+                    dropdown2.enabledToggle = toggle2
                 end
             end
             
