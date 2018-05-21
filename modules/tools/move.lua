@@ -210,5 +210,18 @@ function SlashCmdList.CLEANUI(msg, editbox)
     if command == "changeProfile" then
         A["modules"]["Profile"]:Change(arg1)
     end
+
+    if command == "db" then
+    	local f = A["Profile"]["Options"][arg1]
+    	if (f) then
+    		if (arg2) then
+    			f = f[arg2]
+	    		if (f and arg3) then
+	    			f = f[arg3]
+	    		end
+    		end
+    	end
+    	A:DebugTable(f)
+    end
 end
 

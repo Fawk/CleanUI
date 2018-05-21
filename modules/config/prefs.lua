@@ -9,21 +9,6 @@ local buildDropdown = A.DropdownBuilder
 
 local media = LibStub("LibSharedMedia-3.0")
 
-local mt = { 
-    __index = function(tbl, k, v) 
-        return tbl.children[k]
-    end 
-}
-
-local function fix(t)
-   for _,v in next, t do
-      if type(v) == "table" and v.children then
-          fix(v.children)
-          setmetatable(v, mt)
-      end
-   end    
-end
-
 local function createDropdownTable(...)
     local tbl = {}
     for _,v in next, {...} do
@@ -32,61 +17,51 @@ local function createDropdownTable(...)
     return table
 end
 
-local function constructGroup(parent, relative, name, tbl)
-    local title = buildText(parent, 14):atTopLeft():outline():build()
-    title:SetTextColor(1, 1, 1)
-    title:SetText(name)
+local function createToggle(key, item, parent)
+    if (parent.enabledToggle) then
+        parent.enabledToggle:Hide()
+    end
 
-    if (tbl.type == "group") then
-        local childCount = A.Tools:tcount(tbl.children)
+    local enabled = item.enabled
+    if (enabled) then
+        local toggle = A.ToggleBuilder(parent):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
+            enabled:set(item.db, self.checked)
+        end):build()
 
-        local group = CreateFrame("Frame", name, parent)
-        group:SetSize(500, childCount * 20)
-        group:SetPoint("TOPLEFT", relative, "TOPLEFT", 0,  childCount * -20)
+        toggle:SetValue(enabled:get(item.db["Enabled"]))
+
+        parent.enabledToggle = toggle
+    end
+end
+
+local function createGroup(name, parent, relative)
+    local builder = A.GroupBuilder(parent)
+    if (relative == parent) then
+        builder:alignWith(relative):atTop()
+    else
+        builder:below(relative)
+    end
+    for name, child in next, v.children do
         
-        for n, g in next, tbl.children do
-            if g.type == "group" then
-                constructGroup(group, group, n, g)
+    end
+    local widget = builder:build()
+end
+
+local widgets = {}
+local function changeStateForWidgets()
+    for _,widget in next, widgets do
+        if (widget and widget.enabled) then
+            local enabled = widget.enabled
+            if (type(enabled) == "table") then
+
             else
-                local title2 = buildText(group, 12):atTopLeft():outline():build()
-                title2:SetTextColor(1, 1, 1)
-                title2:SetText(name)
+
             end
         end
     end
 end
 
 function A:ConstructPreferences(db)
-
-	    				-- 	["Position"] = {
-    					-- 	["Point"] = "TOP",
-    					-- 	["Local Point"] = "TOP",
-    					-- 	["Offset X"] = 0,
-    					-- 	["Offset Y"] = 0,
-    					-- 	["Relative To"] = "Player"
-    					-- },
-    					-- ["Size"] = {
-    					-- 	["Match width"] = true,
-    					-- 	["Match height"] = false,
-    					-- 	["Width"] = 150,
-    					-- 	["Height"] = 35
-    					-- },
-         --                ["Color By"] = "Gradient",
-         --                ["Custom Color"] = { 1, 1, 1 },
-         --                ["Background Multiplier"] = 0.33,
-         --                ["Orientation"] = "HORIZONTAL",
-         --                ["Reversed"] = false,
-         --                ["Texture"] = "Default2",
-         --                ["Missing Health Bar"] = {
-         --                    ["Enabled"] = false,
-         --                    ["Custom Color"] = {
-         --                        0.5, -- [1]
-         --                        0.5, -- [2]
-         --                        0.5, -- [3]
-         --                        1, -- [4]
-         --                    },
-         --                    ["Color By"] = "Custom",
-         --                }
 	
 	-- Construct the table used
 	local prefs = {
@@ -100,22 +75,26 @@ function A:ConstructPreferences(db)
 			type = "group",
 			children = {
 				["Player"] = {
-                    ["Enabled"] = {
+                    enabled = {
                         type = "toggle",
-                        set = function(self, value)
-                            db["Player"]["Enabled"] = value
+                        set = function(self, db, value)
+                            db["Enabled"] = value
                         end,
-                        get = function() return db["Player"]["Enabled"] end
+                        get = function(self, db)
+                            return db
+                        end
                     },
                     type = "group",
                     children = {
                         ["Health"] = {
-                            ["Enabled"] = {
+                            enabled = {
                                 type = "toggle",
-                                set = function(self, value)
-                                    db["Player"]["Health"]["Enabled"] = value
+                                set = function(self, db, value)
+                                    db["Enabled"] = value
                                 end,
-                                get = function() return db["Player"]["Health"]["Enabled"] end
+                                get = function(self, db)
+                                    return db
+                                end
                             },
 							type = "group",
 							children = {
@@ -125,31 +104,31 @@ function A:ConstructPreferences(db)
 										["Point"] = {
 											type = "dropdown",
 											values = A.Tools.points,
-											set = function(self, value)
-												db["Player"]["Health"]["Position"]["Point"] = value
+											set = function(self, db, value)
+												db["Point"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Position"]["Point"]
+											get = function(self, db)
+												return db
 											end
 										},
 										["Local Point"] = {
 											type = "dropdown",
 											values = A.Tools.points,
-											set = function(self, value)
-												db["Player"]["Health"]["Position"]["Local Point"] = value
+											set = function(self, db, value)
+												db["Local Point"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Position"]["Local Point"]
+											get = function(self, db)
+												return db
 											end
 										},
 										["Relative To"] = {
 											type = "dropdown",
 											values = createDropdownTable("Player", "Power"),
-											set = function(self, value)
-												db["Player"]["Health"]["Position"]["Relative To"] = value
+											set = function(self, db, value)
+												db["Relative To"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Position"]["Relative To"]
+											get = function(self, db)
+												return db
 											end
 										},
 									}
@@ -159,44 +138,48 @@ function A:ConstructPreferences(db)
 									children = {
 										["Match width"] = {
 											type = "toggle",
-											set = function(self, value)
-												db["Player"]["Health"]["Size"]["Match width"] = value
+											set = function(self, db, value)
+												db["Match width"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Size"]["Match width"]
+											get = function(self, db)
+												return db
 											end
 										},
 			    						["Match height"] = {
 			    							type = "toggle",
-											set = function(self, value)
-												db["Player"]["Health"]["Size"]["Match height"] = value
+											set = function(self, db, value)
+												db["Match height"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Size"]["Match height"]
+											get = function(self, db)
+												return db
 											end											
 										},
 			    						["Width"] = {
-			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match width"]:get() end,
+			    							enabled = function(self, parent, item, db) 
+                                                return not db["Match width"]
+                                            end,
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
-											set = function(self, value)
-												db["Player"]["Health"]["Size"]["Width"] = value
+											set = function(self, db, value)
+												db["Width"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Size"]["Width"]
+											get = function(self, db)
+												return db
 											end		
 			    						},
 			    						["Height"] = {
-			    							enabled = function(self) return not prefs["Player"]["Health"]["Size"]["Match height"]:get() end,
+			    							enabled = function(self, parent, item, db) 
+                                                return not db["Match height"]
+                                            end,
 			    							type = "number",
                                             min = 1,
                                             max = GetScreenHeight(),
-											set = function(self, value)
-												db["Player"]["Health"]["Size"]["Height"] = value
+											set = function(self, db, value)
+												db["Height"] = value
 											end,
-											get = function()
-												return db["Player"]["Health"]["Size"]["Height"]
+											get = function(self, db)
+												return db
 											end		
 			    						}
 			    					}
@@ -204,77 +187,79 @@ function A:ConstructPreferences(db)
                                 ["Color By"] = {
                                     type = "dropdown",
                                     values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
-                                    get = function() return db["Player"]["Health"]["Color By"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Color By"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Color By"] = value
                                     end
                                 },
                                 ["Custom Color"] = {
-                                    ["Enabled"] = function(self)
-                                        return self["*"]["*"]["Color By"]:get() == "Custom"
+                                    enabled = function(self, parent, item, db)
+                                        return db["Color By"] == "Custom"
                                     end,
                                     type = "color",
-                                    get = function() return db["Player"]["Health"]["Custom Color"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Custom Color"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Custom Color"] = value
                                     end
                                 },
                                 ["Background Multiplier"] = {
                                     type = "number",
                                     min = -1,
                                     max = 1,
-                                    get = function() return db["Player"]["Health"]["Background Multiplier"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Background Multiplier"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Background Multiplier"] = value
                                     end 
                                 },
                                 ["Orientation"] = {
                                     type = "dropdown",
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
-                                    get = function() return db["Player"]["Health"]["Orientation"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Orientation"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Orientation"] = value
                                     end 
                                 },
                                 ["Reversed"] = {
                                     type = "toggle",
-                                    get = function() return db["Player"]["Health"]["Reversed"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Reversed"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Reversed"] = value
                                     end 
                                 },
                                 ["Texture"] = {
                                     type = "dropdown",
                                     values = media:List("statusbar"),
-                                    get = function() return db["Player"]["Health"]["Texture"]  end,
-                                    set = function(self, value)
-                                        db["Player"]["Health"]["Texture"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Texture"] = value
                                     end
                                 },
                                 ["Missing Health Bar"] = {
-                                    ["Enabled"] = {
+                                    enabled = {
                                         type = "toggle",
-                                        set = function(self, value)
-                                            db["Player"]["Health"]["Missing Health Bar"]["Enabled"] = value
+                                        set = function(self, db, value)
+                                            db["Enabled"] = value
                                         end,
-                                        get = function() return db["Player"]["Health"]["Missing Health Bar"]["Enabled"] end
+                                        get = function(self, db) return db end
                                     },
                                     type = "group",
                                     children = {
                                         ["Custom Color"] = {
-                                            ["Enabled"] = function(self) return prefs["Player"]["Health"]["Missing Health Bar"]["Color By"]:get() == "Custom" end,
+                                            enabled = function(self, parent, item, db)
+                                                return db["Color By"] == "Custom"
+                                            end,
                                             type = "color",
-                                            get = function() return db["Player"]["Health"]["Missing Health Bar"]["Custom Color"] end,
-                                            set = function(self, value)
-                                                db["Player"]["Health"]["Missing Health Bar"]["Custom Color"] = value
+                                            get = function(self, db) return db end,
+                                            set = function(self, db, value)
+                                                db["Custom Color"] = value
                                             end
                                         },
                                         ["Color By"] = {
                                             type = "dropdown",
                                             values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
-                                            get = function() return db["Player"]["Health"]["Missing Health Bar"]["Color By"] end,
-                                            set = function(self, value)
-                                                db["Player"]["Health"]["Missing Health Bar"]["Color By"] = value
+                                            get = function(self, db) return db end,
+                                            set = function(self, db, value)
+                                                db["Color By"] = value
                                             end
                                         }
                                     }
@@ -282,12 +267,12 @@ function A:ConstructPreferences(db)
 							}
 						},
 						["Power"] = {
-                            ["Enabled"] = {
+                            enabled = {
                                 type = "toggle",
-                                set = function(self, value)
-                                    db["Player"]["Power"]["Enabled"] = value
+                                set = function(self, db, value)
+                                    db["Enabled"] = value
                                 end,
-                                get = function() return db["Player"]["Power"]["Enabled"] end
+                                get = function(self, db) return db end
                             },
                             type = "group",
                             children = {
@@ -297,31 +282,31 @@ function A:ConstructPreferences(db)
                                         ["Point"] = {
                                             type = "dropdown",
                                             values = A.Tools.points,
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Position"]["Point"] = value
+                                            set = function(self, db, value)
+                                                db["Point"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Position"]["Point"]
+                                            get = function(self, db)
+                                                return db
                                             end
                                         },
                                         ["Local Point"] = {
                                             type = "dropdown",
                                             values = A.Tools.points,
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Position"]["Local Point"] = value
+                                            set = function(self, db, value)
+                                                db["Local Point"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Position"]["Local Point"]
+                                            get = function(self, db)
+                                                return db
                                             end
                                         },
                                         ["Relative To"] = {
                                             type = "dropdown",
                                             values = createDropdownTable("Player", "Health"),
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Position"]["Relative To"] = value
+                                            set = function(self, db, value)
+                                                db["Relative To"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Position"]["Relative To"]
+                                            get = function(self, db)
+                                                return db
                                             end
                                         },
                                     }
@@ -331,44 +316,48 @@ function A:ConstructPreferences(db)
                                     children = {
                                         ["Match width"] = {
                                             type = "toggle",
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Size"]["Match width"] = value
+                                            set = function(self, db, value)
+                                                db["Match width"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Size"]["Match width"]
+                                            get = function(self, db)
+                                                return db
                                             end
                                         },
                                         ["Match height"] = {
                                             type = "toggle",
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Size"]["Match height"] = value
+                                            set = function(self, db, value)
+                                                db["Match height"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Size"]["Match height"]
+                                            get = function(self, db)
+                                                return db
                                             end                                         
                                         },
                                         ["Width"] = {
-                                            ["Enabled"] = function(self) return not prefs["Player"]["Power"]["Size"]["Match width"]:get() end,
+                                            enabled = function(self, parent, item, db) 
+                                                return not db["Match width"]
+                                            end,
                                             type = "number",
                                             min = 1,
                                             max = GetScreenWidth(),
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Size"]["Width"] = value
+                                            set = function(self, db, value)
+                                                db["Width"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Size"]["Width"]
+                                            get = function(self, db)
+                                                return db
                                             end     
                                         },
                                         ["Height"] = {
-                                            ["Enabled"] = function(self) return not prefs["Player"]["Power"]["Size"]["Match height"]:get() end,
+                                            enabled = function(self, parent, item, db) 
+                                                return not db["Match height"]
+                                            end,
                                             type = "number",
                                             min = 1,
                                             max = GetScreenHeight(),
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Size"]["Height"] = value
+                                            set = function(self, db, value)
+                                                db["Height"] = value
                                             end,
-                                            get = function()
-                                                return db["Player"]["Power"]["Size"]["Height"]
+                                            get = function(self, db)
+                                                return db
                                             end     
                                         }
                                     }
@@ -376,77 +365,79 @@ function A:ConstructPreferences(db)
                                 ["Color By"] = {
                                     type = "dropdown",
                                     values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
-                                    get = function() return db["Player"]["Power"]["Color By"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Color By"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Color By"] = value
                                     end
                                 },
                                 ["Custom Color"] = {
-                                    ["Enabled"] = function(self)
-                                        return self["*"]["*"]["Color By"]:get() == "Custom"
+                                    enabled = function(self, parent, item, db)
+                                        return db["Color By"] == "Custom"
                                     end,
                                     type = "color",
-                                    get = function() return db["Player"]["Power"]["Custom Color"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Custom Color"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Custom Color"] = value
                                     end
                                 },
                                 ["Background Multiplier"] = {
                                     type = "number",
                                     min = -1,
                                     max = 1,
-                                    get = function() return db["Player"]["Power"]["Background Multiplier"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Background Multiplier"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Background Multiplier"] = value
                                     end 
                                 },
                                 ["Orientation"] = {
                                     type = "dropdown",
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
-                                    get = function() return db["Player"]["Power"]["Orientation"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Orientation"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Orientation"] = value
                                     end 
                                 },
                                 ["Reversed"] = {
                                     type = "toggle",
-                                    get = function() return db["Player"]["Power"]["Reversed"] end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Reversed"] = value
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Reversed"] = value
                                     end 
                                 },
                                 ["Texture"] = {
                                     type = "dropdown",
                                     values = media:List("statusbar"),
-                                    get = function() return db["Player"]["Power"]["Texture"]  end,
-                                    set = function(self, value)
-                                        db["Player"]["Power"]["Texture"] = value
+                                    get = function(self, db) return db  end,
+                                    set = function(self, db, value)
+                                        db["Texture"] = value
                                     end
                                 },
                                 ["Missing Power Bar"] = {
-                                    ["Enabled"] = {
+                                    enabled = {
                                         type = "toggle",
-                                        set = function(self, value)
-                                            db["Player"]["Power"]["Missing Power Bar"]["Enabled"] = value
+                                        set = function(self, db, value)
+                                            db["Enabled"] = value
                                         end,
-                                        get = function() return db["Player"]["Power"]["Missing Power Bar"]["Enabled"] end
+                                        get = function(self, db) return db end
                                     },
                                     type = "group",
                                     children = {
                                         ["Custom Color"] = {
-                                            ["Enabled"] = function(self) return prefs["Player"]["Power"]["Missing Power Bar"]["Color By"]:get() == "Custom" end,
+                                            enabled = function(self, parent, item, db)
+                                                return db["Color By"] == "Custom"
+                                            end,
                                             type = "color",
-                                            get = function() return db["Player"]["Power"]["Missing Power Bar"]["Custom Color"] end,
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Missing Power Bar"]["Custom Color"] = value
+                                            get = function(self, db) return db end,
+                                            set = function(self, db, value)
+                                                db["Custom Color"] = value
                                             end
                                         },
                                         ["Color By"] = {
                                             type = "dropdown",
                                             values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
-                                            get = function() return db["Player"]["Power"]["Missing Power Bar"]["Color By"] end,
-                                            set = function(self, value)
-                                                db["Player"]["Power"]["Missing Power Bar"]["Color By"] = value
+                                            get = function(self, db) return db end,
+                                            set = function(self, db, value)
+                                                db["Color By"] = value
                                             end
                                         }
                                     }
@@ -502,8 +493,8 @@ function A:ConstructPreferences(db)
 		}
 	}
 
-    setmetatable(prefs, mt)
-    fix(prefs)
+    --setmetatable(prefs, mt)
+    --fix(prefs)
 
     -- Use table to construct the visual widgets and bind everything together
     -- Make sure every widgets various SetValue functions is calling UnitEvent.UPDATE_DB for everything
@@ -515,11 +506,18 @@ function A:ConstructPreferences(db)
     frame:SetBackdrop(A.enum.backdrops.editbox)
     frame:SetBackdropColor(0, 0, 0, 0.75)
 
-    local detailFrame = CreateFrame("Frame", nil, frame)
+    local detailFrame = CreateFrame("ScrollFrame", nil, frame)
     detailFrame:SetSize(497, 465)
     detailFrame:SetPoint("BOTTOMRIGHT", -3, 3)
     detailFrame:SetBackdrop(A.enum.backdrops.editbox)
     detailFrame:SetBackdropColor(28/255, 28/255, 28/255, 0.5)
+
+    local scrollContent = CreateFrame("ScrollFrame", nil, detailFrame)
+    scrollContent:SetSize(497, 465)
+
+    detailFrame:SetScrollChild(scrollContent)
+
+    frame.detailFrame = detailFrame
 
     local count = 1
     local buttons = {}
@@ -565,47 +563,34 @@ function A:ConstructPreferences(db)
                     -- Nothing
                 end)
                 :onItemClick(function(button, dropdown)
-
-                    if (dropdown.enabledToggle) then
-                        dropdown.enabledToggle:Hide()
-                    end
-
-                    local enabled = button.item["Enabled"]
-                    if (enabled) then
-                        local toggle = A.ToggleBuilder(dropdown):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
-                            enabled:set(self.checked)
-                        end):build()
-
-                        toggle:SetValue(enabled:get())
-
-                        dropdown.enabledToggle = toggle
-                    end
-
+                    createToggle(button.name, button.item, dropdown)
+                    local relative = scrollContent
                     for k,v in next, (button.item.children or {}) do
-                        
-                    end
+                        -- Create widget using template relative to previous or scrollContent
+                        if (v.type == "group") then
 
+                        elseif (v.type == "toggle") then
+
+                        elseif (v.type == "number") then
+
+                        elseif (v.type == "text") then
+
+                        elseif (v.type == "color") then
+
+                        elseif (v.type == "dropdown") then
+
+                        elseif (v.type == "number") then
+
+                        end
+                    end
                 end)
 
-                local enabled = button.item["Enabled"]
-                if (enabled) then
-
-                    if (dropdown.enabledToggle) then
-                        dropdown.enabledToggle:Hide()
-                    end
-
-                    local toggle = A.ToggleBuilder(dropdown):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
-                        enabled:set(self.checked)
-                    end):build()
-
-                    toggle:SetValue(enabled:get())
-
-                    dropdown.enabledToggle = toggle
-                end
+                createToggle(button.name, button.item, dropdown)
 
                 if (button.item.children) then
                     for k,v in next, button.item.children do
                         v.name = k
+                        v.db = button.item.db[k]
                         ddbuilder2:addItem(v)
                     end
                 end
@@ -620,26 +605,12 @@ function A:ConstructPreferences(db)
 
             for k,v in next, child.children do
                 v.name = k
+                v.db = db[k]
                 ddbuilder1:addItem(v)
             end
 
             local dropdown1 = ddbuilder1:build()
-
-            local enabled = child["Enabled"]
-            if (enabled) then
-                
-                if (dropdown1.enabledToggle) then
-                    dropdown1.enabledToggle:Hide()
-                end
-
-                local toggle = A.ToggleBuilder(dropdown1):onClick(function(self)
-                    enabled:set(self.checked)
-                end):build()
-
-                toggle:SetValue(enabled:get())
-
-                dropdown1.enabledToggle = toggle
-            end
+            createToggle(name, child, dropdown1)
 
             frame.firstDropdown = dropdown1
 
@@ -648,26 +619,14 @@ function A:ConstructPreferences(db)
 
             local firstChild = A.Tools.Table:first(child.children)
             if (firstChild and firstChild.children) then
+                local childCount = 0
                 for k,v in next, firstChild.children do
                     v.name = k
-                    ddbuilder2:addItem(v)
-                end
-
-                local first = A.Tools.Table:first(firstChild.children)
-                local enabled2 = first["Enabled"]
-                if (enabled2) then
-
-                    if (dropdown2.enabledToggle) then
-                        dropdown2.enabledToggle:Hide()
+                    v.db = firstChild.db[k]
+                    if (childCount == 0) then
+                        createToggle(k, v, dropdown2)
                     end
-
-                    local toggle2 = A.ToggleBuilder(dropdown2):onClick(function(self)
-                        enabled2:set(self.checked)
-                    end):build()
-
-                    toggle2:SetValue(enabled:get())
-
-                    dropdown2.enabledToggle = toggle2
+                    ddbuilder2:addItem(v)
                 end
             end
             
@@ -690,4 +649,6 @@ function A:ConstructPreferences(db)
         buttons[count] = button
         count = count + 1
     end
+
+    widgets = buttons
 end

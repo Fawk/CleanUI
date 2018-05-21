@@ -8,6 +8,9 @@
 ## X-Embeds: Ace3
 
 libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 libs\LibSharedMedia-3.0\lib.xml
 libs\AceLocale-3.0\AceLocale-3.0.xml
 media\load_media.xml

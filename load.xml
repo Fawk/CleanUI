@@ -2,7 +2,6 @@
 
     <Script file="libs\UTF8\utf8data.lua"/>
     <Script file="libs\UTF8\utf8.lua"/>
-	<Include file="libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
 	<Include file="libs\AceAddon-3.0\AceAddon-3.0.xml"/>
 	<Include file="libs\AceEvent-3.0\AceEvent-3.0.xml"/>
 	<Include file="libs\AceDB-3.0\AceDB-3.0.xml"/>
@@ -13,9 +12,6 @@
 	<Include file="libs\AceBucket-3.0\AceBucket-3.0.xml"/>
 	<!-- AceLocale -->
 	<Include file="libs\AceTimer-3.0\AceTimer-3.0.xml"/>	
-	<Include file="libs\LibSharedMedia-3.0\lib.xml"/>
-	<Inlucde file="libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
-	<Inlucde file="libs\LibDBIcon-1.0\LibDBIcon-1.0.lua"/>
 	<Include file="libs\oUF\oUF.xml" />
 	<Include file="libs\oUF_Smooth\load.xml"/>
 	<Include file="libs\LibActionButton-1.0\LibActionButton-1.0.xml"/>
