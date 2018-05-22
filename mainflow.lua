@@ -281,7 +281,7 @@ function Addon:OnEnable()
 		return control
 	end
 
-    Addon:ConstructPreferences(Addon["Profile"]["Options"])
+    --Addon:ConstructPreferences(Addon["Profile"]["Options"])
 
 	collectgarbage("collect");
 end

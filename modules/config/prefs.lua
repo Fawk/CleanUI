@@ -6,6 +6,7 @@ local CreateFrame = CreateFrame
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
 local buildDropdown = A.DropdownBuilder
+local buildGroup = A.GroupBuilder
 
 local media = LibStub("LibSharedMedia-3.0")
 
@@ -34,17 +35,52 @@ local function createToggle(key, item, parent)
     end
 end
 
-local function createGroup(name, parent, relative)
-    local builder = A.GroupBuilder(parent)
+local function createGroup(name, group, parent, relative)
+    print("createGroup", group, name, parent, relative)
+
+    local builder = buildGroup(parent)
     if (relative == parent) then
         builder:alignWith(relative):atTop()
     else
         builder:below(relative)
     end
-    for name, child in next, v.children do
-        
-    end
+
     local widget = builder:build()
+
+    local groupTitle = buildText(widget, 14):atTopLeft():x(10):y(-10):outline():build()
+    groupTitle:SetText(group.name)
+
+    widget.title = groupTitle
+
+    local childRelative = widget
+    for name, child in next, group.children do
+
+        local childTitle = buildText(childRelative, 12):atTopLeft():x(10):y(-30):outline():build()
+        childTitle:SetText(name)
+
+        child.title = childTitle
+
+        local childWidget
+        if (child.type == "group") then
+            childWidget = createGroup(name, child, widget, childRelative)
+        elseif (child.type == "text") then
+
+        elseif (child.type == "number") then
+
+        elseif (child.type == "dropdown") then
+
+        elseif (child.type == "toggle") then
+
+        elseif (child.type == "color") then
+
+        end
+
+        -- check enabled here
+
+        childRelative = childWidget
+    end
+
+    return widget
 end
 
 local widgets = {}
@@ -59,6 +95,16 @@ local function changeStateForWidgets()
             end
         end
     end
+end
+
+local function createScrollFrame(parent)
+    local scrollContent = CreateFrame("ScrollFrame", nil, parent)
+    scrollContent:SetAllPoints()
+    scrollContent:SetSize(497, 465)
+
+    parent:SetScrollChild(scrollContent)
+
+    return scrollContent
 end
 
 function A:ConstructPreferences(db)
@@ -512,10 +558,7 @@ function A:ConstructPreferences(db)
     detailFrame:SetBackdrop(A.enum.backdrops.editbox)
     detailFrame:SetBackdropColor(28/255, 28/255, 28/255, 0.5)
 
-    local scrollContent = CreateFrame("ScrollFrame", nil, detailFrame)
-    scrollContent:SetSize(497, 465)
-
-    detailFrame:SetScrollChild(scrollContent)
+    detailFrame.scrollContent = createScrollFrame(detailFrame)
 
     frame.detailFrame = detailFrame
 
@@ -564,25 +607,12 @@ function A:ConstructPreferences(db)
                 end)
                 :onItemClick(function(button, dropdown)
                     createToggle(button.name, button.item, dropdown)
-                    local relative = scrollContent
-                    for k,v in next, (button.item.children or {}) do
-                        -- Create widget using template relative to previous or scrollContent
-                        if (v.type == "group") then
 
-                        elseif (v.type == "toggle") then
+                    detailFrame.scrollContent:Hide()
+                    detailFrame.scrollContent = createScrollFrame(detailFrame)
 
-                        elseif (v.type == "number") then
-
-                        elseif (v.type == "text") then
-
-                        elseif (v.type == "color") then
-
-                        elseif (v.type == "dropdown") then
-
-                        elseif (v.type == "number") then
-
-                        end
-                    end
+                    local relative = detailFrame.scrollContent
+                    local widget = createGroup(button.name, button.item, relative, relative)
                 end)
 
                 createToggle(button.name, button.item, dropdown)
@@ -627,6 +657,7 @@ function A:ConstructPreferences(db)
                         createToggle(k, v, dropdown2)
                     end
                     ddbuilder2:addItem(v)
+                    childCount = childCount + 1
                 end
             end
             

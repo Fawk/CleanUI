@@ -912,7 +912,7 @@ local function ToggleBuilder(parent)
 	return o
 end
 
-function A:GroupBuilder(parent)
+local function GroupBuilder(parent)
 	local o = {
 		parent = parent,
 		children = A:OrderedTable()
@@ -938,35 +938,34 @@ function A:GroupBuilder(parent)
 		return (parent.IsActive and parent:IsActive() or true) and self.active
 	end
 
-	function o:addChild(child)
-		local count = self.children:count()
-		local relative = self.children:getRelative(self.group)
-		if type(child) ~= "table" then
-			self.children:add({ name = child, relative = relative })
-		else
-			child.relative = relative
-			self.children:add(child)
-		end
-		return self
-	end
-
 	function o:backdrop(bd, bdColor, borderColor)
-		self.dropdown:SetBackdrop(bd)
-		self.dropdown:SetBackdropColor(unpack(bdColor))
-		self.dropdown:SetBackdropBorderColor(unpack(borderColor))
+		self.group:SetBackdrop(bd)
+		self.group:SetBackdropColor(unpack(bdColor))
+		self.group:SetBackdropBorderColor(unpack(borderColor))
 		return self
 	end
 
 	function o:build()
 		setPoints(self, self.group)
-		self.group:SetSize(self.w, self.h)
 
-		for i = 1, self.children:count() do
-			self.dropdown.children:add(button)
+		self.group:SetSize(self.group.parent:GetWidth(), 20)
+		
+		self.group.addChild = function(self, child)
+			local relative = self.children:getRelative(self.group)
+			if type(child) ~= "table" then
+				self.children:add({ name = child, relative = relative })
+			else
+				child.relative = relative
+				self.children:add(child)
+			end
+
+			self:SetSize(self:GetWidth(), self:GetHeight() + child:GetHeight())
 		end
-
-		return self.dropdown
+		
+		return self.group
 	end
+
+	return o
 end
 
 function A:ColumnBuilder()
@@ -1286,3 +1285,4 @@ A.EditBoxBuilder = EditBoxBuilder
 A.DrawerBuilder = DrawerBuilder
 A.DropdownBuilder = DropdownBuilder
 A.ToggleBuilder = ToggleBuilder
+A.GroupBuilder = GroupBuilder
