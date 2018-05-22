@@ -600,6 +600,78 @@ local function EditBoxBuilder(parent)
 	return o
 end
 
+local function NumberBuilder(parent)
+	local o = {
+		parent = parent
+	}
+
+	setmetatable(o, widget)
+	o.textbox = CreateFrame("EditBox", nil, parent)
+
+	o.textbox.parent = parent
+	o.textbox.active = true
+
+	local increase = CreateFrame("Button", nil, o.textbox)
+	increase:SetSize(5, o.textbox:GetHeight() / 2)
+	increase:SetPoint("TOPRIGHT")
+	o.textbox.increaseButton = increase
+
+	local decrease = CreateFrame("Button", nil, o.textbox)
+	decrease:SetSize(5, o.textbox:GetHeight() / 2)
+	decrease:SetPoint("TOP", increase, "BOTTOM", 0, 0)
+	o.textbox.decreaseButton = decrease
+
+	o.textbox.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+	end
+
+	o.textbox.IsActive = function(self)
+		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
+	function o:onTextChanged(func)
+		self.textbox:SetScript("OnTextChanged", func)
+		return self
+	end
+
+	function o:onEnterPressed(func)
+		self.textbox:SetScript("OnEnterPressed", func)
+		return self
+	end
+
+	function o:onValueChanged(func)
+		self.valueChanged = func
+	end
+
+	function o:backdrop(bd, bdColor, borderColor)
+		self.textbox:SetBackdrop(bd)
+		self.textbox:SetBackdropColor(unpack(bdColor))
+		self.textbox:SetBackdropColor(unpack(borderColor))
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.textbox)
+		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
+		self.textbox:SetNumeric(true)
+
+		self.textbox.increaseButton:SetScript("OnClick", function(self, b, d)
+			local number = self:GetNumber()
+			o:valueChanged(self, number)
+		end)
+
+		self.textbox.decreaseButton:SetScript("OnClick", function(self, b, d)
+			local number = self:GetNumber()
+			o:valueChanged(self, number)
+		end)
+
+		return self.textbox
+	end
+
+	return o
+end
+
 local function DropdownBuilder(parent)
 	local o = {
 		parent = parent,
@@ -1286,3 +1358,4 @@ A.DrawerBuilder = DrawerBuilder
 A.DropdownBuilder = DropdownBuilder
 A.ToggleBuilder = ToggleBuilder
 A.GroupBuilder = GroupBuilder
+A.NumberBuilder = NumberBuilder

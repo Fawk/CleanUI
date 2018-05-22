@@ -66,7 +66,8 @@ local function createGroup(name, group, parent, relative)
         elseif (child.type == "text") then
 
         elseif (child.type == "number") then
-
+            childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
+            widget:addChild(childWidget)
         elseif (child.type == "dropdown") then
 
         elseif (child.type == "toggle") then
