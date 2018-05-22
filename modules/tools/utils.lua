@@ -831,8 +831,8 @@ function A:ColorBuilder(parent)
 		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
 	end
 
-    o.color.GetColor = function(self) return self.r, self.g, self.b, self.a end
-    o.color.SetColor = function(self, r, g, b, a) 
+    o.color.GetValue = function(self) return self.r, self.g, self.b, self.a end
+    o.color.SetValue = function(self, r, g, b, a) 
         self.r = r 
         self.g = g
         self.b = b

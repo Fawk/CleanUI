@@ -7,6 +7,9 @@ local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
 local buildDropdown = A.DropdownBuilder
 local buildGroup = A.GroupBuilder
+local buildEditBox = A.EditBoxBuilder
+local buildColor = A.ColorBuilder
+local buildToggle = A.ColorBuilder
 
 local media = LibStub("LibSharedMedia-3.0")
 
@@ -25,7 +28,7 @@ local function createToggle(key, item, parent)
 
     local enabled = item.enabled
     if (enabled) then
-        local toggle = A.ToggleBuilder(parent):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
+        local toggle = buildToggle(parent):atRight():x(-37):texts("ON", "OFF"):onClick(function(self)
             enabled:set(item.db, self.checked)
         end):build()
 
@@ -64,19 +67,27 @@ local function createGroup(name, group, parent, relative)
         if (child.type == "group") then
             childWidget = createGroup(name, child, widget, childRelative)
         elseif (child.type == "text") then
-
+            childWidget = buildEditBox(childRelative):size(childRelative:GetWidth(), 20):build()
         elseif (child.type == "number") then
             childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
-            widget:addChild(childWidget)
         elseif (child.type == "dropdown") then
-
+            childWidget = buildDropdown(childRelative):items(child.values):size(childRelative:GetWidth(), 20):build()
         elseif (child.type == "toggle") then
-
+            childWidget =  buildToggle(childRelative):texts("ON", "OFF"):onClick(function(self)
+                child:set(group.db, self.checked)
+            end):build()
         elseif (child.type == "color") then
-
+            childWidget = buildColor(childRelative):size(16, 16):build()
         end
+        
+        childWidget:SetValue(child:get(group.db[name]))
+        widget:addChild(childWidget)
 
-        -- check enabled here
+        if (child.enabled) then
+            child:SetActive(child:enabled(widget, child, group.db))
+        else
+            child:SetActive(true)
+        end
 
         childRelative = childWidget
     end
