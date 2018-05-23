@@ -9,9 +9,13 @@ local buildDropdown = A.DropdownBuilder
 local buildGroup = A.GroupBuilder
 local buildEditBox = A.EditBoxBuilder
 local buildColor = A.ColorBuilder
-local buildToggle = A.ColorBuilder
+local buildToggle = A.ToggleBuilder
+local buildNumber = A.NumberBuilder
 
 local media = LibStub("LibSharedMedia-3.0")
+
+local bdColor = { 123/255, 132/255, 132/255, .25 }
+local transparent = { 0, 0, 0, 0 }
 
 local function createDropdownTable(...)
     local tbl = {}
@@ -19,6 +23,10 @@ local function createDropdownTable(...)
         tbl[v] = v
     end
     return table
+end
+
+local function getChildrenInOrder(children)
+    
 end
 
 local function createToggle(key, item, parent)
@@ -39,8 +47,6 @@ local function createToggle(key, item, parent)
 end
 
 local function createGroup(name, group, parent, relative)
-    print("createGroup", group, name, parent, relative)
-
     local builder = buildGroup(parent)
     if (relative == parent) then
         builder:alignWith(relative):atTop()
@@ -51,17 +57,46 @@ local function createGroup(name, group, parent, relative)
     local widget = builder:build()
 
     local groupTitle = buildText(widget, 14):atTopLeft():x(10):y(-10):outline():build()
-    groupTitle:SetText(group.name)
+    groupTitle:SetText(name)
+
+    if (group.enabled) then
+        if (group.enabledToggle) then
+            group.enabledToggle:Hide()
+        end
+
+        group.enabledToggle = buildToggle(widget):alignWith(groupTitle):atLeft():againstRight():x(5):texts("ON", "OFF"):onClick(function(self)
+            group.enabled:set(group.db, self.checked)
+        end):build()
+
+        group.enabledToggle:SetValue(group.enabled:get(group.db["Enabled"]))
+    end
 
     widget.title = groupTitle
+    widget.type = group.type
+    widget.name = name
 
     local childRelative = widget
     for name, child in next, group.children do
 
-        local childTitle = buildText(childRelative, 12):atTopLeft():x(10):y(-30):outline():build()
+        if (not child.db and group.db) then
+            child.db = group.db[name]
+        end
+
+        local childTitleBuilder = buildText(widget, 12):outline()
+        if (childRelative == widget) then
+            childTitleBuilder:alignWith(widget.title):atTopLeft():againstBottomLeft():y(-5)
+        else
+            if (childRelative.type == "group") then
+                childTitleBuilder:alignWith(childRelative.title):atTopLeft():y(-5)
+            else
+                childTitleBuilder:alignWith(childRelative):atTopLeft():againstBottomLeft():y(-5)
+            end
+        end
+        
+        local childTitle = childTitleBuilder:build()
         childTitle:SetText(name)
 
-        child.title = childTitle
+        child.name = name
 
         local childWidget
         if (child.type == "group") then
@@ -71,7 +106,11 @@ local function createGroup(name, group, parent, relative)
         elseif (child.type == "number") then
             childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
         elseif (child.type == "dropdown") then
-            childWidget = buildDropdown(childRelative):items(child.values):size(childRelative:GetWidth(), 20):build()
+            childWidget = buildDropdown(childRelative)
+                    :addItems(child.values)
+                    :size(childRelative:GetWidth(), 20)
+                    :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
+                    :build()
         elseif (child.type == "toggle") then
             childWidget =  buildToggle(childRelative):texts("ON", "OFF"):onClick(function(self)
                 child:set(group.db, self.checked)
@@ -80,13 +119,23 @@ local function createGroup(name, group, parent, relative)
             childWidget = buildColor(childRelative):size(16, 16):build()
         end
         
-        childWidget:SetValue(child:get(group.db[name]))
+        if (child.type ~= "group") then
+            childWidget:SetValue(child:get(group.db[name]))
+        else
+            childTitle:SetText("")
+        end
+        
+        childWidget.title = childTitle
+        childWidget.type = child.type
+
         widget:addChild(childWidget)
 
         if (child.enabled) then
-            child:SetActive(child:enabled(widget, child, group.db))
+            if (child.type ~= "group") then
+                childWidget:SetActive(child:enabled(widget, child, group.db))
+            end
         else
-            child:SetActive(true)
+            childWidget:SetActive(true)
         end
 
         childRelative = childWidget
@@ -110,7 +159,7 @@ local function changeStateForWidgets()
 end
 
 local function createScrollFrame(parent)
-    local scrollContent = CreateFrame("ScrollFrame", nil, parent)
+    local scrollContent = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
     scrollContent:SetAllPoints()
     scrollContent:SetSize(497, 465)
 
@@ -158,6 +207,7 @@ function A:ConstructPreferences(db)
 							children = {
 								["Position"] = {
 									type = "group",
+                                    order = 1,
 									children = {
 										["Point"] = {
 											type = "dropdown",
@@ -193,6 +243,7 @@ function A:ConstructPreferences(db)
 								},
 								["Size"] = {
 									type = "group",
+                                    order = 2,
 									children = {
 										["Match width"] = {
 											type = "toggle",
@@ -244,6 +295,7 @@ function A:ConstructPreferences(db)
 								},
                                 ["Color By"] = {
                                     type = "dropdown",
+                                    order = 3,
                                     values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
@@ -255,6 +307,7 @@ function A:ConstructPreferences(db)
                                         return db["Color By"] == "Custom"
                                     end,
                                     type = "color",
+                                    order = 4,
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
                                         db["Custom Color"] = value
@@ -262,6 +315,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Background Multiplier"] = {
                                     type = "number",
+                                    order = 5,
                                     min = -1,
                                     max = 1,
                                     get = function(self, db) return db end,
@@ -271,6 +325,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Orientation"] = {
                                     type = "dropdown",
+                                    order = 6,
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
@@ -279,6 +334,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Reversed"] = {
                                     type = "toggle",
+                                    order = 7,
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
                                         db["Reversed"] = value
@@ -286,6 +342,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Texture"] = {
                                     type = "dropdown",
+                                    order = 8,
                                     values = media:List("statusbar"),
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
@@ -301,6 +358,7 @@ function A:ConstructPreferences(db)
                                         get = function(self, db) return db end
                                     },
                                     type = "group",
+                                    order = 9,
                                     children = {
                                         ["Custom Color"] = {
                                             enabled = function(self, parent, item, db)
@@ -585,13 +643,13 @@ function A:ConstructPreferences(db)
             builder = buildButton(buttons[count - 1]):below(buttons[count -1]):y(-3)
         end
 
-        local color = { 123/255, 132/255, 132/255, .25 }
+        local color = bdColor
         if (count % 2 == 0) then
-            color = { 0, 0, 0, 0 }
+            color = transparent
         end
 
         local button = builder
-        :backdrop(A.enum.backdrops.editbox, color, { 0, 0, 0, 0 })
+        :backdrop(A.enum.backdrops.editbox, color, transparent)
         :size(247, 25)
         :onClick(function(self)
             -- Create first dropdown with children
@@ -613,17 +671,20 @@ function A:ConstructPreferences(db)
                 frame.secondDropdown:Hide()
                 
                 local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(dropdown):x(3)
-                :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+                :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
                 :onClick(function(self)
                     -- Nothing
                 end)
                 :onItemClick(function(button, dropdown)
-                    createToggle(button.name, button.item, dropdown)
+                    --createToggle(button.name, button.item, dropdown)
 
                     detailFrame.scrollContent:Hide()
                     detailFrame.scrollContent = createScrollFrame(detailFrame)
 
                     local relative = detailFrame.scrollContent
+
+                    print(button.name, button.item, button.item.db)
+
                     local widget = createGroup(button.name, button.item, relative, relative)
                 end)
 
@@ -643,7 +704,7 @@ function A:ConstructPreferences(db)
                     dropdown2:Hide()
                 end
             end)
-            :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+            :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
 
             for k,v in next, child.children do
                 v.name = k
@@ -657,19 +718,14 @@ function A:ConstructPreferences(db)
             frame.firstDropdown = dropdown1
 
             local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(dropdown1):x(3)
-            :backdrop(A.enum.backdrops.editbox, { 123/255, 132/255, 132/255, .25 }, { 0, 0, 0, 0 })
+            :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
 
             local firstChild = A.Tools.Table:first(child.children)
             if (firstChild and firstChild.children) then
-                local childCount = 0
                 for k,v in next, firstChild.children do
                     v.name = k
                     v.db = firstChild.db[k]
-                    if (childCount == 0) then
-                        createToggle(k, v, dropdown2)
-                    end
                     ddbuilder2:addItem(v)
-                    childCount = childCount + 1
                 end
             end
             

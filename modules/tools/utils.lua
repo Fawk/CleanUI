@@ -574,6 +574,14 @@ local function EditBoxBuilder(parent)
 		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
 	end
 
+	o.textbox.SetValue = function(self, value)
+		self:SetText(value)
+	end
+
+	o.textbox.GetValue = function(self)
+		return self:GetText()
+	end
+
 	function o:onTextChanged(func)
 		self.textbox:SetScript("OnTextChanged", func)
 		return self
@@ -594,6 +602,14 @@ local function EditBoxBuilder(parent)
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
+
+		self.textbox:SetAutoFocus(false)
+		self.textbox:ClearFocus()
+
+		self.textbox:SetScript("OnEscapePressed", function(self)
+			self:ClearFocus()
+		end)
+
 		return self.textbox
 	end
 
@@ -630,6 +646,14 @@ local function NumberBuilder(parent)
 		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
 	end
 
+	o.textbox.SetValue = function(self, value)
+		self:SetNumber(value)
+	end
+
+	o.textbox.GetValue = function(self)
+		return self:GetNumber()
+	end
+
 	function o:onTextChanged(func)
 		self.textbox:SetScript("OnTextChanged", func)
 		return self
@@ -642,6 +666,17 @@ local function NumberBuilder(parent)
 
 	function o:onValueChanged(func)
 		self.valueChanged = func
+		return self
+	end
+
+	function o:min(minValue)
+		self.minValue = minValue
+		return self
+	end
+
+	function o:max(maxValue)
+		self.maxValue = maxValue
+		return self
 	end
 
 	function o:backdrop(bd, bdColor, borderColor)
@@ -658,12 +693,25 @@ local function NumberBuilder(parent)
 
 		self.textbox.increaseButton:SetScript("OnClick", function(self, b, d)
 			local number = self:GetNumber()
-			o:valueChanged(self, number)
+			if (number < o.maxValue) then
+				self:SetNumber(number + 1)
+				o:valueChanged(self, number + 1)
+			end
 		end)
 
 		self.textbox.decreaseButton:SetScript("OnClick", function(self, b, d)
 			local number = self:GetNumber()
-			o:valueChanged(self, number)
+			if (number > o.minValue) then
+				self:SetNumber(number - 1)
+				o:valueChanged(self, number - 1)
+			end
+		end)
+
+		self.textbox:SetAutoFocus(false)
+		self.textbox:ClearFocus()
+
+		self.textbox:SetScript("OnEscapePressed", function(self)
+			self:ClearFocus()
 		end)
 
 		return self.textbox
@@ -694,6 +742,27 @@ local function DropdownBuilder(parent)
 
 	o.dropdown.IsActive = function(self)
 		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+	end
+
+	o.dropdown.SetValue = function(self, value)
+		for i = 1, self.items:count() do
+			local item = self.items:get(i)
+			if (item.name == value) then
+				self.selected = i
+				self.selectedButton.text:SetText(item.name)
+			end
+		end
+	end
+
+	o.dropdown.GetValue = function(self)
+		return self.items:get(self.selected).name
+	end
+
+	function o:addItems(items)
+		for _,item in next, items do
+			self.items:add(item)
+		end
+		return self
 	end
 
 	function o:addItem(item)
@@ -811,7 +880,7 @@ local function DropdownBuilder(parent)
 	return o
 end
 
-function A:ColorBuilder(parent)
+local function ColorBuilder(parent)
 	local o = {
 		parent = parent,
 	}
@@ -831,16 +900,14 @@ function A:ColorBuilder(parent)
 		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
 	end
 
-    o.color.GetValue = function(self) return self.r, self.g, self.b, self.a end
-    o.color.SetValue = function(self, r, g, b, a) 
-        self.r = r 
-        self.g = g
-        self.b = b
-        self.a = a
+    o.color.GetValue = function(self) return { self.r, self.g, self.b, self.a } end
+    o.color.SetValue = function(self, color) 
+        self.r = color[1] or 1
+        self.g = color[2] or 1
+        self.b = color[3] or 1
+        self.a = color[4] or 1
         self:SetBackdropColor(self.r, self.g, self.b, self.a)
     end
-
-    color:SetColor(optionValue.r, optionValue.g, optionValue.b, optionValue.a)
 
 	o.color:SetScript("OnClick", function(self, button, down)
 		if button == "LeftButton" and not down then
@@ -853,7 +920,7 @@ function A:ColorBuilder(parent)
 	        ColorPickerFrame.func = function()
 	            local r, g, b = ColorPickerFrame:GetColorRGB()
 	            local a = 1 - OpacitySliderFrame:GetValue()
-	            color:SetColor(r, g, b, a)
+	            color:SetValue({r, g, b, a })
 	        end
 
 	        ColorPickerFrame.hasOpacity = true
@@ -868,7 +935,7 @@ function A:ColorBuilder(parent)
 	        ColorPickerFrame.cancelFunc = function()
 	            local r, g, b = ColorPickerFrame:GetColorRGB()
 	            local a = 1 - OpacitySliderFrame:GetValue()
-	            color:SetColor(r, g, b, a)
+	            color:SetValue({r, g, b, a })
 	        end
 
 	        local r, g, b, a = self.r, self.g, self.b, self.a
@@ -889,10 +956,10 @@ function A:ColorBuilder(parent)
 		self.color:SetSize(self.w, self.h)
 		self.color:SetBackdropBorderColor(0.67, 0.67, 0.67, 1)
 
-		local title = A:TextBuilder(self.color, 10):rightOf(self.color)
-
 		return self.color
 	end
+
+	return o
 end
 
 local function ToggleBuilder(parent)
@@ -999,11 +1066,9 @@ local function GroupBuilder(parent)
 
 	o.group.SetActive = function(self, boolean)
 		self.active = boolean
-		self:SetEnabled(self.active)
-		for i = 1, self.children:count() do
-			local child = self.children:get(i)
+		self.children:foreach(function(child)
 			child:SetActive(self.active)
-		end
+		end)
 	end
 
 	o.group.IsActive = function(self)
@@ -1023,17 +1088,19 @@ local function GroupBuilder(parent)
 		self.group:SetSize(self.group.parent:GetWidth(), 20)
 		
 		self.group.addChild = function(self, child)
-			local relative = self.children:getRelative(self.group)
+
 			if type(child) ~= "table" then
-				self.children:add({ name = child, relative = relative })
+				self.children:add({ name = child, relative = child.title })
 			else
-				child.relative = relative
+				child.relative = child.title
 				self.children:add(child)
 			end
 
+			child:SetPoint("TOPLEFT", child.title, "BOTTOMLEFT", 0, -5)
+
 			self:SetSize(self:GetWidth(), self:GetHeight() + child:GetHeight())
 		end
-		
+
 		return self.group
 	end
 
@@ -1359,3 +1426,4 @@ A.DropdownBuilder = DropdownBuilder
 A.ToggleBuilder = ToggleBuilder
 A.GroupBuilder = GroupBuilder
 A.NumberBuilder = NumberBuilder
+A.ColorBuilder = ColorBuilder
