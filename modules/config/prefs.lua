@@ -25,8 +25,12 @@ local function createDropdownTable(...)
     return table
 end
 
-local function getChildrenInOrder(children)
-    
+local function getNameAndChildWithOrder(children, order)
+    for name, child in next, children do
+        if (child.order and child.order == order) then
+            return name, child
+        end
+    end
 end
 
 local function createToggle(key, item, parent)
@@ -76,69 +80,72 @@ local function createGroup(name, group, parent, relative)
     widget.name = name
 
     local childRelative = widget
-    for name, child in next, group.children do
+    for i = 1, 100 do 
+        local name, child = getNameAndChildWithOrder(group.children, i)
+        if (name and child) then
 
-        if (not child.db and group.db) then
-            child.db = group.db[name]
-        end
+            if (not child.db and group.db) then
+                child.db = group.db[name]
+            end
 
-        local childTitleBuilder = buildText(widget, 12):outline()
-        if (childRelative == widget) then
-            childTitleBuilder:alignWith(widget.title):atTopLeft():againstBottomLeft():y(-5)
-        else
-            if (childRelative.type == "group") then
-                childTitleBuilder:alignWith(childRelative.title):atTopLeft():y(-5)
+            local childTitleBuilder = buildText(widget, 12):outline()
+            if (childRelative == widget) then
+                childTitleBuilder:alignWith(widget.title):atTopLeft():againstBottomLeft():y(-5)
             else
-                childTitleBuilder:alignWith(childRelative):atTopLeft():againstBottomLeft():y(-5)
+                if (childRelative.type == "group") then
+                    childTitleBuilder:alignWith(childRelative.title):atTopLeft():y(-5)
+                else
+                    childTitleBuilder:alignWith(childRelative):atTopLeft():againstBottomLeft():y(-5)
+                end
             end
-        end
-        
-        local childTitle = childTitleBuilder:build()
-        childTitle:SetText(name)
+            
+            local childTitle = childTitleBuilder:build()
+            childTitle:SetText(name)
 
-        child.name = name
+            child.name = name
 
-        local childWidget
-        if (child.type == "group") then
-            childWidget = createGroup(name, child, widget, childRelative)
-        elseif (child.type == "text") then
-            childWidget = buildEditBox(childRelative):size(childRelative:GetWidth(), 20):build()
-        elseif (child.type == "number") then
-            childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
-        elseif (child.type == "dropdown") then
-            childWidget = buildDropdown(childRelative)
-                    :addItems(child.values)
-                    :size(childRelative:GetWidth(), 20)
-                    :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
-                    :build()
-        elseif (child.type == "toggle") then
-            childWidget =  buildToggle(childRelative):texts("ON", "OFF"):onClick(function(self)
-                child:set(group.db, self.checked)
-            end):build()
-        elseif (child.type == "color") then
-            childWidget = buildColor(childRelative):size(16, 16):build()
-        end
-        
-        if (child.type ~= "group") then
-            childWidget:SetValue(child:get(group.db[name]))
-        else
-            childTitle:SetText("")
-        end
-        
-        childWidget.title = childTitle
-        childWidget.type = child.type
-
-        widget:addChild(childWidget)
-
-        if (child.enabled) then
+            local childWidget
+            if (child.type == "group") then
+                childWidget = createGroup(name, child, widget, childRelative)
+            elseif (child.type == "text") then
+                childWidget = buildEditBox(childRelative):size(childRelative:GetWidth(), 20):build()
+            elseif (child.type == "number") then
+                childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
+            elseif (child.type == "dropdown") then
+                childWidget = buildDropdown(childRelative)
+                        :addItems(child.values)
+                        :size(childRelative:GetWidth(), 20)
+                        :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
+                        :build()
+            elseif (child.type == "toggle") then
+                childWidget =  buildToggle(childRelative):texts("ON", "OFF"):onClick(function(self)
+                    child:set(group.db, self.checked)
+                end):build()
+            elseif (child.type == "color") then
+                childWidget = buildColor(childRelative):size(16, 16):build()
+            end
+            
             if (child.type ~= "group") then
-                childWidget:SetActive(child:enabled(widget, child, group.db))
+                childWidget:SetValue(child:get(group.db[name]))
+            else
+                childTitle:SetText("")
             end
-        else
-            childWidget:SetActive(true)
-        end
+            
+            childWidget.title = childTitle
+            childWidget.type = child.type
 
-        childRelative = childWidget
+            widget:addChild(childWidget)
+
+            if (child.enabled) then
+                if (child.type ~= "group") then
+                    childWidget:SetActive(child:enabled(widget, child, group.db))
+                end
+            else
+                childWidget:SetActive(true)
+            end
+
+            childRelative = childWidget
+        end
     end
 
     return widget
