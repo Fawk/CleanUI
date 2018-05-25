@@ -770,6 +770,11 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:fontSize(fontSize)
+		self.fs = fontSize
+		return self
+	end
+
 	function o:onItemClick(func)
 		self.itemClick = function(self, item, button)
 			self.dropdown.selected = button.index
@@ -834,7 +839,7 @@ local function DropdownBuilder(parent)
 				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
 			end)
 			:build()
-		selectedButton.text = A.TextBuilder(selectedButton, 14):atLeft():x(6):outline():build()
+		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
 
 		self.items:foreach(function(item)
 
@@ -861,7 +866,7 @@ local function DropdownBuilder(parent)
 				button.name = item
 			end
 
-			button.text = A.TextBuilder(button, 14):atLeft():x(6):outline():build()
+			button.text = A.TextBuilder(button, o.fs or 14):atLeft():x(6):outline():build()
 			button.text:SetText(button.name)
 
 			button:Hide()
@@ -1085,7 +1090,7 @@ local function GroupBuilder(parent)
 	function o:build()
 		setPoints(self, self.group)
 
-		self.group:SetSize(self.group.parent:GetWidth(), 20)
+		self.group:SetSize(self.w or self.group.parent:GetWidth(), 50)
 		
 		self.group.addChild = function(self, child)
 
@@ -1098,7 +1103,7 @@ local function GroupBuilder(parent)
 
 			child:SetPoint("TOPLEFT", child.title, "BOTTOMLEFT", 0, -5)
 
-			self:SetSize(self:GetWidth(), self:GetHeight() + child:GetHeight())
+			self:SetHeight(self:GetHeight() + child:GetHeight() + 25)
 		end
 
 		return self.group
