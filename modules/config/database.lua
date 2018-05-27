@@ -81,7 +81,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
     				},
     				["Buffs"] = {
     					["Enabled"] = true,
@@ -411,7 +421,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
     				},
     				["Buffs"] = {
                         ["Enabled"] = false,
@@ -672,7 +692,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Buffs"] = {
                         ["Enabled"] = false,
@@ -836,7 +866,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Size"] = {
                         ["Width"] = 63,
@@ -970,7 +1010,16 @@ local defaults =  {
                         ["Orientation"] = "VERTICAL",
                         ["Reversed"] = false,
                         ["Texture"] = "Default2",
-
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -992,7 +1041,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Size"] = {
                         ["Width"] = 63,
@@ -1084,7 +1143,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Health Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -1106,7 +1175,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Buffs"] = {
                         ["Enabled"] = false,
@@ -1372,7 +1451,17 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2"
+                        ["Texture"] = "Default2",
+                        ["Missing Power Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        }
                     },
                     ["Orientation"] = "VERTICAL",
                     ["Tags"] = {

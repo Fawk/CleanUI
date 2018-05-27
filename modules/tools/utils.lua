@@ -511,7 +511,12 @@ local function ButtonBuilder(parent)
 	o.button.active = true
 
 	o.button.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = boolean
+		if (o.activeCond) then
+			active = o:activeCond()
+		end
+
+		self.active = active
 		self:SetEnabled(self.active)
 	end
 	o.button.IsActive = function(self)
@@ -542,6 +547,7 @@ local function ButtonBuilder(parent)
 				func(self, motion)
 			end
 		end)
+		return self
 	end
 
 	function o:backdrop(bd, bdColor, borderColor)
@@ -566,7 +572,8 @@ local function EditBoxBuilder(parent)
 	o.textbox.active = true
 
 	o.textbox.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = (boolean and o.activeCond and o.activeCond()) or false
+		self.active = active
 		self:SetEnabled(self.active)
 	end
 
@@ -592,13 +599,6 @@ local function EditBoxBuilder(parent)
 		return self
 	end
 
-	function o:backdrop(bd, bdColor, borderColor)
-		self.textbox:SetBackdrop(bd)
-		self.textbox:SetBackdropColor(unpack(bdColor))
-		self.textbox:SetBackdropColor(unpack(borderColor))
-		return self
-	end
-
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
@@ -609,6 +609,10 @@ local function EditBoxBuilder(parent)
 		self.textbox:SetScript("OnEscapePressed", function(self)
 			self:ClearFocus()
 		end)
+
+		self.textbox:SetBackdrop(A.enum.backdrops.editboxborder)
+		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
+		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
 
 		return self.textbox
 	end
@@ -638,7 +642,8 @@ local function NumberBuilder(parent)
 	o.textbox.decreaseButton = decrease
 
 	o.textbox.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = (boolean and o.activeCond()) or false
+		self.active = active
 		self:SetEnabled(self.active)
 	end
 
@@ -679,13 +684,6 @@ local function NumberBuilder(parent)
 		return self
 	end
 
-	function o:backdrop(bd, bdColor, borderColor)
-		self.textbox:SetBackdrop(bd)
-		self.textbox:SetBackdropColor(unpack(bdColor))
-		self.textbox:SetBackdropColor(unpack(borderColor))
-		return self
-	end
-
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
@@ -714,6 +712,11 @@ local function NumberBuilder(parent)
 			self:ClearFocus()
 		end)
 
+		self.textbox:SetBackdrop(A.enum.backdrops.editboxborder)
+		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
+		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
+		self.textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
 		return self.textbox
 	end
 
@@ -736,8 +739,13 @@ local function DropdownBuilder(parent)
 	o.dropdown.open = false
 
 	o.dropdown.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = (boolean and o:activeCond()) or false
+
+		self.active = active
 		self:SetEnabled(self.active)
+
+		self.selectedButton.active = active
+		self.selectedButton:SetActive(self.selectedButton.active)
 	end
 
 	o.dropdown.IsActive = function(self)
@@ -776,16 +784,26 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:onItemClick(func)
-		self.itemClick = function(self, item, button)
-			self.dropdown.selected = button.index
-			self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
-			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
-			func(button, self.dropdown)
-		end
+		self.itemFunc = func
 		return self
 	end
 
 	function o:onClick(func)
+		self.func = func
+		return self
+	end
+
+	function o:backdrop(bd, bdColor, borderColor)
+		self.dropdown.bd = bd
+		self.dropdown.bdColor = bdColor
+		self.dropdown.borderColor = borderColor
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.dropdown)
+		self.dropdown:SetSize(self.w, self.h)
+
 		self.dropdown:SetScript("OnClick", function(self, b, down)
 			if b == "LeftButton" and not down then
 				if (self.active) then
@@ -799,36 +817,19 @@ local function DropdownBuilder(parent)
 					end)
 					self.open = not self.open
 
-					func(self)
+					if (o.func) then
+						o:func(self)
+					end
 				end
 			end
 		end)
-		return self
-	end
 
-	function o:backdrop(bd, bdColor, borderColor)
-		self.dropdown.bd = bd
-		self.dropdown.bdColor = bdColor
-		self.dropdown.borderColor = borderColor
-		return self
-	end
-
-	function o:button(position, normal, pushed, disabled)
-		local b = self.dropdown.button or CreateFrame("Button", nil, self.dropdown)
-		local lp, p, x, y
-		if type(position) == "table" then
-			lp = position["Local Point"]
-			p = position["Point"]
-			x = position["Offset X"]
-			y = position["Offset Y"]
+		self.itemClick = function(item, button)
+			self.dropdown.selected = button.index
+			self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
+			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
+			o:itemFunc(button, self.dropdown)
 		end
-		b:SetPoint(T.reversedPoints[lp or position], self.dropdown, p or position, x or 0, y or 0)
-		self.dropdown.button = b
-	end
-
-	function o:build()
-		setPoints(self, self.dropdown)
-		self.dropdown:SetSize(self.w, self.h)
 
 		self.dropdown.selected = 1
 		local selectedButton = A.ButtonBuilder(self.dropdown)
@@ -850,14 +851,23 @@ local function DropdownBuilder(parent)
 			:onClick(function(self, b, down)
 				if b == "LeftButton" and not down then
 					if o.dropdown.active then
-						o:itemClick(item, self)
+						o:itemClick(self, o.dropdown)
 					end
+				end
+			end)
+			:onHover(function(self)
+				if (self.hover) then
+					local r, g, b, a = self:GetBackdropColor()
+					self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
+				else
+					self:SetBackdropColor(unpack(o.dropdown.bdColor))
 				end
 			end)
 
 			builder:below(relative)
 
 			local button = builder:build()
+			button:SetFrameLevel(8)
 			button.item = item
 
 			if (type(item) == "table") then
@@ -897,7 +907,8 @@ local function ColorBuilder(parent)
 	o.color.active = true
 
 	o.color.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = (boolean and o.activeCond and o.activeCond()) or false
+		self.active = active
 		self:SetEnabled(self.active)
 	end
 
@@ -959,8 +970,8 @@ local function ColorBuilder(parent)
 	function o:build()
 		setPoints(self, self.color)
 		self.color:SetSize(self.w, self.h)
+		self.color:SetBackdrop(A.enum.backdrops.editboxborder)
 		self.color:SetBackdropBorderColor(0.67, 0.67, 0.67, 1)
-
 		return self.color
 	end
 
@@ -980,7 +991,8 @@ local function ToggleBuilder(parent)
 	o.toggle.checked = false
 
 	o.toggle.SetActive = function(self, boolean)
-		self.active = boolean
+		local active = (boolean and o.activeCond and o.activeCond()) or false
+		self.active = active
 		self:SetEnabled(self.active)
 	end
 

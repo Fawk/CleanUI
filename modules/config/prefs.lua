@@ -22,7 +22,7 @@ end
 
 local media = LibStub("LibSharedMedia-3.0")
 
-local bdColor = { 123/255, 132/255, 132/255, .25 }
+local bdColor = { 123/255, 132/255, 132/255, 1 }
 local transparent = { 0, 0, 0, 0 }
 
 local function createDropdownTable(...)
@@ -59,6 +59,10 @@ local function createToggle(key, item, parent)
     end
 end
 
+local function getEnabledFuncOrTrue(widget, child, db)
+    return child.enabled and (function() return child:enabled(widget, child, db) end) or (function() return true end)
+end
+
 local function createGroup(name, group, parent, relative)
     local builder = buildGroup(parent):backdrop(A.enum.backdrops.editboxborder, transparent, bdColor)
     if (relative == parent) then
@@ -79,9 +83,11 @@ local function createGroup(name, group, parent, relative)
 
         group.enabledToggle = buildToggle(widget):alignWith(groupTitle):atLeft():againstRight():x(5):texts("ON", "OFF"):onClick(function(self)
             group.enabled:set(group.db, self.checked)
+            widget:SetActive(self.checked)
         end):build()
 
         group.enabledToggle:SetValue(group.enabled:get(group.db["Enabled"]))
+        widget:SetActive(group.enabled:get(group.db["Enabled"]))
     end
 
     widget.title = groupTitle
@@ -98,7 +104,7 @@ local function createGroup(name, group, parent, relative)
 
             local childTitleBuilder = buildText(widget, 12):outline()
             if (childRelative == widget) then
-                childTitleBuilder:alignWith(widget.title):atTopLeft():againstBottomLeft():y(-10)
+                childTitleBuilder:alignWith(widget.title):atTopLeft():againstBottomLeft():y(-20)
             else
                 childTitleBuilder:alignWith(childRelative):atTopLeft():againstBottomLeft():y(-10)
             end
@@ -112,22 +118,25 @@ local function createGroup(name, group, parent, relative)
             if (child.type == "group") then
                 childWidget = createGroup(name, child, widget, childRelative)
             elseif (child.type == "text") then
-                childWidget = buildEditBox(childRelative):size(childRelative:GetWidth(), 20):build()
+                childWidget = buildEditBox(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(child.width or 30, child.height or 20):build()
             elseif (child.type == "number") then
-                childWidget = buildNumber(childRelative):size(childRelative:GetWidth(), 20):min(child.min):max(child.max):build()
+                childWidget = buildNumber(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(child.width or 30, child.height or 20):min(child.min):max(child.max):build()
             elseif (child.type == "dropdown") then
                 childWidget = buildDropdown(childRelative)
+                        :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
                         :addItems(child.values)
                         :size(widget:GetWidth() / 3, 20)
                         :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
                         :fontSize(12)
                         :build()
             elseif (child.type == "toggle") then
-                childWidget =  buildToggle(childRelative):texts("ON", "OFF"):onClick(function(self)
-                    child:set(group.db, self.checked)
-                end):build()
+                childWidget =  buildToggle(childRelative):texts("ON", "OFF")
+                        :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
+                        :onClick(function(self)
+                            child:set(group.db, self.checked)
+                        end):build()
             elseif (child.type == "color") then
-                childWidget = buildColor(childRelative):size(16, 16):build()
+                childWidget = buildColor(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(16, 16):build()
             end
             
             if (child.type ~= "group") then
@@ -145,9 +154,15 @@ local function createGroup(name, group, parent, relative)
             if (child.enabled) then
                 if (child.type ~= "group") then
                     childWidget:SetActive(child:enabled(widget, child, group.db))
+                else
+                    childWidget:SetActive(child.enabled:get(child.db["Enabled"]))
                 end
             else
-                childWidget:SetActive(true)
+                if (group.enabled) then
+                    childWidget:SetActive(group.enabled:get(group.db["Enabled"]))
+                else
+                    childWidget:SetActive(true)
+                end
             end
 
             childRelative = childWidget
@@ -244,6 +259,7 @@ function A:ConstructPreferences(db)
                                     order = 3,
                                     min = -1,
                                     max = 1,
+                                    width = 30,
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
                                         db["Background Multiplier"] = value
@@ -345,6 +361,7 @@ function A:ConstructPreferences(db)
                                             type = "number",
                                             order = 3,
                                             min = 1,
+                                            width = 60,
                                             max = GetScreenWidth(),
                                             set = function(self, db, value)
                                                 db["Width"] = value
@@ -360,6 +377,7 @@ function A:ConstructPreferences(db)
                                             type = "number",
                                             min = 1,
                                             order = 4,
+                                            width = 60,
                                             max = GetScreenHeight(),
                                             set = function(self, db, value)
                                                 db["Height"] = value
@@ -523,6 +541,7 @@ function A:ConstructPreferences(db)
                                     type = "number",
                                     min = -1,
                                     max = 1,
+                                    width = 30,
                                     get = function(self, db) return db end,
                                     set = function(self, db, value)
                                         db["Background Multiplier"] = value
@@ -643,13 +662,13 @@ function A:ConstructPreferences(db)
     frame:SetSize(753, 500)
     frame:SetPoint("CENTER")
     frame:SetBackdrop(A.enum.backdrops.editbox)
-    frame:SetBackdropColor(0, 0, 0, 0.75)
+    frame:SetBackdropColor(.1, .1, .1, 1)
 
     local detailFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     detailFrame:SetSize(475, 465)
     detailFrame:SetPoint("BOTTOMRIGHT", -25, 3)
     detailFrame:SetBackdrop(A.enum.backdrops.editbox)
-    detailFrame:SetBackdropColor(28/255, 28/255, 28/255, 0.5)
+    detailFrame:SetBackdropColor(28/255, 28/255, 28/255, 1)
 
     detailFrame.scrollContent = createScrollFrame(detailFrame)
 
@@ -690,6 +709,10 @@ function A:ConstructPreferences(db)
             end)
             :onItemClick(function(button, dropdown)
                 -- Construct new second dropdown
+                for k,v in next, self do print(k,v) end
+                for k,v in next, button do print(k,v) end
+                for k,v in next, dropdown do print(k,v) end
+
                 print("Constructing new dropdown for: ", button.name, button.item)
                 frame.secondDropdown:Hide()
                 
