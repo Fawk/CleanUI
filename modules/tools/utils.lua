@@ -828,7 +828,7 @@ local function DropdownBuilder(parent)
 			self.dropdown.selected = button.index
 			self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
-			o:itemFunc(button, self.dropdown)
+			if (o.itemFunc) then o:itemFunc(button) end
 		end
 
 		self.dropdown.selected = 1
@@ -840,6 +840,7 @@ local function DropdownBuilder(parent)
 				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
 			end)
 			:build()
+		selectedButton:SetFrameLevel(7)
 		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
 
 		self.items:foreach(function(item)
@@ -867,7 +868,7 @@ local function DropdownBuilder(parent)
 			builder:below(relative)
 
 			local button = builder:build()
-			button:SetFrameLevel(8)
+			button:SetFrameLevel(10)
 			button.item = item
 
 			if (type(item) == "table") then
@@ -1043,7 +1044,7 @@ local function ToggleBuilder(parent)
 
 		self.toggle:SetSize(40, 15)
 		self.toggle:SetScript("OnClick", self.click)
-		self.toggle:SetFrameLevel(5)
+		self.toggle:SetFrameLevel(8)
 
 		self.toggle.block = A.ButtonBuilder(self.toggle):atRight():size(15, 15)
 		   :backdrop(A.enum.backdrops.editbox, { .5, .5, .5, 0.8 }, { 0, 0, 0 })
@@ -1054,7 +1055,7 @@ local function ToggleBuilder(parent)
 
 		self.toggle.path = A.ButtonBuilder(self.toggle):alignAll()
 		   :backdrop(A.enum.backdrops.editbox, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0 }):build()
-		self.toggle.path:SetFrameLevel(4)
+		self.toggle.path:SetFrameLevel(8)
 
 		self.toggle.onText = self.onText
 		self.toggle.offText = self.offText

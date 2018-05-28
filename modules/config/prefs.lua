@@ -22,7 +22,7 @@ end
 
 local media = LibStub("LibSharedMedia-3.0")
 
-local bdColor = { 123/255, 132/255, 132/255, 1 }
+local bdColor = { 55/255, 55/255, 55/255, 1 }
 local transparent = { 0, 0, 0, 0 }
 
 local function createDropdownTable(...)
@@ -63,6 +63,25 @@ local function getEnabledFuncOrTrue(widget, child, db)
     return child.enabled and (function() return child:enabled(widget, child, db) end) or (function() return true end)
 end
 
+local widgets = A:OrderedTable()
+local function changeStateForWidgets()
+    widgets:foreach(function(widget)
+        if (widget.enabled) then
+            local enabled = widget.enabled
+            if (type(enabled) == "table") then
+                widget:SetActive(widget.enabled:get(widget.db["Enabled"]))
+            else
+                local gp = widget.groupParent
+                if (gp) then
+                    if (not gp.enabledToggle or (gp.enabledToggle and gp.enabledToggle:GetValue())) then
+                        widget:SetActive(widget:enabled(widget:GetParent(), widget.item, gp.db))
+                    end
+                end
+            end
+        end
+    end)
+end
+
 local function createGroup(name, group, parent, relative)
     local builder = buildGroup(parent):backdrop(A.enum.backdrops.editboxborder, transparent, bdColor)
     if (relative == parent) then
@@ -92,7 +111,11 @@ local function createGroup(name, group, parent, relative)
 
     widget.title = groupTitle
     widget.type = group.type
+    widget.enabled = group.enabled
+    widget.db = group.db
     widget.name = name
+
+    widgets:add(widget)
 
     local childRelative = widget
     for i = 1, tcount(group.children) do
@@ -128,6 +151,10 @@ local function createGroup(name, group, parent, relative)
                         :size(widget:GetWidth() / 3, 20)
                         :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
                         :fontSize(12)
+                        :onItemClick(function(button)
+                            -- Need to check the active state for all widgets as they might be affected by this
+                            changeStateForWidgets()
+                        end)
                         :build()
             elseif (child.type == "toggle") then
                 childWidget =  buildToggle(childRelative):texts("ON", "OFF")
@@ -148,7 +175,11 @@ local function createGroup(name, group, parent, relative)
             childWidget.title = childTitle
             childWidget.type = child.type
             childWidget.groupParent = widget
+            childWidget.enabled = child.enabled
+            childWidget.name = name
+            childWidget.db = child.db
 
+            widgets:add(childWidget)
             widget:addChild(childWidget)
 
             if (child.enabled) then
@@ -170,20 +201,6 @@ local function createGroup(name, group, parent, relative)
     end
 
     return widget
-end
-
-local widgets = {}
-local function changeStateForWidgets()
-    for _,widget in next, widgets do
-        if (widget and widget.enabled) then
-            local enabled = widget.enabled
-            if (type(enabled) == "table") then
-
-            else
-
-            end
-        end
-    end
 end
 
 local function createScrollFrame(parent)
@@ -245,6 +262,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Custom Color"] = {
                                     enabled = function(self, parent, item, db)
+                                        print(db["Color By"])
                                         return db["Color By"] == "Custom"
                                     end,
                                     type = "color",
@@ -704,24 +722,15 @@ function A:ConstructPreferences(db)
             end
 
             local ddbuilder1 = buildDropdown(frame):size(247, 25):rightOf(buttons[1]):x(3)
-            :onClick(function(self)
-                -- Nothing
-            end)
-            :onItemClick(function(button, dropdown)
+            :onItemClick(function(self, button)
                 -- Construct new second dropdown
-                for k,v in next, self do print(k,v) end
-                for k,v in next, button do print(k,v) end
-                for k,v in next, dropdown do print(k,v) end
 
                 print("Constructing new dropdown for: ", button.name, button.item)
                 frame.secondDropdown:Hide()
                 
-                local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(dropdown):x(3)
+                local ddbuilder2 = buildDropdown(frame):size(247, 25):rightOf(self.dropdown):x(3)
                 :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
-                :onClick(function(self)
-                    -- Nothing
-                end)
-                :onItemClick(function(button, dropdown)
+                :onItemClick(function(self, button)
                     --createToggle(button.name, button.item, dropdown)
 
                     detailFrame.scrollContent:Hide()
@@ -731,7 +740,7 @@ function A:ConstructPreferences(db)
                     local widget = createGroup(button.name, button.item, relative, relative)
                 end)
 
-                createToggle(button.name, button.item, dropdown)
+                createToggle(button.name, button.item, self.dropdown)
 
                 if (button.item.children) then
                     for k,v in next, button.item.children do
@@ -787,10 +796,10 @@ function A:ConstructPreferences(db)
         local text = buildText(button, 14):atLeft():x(6):outline():build()
         text:SetText(name)
 
+        widgets:add(button)
+
         --constructGroup(frame, frame, name, child)
         buttons[count] = button
         count = count + 1
     end
-
-    widgets = buttons
 end
