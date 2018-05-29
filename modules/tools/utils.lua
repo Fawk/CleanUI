@@ -174,23 +174,15 @@ function object:activeCondition(func)
 	self.activeCond = func
 	return self
 end
-
-object.__index = object
-
-local widget = setmetatable({}, object)
-function widget:desc(text)
-	self._desc = text
-	return self
-end
-function widget:name(text)
-	self._name = text
-	return self
-end
-function widget:onValueChanged(func)
+function object:onValueChanged(func)
 	self.onValueChangedFunc = func
 	return self
 end
 
+
+object.__index = object
+
+local widget = setmetatable({}, object)
 widget.__index = object
 
 local points = {
@@ -587,8 +579,8 @@ local function EditBoxBuilder(parent)
 
 	o.textbox.SetValue = function(self, value)
 		self:SetText(value)
-		if o.onValueChanged then 
-			o:onValueChanged(self, self:GetText())
+		if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, self:GetText())
 		end
 	end
 
@@ -660,8 +652,8 @@ local function NumberBuilder(parent)
 
 	o.textbox.SetValue = function(self, value)
 		self:SetNumber(value)
-		if o.onValueChanged then 
-			o:onValueChanged(self, self:GetNumber())
+		if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, self:GetNumber())
 		end
 	end
 
@@ -771,8 +763,8 @@ local function DropdownBuilder(parent)
 			end
 		end
 
-		if o.onValueChanged then 
-			o:onValueChanged(self, self.selectedButton.text:GetText())
+		if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, self.selectedButton.text:GetText())
 		end
 	end
 
@@ -940,8 +932,8 @@ local function ColorBuilder(parent)
         self.a = color[4] or 1
         self:SetBackdropColor(self.r, self.g, self.b, self.a)
 
-        if o.onValueChanged then 
-			o:onValueChanged(self, { self.r, self.g, self.b, self.a })
+        if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, { self.r, self.g, self.b, self.a })
 		end
     end
 
@@ -956,7 +948,7 @@ local function ColorBuilder(parent)
 	        ColorPickerFrame.func = function()
 	            local r, g, b = ColorPickerFrame:GetColorRGB()
 	            local a = 1 - OpacitySliderFrame:GetValue()
-	            color:SetValue({r, g, b, a })
+	            o.color:SetValue({r, g, b, a })
 	        end
 
 	        ColorPickerFrame.hasOpacity = true
@@ -971,7 +963,7 @@ local function ColorBuilder(parent)
 	        ColorPickerFrame.cancelFunc = function()
 	            local r, g, b = ColorPickerFrame:GetColorRGB()
 	            local a = 1 - OpacitySliderFrame:GetValue()
-	            color:SetValue({r, g, b, a })
+	            o.color:SetValue({r, g, b, a })
 	        end
 
 	        local r, g, b, a = self.r, self.g, self.b, self.a
@@ -980,7 +972,7 @@ local function ColorBuilder(parent)
 	        ColorPickerFrame:SetColorRGB(r, g, b)
 
 	        ColorPickerOkayButton:HookScript("OnClick", function() 
-	            A.dbProvider:Save()
+	            --A.dbProvider:Save()
 	        end)
 
 	        ShowUIPanel(ColorPickerFrame)
@@ -1031,8 +1023,8 @@ local function ToggleBuilder(parent)
 			self.text:SetText(self.offText)
 		end
 
-		if o.onValueChanged then 
-			o:onValueChanged(self, self.checked)
+		if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, self.checked)
 		end
 	end
 

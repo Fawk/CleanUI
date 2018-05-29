@@ -165,11 +165,12 @@ local function createGroup(name, group, parent, relative)
             if (not childWidget) then
                 childWidget = childWidgetBuilder
                         :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
-                        :onValueChanged(function(widget, value)
+                        :onValueChanged(function(self, widget, value)
                             child:set(group.db, value)
                             --A.dbProvider:Save()
                             changeStateForWidgets()
-                end):build()
+                        end)
+                        :build()
             end
 
             if (child.type ~= "group") then
