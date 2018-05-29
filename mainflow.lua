@@ -3,7 +3,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon.modules, Addon.options = {}, {}, {}
+Addon.frames, Addon.modules, Addon.general, Addon.options = {}, {}, {}, {}
 Addon.debugging = true
 
 Addon.OrderedTable = Args.OrderedTable
@@ -128,7 +128,7 @@ end
 
 function Addon:OnInitialize()
 
-	self.db = self.dbProvider:New("CleanUI_DB", self.defaults)
+	self.db = self.dbProvider:New(AddonName.."_DB", self.defaults)
 
 	local uiscale = GetCVar("uiscale") or 0.71
 	local h, w = GetScreenHeight() or 1080, GetScreenWidth() or 1920
@@ -290,6 +290,22 @@ function Addon:Update()
 	for key, module in pairs(self.modules) do
 		if module.Trigger then module:Trigger() end
 	end
+end
+
+function Addon:UpdateDb()
+    -- General
+    for key, module in next, self.general do
+        if (module.Update) then
+            module:Update(UnitEvent.UPDATE_DB)
+        end
+    end
+
+    -- Units
+    for key, module in next, self.modules do
+        if (module.Update) then
+            module:Update(UnitEvent.UPDATE_DB)
+        end
+    end
 end
 
 local frame = CreateFrame("Frame")

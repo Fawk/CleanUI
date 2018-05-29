@@ -1,3 +1,4 @@
+local AddonName = ...
 local A, L = unpack(select(2, ...))
 local rawset = rawset
 local rawget = rawget
@@ -16,6 +17,8 @@ for k,v in pairs(Database) do
         Database.prepared[Database[k]] = {}
     end
 end
+
+local global = _G[AddonName + "_DB"]
 
 local defaults =  {
     ["Profiles"] = {
@@ -1841,15 +1844,15 @@ local defaults =  {
                     },
                 },
                 ["Key Bindings"] = {
-                    ["1"] = "CleanUI_ActionBar1Button1",
-                    ["2"] = "CleanUI_ActionBar1Button2",
-                    ["3"] = "CleanUI_ActionBar1Button3",
-                    ["4"] = "CleanUI_ActionBar1Button4",
-                    ["5"] = "CleanUI_ActionBar1Button5",
-                    ["6"] = "CleanUI_ActionBar1Button6",
-                    ["7"] = "CleanUI_ActionBar1Button7",
-                    ["8"] = "CleanUI_ActionBar1Button8",
-                    ["9"] = "CleanUI_ActionBar1Button9"
+                    ["1"] = AddonName.."_ActionBar1Button1",
+                    ["2"] = AddonName.."_ActionBar1Button2",
+                    ["3"] = AddonName.."_ActionBar1Button3",
+                    ["4"] = AddonName.."_ActionBar1Button4",
+                    ["5"] = AddonName.."_ActionBar1Button5",
+                    ["6"] = AddonName.."_ActionBar1Button6",
+                    ["7"] = AddonName.."_ActionBar1Button7",
+                    ["8"] = AddonName.."_ActionBar1Button8",
+                    ["9"] = AddonName.."_ActionBar1Button9"
                 }
     		}
 	    }
@@ -1966,15 +1969,15 @@ function Database:Save()
     
     --A:DebugTable(save["Profiles"][activeProfile]["Options"]["Minimap"])
 
-    CleanUI_DB = save
+    global = save
 end
 
 function Database:CreateDatabase()
-	if CleanUI_DB == nil then 
-		CleanUI_DB = {}
+	if global == nil then 
+		global = {}
         return deepCopy(defaults)
 	else
-        return merge(deepCopy(defaults), deepCopy(CleanUI_DB))
+        return merge(deepCopy(defaults), deepCopy(global))
     end
 end
 

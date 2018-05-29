@@ -19,6 +19,7 @@ function NewPlayer:Init()
     oUF:SetActiveStyle(frameName)
 
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
+    frame.db = db
     frame.orderedElements = A:OrderedTable()
     frame:SetScript("OnShow", function(self)
         self:Update(UnitEvent.UPDATE_DB, db)
@@ -47,7 +48,7 @@ function NewPlayer:Update(...)
         -- Update player specific things based on the event
         if (event == UnitEvent.UPDATE_DB) then
             
-            local db = arg2
+            local db = self.db or arg2
             local position, size = db["Position"], db["Size"]
 
             Units:Position(self, position)

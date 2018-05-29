@@ -99,6 +99,7 @@ function Raid:Init()
     )
 
     local raidContainer = Units:Get(frameName) or CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerStateTemplate")
+    raidContainer.db = db
 
     RegisterStateDriver(raidContainer, "visibility", "[@raid1,exists] show; hide")
 

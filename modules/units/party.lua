@@ -104,6 +104,7 @@ function Party:Init()
     )
 
     local partyContainer = Units:Get(frameName) or CreateFrame("Frame", A:GetName().."_"..frameName.."Container", A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
+    partyContainer.db = db
 
     RegisterStateDriver(partyContainer, "visibility", "[@party1,exists] show; hide")
 

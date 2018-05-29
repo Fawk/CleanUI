@@ -20,6 +20,7 @@ function Boss:Init()
 
     self.container = self.container or Units:Get(frameName) or CreateFrame("Frame", T:frameName("Boss Container"), A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
     self.container:SetSize(size["Width"], size["Height"])
+    self.container.db = db
 
     RegisterStateDriver(self.container, "visibility", "[@boss1,exists] show; hide")
     Units:Position(self.container, db["Position"])
