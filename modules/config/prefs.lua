@@ -137,35 +137,41 @@ local function createGroup(name, group, parent, relative)
 
             child.name = name
 
-            local childWidget
+            local childWidgetBuilder, childWidget
             if (child.type == "group") then
                 childWidget = createGroup(name, child, widget, childRelative)
             elseif (child.type == "text") then
-                childWidget = buildEditBox(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(child.width or 30, child.height or 20):build()
+                childWidgetBuilder = buildEditBox(childRelative)
+                        :size(child.width or 30, child.height or 20)
             elseif (child.type == "number") then
-                childWidget = buildNumber(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(child.width or 30, child.height or 20):min(child.min):max(child.max):build()
+                childWidgetBuilder = buildNumber(childRelative)
+                        :size(child.width or 30, child.height or 20)
+                        :min(child.min)
+                        :max(child.max)
             elseif (child.type == "dropdown") then
-                childWidget = buildDropdown(childRelative)
-                        :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
+                childWidgetBuilder = buildDropdown(childRelative)
                         :addItems(child.values)
                         :size(widget:GetWidth() / 3, 20)
                         :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
                         :fontSize(12)
-                        :onItemClick(function(button)
-                            -- Need to check the active state for all widgets as they might be affected by this
-                            changeStateForWidgets()
-                        end)
-                        :build()
             elseif (child.type == "toggle") then
-                childWidget =  buildToggle(childRelative):texts("ON", "OFF")
-                        :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
-                        :onClick(function(self)
-                            child:set(group.db, self.checked)
-                        end):build()
+                childWidgetBuilder =  buildToggle(childRelative)
+                        :texts("ON", "OFF")
             elseif (child.type == "color") then
-                childWidget = buildColor(childRelative):activeCondition(getEnabledFuncOrTrue(widget, child, group.db)):size(16, 16):build()
+                childWidgetBuilder = buildColor(childRelative)
+                        :size(16, 16)
             end
-            
+
+            if (not childWidget) then
+                childWidget = childWidgetBuilder
+                        :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
+                        :onValueChanged(function(widget, value)
+                            child:set(group.db, value)
+                            --A.dbProvider:Save()
+                            changeStateForWidgets()
+                end):build()
+            end
+
             if (child.type ~= "group") then
                 childWidget:SetValue(child:get(group.db[name]))
             else
@@ -262,7 +268,6 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Custom Color"] = {
                                     enabled = function(self, parent, item, db)
-                                        print(db["Color By"])
                                         return db["Color By"] == "Custom"
                                     end,
                                     type = "color",

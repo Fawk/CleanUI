@@ -186,6 +186,10 @@ function widget:name(text)
 	self._name = text
 	return self
 end
+function widget:onValueChanged(func)
+	self.onValueChangedFunc = func
+	return self
+end
 
 widget.__index = object
 
@@ -583,6 +587,9 @@ local function EditBoxBuilder(parent)
 
 	o.textbox.SetValue = function(self, value)
 		self:SetText(value)
+		if o.onValueChanged then 
+			o:onValueChanged(self, self:GetText())
+		end
 	end
 
 	o.textbox.GetValue = function(self)
@@ -653,6 +660,9 @@ local function NumberBuilder(parent)
 
 	o.textbox.SetValue = function(self, value)
 		self:SetNumber(value)
+		if o.onValueChanged then 
+			o:onValueChanged(self, self:GetNumber())
+		end
 	end
 
 	o.textbox.GetValue = function(self)
@@ -760,6 +770,10 @@ local function DropdownBuilder(parent)
 				self.selectedButton.text:SetText(item.name)
 			end
 		end
+
+		if o.onValueChanged then 
+			o:onValueChanged(self, self.selectedButton.text:GetText())
+		end
 	end
 
 	o.dropdown.GetValue = function(self)
@@ -825,8 +839,9 @@ local function DropdownBuilder(parent)
 		end)
 
 		self.itemClick = function(item, button)
-			self.dropdown.selected = button.index
-			self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
+			--self.dropdown.selected = button.index
+			--self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
+			self.dropdown:SetValue(button.name)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
 			if (o.itemFunc) then o:itemFunc(button) end
 		end
@@ -924,6 +939,10 @@ local function ColorBuilder(parent)
         self.b = color[3] or 1
         self.a = color[4] or 1
         self:SetBackdropColor(self.r, self.g, self.b, self.a)
+
+        if o.onValueChanged then 
+			o:onValueChanged(self, { self.r, self.g, self.b, self.a })
+		end
     end
 
 	o.color:SetScript("OnClick", function(self, button, down)
@@ -1010,6 +1029,10 @@ local function ToggleBuilder(parent)
 			self.block:SetPoint("LEFT", self, "LEFT", 0, 0)
 			self.text:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 			self.text:SetText(self.offText)
+		end
+
+		if o.onValueChanged then 
+			o:onValueChanged(self, self.checked)
 		end
 	end
 
