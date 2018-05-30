@@ -47,6 +47,12 @@ function Boss:Init()
         self:Update(frame, db)
     end
 
+    self.container.UpdateUnits = function(self)
+        for _,frame in next, self.frames do
+            Boss:Update(frame, db)
+        end
+    end
+
     A:CreateMover(self.container, db, "Boss Header")
 end
 

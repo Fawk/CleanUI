@@ -302,11 +302,19 @@ function Addon:UpdateDb()
 
     -- Units
     for key, module in next, self.modules do
-        if (module.Update) then
+	       if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())
-        	module:Update(unit, unit.db)
-            --module:Update(UnitEvent.UPDATE_DB)
-        end
+        	if (unit) then
+	        	if (unit.UpdateUnits) then
+	        		unit:UpdateUnits()
+	        	else
+	        		module:Update(unit, unit.db)
+	            	--module:Update(UnitEvent.UPDATE_DB)
+	        	end
+	        else
+	        	Addon:Debug("Could not find unit with key:", key)
+	        end
+	    end
     end
 end
 

@@ -169,7 +169,7 @@ local function createGroup(name, group, parent, relative)
                             child:set(group.db, value)
                             --A.dbProvider:Save()
                             changeStateForWidgets()
-                            --A:UpdateDb()
+                            A:UpdateDb()
                         end)
                         :build()
             end

@@ -81,6 +81,7 @@ function Player:Init()
     oUF:SetActiveStyle(frameName)
 
     local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
+    frame.db = db
     Units:Add(frame)
 
     A:CreateMover(frame, db)
