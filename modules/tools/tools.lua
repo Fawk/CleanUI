@@ -84,6 +84,10 @@ function string.replace(self, t, r)
    return self:gsub(format, r)
 end
 
+function string.fupper(self)
+    return self:sub(1, 1):upper()..self:sub(2)
+end
+
 function T:tcount(tbl)
 	local i = 0
 	for k,v in pairs(tbl) do i=i+1 end

@@ -198,7 +198,7 @@ function Raid:Trigger()
 end
  
 function Raid:Update(frame, db)
-    if not db["Enabled"] then return end
+    if not db or not db["Enabled"] then return end
 
     T:RunNowOrAfterCombat(function() 
         Units:SetupClickcast(frame, db["Clickcast"])

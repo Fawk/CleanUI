@@ -303,7 +303,9 @@ function Addon:UpdateDb()
     -- Units
     for key, module in next, self.modules do
         if (module.Update) then
-            module:Update(UnitEvent.UPDATE_DB)
+        	local unit = Addon.Units:Get(key:fupper())
+        	module:Update(unit, unit.db)
+            --module:Update(UnitEvent.UPDATE_DB)
         end
     end
 end

@@ -165,7 +165,9 @@ local function Power(frame, db)
 			end
 		end
 		
-		local min, max = UnitPower(frame.unit), UnitPowerMax(frame.unit)
+		print(frame.unit)
+		local powerType = UnitPowerType(frame.unit)
+		local min, max = UnitPower(frame.unit, powerType), UnitPowerMax(frame.unit, powerType)
 		power:PostUpdate(frame.unit, min, max)
 
 		return power

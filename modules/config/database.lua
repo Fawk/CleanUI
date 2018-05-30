@@ -18,7 +18,9 @@ for k,v in pairs(Database) do
     end
 end
 
-local global = _G[AddonName + "_DB"]
+local global = _G[AddonName.."_DB"]
+
+print(AddonName, global)
 
 local defaults =  {
     ["Profiles"] = {
