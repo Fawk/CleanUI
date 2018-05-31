@@ -155,6 +155,11 @@ function _HealthPrediction:Init(parent)
 			healPrediction.overHealAbsorb = overHealAbsorb
 	    end
 
+		my:SetFrameLevel(5)
+		all:SetFrameLevel(5)
+		absorb:SetFrameLevel(5)
+		healAbsorb:SetFrameLevel(5)
+
 		healPrediction.myBar = my
 		healPrediction.otherBar = all
 		healPrediction.absorbBar = absorb
@@ -266,7 +271,7 @@ function HealthPrediction(frame, db)
 		healAbsorb:SetStatusBarTexture(texture)
 		healAbsorb:SetStatusBarColor(unpack(A.colors.healPrediction.healAbsorb))
 		healAbsorb:Hide()
-		
+
 		if frame.Health then
 			my:SetParent(frame.Health)
 			all:SetParent(frame.Health)
@@ -274,6 +279,11 @@ function HealthPrediction(frame, db)
 			healAbsorb:SetParent(frame.Health)
 		end
 		
+		my:SetFrameLevel(5)
+		all:SetFrameLevel(5)
+		absorb:SetFrameLevel(5)
+		healAbsorb:SetFrameLevel(5)
+
 		healPrediction.myBar = my
 		healPrediction.otherBar = all
 		healPrediction.absorbBar = absorb

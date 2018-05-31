@@ -20,8 +20,6 @@ end
 
 local global = _G[AddonName.."_DB"]
 
-print(AddonName, global)
-
 local defaults =  {
     ["Profiles"] = {
 	    ["Default"] = {

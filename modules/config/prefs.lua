@@ -100,10 +100,18 @@ local function createGroup(name, group, parent, relative)
             group.enabledToggle:Hide()
         end
 
-        group.enabledToggle = buildToggle(widget):alignWith(groupTitle):atLeft():againstRight():x(5):texts("ON", "OFF"):onClick(function(self)
-            group.enabled:set(group.db, self.checked)
-            widget:SetActive(self.checked)
-        end):build()
+        group.enabledToggle = buildToggle(widget)
+                :alignWith(groupTitle)
+                :atLeft():againstRight()
+                :x(5)
+                :texts("ON", "OFF")
+                :onValueChanged(function(self, widget, value)
+                    group.enabled:set(group.db, value)
+                    changeStateForWidgets()
+                    A.dbProvider:Save()
+                    A:UpdateDb()
+                end)
+                :build()
 
         group.enabledToggle:SetValue(group.enabled:get(group.db["Enabled"]))
         widget:SetActive(group.enabled:get(group.db["Enabled"]))
@@ -167,7 +175,7 @@ local function createGroup(name, group, parent, relative)
                         :activeCondition(getEnabledFuncOrTrue(widget, child, group.db))
                         :onValueChanged(function(self, widget, value)
                             child:set(group.db, value)
-                            --A.dbProvider:Save()
+                            A.dbProvider:Save()
                             changeStateForWidgets()
                             A:UpdateDb()
                         end)
@@ -419,7 +427,9 @@ function A:ConstructPreferences(db)
                                         set = function(self, db, value)
                                             db["Enabled"] = value
                                         end,
-                                        get = function(self, db) return db end
+                                        get = function(self, db)
+                                            return db 
+                                        end
                                     },
                                     type = "group",
                                     order = 9,

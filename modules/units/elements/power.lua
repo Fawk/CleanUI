@@ -164,8 +164,7 @@ local function Power(frame, db)
 				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
 			end
 		end
-		for k,v in next, frame do print(k,v) end
-		print(unit, frame.unit)
+
 		local powerType = UnitPowerType(frame.unit)
 		local min, max = UnitPower(frame.unit, powerType), UnitPowerMax(frame.unit, powerType)
 		power:PostUpdate(frame.unit, min, max)

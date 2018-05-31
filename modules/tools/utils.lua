@@ -915,7 +915,7 @@ local function ColorBuilder(parent)
 	o.color.active = true
 
 	o.color.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o.activeCond()) or false
+		local active = (boolean and o.activeCond and o:activeCond()) or false
 		self.active = active
 		self:SetEnabled(self.active)
 	end
@@ -1003,7 +1003,7 @@ local function ToggleBuilder(parent)
 	o.toggle.checked = false
 
 	o.toggle.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o.activeCond()) or false
+		local active = (boolean and o.activeCond and o:activeCond()) or false
 		self.active = active
 		self:SetEnabled(self.active)
 	end
@@ -1037,14 +1037,7 @@ local function ToggleBuilder(parent)
 	end
 
 	function o:onClick(func)
-		self.click = function(self, button, down)
-			if button == "LeftButton" and not down then
-				if (self.active) then
-					self:SetValue(not self.checked)
-					func(self)
-				end
-		    end
-		end
+		self.click = func
 		return self
 	end
 
@@ -1058,12 +1051,21 @@ local function ToggleBuilder(parent)
 		setPoints(self, self.toggle)
 
 		self.toggle:SetSize(40, 15)
-		self.toggle:SetScript("OnClick", self.click)
+		self.toggle:SetScript("OnClick", function(self, button, down)
+			if button == "LeftButton" and not down then
+				if (self.active) then
+					self:SetValue(not self.checked)
+					if (o.click) then
+						o:click(self)
+					end
+				end
+		    end
+		end)
 		self.toggle:SetFrameLevel(8)
 
 		self.toggle.block = A.ButtonBuilder(self.toggle):atRight():size(15, 15)
 		   :backdrop(A.enum.backdrops.editbox, { .5, .5, .5, 0.8 }, { 0, 0, 0 })
-		   :onClick(function() 
+		   :onClick(function(self, b, d)
 		   		o.toggle:GetScript("OnClick")(o.toggle, "LeftButton", false)
 		   end)
 		   :build()
