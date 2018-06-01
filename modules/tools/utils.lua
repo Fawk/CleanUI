@@ -755,6 +755,8 @@ local function DropdownBuilder(parent)
 	end
 
 	o.dropdown.SetValue = function(self, value)
+		if (self.override) then return end;
+
 		for i = 1, self.items:count() do
 			local item = self.items:get(i)
 			if (item.name == value) then
@@ -769,6 +771,7 @@ local function DropdownBuilder(parent)
 	end
 
 	o.dropdown.GetValue = function(self)
+		if (self.override) then return self.override end
 		return self.items:get(self.selected).name
 	end
 
@@ -809,8 +812,23 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
-	function o:overrideSelectedButton(value)
-		self.overridenSelectedButton = value
+	function o:overrideText(value)
+		self.override = value
+		return self
+	end
+
+	function o:upwards()
+		self.directionUp = true
+		return self
+	end
+
+	function o:leftOfButton()
+		self.openAtLeft = true
+		return self
+	end
+
+	function o:rightOfButton()
+		self.openAtRight = true
 		return self
 	end
 
@@ -839,8 +857,6 @@ local function DropdownBuilder(parent)
 		end)
 
 		self.itemClick = function(item, button)
-			--self.dropdown.selected = button.index
-			--self.dropdown.selectedButton.text:SetText(self.dropdown.items:get(button.index).name)
 			self.dropdown:SetValue(button.name)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
 			if (o.itemFunc) then o:itemFunc(button) end
@@ -882,7 +898,19 @@ local function DropdownBuilder(parent)
 				end
 			end)
 
-			builder:below(relative)
+			if (relative == self.dropdown.selectedButton) then
+				if (self.openAtRight) then
+					builder:rightOf(relative):x(2)
+				elseif (self.openAtLeft) then
+					builder:leftOf(relative):x(-2)
+				end
+			else
+				if (self.directionUp)
+					builder:above(relative)
+				else
+					builder:below(relative)
+				end
+			end
 
 			local button = builder:build()
 			button:SetFrameLevel(10)
@@ -902,8 +930,12 @@ local function DropdownBuilder(parent)
 			self.dropdown.items:add(button)
 		end)
 
-		local current = self.dropdown.items:get(self.dropdown.selected)
-		selectedButton.text:SetText(current and current.name or "")
+		if (self.override) then
+			selectedButton.text:SetText(self.override)
+		else
+			local current = self.dropdown.items:get(self.dropdown.selected)
+			selectedButton.text:SetText(current and current.name or "")
+		end
 
 		self.dropdown.selectedButton = selectedButton
 
