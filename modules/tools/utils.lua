@@ -809,6 +809,11 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:overrideSelectedButton(value)
+		self.overridenSelectedButton = value
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
@@ -852,6 +857,8 @@ local function DropdownBuilder(parent)
 			:build()
 		selectedButton:SetFrameLevel(7)
 		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
+
+		-- Use overriden selected button here, also implement the possibility to choose where the dropdown should start i.e upwards/downwards, to the left of, right of
 
 		self.items:foreach(function(item)
 
