@@ -5,7 +5,7 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 
 local TargetTarget = {}
-local frameName = "TargetTarget"
+local frameName = "Target of Target"
  
 function TargetTarget:Init()
 
@@ -16,9 +16,9 @@ function TargetTarget:Init()
     end)
     oUF:SetActiveStyle(frameName)
 
-    local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
+    local frame = Units:Get(frameName) or oUF:Spawn("targettarget", frameName)
     frame.db = db
-    Units:Add(frame)
+    Units:Add(frame, frameName)
 
     A:CreateMover(frame, db)
 end
@@ -93,4 +93,4 @@ function TargetTarget:Update(frame, db)
     end
 end
 
-A.modules["targettarget"] = TargetTarget
+A.modules["Target of Target"] = TargetTarget

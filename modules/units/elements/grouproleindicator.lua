@@ -6,7 +6,7 @@ local CreateFrame = CreateFrame
 local GetTexCoordsForRoleSmallCircle = GetTexCoordsForRoleSmallCircle
 local T = A.Tools
 
-local elementName = "GroupRoleIndicator"
+local elementName = "Group Role Indicator"
 local Role = { name = elementName }
 A["Shared Elements"]:add(Role)
 
@@ -20,7 +20,7 @@ function Role:Init(parent)
     local role = tbl and tbl.element or nil
     if (not role) then
 
-        role = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
+        role = CreateFrame("Frame", T:frameName(parentName, elementName), A.frameParent)
         role:SetParent(parent)
         role.db = db
         role.text = role:CreateFontString(nil, "OVERLAY")
@@ -82,7 +82,7 @@ end
 
 function GroupRoleIndicator(frame, db)
 	local role = frame.GroupRoleIndicator or (function()
-		local role = CreateFrame("Frame", T:frameName(frame:GetName(), "GroupRoleIndicator"), frame)
+		local role = CreateFrame("Frame", T:frameName(frame:GetName(), elementName), frame)
 		role:SetSize(14, 14)
 		role:SetFrameLevel(4)
 		local texture = role:CreateTexture(nil, "OVERLAY")
@@ -101,4 +101,4 @@ function GroupRoleIndicator(frame, db)
 	frame.GroupRoleIndicator = role
 end
 
-A["Elements"]:add({ name = "GroupRoleIndicator", func = GroupRoleIndicator })
+A["Elements"]:add({ name = elementName, func = GroupRoleIndicator })

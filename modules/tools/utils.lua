@@ -773,7 +773,10 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:addItems(items)
-		for _,item in next, items do
+		for name,item in next, items do
+			if (type(item) == "table" and not item.name) then 
+				item.name = name 
+			end
 			self.items:add(item)
 		end
 		return self

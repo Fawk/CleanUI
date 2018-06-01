@@ -99,7 +99,7 @@ local function HealPredictionPostUpdate(self, unit, my, all, absorb, healAbsorb)
 	previous = Update(frame, previous, self.healAbsorbBar, healAbsorb)
 end
 
-local elementName = "HealthPrediction"
+local elementName = "Heal Prediction"
 
 local _HealthPrediction = { name = elementName }
 A["Shared Elements"]:add(_HealthPrediction)
@@ -115,7 +115,7 @@ function _HealthPrediction:Init(parent)
 	local healPrediction = tbl and tbl.element or nil
 	if (not healPrediction) then
 
-		healPrediction = CreateFrame("Frame", T:frameName("HealthPrediction"), A.frameParent)
+		healPrediction = CreateFrame("Frame", T:frameName(parentName, elementName), A.frameParent)
 
 		healPrediction:SetParent(parent)
 		
@@ -198,8 +198,8 @@ function _HealthPrediction:Update(...)
 		local db = arg1
 		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
-		self.maxOverflow = db["MaxOverflow"]
-		self.frequentUpdates = db["FrequentUpdates"]
+		self.maxOverflow = db["Max Overflow"]
+		self.frequentUpdates = db["Frequent Updates"]
 		
 		self.myBar:SetStatusBarTexture(texture)
 		self.otherBar:SetStatusBarTexture(texture)
@@ -294,8 +294,8 @@ function HealthPrediction(frame, db)
 
 	end)()
 	
-	healPrediction.maxOverflow = db["MaxOverflow"]
-	healPrediction.frequentUpdates = db["FrequentUpdates"]
+	healPrediction.maxOverflow = db["Max Overflow"]
+	healPrediction.frequentUpdates = db["Frequent Updates"]
 	
 	healPrediction.myBar:SetStatusBarTexture(texture)
 	healPrediction.otherBar:SetStatusBarTexture(texture)
@@ -305,4 +305,4 @@ function HealthPrediction(frame, db)
 	frame.HealthPrediction = healPrediction
 end
 
-A["Elements"]:add({ name = "HealthPrediction", func = HealthPrediction })
+A["Elements"]:add({ name = "Heal Prediction", func = HealthPrediction })

@@ -102,7 +102,7 @@ local function Update(bar, event, unit, powerType, func)
 end
 
 local function createIcon(parent, index)
-	local icon = CreateFrame("StatusBar", T:frameName("ClassIcons", index), parent)
+	local icon = CreateFrame("StatusBar", T:frameName("Class Icons", index), parent)
 
 	icon:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
 	icon:SetSize(parent.iconW, parent.iconH)
@@ -498,4 +498,4 @@ local function ClassIcons(frame, db)
 	frame.ClassIcons = bar
 end
 
-A["Elements"]:add({ name = "ClassIcons", func = ClassIcons })
+A["Elements"]:add({ name = "Class Icons", func = ClassIcons })

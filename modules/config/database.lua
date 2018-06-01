@@ -192,9 +192,9 @@ local defaults =  {
                         },
                         ["Custom"] = {}
                     },
-                    ["HealthPrediction"] = {
+                    ["Heal Prediction"] = {
                         ["Texture"] = "Default2",
-                        ["MaxOverflow"] = 1,
+                        ["Max Overflow"] = 1,
                         ["FrequentUpdates"] = true,
                         ["Enabled"] = true
                     },
@@ -208,7 +208,7 @@ local defaults =  {
 						},
 						["Enabled"] = true,
 					},
-                    ["AlternativePower"] = {
+                    ["Alternative Power"] = {
                         ["Enabled"] = true,
                         ["Background"] = {
                             ["Enabled"] = true,
@@ -235,7 +235,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.3,
                         ["Hide Blizzard"] = true
                     },
-                    ["ClassIcons"] = {
+                    ["Class Icons"] = {
                         ["Enabled"] = true,
                         ["Position"] = {
                             ["Relative To"] = "Parent",
@@ -359,7 +359,7 @@ local defaults =  {
                         },
                         ["Attached"] = true
                     },
-                    ["CombatIndicator"] = {
+                    ["Combat Indicator"] = {
                         ["Enabled"] = true
                     },
     				["Enabled"] = true
@@ -548,10 +548,10 @@ local defaults =  {
                             } 
                         }
                     },
-                    ["HealthPrediction"] = {
+                    ["Heal Prediction"] = {
                         ["Texture"] = "Default2",
-                        ["MaxOverflow"] = 1,
-                        ["FrequentUpdates"] = true,
+                        ["Max Overflow"] = 1,
+                        ["Frequent Updates"] = true,
                         ["Enabled"] = true
                     },
                     ["Background"] = {
@@ -635,7 +635,7 @@ local defaults =  {
                     },
                     ["Enabled"] = true
     			},
-                ["TargetTarget"] = {
+                ["Target of Target"] = {
                     ["Position"] = {
                         ["Relative To"] = "Target",
                         ["Point"] = "BOTTOMRIGHT",
@@ -650,7 +650,7 @@ local defaults =  {
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0,
-                            ["Relative To"] = "TargetTarget"
+                            ["Relative To"] = "Target of Target"
                         },
                         ["Size"] = {
                             ["Match width"] = false,
@@ -904,7 +904,7 @@ local defaults =  {
                         },
                         ["Custom"] = {}
                     },
-                    ["RaidBuffs"] = {
+                    ["Raid Buffs"] = {
                         ["Limit"] = 40,
                         ["Tracked"] = {
                             [119611] = {
@@ -950,10 +950,10 @@ local defaults =  {
 						["Important"] = true,
                         ["Enabled"] = true
                     },
-                    ["HealthPrediction"] = {
+                    ["Heal Prediction"] = {
                         ["Texture"] = "Default2",
-                        ["MaxOverflow"] = 1,
-                        ["FrequentUpdates"] = true,
+                        ["Max Overflow"] = 1,
+                        ["Frequent Updates"] = true,
                         ["Enabled"] = true
                     },
                     ["Offset X"] = 2,
@@ -962,7 +962,7 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
-                    ["GroupRoleIndicator"] = {
+                    ["Group Role Indicator"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
                             ["Local Point"] = "TOPLEFT",
@@ -970,6 +970,7 @@ local defaults =  {
                             ["Offset Y"] = -2,
                             ["Relative To"] = "Parent"    
                         },
+                        ["Style"] = "Letter",
                         ["Enabled"] = true
                     },
                     ["Background"] = {
@@ -1079,15 +1080,15 @@ local defaults =  {
                         },
                         ["Custom"] = {}
                     },
-                    ["RaidBuffs"] = {
+                    ["Raid Buffs"] = {
                         ["Tracked"] = {},
                         ["Important"] = true,
                         ["Enabled"] = true
                     },
-                    ["HealthPrediction"] = {
+                    ["Heal Prediction"] = {
                         ["Texture"] = "Default2",
-                        ["MaxOverflow"] = 1,
-                        ["FrequentUpdates"] = true,
+                        ["Max Overflow"] = 1,
+                        ["Frequent Updates"] = true,
                         ["Enabled"] = true
                     },
                     ["Offset X"] = 2,
@@ -1096,7 +1097,7 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
-                    ["GroupRoleIndicator"] = {
+                    ["Group Role Indicator"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
                             ["Local Point"] = "TOPLEFT",
@@ -1104,6 +1105,7 @@ local defaults =  {
                             ["Offset Y"] = -2,
                             ["Relative To"] = "Parent"    
                         },
+                        ["Style"] = "Letter",
                         ["Enabled"] = true
                     },
                     ["Background"] = {
@@ -1302,10 +1304,10 @@ local defaults =  {
                             } 
                         }
                     },
-                    ["HealthPrediction"] = {
+                    ["Heal Prediction"] = {
                         ["Texture"] = "Default2",
-                        ["MaxOverflow"] = 1,
-                        ["FrequentUpdates"] = true,
+                        ["Max Overflow"] = 1,
+                        ["Frequent Updates"] = true,
                         ["Enabled"] = true
                     },
                     ["Background"] = {
@@ -1322,7 +1324,7 @@ local defaults =  {
                         ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "ClassIcons",
+                            ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
