@@ -107,6 +107,17 @@ function O:CreateChild(childName, child, group, parent, childRelative)
             parent.groups = A:OrderedTable()
         end
 
+        -- Update the dropdown widget with onChildCreation which can add the required widget depending on type
+                        --         elseif (type == "color") then
+
+                        -- elseif (type == "text") then
+
+                        -- elseif (type == "number") then
+
+                        -- elseif (type == "dropdown") then
+
+                        -- end
+
         childWidgetBuilder = buildDropdown(parent)
                 :size(171, 32)
                 :overrideText(childName)
@@ -183,20 +194,13 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                             first.children = A:OrderedTable()
                         end
 
+                        local value = child.db[button.name]
+
                         if (type == "toggle") then
-                            local enabled = child.db[button.name]
-                            item:set(child.db, not enabled)
+                            item:set(child.db, not value)
                             A.dbProvider:Save()
                             changeStateForWidgets()
                             A:UpdateDb()
-                        elseif (type == "color") then
-
-                        elseif (type == "text") then
-
-                        elseif (type == "number") then
-
-                        elseif (type == "dropdown") then
-
                         end
                     end
 
