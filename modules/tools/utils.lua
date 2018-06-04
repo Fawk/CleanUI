@@ -741,7 +741,7 @@ local function DropdownBuilder(parent)
 	o.dropdown.open = false
 
 	o.dropdown.SetActive = function(self, boolean)
-		local active = (boolean and o:activeCond()) or false
+		local active = (boolean and o.activeCond and o:activeCond()) or false
 
 		self.active = active
 		self:SetEnabled(self.active)
@@ -755,7 +755,7 @@ local function DropdownBuilder(parent)
 	end
 
 	o.dropdown.SetValue = function(self, value)
-		if (self.override) then return end;
+		if (o.override) then return end;
 
 		for i = 1, self.items:count() do
 			local item = self.items:get(i)
@@ -773,6 +773,21 @@ local function DropdownBuilder(parent)
 	o.dropdown.GetValue = function(self)
 		if (self.override) then return self.override end
 		return self.items:get(self.selected).name
+	end
+
+	o.dropdown.Open = function(self)
+		self.open = true
+		self.items:foreach(function(item)
+			item:Show()
+		end)
+	end
+
+	o.dropdown.Close = function(self)
+		self.open = false
+		self.items:foreach(function(item)
+			item:SetBackdropBorderColor(0, 0, 0, 0)
+			item:Hide()
+		end)
 	end
 
 	function o:addItems(items)
@@ -832,17 +847,34 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:stayOpenAfterChoosing()
+		self.dontClose = true
+		return self
+	end
+
+	function o:overrideRelative(relative)
+		self.realRelative = relative
+		return self
+	end
+
+	function o:onHover(func)
+		self.hoverFunc = func
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
 
 		self.dropdown:SetScript("OnClick", function(self, b, down)
-			if b == "LeftButton" and not down then
+			if not down then
 				if (self.active) then
 
 					self.items:foreach(function(item)
 						if (self.open) then
-							item:Hide()
+							if (not o.dontClose) then
+								item:Hide()
+							end
 						else
 							item:Show()
 						end
@@ -850,16 +882,16 @@ local function DropdownBuilder(parent)
 					self.open = not self.open
 
 					if (o.func) then
-						o:func(self)
+						o:func(self, b)
 					end
 				end
 			end
 		end)
 
-		self.itemClick = function(item, button)
-			self.dropdown:SetValue(button.name)
+		self.itemClick = function(self, item, mouseButton)
+			self.dropdown:SetValue(item.name)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
-			if (o.itemFunc) then o:itemFunc(button) end
+			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
 		end
 
 		self.dropdown.selected = 1
@@ -867,10 +899,12 @@ local function DropdownBuilder(parent)
 			:size(self.w, self.h)
 			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
 			:atTopLeft()
+			:onHover(self.hoverFunc or A.noop)
 			:onClick(function(self, b, d)
 				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
 			end)
 			:build()
+		selectedButton:RegisterForClicks("AnyUp")
 		selectedButton:SetFrameLevel(7)
 		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
 
@@ -878,14 +912,21 @@ local function DropdownBuilder(parent)
 
 		self.items:foreach(function(item)
 
-			local relative = self.dropdown.items:getRelative(self.dropdown.selectedButton)
+			local relative = self.dropdown.items:getRelative(self.realRelative or self.dropdown.selectedButton)
 
 			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
 			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
 			:onClick(function(self, b, down)
-				if b == "LeftButton" and not down then
+				if not down then
 					if o.dropdown.active then
-						o:itemClick(self, o.dropdown)
+
+						o.dropdown.items:foreach(function(item)
+							item:SetBackdropBorderColor(0, 0, 0, 0)
+						end)
+
+						o:itemClick(self, b)
+
+						self:SetBackdropBorderColor(1, 1, 1, 1)
 					end
 				end
 			end)
@@ -898,14 +939,14 @@ local function DropdownBuilder(parent)
 				end
 			end)
 
-			if (relative == self.dropdown.selectedButton) then
+			if (relative == (self.realRelative or self.dropdown.selectedButton)) then
 				if (self.openAtRight) then
-					builder:rightOf(relative):x(2)
+					builder:rightOf(relative)
 				elseif (self.openAtLeft) then
-					builder:leftOf(relative):x(-2)
+					builder:leftOf(relative)
 				end
 			else
-				if (self.directionUp)
+				if (self.directionUp) then
 					builder:above(relative)
 				else
 					builder:below(relative)
@@ -913,6 +954,7 @@ local function DropdownBuilder(parent)
 			end
 
 			local button = builder:build()
+			button:RegisterForClicks("AnyUp")
 			button:SetFrameLevel(10)
 			button.item = item
 
@@ -1162,20 +1204,21 @@ local function GroupBuilder(parent)
 	function o:build()
 		setPoints(self, self.group)
 
-		self.group:SetSize(self.w or self.group.parent:GetWidth(), 50)
+		self.group:SetSize(self.w or self.group.parent:GetWidth(), 32)
 		
 		self.group.addChild = function(self, child)
 
+			local relative = self.children:getRelative(self)
+
 			if type(child) ~= "table" then
-				self.children:add({ name = child, relative = child.title })
+				self.children:add({ name = child, relative = child })
 			else
-				child.relative = child.title
 				self.children:add(child)
 			end
 
-			child:SetPoint("TOPLEFT", child.title, "BOTTOMLEFT", 0, -5)
+			child:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, -2)
 
-			self:SetHeight(self:GetHeight() + child:GetHeight() + 25)
+			self:SetHeight(self:GetHeight())
 		end
 
 		return self.group

@@ -5,6 +5,7 @@ local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "Ace
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
 Addon.frames, Addon.modules, Addon.general, Addon.options = {}, {}, {}, {}
 Addon.debugging = true
+Addon.noop = function() end
 
 Addon.OrderedTable = Args.OrderedTable
 

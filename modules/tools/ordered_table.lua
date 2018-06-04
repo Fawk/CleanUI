@@ -54,6 +54,16 @@ function OT:addUnique(t)
 	return false
 end
 
+function OT:addUniqueByKey(t, k, v)
+  local f = false
+  self:foreach(function(i)
+    if (i[k] == v) then f = true end
+  end)
+  if (not f) then 
+    return self:add(t) 
+  end
+end
+
 function OT:contains(tbl)
 	for k = 1, self:count() do
 		local v = self:get(k)
