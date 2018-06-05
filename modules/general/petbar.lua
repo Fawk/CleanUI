@@ -188,6 +188,8 @@ function PetBar:Init()
 
     bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 
+    bar.db = db
+
     A:CreateMover(bar, db, "PetBar")
 end
 

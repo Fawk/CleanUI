@@ -56,6 +56,8 @@ function V:Init()
 
     T:Background(vehicle, db, vehicle, false)
 
+    vehicle.db = db
+
     A:CreateMover(vehicle, db, self.name)
 
     if not UnitOnTaxi("player") and not CanExitVehicle() then

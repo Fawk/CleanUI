@@ -74,11 +74,9 @@ end
 function Player:Init()
 
 	local db = A["Profile"]["Options"][frameName]
-
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Player:Setup(frame, db)
+    Units:RegisterStyle(frameName, function(frame) 
+        Player:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 
     local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
     frame.db = db

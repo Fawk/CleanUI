@@ -319,6 +319,8 @@ local function setStyle()
 		MinimapCluster.ignoreFramePositionManager = true
 		Minimap.ignoreFramePositionManager = true
 
+		MinimapCluster.db = minimapConfig
+
         A:CreateMover(MinimapCluster, minimapConfig, "Minimap")
 
 		Minimap:SetMaskTexture(media:Fetch("widget", "cui-minimap-mask-square"))
@@ -523,6 +525,8 @@ local function setStyle()
         	end
         end)
 
+        ObjectiveTrackerFrame.db = db
+
         A:CreateMover(ObjectiveTrackerFrame, db, "Objective Tracker")
 
         local ff = CreateFrame("Frame")
@@ -641,6 +645,8 @@ local function setStyle()
     	VehicleSeatIndicatorBackgroundTexture:SetSize(w, h)
 
     	VehicleSeatIndicator:SetSize(w, h)
+
+    	VehicleSeatIndicator.db = A["Profile"]["Options"]["Vehicle Seat Indicator"]
 
         A:CreateMover(VehicleSeatIndicator, { 
             ["Position"] = position,
@@ -1279,6 +1285,7 @@ local function setStyle()
 		local x, y = position["Offset X"], position["Offset Y"]
 
 		if button then
+			button.db = eabdb
 			A:CreateMover(button, eabdb, "Extra Action Button")
 			button:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 			button:SetParent(A.frameParent)

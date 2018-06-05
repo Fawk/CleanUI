@@ -69,10 +69,9 @@ function Raid:Init()
         anchorPoint = "TOP"
     end
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
+    Units:RegisterStyle(frameName, function(frame) 
         Raid:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 
     local raidHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",

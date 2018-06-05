@@ -8,7 +8,7 @@ local bindingMode = false
 local capture = CreateFrame("Frame", "KeyBinder", A.frameParent)
 
 local AB = {
-	bars = {}
+	bars = A:OrderedTable()
 }
 
 local keys = {
@@ -124,8 +124,10 @@ function AB:Init()
 		local horizontalLimit = db["Horizontal Limit"]
 		local rows = 1
 
-		local bar = CreateFrame("Frame", T:frameName("ActionBar"..x), A.frameParent, "SecureHandlerStateTemplate")
-		bar.buttons = {}
+		local bar = self.bars:get(x) or CreateFrame("Frame", T:frameName("ActionBar"..x), A.frameParent, "SecureHandlerStateTemplate")
+		if (not bar.buttons) then
+			bar.buttons = A:OrderedTable()
+		end
 
 		for i = 1, 12 do
 
@@ -139,15 +141,15 @@ function AB:Init()
 				if rows <= horizontalLimit then
 
 					local name = string.format("%s_ActionBar%dButton%d", A:GetName(), x, i)
-					local button = LAB:CreateButton(i, name, bar, { 
+					local button = bar.buttons:get(i) or LAB:CreateButton(i, name, bar, { 
 						keyBoundTarget = name,
 						showGrid = true
 					})
 
 					if shouldIncreaseRows then
-						button:SetPoint("TOPLEFT", bar.buttons[rows == 1 and 1 or i - verticalLimit], "BOTTOMLEFT", 0, -1)			
+						button:SetPoint("TOPLEFT", bar.buttons:get(rows == 1 and 1 or i - verticalLimit), "BOTTOMLEFT", 0, -1)			
 					else
-						button:SetPoint(i == 1 and "TOPLEFT" or "LEFT", bar.buttons[i - 1] or bar, i == 1 and "TOPLEFT" or "RIGHT", i == 1 and 0 or 1, 0)
+						button:SetPoint(i == 1 and "TOPLEFT" or "LEFT", bar.buttons:get(i - 1) or bar, i == 1 and "TOPLEFT" or "RIGHT", i == 1 and 0 or 1, 0)
 					end
 
 					button.HotKey:SetWidth(size)
@@ -215,7 +217,7 @@ function AB:Init()
 					button.emptySlot:SetDrawLayer("BACKGROUND", 1)
 					button.emptySlot:SetVertexColor(1, 1, 1, 0.3)
 
-					local captureFrame = CreateFrame("Frame", nil, button)
+					local captureFrame = button.captureFrame or CreateFrame("Frame", nil, button)
 					captureFrame:SetFrameLevel(1)
 					captureFrame:SetAllPoints()
 					captureFrame:SetScript("OnEnter", function(self, userMoved)
@@ -227,11 +229,17 @@ function AB:Init()
 					end)
 
 					button.captureFrame = captureFrame
-					table.insert(bar.buttons, button)
+
+					if (bar.buttons:count() < i) then
+						bar.buttons:add(button)
+					end
 				end
 			end
 		end
-		table.insert(self.bars, bar)
+
+		if (self.bars:count() < x) then
+			self.bars:add(bar)
+		end
 
 		if x == 1 then
 			local actionpage = "[bar:6]6;[bar:5]5;[bar:4]4;[bar:3]3;[bar:2]2;[overridebar]14;[shapeshift]13;[vehicleui]12;[possessbar]12;[bonusbar:5]11;[bonusbar:4]10;[bonusbar:3]9;[bonusbar:2]8;[bonusbar:1]7;1";
@@ -251,22 +259,24 @@ function AB:Init()
 	    local x1, y1 = position["Offset X"], position["Offset Y"]
 	    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x1, y1)
 
+	    bar.db = db
 		A:CreateMover(bar, db, "ActionBar"..x)
 	end
 
 	self:SetupBindings(A["Profile"]["Options"]["Key Bindings"])
-	local bindFrame = CreateFrame("Frame")
+	local bindFrame = self.bindFrame or CreateFrame("Frame")
 	bindFrame:RegisterEvent("UPDATE_BINDINGS")
 	bindFrame:SetScript("OnEvent", function(self, ...)
 		AB:SetupBindings(A["Profile"]["Options"]["Key Bindings"])
 	end)
 
+	self.bindFrame = bindFrame
 end
 
 function AB:ClearBindings()
-	for _,bar in next, self.bars do
+	self.bars:foreach(function(bar)
 		ClearOverrideBindings(bar)
-	end
+	end)
 end
 
 function AB:BindingMode()
@@ -284,18 +294,18 @@ function AB:BindingMode()
 			local text = buildText(window, 11):outline():atCenter():build()
 			text:SetText(L["You can now bind the actionbar keys"])
 
-			self.bindingWindow =  window
+			self.bindingWindow = window
 		end
 		self.bindingWindow:Show()
 
-		for i, bar in next, self.bars do
-			for k, button in next, bar.buttons do
+		self.bars:foreach(function(bar)
+			bar.buttons:foreach(function(button)
 				if button:IsMouseOver() then
 					capture.button = button
 				end
 				button.captureFrame:SetFrameLevel(3)
-			end
-		end
+			end)
+		end)
 
 		capture:SetFrameStrata("DIALOG");
 		capture:SetFrameLevel(99)
@@ -311,11 +321,11 @@ function AB:BindingMode()
 		A:Debug("Stopped binding...")
 		self.bindingWindow:Hide()
 
-		for i, bar in next, self.bars do
-			for k, button in next, bar.buttons do
+		self.bars:foreach(function(bar)
+			bar.buttons:foreach(function(button)
 				button.captureFrame:SetFrameLevel(1)
-			end
-		end
+			end)
+		end)
 	end
 end
 
@@ -333,8 +343,8 @@ function AB:SetupBindings(bindings)
 				button:gsub("%d+", function(match) table.insert(matches, match) end)
 				local barId, buttonId = unpack(matches)
 
-				local bar = self.bars[tonumber(barId)]
-				local buttonObject = bar.buttons[tonumber(buttonId)]
+				local bar = self.bars:get(tonumber(barId))
+				local buttonObject = bar.buttons:get(tonumber(buttonId))
 
 				SetOverrideBindingClick(bar, true, key, button, "LEFTBUTTON")
 

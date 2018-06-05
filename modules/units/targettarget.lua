@@ -11,10 +11,9 @@ function TargetTarget:Init()
 
 	local db = A["Profile"]["Options"][frameName]
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        TargetTarget:Setup(frame, db)
+    Units:RegisterStyle(frameName, function(frame) 
+        TargetTarget:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 
     local frame = Units:Get(frameName) or oUF:Spawn("targettarget", frameName)
     frame.db = db

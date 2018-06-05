@@ -150,6 +150,8 @@ function R:Init()
         reputation.text:SetText(string.format("%s, %s (%d / %d)", activeBar.faction, activeBar.name, activeBar.current, activeBar.max))
     end
 
+    reputation.db = db
+
     A:CreateMover(reputation, db, self.name)
     A.frames.reputationBar = reputation
 end

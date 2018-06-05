@@ -13,10 +13,9 @@ function Boss:Init()
 	local db = A["Profile"]["Options"][frameName]
 	local size = db["Size"]
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Boss:Setup(frame, db)
+    Units:RegisterStyle(frameName, function(frame) 
+        Boss:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 
     self.container = self.container or Units:Get(frameName) or CreateFrame("Frame", T:frameName("Boss Container"), A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
     self.container:SetSize(size["Width"], size["Height"])

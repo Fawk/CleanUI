@@ -13,10 +13,9 @@ function Pet:Init()
 
     if not db then return end
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        Pet:Setup(frame, db)
+    Units:RegisterStyle(frameName, function(frame) 
+        Pet:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 
     local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
     frame.db = db

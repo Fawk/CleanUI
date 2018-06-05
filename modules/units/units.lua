@@ -54,7 +54,22 @@ for key, obj in next, {
     oUF["Tags"]["Events"][key] = obj.events
 end
 
- 
+function Units:RegisterStyle(name, func)
+    local found = false
+    for style in oUF:IterateStyles() do
+        if (style == name) then
+            found = true
+        end
+    end
+
+    if (not found) then
+        oUF:RegisterStyle(name, function(frame, unit, notHeader)
+            func(frame)
+        end)
+    end
+    oUF:SetActiveStyle(name)
+end
+
 function Units:Get(unit)
     return units[unit]
 end

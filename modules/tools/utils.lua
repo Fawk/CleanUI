@@ -862,6 +862,11 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:onChildCreation(func)
+		self.childCreation = func
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
@@ -966,6 +971,10 @@ local function DropdownBuilder(parent)
 
 			button.text = A.TextBuilder(button, o.fs or 14):atLeft():x(6):outline():build()
 			button.text:SetText(button.name)
+
+			if (self.childCreation) then
+				self:childCreation(self, button)
+			end
 
 			button:Hide()
 

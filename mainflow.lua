@@ -247,18 +247,7 @@ function Addon:OnEnable()
 	profile:Init(self.db)
 	profile:Load()
 
-	for modName, module in pairs(self.modules) do
-		if module.Init then 
-	            local unit = module:Init() 
-            if (unit) then
-                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
-                Units:Add(unit)
-                Addon["Shared Elements"]:foreach(function(element)
-                    element:Init(unit)
-                end)
-            end
-        end
-	end
+	self:Init()
 
 	self:SetStyle()
 
@@ -285,6 +274,21 @@ function Addon:OnEnable()
     Addon:ConstructPreferences(Addon["Profile"]["Options"])
 
 	collectgarbage("collect");
+end
+
+function Addon:Init()
+	for modName, module in pairs(self.modules) do
+		if module.Init then 
+	            local unit = module:Init() 
+            if (unit) then
+                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
+                Units:Add(unit)
+                Addon["Shared Elements"]:foreach(function(element)
+                    element:Init(unit)
+                end)
+            end
+        end
+	end
 end
 
 function Addon:Update()

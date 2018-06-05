@@ -19,6 +19,19 @@ local function FinalizeMove()
 	A.isMovingFrames = false
 end
 
+function A:UpdateMoveableFrames()
+	for name, moveFrame in next, moveableFrames do
+		local db = moveFrame.affecting.db
+		if (db) then
+			local p = db["Position"]
+
+			moveFrame:ClearAllPoints()
+			moveFrame.affecting:ClearAllPoints()
+			moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], p["Offset X"], p["Offset Y"])
+		end
+	end
+end
+
 function A:InitMove()
 
 	if InCombatLockdown() then return end
@@ -222,6 +235,15 @@ function SlashCmdList.CLEANUI(msg, editbox)
     		end
     	end
     	A:DebugTable(f)
+    end
+
+    if command == "printProfile" then
+    	local p = A.modules["Profile"]
+    	if arg1 then
+    		print(arg1, A.db["Profiles"][arg1])
+    	else
+    		print(p:GetActive(), A["Profile"])
+    	end
     end
 end
 

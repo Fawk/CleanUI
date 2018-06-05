@@ -70,10 +70,9 @@ function Party:Init()
         anchorPoint = "RIGHT"
     end
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
+    Units:RegisterStyle(frameName, function(frame) 
         Party:Update(frame, db)
     end)
-    oUF:SetActiveStyle(frameName)
 -- https://jsfiddle.net/gb3ka3re/
 
     local initString = [[

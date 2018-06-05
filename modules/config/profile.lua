@@ -4,27 +4,23 @@ local Profile, profiles = {}, {}
 local activeProfile = nil
 local currentCharacter = nil
 
-local function deepCopy(object)
-    local lookup_table = {}
-    local function _copy(object)
-        if type(object) ~= "table" then
-            return object
-        elseif lookup_table[object] then
-            return lookup_table[object]
+local function deepCopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepCopy(orig_key)] = deepCopy(orig_value)
         end
-        local new_table = {}
-        lookup_table[object] = new_table
-        for index, value in pairs(object) do
-            new_table[_copy(index)] = _copy(value)
-        end
-        return setmetatable(new_table, getmetatable(object))
+        setmetatable(copy, deepCopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
     end
-    return _copy(object)
+    return copy
 end
 
-function Profile:Init(db)
-	local _db = db or A.db
-	for name, profile in pairs(_db["Profiles"]) do
+function Profile:Init()
+	for name, profile in pairs(A.db["Profiles"]) do
 		A:Debug("Profile:", name, "loaded!")
 		profiles[name] = profile
 	end
@@ -121,8 +117,11 @@ function Profile:Change(name)
 
 	self:Init()
 	self:SetActive(name)
+
+	A:Init()
+	A:UpdateMoveableFrames()
+
 	A.dbProvider:Save()
 end
 
 A.modules["Profile"] = Profile
-

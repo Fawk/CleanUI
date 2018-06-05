@@ -88,6 +88,8 @@ local function setup(name, artifact, db)
         artifact:Hide()
     end
 
+    artifact.db = db
+
     A:CreateMover(artifact, db, name)
     A.frames.artifactPowerBar = artifact
 end

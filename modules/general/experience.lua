@@ -128,6 +128,8 @@ function E:Init()
         experience:Hide()
     end
 
+    experience.db = db
+
 	A:CreateMover(experience, db, self.name)
 	A.frames.experienceBar = experience
 end

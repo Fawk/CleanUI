@@ -107,17 +107,6 @@ function O:CreateChild(childName, child, group, parent, childRelative)
             parent.groups = A:OrderedTable()
         end
 
-        -- Update the dropdown widget with onChildCreation which can add the required widget depending on type
-                        --         elseif (type == "color") then
-
-                        -- elseif (type == "text") then
-
-                        -- elseif (type == "number") then
-
-                        -- elseif (type == "dropdown") then
-
-                        -- end
-
         childWidgetBuilder = buildDropdown(parent)
                 :size(171, 32)
                 :overrideText(childName)
@@ -204,6 +193,17 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                         end
                     end
 
+                end)
+                :onChildCreation(function(builder, button)
+                    if (type == "color") then
+                        
+                    elseif (type == "text") then
+                        
+                    elseif (type == "number") then
+                        
+                    elseif (type == "dropdown") then
+                        
+                    end
                 end)
     elseif (child.type == "text") then
         childWidgetBuilder = buildEditBox(childRelative)
