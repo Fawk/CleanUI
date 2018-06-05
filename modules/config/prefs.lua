@@ -195,8 +195,21 @@ function O:CreateChild(childName, child, group, parent, childRelative)
 
                 end)
                 :onChildCreation(function(builder, button)
+
+                    local widgetBuilder
+
+                    if (button.widget) then
+                        button.widget:Hide()
+                    end
+
+                    -- SetValue using db
+                    button:SetValue(button.item:get(child.db[button.name]))
+
                     if (type == "color") then
-                        
+                        widgetBuilder = buildColor(button)
+                                :size(30, 30)
+                                :atRight()
+                                :x(-1)
                     elseif (type == "text") then
                         
                     elseif (type == "number") then
@@ -204,6 +217,16 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                     elseif (type == "dropdown") then
                         
                     end
+
+                    button.widget = widgetBuilder
+                            :activeCondition(getEnabledFuncOrTrue(child, button.item, child.db))
+                            :onValueChanged(function(self, widget, value)
+                                button.item:set(child.db, value)
+                                A.dbProvider:Save()
+                                changeStateForWidgets()
+                                A:UpdateDb()
+                            end)
+                            :build()
                 end)
     elseif (child.type == "text") then
         childWidgetBuilder = buildEditBox(childRelative)
@@ -224,7 +247,9 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                 :texts("ON", "OFF")
     elseif (child.type == "color") then
         childWidgetBuilder = buildColor(childRelative)
-                :size(16, 16)
+                :size(30, 30)
+                :atRight()
+                :x(-1)
     end
 
     if (childRelative == parent) then
@@ -234,6 +259,7 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                 :alignWith(childRelative)
                 :x(parent:GetWidth())
     else
+        -- This needs to be changed, introduce an anchor or something instead
         childWidgetBuilder
                 :below(childRelative)
     end
