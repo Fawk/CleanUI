@@ -913,8 +913,6 @@ local function DropdownBuilder(parent)
 		selectedButton:SetFrameLevel(7)
 		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
 
-		-- Use overriden selected button here, also implement the possibility to choose where the dropdown should start i.e upwards/downwards, to the left of, right of
-
 		self.items:foreach(function(item)
 
 			local relative = self.dropdown.items:getRelative(self.realRelative or self.dropdown.selectedButton)

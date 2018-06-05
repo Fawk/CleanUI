@@ -194,39 +194,42 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                     end
 
                 end)
-                :onChildCreation(function(builder, button)
+                :onChildCreation(function(self, builder, button)
+                    if (button.item and button.item.type ~= "group") then 
+                        local type = button.item.type
+                        local widgetBuilder
 
-                    local widgetBuilder
+                        if (button.widget) then
+                            button.widget:Hide()
+                        end
 
-                    if (button.widget) then
-                        button.widget:Hide()
+                        if (type == "color") then
+                            widgetBuilder = buildColor(button)
+                                    :size(30, 30)
+                                    :atRight()
+                                    :x(-1)
+                        elseif (type == "text") then
+                            
+                        elseif (type == "number") then
+                            
+                        elseif (type == "dropdown") then
+                            
+                        end
+
+                        if (widgetBuilder) then
+                            button.widget = widgetBuilder
+                                    :activeCondition(getEnabledFuncOrTrue(child, button.item, child.db))
+                                    :onValueChanged(function(self, widget, value)
+                                        button.item:set(child.db, value)
+                                        A.dbProvider:Save()
+                                        changeStateForWidgets()
+                                        A:UpdateDb()
+                                    end)
+                                    :build()
+
+                            button.widget:SetValue(button.item:get(child.db[button.name]))
+                        end
                     end
-
-                    -- SetValue using db
-                    button:SetValue(button.item:get(child.db[button.name]))
-
-                    if (type == "color") then
-                        widgetBuilder = buildColor(button)
-                                :size(30, 30)
-                                :atRight()
-                                :x(-1)
-                    elseif (type == "text") then
-                        
-                    elseif (type == "number") then
-                        
-                    elseif (type == "dropdown") then
-                        
-                    end
-
-                    button.widget = widgetBuilder
-                            :activeCondition(getEnabledFuncOrTrue(child, button.item, child.db))
-                            :onValueChanged(function(self, widget, value)
-                                button.item:set(child.db, value)
-                                A.dbProvider:Save()
-                                changeStateForWidgets()
-                                A:UpdateDb()
-                            end)
-                            :build()
                 end)
     elseif (child.type == "text") then
         childWidgetBuilder = buildEditBox(childRelative)
