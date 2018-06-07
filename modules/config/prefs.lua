@@ -1157,7 +1157,9 @@ function X:CreateGroup(name, parent, setting, db)
 
     group.db = db
     group.enabled = setting.enabled
-    group.placement = setting.placement
+    group.group = setting.placement
+    group.set = setting.set
+    group.get = setting.get
 
     for childName, childSetting in next, getChildrenInOrder(setting.children) do
 
@@ -1184,31 +1186,38 @@ function X:CreateChild(name, parent, setting, db)
             childBuilder = buildDropdown(parent)
                     :addItems(setting.values)
                     :size(setting.width, setting.height)
-                    :build()
         elseif (type == "text") then
-
+            childBuilder = buildText(parent, setting.textSize or 10)
+                    :size(setting.width, setting.height)
         elseif (type == "number") then
-
+            childBuilder = buildText(parent, setting.textSize or 10)
+                    :min(setting.min)
+                    :max(setting.max)
+                    :size(setting.width, setting.height)
         elseif (type == "toggle") then
-
+            childBuilder = buildToggle(parent)
         elseif (type == "color") then
-
+            childBuilder = buildColor(parent)
+                    :size(setting.width, setting.height)
         end
     end
 
     if (not child) then
         child = childBuilder
             :onValueChanged(function(self, widget, value)
-                -- Need to iterate over all widgets here and call SetActive again
+                widget:set(value)
+                X:UpdateWidgetStates()
             end)
             :build()
 
         child.db = db
         child.enabled = setting.enabled
         child.placement = setting.placement
+        child.set = setting.set
+        child.get = setting.get
     end
 
-    child.title = buildText(child, setting.titleSize)
+    child.title = buildText(child, setting.titleSize or 10)
             :build()
 
     child.title:SetText(name)
@@ -1226,6 +1235,15 @@ function A:CreatePrefs(db)
     parent:SetPoint("TOPLEFT", 0, -300)
     parent.widgets = A:OrderedTable()
 
+    X.UpdateWidgetStates = function(self, widgets)
+        widgets:foreach(function(widget)
+            if (widget.children) then
+                X:UpdateWidgetStates(widget.children)
+            end
+            widget:SetActive(widget:enabled())
+        end)
+    end
+
     -- Iterate prefs
     for name, setting in next, prefs do
         
@@ -1238,12 +1256,10 @@ function A:CreatePrefs(db)
             widget = X:CreateChild(name, parent, setting, db[name])
         end
 
-        parent.widget:add(widget)
+        parent.widgets:add(widget)
     end
 
     parent.widgets:foreach(function(widget)
-        -- Placement in accordance to parent!
-        -- Should be specified on the setting
         widget:placement()
     end)
 end

@@ -11,6 +11,14 @@ prefs = {
 				placement = function(self)
 					self:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 0, 0)
 				end,
+				get = function(self)
+					return self.db
+				end,
+				set = function(self, value)
+					self.parent.db[self.name] = value
+				end,
+				-- min, max, titleSize, textSize, width, height
+				-- style for groups perhaps?
 			}
 		}
 	},
