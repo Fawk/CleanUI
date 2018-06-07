@@ -58,7 +58,7 @@ function OT:addAt(t, i)
       t.previous = p
       p.next = t
     end
-    t.parent = self
+    t.__parent = self
     t.index = i
   end
   self.e[i] = t

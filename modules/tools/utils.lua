@@ -1265,6 +1265,14 @@ local function GroupBuilder(parent)
 		return (parent.IsActive and parent:IsActive() or true) and self.active
 	end
 
+	o.group.SetValue = function(self)
+		A:Debug("SetValue on group in not supported")
+	end
+
+	o.group.GetValue = function(self)
+		A:Debug("GetValue on group in not supported")	
+	end
+
 	function o:backdrop(bd, bdColor, borderColor)
 		self.group:SetBackdrop(bd)
 		self.group:SetBackdropColor(unpack(bdColor))
@@ -1275,21 +1283,16 @@ local function GroupBuilder(parent)
 	function o:build()
 		setPoints(self, self.group)
 
-		self.group:SetSize(self.w or self.group.parent:GetWidth(), 32)
-		
+		self.group:SetSize(self.w or self.h)
+
 		self.group.addChild = function(self, child)
-
-			local relative = self.children:getRelative(self)
-
 			if type(child) ~= "table" then
-				self.children:add({ name = child, relative = child })
-			else
-				self.children:add(child)
+				child = { name = child }
 			end
 
-			child:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, -2)
+			child.parent = self
 
-			self:SetHeight(self:GetHeight())
+			self.children:add(child)
 		end
 
 		return self.group

@@ -1,12 +1,15 @@
 prefs = {
 	widget = {
 		type = "group",
-		enabled = true,
+		enabled = function(self) return true end,
 		children = {
 			widget = {
 				type = "whatever",
-				enabled = function(self, parent, db)
-					return parent.enabled and parent.db["Something"] == "Wanted"
+				enabled = function(self)
+					return self.parent:enabled() and self.parent.db["Something"] == "Wanted"
+				end,
+				placement = function(self)
+					self:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 0, 0)
 				end,
 			}
 		}
@@ -17,20 +20,20 @@ prefs = {
 		children = {
 			widget = {
 				type = "group",
-				enabled = function(self, parent, db)
-					return parent.enabled
+				enabled = function(self)
+					return self.parent:enabled()
 				end,
 				children = {
 					widget = {
 						type = "group",
-						enabled = function(self, parent, db)
-							return parent.enabled
+						enabled = function(self)
+							return self.parent:enabled()
 						end,
 						children = {
 							widget = {
 								type = "whatever",
-								enabled = function(self, parent, db)
-									return parent.enabled and parent.parent.db["Something"] == "Wanted"
+								enabled = function(self)
+									return self.parent:enabled() and self.parent.parent.db["Something"] == "Wanted"
 								end,
 							}
 						}

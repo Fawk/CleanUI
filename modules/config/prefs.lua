@@ -1134,3 +1134,116 @@ function A:ConstructPreferences(db)
         relative = widget
     end
 end
+
+local function getChildrenInOrder(children)
+    local tbl = {}
+    for i = 1, tcount(children) do
+        local child = children[i]
+        tbl[child.order] = child
+    end
+    return tbl
+end
+
+local X = {}
+
+-- SetActive should look something like:
+-- widget:SetActive(widget:enabled())
+-- Where widget == self in widget:enabled()
+
+function X:CreateGroup(name, parent, setting, db)
+
+    local group = buildGroup(parent)
+            :build()
+
+    group.db = db
+    group.enabled = setting.enabled
+    group.placement = setting.placement
+
+    for childName, childSetting in next, getChildrenInOrder(setting.children) do
+
+        local child = X:CreateChild(childName, group, childSetting, db[childName])
+
+        group:addChild(child)
+    end
+
+    group:SetActive(group:enabled())
+
+    return group
+end
+
+function X:CreateChild(name, parent, setting, db)
+
+    local type = setting.type
+
+    local child, childBuilder
+    if (type == "group") then
+        child = X:CreateGroup(name, parent, setting, db)
+        -- What needs to be done here?
+    else
+        if (type == "dropdown") then
+            childBuilder = buildDropdown(parent)
+                    :addItems(setting.values)
+                    :size(setting.width, setting.height)
+                    :build()
+        elseif (type == "text") then
+
+        elseif (type == "number") then
+
+        elseif (type == "toggle") then
+
+        elseif (type == "color") then
+
+        end
+    end
+
+    if (not child) then
+        child = childBuilder
+            :onValueChanged(function(self, widget, value)
+                -- Need to iterate over all widgets here and call SetActive again
+            end)
+            :build()
+
+        child.db = db
+        child.enabled = setting.enabled
+        child.placement = setting.placement
+    end
+
+    child.title = buildText(child, setting.titleSize)
+            :build()
+
+    child.title:SetText(name)
+
+    child:SetActive(child:enabled())
+    child:SetValue(db)
+
+    return child
+end
+
+function A:CreatePrefs(db)
+
+    local parent = CreateFrame("Frame", nil, A.frameParent)
+    parent:SetSize(1, 1)
+    parent:SetPoint("TOPLEFT", 0, -300)
+    parent.widgets = A:OrderedTable()
+
+    -- Iterate prefs
+    for name, setting in next, prefs do
+        
+        local type = setting.type
+        local widget
+
+        if (type == "group") then
+            widget = X:CreateGroup(name, parent, setting, db[name])
+        else
+            widget = X:CreateChild(name, parent, setting, db[name])
+        end
+
+        parent.widget:add(widget)
+    end
+
+    parent.widgets:foreach(function(widget)
+        -- Placement in accordance to parent!
+        -- Should be specified on the setting
+        widget:placement()
+    end)
+end
