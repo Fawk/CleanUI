@@ -1,0 +1,50 @@
+prefs = {
+	widget = {
+		type = "group",
+		enabled = true,
+		children = {
+			widget = {
+				type = "whatever",
+				enabled = function(self, parent, db)
+					return parent.enabled and parent.db["Something"] == "Wanted"
+				end,
+			}
+		}
+	},
+	widget = {
+		type = "group",
+		enabled = true,
+		children = {
+			widget = {
+				type = "group",
+				enabled = function(self, parent, db)
+					return parent.enabled
+				end,
+				children = {
+					widget = {
+						type = "group",
+						enabled = function(self, parent, db)
+							return parent.enabled
+						end,
+						children = {
+							widget = {
+								type = "whatever",
+								enabled = function(self, parent, db)
+									return parent.enabled and parent.parent.db["Something"] == "Wanted"
+								end,
+							}
+						}
+					}
+				}
+			}
+		]
+	},
+	widget = {
+		type = "group",
+		children = {}
+	},
+	widget = {
+		type = "group",
+		children = {}
+	},
+}

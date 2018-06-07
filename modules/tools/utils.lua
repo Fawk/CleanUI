@@ -743,6 +743,11 @@ local function DropdownBuilder(parent)
 	o.dropdown.SetActive = function(self, boolean)
 		local active = (boolean and o.activeCond and o:activeCond()) or false
 
+		local k = self.items:getChildByKey("name", "Missing Health Bar")
+		if (k) then
+			print("FOUND MISSING HEALTH BAR GROUP", self.name, boolean, active)
+		end
+
 		self.active = active
 		self:SetEnabled(self.active)
 
@@ -791,11 +796,15 @@ local function DropdownBuilder(parent)
 	end
 
 	function o:addItems(items)
-		for name,item in next, items do
+		for name, item in next, items do
 			if (type(item) == "table" and not item.name) then 
 				item.name = name 
 			end
-			self.items:add(item)
+			if (item.order) then
+				self.items:addAt(item, item.order)
+			else
+				self.items:add(item)
+			end
 		end
 		return self
 	end
@@ -867,6 +876,26 @@ local function DropdownBuilder(parent)
 		return self
 	end
 
+	function o:hideSelectedButtonBackdrop()
+		self.hideSelectedButtonBd = true
+		return self
+	end
+
+	function o:selectedButtonTextHorizontalAlign(halign)
+		self.selectedButtonAlignH = halign
+		return self
+	end
+
+	function o:selectedButtonTextVerticalAlign(valign)
+		self.selectedButtonAlignV = valign
+		return self
+	end
+
+	function o:onItemHover(func)
+		self.itemHover = func
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
@@ -900,18 +929,56 @@ local function DropdownBuilder(parent)
 		end
 
 		self.dropdown.selected = 1
-		local selectedButton = A.ButtonBuilder(self.dropdown)
+		local selectedButtonBuilder = A.ButtonBuilder(self.dropdown)
 			:size(self.w, self.h)
-			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
 			:atTopLeft()
 			:onHover(self.hoverFunc or A.noop)
 			:onClick(function(self, b, d)
 				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
 			end)
-			:build()
+
+		if (not self.hideSelectedButtonBd) then
+			selectedButtonBuilder
+					:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
+		end
+			
+		local selectedButton = selectedButtonBuilder:build()
 		selectedButton:RegisterForClicks("AnyUp")
-		selectedButton:SetFrameLevel(7)
-		selectedButton.text = A.TextBuilder(selectedButton, o.fs or 14):atLeft():x(6):outline():build()
+		selectedButton:SetFrameLevel(self.dropdown:GetFrameLevel() + 1)
+
+		local tb = A.TextBuilder(selectedButton, o.fs or 14):outline()
+
+		if (self.selectedButtonAlignH) then
+			local h = self.selectedButtonAlignH
+			if (h == "LEFT") then
+				selectedButton.text = tb:atLeft():x(6)
+			elseif (h == "RIGHT") then
+				selectedButton.text = tb:atRight():x(-6)
+			elseif (h == "CENTER") then
+				selectedButton.text = tb:atCenter()
+			end
+			
+			selectedButton.text = tb:build()
+			selectedButton.text:SetJustifyH(h)
+		end
+		
+		if (self.selectedButtonAlignV) then
+			local v = self.selectedButtonAlignV
+			if (v == "TOP") then
+				selectedButton.text = tb:atTop():y(-6)
+			elseif (v == "BOTTOM") then
+				selectedButton.text = tb:atBottom():y(6)
+			elseif (v == "MIDDLE") then
+				selectedButton.text = tb:atCenter()
+			end
+
+			selectedButton.text = tb:build()
+			selectedButton.text:SetJustifyV(v)
+		end
+
+		if (not selectedButton.text) then
+			selectedButton.text = tb:atLeft():x(6):build()
+		end
 
 		self.items:foreach(function(item)
 
@@ -921,6 +988,7 @@ local function DropdownBuilder(parent)
 			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
 			:onClick(function(self, b, down)
 				if not down then
+					print(o.dropdown.active)
 					if o.dropdown.active then
 
 						o.dropdown.items:foreach(function(item)
@@ -933,14 +1001,10 @@ local function DropdownBuilder(parent)
 					end
 				end
 			end)
-			:onHover(function(self)
-				if (self.hover) then
-					local r, g, b, a = self:GetBackdropColor()
-					self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
-				else
-					self:SetBackdropColor(unpack(o.dropdown.bdColor))
-				end
-			end)
+			
+			if (self.itemHover) then
+				builder:onHover(self.itemHover)
+			end
 
 			if (relative == (self.realRelative or self.dropdown.selectedButton)) then
 				if (self.openAtRight) then

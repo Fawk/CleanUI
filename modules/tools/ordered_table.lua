@@ -23,18 +23,46 @@ function OT:add(t)
 	if self.s ~= -1 and self.c+1 > self.s then
 		return false
 	end
+
+  local c = 1
+  while(self.e[c] ~= nil) do
+    c = c + 1
+  end
+
 	self.c = self.c + 1
   if type(t) == "table" then
-    local p = self.e[self.c - 1]
+    local p = self.e[c - 1]
     if p then
       t.previous = p
       p.next = t
     end
     t.parent = self
-    t.index = self.c
+    t.index = c
   end
-	self.e[self.c] = t
+	self.e[c] = t
 	return true
+end
+
+function OT:addAt(t, i)
+  if self.s ~= -1 and self.c+1 > self.s then
+    return false
+  end
+  if self.e[i] ~= nil then
+    error("OrderedTable already has element with index: "..i)
+    return false
+  end
+  self.c = self.c + 1
+  if type(t) == "table" then
+    local p = self.e[i - 1]
+    if p then
+      t.previous = p
+      p.next = t
+    end
+    t.parent = self
+    t.index = i
+  end
+  self.e[i] = t
+  return true
 end
 
 function OT:addAll(...)
@@ -59,7 +87,7 @@ function OT:addUniqueByKey(t, k, v)
   self:foreach(function(i)
     if (i[k] == v) then f = true end
   end)
-  if (not f) then 
+  if (not f) then
     return self:add(t) 
   end
 end

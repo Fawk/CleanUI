@@ -25,6 +25,14 @@ local media = LibStub("LibSharedMedia-3.0")
 local bdColor = { 39/255, 37/255, 37/255, 1 }
 local transparent = { 0, 0, 0, 0 }
 
+local function setBackdropForEnabled(button, enabled)
+    if (enabled) then
+        button:SetBackdropColor(unpack(bdColor))
+    else
+        button:SetBackdropColor(180/255, 33/255, 33/255, 0.7)
+    end
+end
+
 local function createDropdownTable(...)
     local tbl = {}
     for _,v in next, {...} do
@@ -74,15 +82,23 @@ local widgets = A:OrderedTable()
 local function changeStateForWidgets()
     widgets:foreach(function(widget)
         if (widget.enabled) then
+            local gp = widget.groupParent
             local enabled = widget.enabled
             if (type(enabled) == "table") then
-                widget:SetActive(widget.enabled:get(widget.db["Enabled"]))
+                if (widget.db["Enabled"] == nil) then
+                    print("SOMEBODY ONCE TOLD ME", widget.name)
+                    for k,v in next, gp.db do print(k,v) end
+                    print("------------")
+                    for k,v in next, widget.db do print(k,v) end
+                end
+                widget:SetActive(enabled:get(widget.db["Enabled"]))
             else
-                local gp = widget.groupParent
-                if (gp) then
-                    if (not gp.enabledToggle or (gp.enabledToggle and gp.enabledToggle:GetValue())) then
-                        widget:SetActive(widget:enabled(widget:GetParent(), widget.item, gp.db))
-                    end
+                local enabled = widget:enabled(gp, widget.item, gp.db)
+                widget:SetActive(enabled)
+
+                local r, g, b, a = gp:GetBackdropColor()
+                if (r) then
+                    setBackdropForEnabled(gp, enabled)
                 end
             end
         end
@@ -100,7 +116,6 @@ function O:CreateChild(childName, child, group, parent, childRelative)
     child.name = childName
 
     local childWidgetBuilder
-
     if (child.type == "group") then
 
         if (not parent.groups) then
@@ -108,19 +123,51 @@ function O:CreateChild(childName, child, group, parent, childRelative)
         end
 
         childWidgetBuilder = buildDropdown(parent)
-                :size(171, 32)
+                :size(parent:GetWidth(), 32)
                 :overrideText(childName)
                 :rightOfButton()
                 :stayOpenAfterChoosing()
                 :overrideRelative(parent.groups:first())
                 :addItems(child.children)
-                :fontSize(12)
+                :fontSize(11)
                 :onHover(function(self, d, b)
                     if (self.hover) then
                         local r, g, b, a = self:GetBackdropColor()
                         self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
                     else
                         self:SetBackdropColor(unpack(bdColor))
+                    end
+                end)
+                :onItemHover(function(self, motion)
+                    local disabled = false
+
+                    if (self.item) then
+                        if (self.item.enabled) then
+                            if (type(self.item.enabled) == "function") then
+                                if (not self.item:enabled(self, self.item, child.db)) then
+                                    disabled = true
+                                end
+                            else
+                                if (not self.item.db["Enabled"]) then
+                                    disabled = true
+                                end
+                            end
+                        else
+                            if (self.item.type == "toggle") then
+                                if (not self.item.db) then
+                                    disabled = true
+                                end
+                            end
+                        end
+                    end
+
+                    if (not disabled) then
+                        if (self.hover) then
+                            local r, g, b, a = self:GetBackdropColor()
+                            self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
+                        else
+                            self:SetBackdropColor(unpack(bdColor))
+                        end
                     end
                 end)
                 :backdrop(A.enum.backdrops.editboxborder, bdColor, transparent)
@@ -141,6 +188,15 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                         first.groups = A:OrderedTable()
                     end
 
+                    if (first.children) then
+                        first.children:foreach(function(child)
+                            child:Hide()
+                            child.anchor:Hide()
+                        end)
+
+                        first.children = A:OrderedTable()
+                    end
+
                     if (mouseButton == "RightButton") then
                         print("Disable group: ", childName)
                     elseif (mouseButton == "LeftButton") then
@@ -148,7 +204,9 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                         self.dropdown.selectedButton:SetBackdropBorderColor(1, 1, 1, 1)
                     end
                 end)
-                :onItemClick(function(self, button, mouseButton)
+                :onItemClick(function(self, button, dropdown, mouseButton)
+
+                    print(button.item.name)
 
                     local first = parent.groups:first()
 
@@ -171,100 +229,192 @@ function O:CreateChild(childName, child, group, parent, childRelative)
                     if (type == "group") then
 
                         button.name = item.name
-                        O:CreateGroup(button, first, first)
+                        local enabled = item.enabled
+                        if (mouseButton == "RightButton") then
+                            if (item.enabled) then
+                                item.db["Enabled"] = not item.db["Enabled"]
+                                A.dbProvider:Save()
+                                changeStateForWidgets()
+                                A:UpdateDb()
+
+                                setBackdropForEnabled(button, item.db["Enabled"])
+                            end
+                        elseif (mouseButton == "LeftButton") then
+                            if (not enabled or enabled:get(item.db["Enabled"])) then
+                                O:CreateGroup(button, first, first)
+                            end
+                        end
                     else
                         if (not first.children) then
                             first.children = A:OrderedTable()
                         else
                             first.children:foreach(function(child)
                                 child:Hide()
+                                child.anchor:Hide()
                             end)
 
                             first.children = A:OrderedTable()
                         end
 
-                        local value = child.db[button.name]
+                        if (type == "toggle" and mouseButton == "RightButton") then
+                            child.db[button.name] = not child.db[button.name]
+                            button.item.db = child.db[button.name]
+                            setBackdropForEnabled(button, button.item.db)
 
-                        if (type == "toggle") then
-                            item:set(child.db, not value)
                             A.dbProvider:Save()
                             changeStateForWidgets()
                             A:UpdateDb()
                         end
                     end
-
                 end)
                 :onChildCreation(function(self, builder, button)
-                    if (button.item and button.item.type ~= "group") then 
-                        local type = button.item.type
-                        local widgetBuilder
+                    if (button.item) then 
+                        local item = button.item
+                        local type = item.type
 
-                        if (button.widget) then
-                            button.widget:Hide()
+                        if (not item.db) then
+                            item.db = child.db[button.name]
                         end
 
-                        if (type == "color") then
-                            widgetBuilder = buildColor(button)
-                                    :size(30, 30)
-                                    :atRight()
-                                    :x(-1)
-                        elseif (type == "text") then
-                            
-                        elseif (type == "number") then
-                            
-                        elseif (type == "dropdown") then
-                            
-                        end
+                        if (type ~= "group") then
+                            local widgetBuilder
 
-                        if (widgetBuilder) then
-                            button.widget = widgetBuilder
-                                    :activeCondition(getEnabledFuncOrTrue(child, button.item, child.db))
-                                    :onValueChanged(function(self, widget, value)
-                                        button.item:set(child.db, value)
-                                        A.dbProvider:Save()
-                                        changeStateForWidgets()
-                                        A:UpdateDb()
-                                    end)
-                                    :build()
+                            if (button.widget) then
+                                button.widget:Hide()
+                            end
 
-                            button.widget:SetValue(button.item:get(child.db[button.name]))
+                            if (type == "color") then
+                                widgetBuilder = buildColor(button)
+                                        :size(30, 30)
+                                        :atRight()
+                                        :x(-1)
+                            elseif (type == "text") then
+                                widgetBuilder = buildEditBox(button)
+                                        :atRight()
+                                        :size(child.width or 30, child.height or 30)
+                            elseif (type == "number") then
+                                widgetBuilder = buildNumber(button)
+                                        :size(child.width or 30, child.height or 30)
+                                        :atRight()
+                                        :min(child.min)
+                                        :max(child.max)
+                            elseif (type == "dropdown") then
+                                widgetBuilder = buildDropdown(button)
+                                        :addItems(item.values)
+                                        :atRight()
+                                        :size(parent:GetWidth(), 32)
+                                        :backdrop(A.enum.backdrops.editboxborder, bdColor, transparent)
+                                        :hideSelectedButtonBackdrop()
+                                        :selectedButtonTextHorizontalAlign("RIGHT")
+                                        :rightOfButton()
+                                        :fontSize(11)
+                                        :onItemHover(function(self, motion)
+
+                                        end)
+                                        :onHover(function(self, motion)
+
+                                        end)
+                                        :onClick(function(self, dropdown, mouseButton)
+
+                                        end)
+                                        :onItemClick(function(self, button, mouseButton)
+
+                                        end)
+                                        :onChildCreation(function(self, builder, button)
+
+                                        end)
+                            elseif (type == "toggle") then
+
+                                setBackdropForEnabled(button, button.item.db)
+                            end
+
+                            if (widgetBuilder) then
+                                button.widget = widgetBuilder
+                                        :activeCondition(getEnabledFuncOrTrue(child, button.item, child.db))
+                                        :onValueChanged(function(self, widget, value)
+                                            button.item:set(child.db, value)
+                                            setBackdropForEnabled(button, child.db[button.name])
+                                            A.dbProvider:Save()
+                                            changeStateForWidgets()
+                                            A:UpdateDb()
+                                        end)
+                                        :build()
+
+                                if (item.enabled) then
+                                    local enabled = item:enabled(button, item, child.db)
+                                    setBackdropForEnabled(button, enabled)
+                                    button.widget:SetActive(enabled)
+                                end
+
+                                if (not button.db) then
+                                    button.db = child.db
+                                end
+
+                                button.widget.groupParent = button
+                                button.widget.db = child.db[button.name]
+                                button.widget.name = button.name
+                                button.widget.item = item
+                                button.widget.enabled = item.enabled
+                                button.widget:SetValue(button.item:get(child.db[button.name]))
+
+                                widgets:add(button.widget)
+                            end
+                        else
+                            if (item.enabled) then
+                                setBackdropForEnabled(button, item.db["Enabled"])
+                            end
                         end
                     end
                 end)
     elseif (child.type == "text") then
-        childWidgetBuilder = buildEditBox(childRelative)
-                :size(child.width or 30, child.height or 32)
+        childWidgetBuilder = buildEditBox(parent)
+                :atRight()
+                :size(child.width or 30, child.height or 30)
     elseif (child.type == "number") then
-        childWidgetBuilder = buildNumber(childRelative)
-                :size(child.width or 30, child.height or 32)
+        childWidgetBuilder = buildNumber(parent)
+                :size(child.width or 30, child.height or 30)
+                :atRight()
                 :min(child.min)
                 :max(child.max)
     elseif (child.type == "dropdown") then
-        childWidgetBuilder = buildDropdown(childRelative)
+        childWidgetBuilder = buildDropdown(parent)
                 :addItems(child.values)
+                :atRight()
                 :size(parent:GetWidth(), 32)
-                :backdrop(A.enum.backdrops.editbox, bdColor, transparent)
-                :fontSize(12)
+                :backdrop(A.enum.backdrops.editboxborder, bdColor, transparent)
+                :hideSelectedButtonBackdrop()
+                :selectedButtonTextHorizontalAlign("RIGHT")
+                :rightOfButton()
+                :fontSize(11)
+                :onItemHover(function(self, motion)
+                    if (self.hover) then
+                        local r, g, b, a = self:GetBackdropColor()
+                        self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
+                    else
+                        self:SetBackdropColor(unpack(bdColor))
+                    end
+                end)
+                :onHover(function(self, motion)
+
+                end)
+                :onClick(function(self, dropdown, mouseButton)
+
+                end)
+                :onItemClick(function(self, button, mouseButton)
+
+                end)
+                :onChildCreation(function(self, builder, button)
+
+                end)
     elseif (child.type == "toggle") then
-        childWidgetBuilder = buildToggle(childRelative)
+        childWidgetBuilder = buildToggle(parent)
+                :atRight()
                 :texts("ON", "OFF")
     elseif (child.type == "color") then
-        childWidgetBuilder = buildColor(childRelative)
+        childWidgetBuilder = buildColor(parent)
                 :size(30, 30)
                 :atRight()
                 :x(-1)
-    end
-
-    if (childRelative == parent) then
-        childWidgetBuilder
-                :atTopLeft()
-                :againstTopRight()
-                :alignWith(childRelative)
-                :x(parent:GetWidth())
-    else
-        -- This needs to be changed, introduce an anchor or something instead
-        childWidgetBuilder
-                :below(childRelative)
     end
 
     local childWidget = childWidgetBuilder
@@ -277,8 +427,26 @@ function O:CreateChild(childName, child, group, parent, childRelative)
             end)
             :build()
 
-    childWidget.title = buildText(childWidget, 12)
+    local anchorBuilder = buildButton(parent)
+            :size(parent:GetSize())
+            :backdrop(A.enum.backdrops.editboxborder, bdColor, transparent)
+
+    if (childRelative == parent) then
+        anchorBuilder:rightOf(childRelative):x(parent:GetWidth())
+    else
+        anchorBuilder:below(childRelative)
+    end
+
+    childWidget.anchor = anchorBuilder:build()
+    childWidget.anchor:SetFrameLevel(5)
+
+    childWidget:ClearAllPoints()
+    childWidget:SetPoint("RIGHT", childWidget.anchor, "RIGHT", 0, 0)
+    childWidget:SetFrameLevel(6)
+
+    childWidget.title = buildText(childWidget.anchor, 11)
             :outline()
+            :x(6)
             :atLeft()
             :build()
 
@@ -290,10 +458,13 @@ function O:CreateChild(childName, child, group, parent, childRelative)
         parent.groups:addUniqueByKey(childWidget, "name", childName)
     end
 
+    parent.db = group.db
+
     childWidget.type = child.type
     childWidget.enabled = child.enabled
     childWidget.name = childName
     childWidget.db = child.db
+    childWidget.groupParent = parent
 
     widgets:add(childWidget)
 
@@ -308,6 +479,7 @@ function O:CreateGroup(button, parent, relative)
     else
         parent.children:foreach(function(child)
             child:Hide()
+            child.anchor:Hide()
         end)
 
         parent.children = A:OrderedTable()
@@ -319,27 +491,31 @@ function O:CreateGroup(button, parent, relative)
         if (childName and child) then
 
             local childWidget = O:CreateChild(childName, child, group, parent, childRelative)
-
             local added = parent.children:addUniqueByKey(childWidget, "name", childName)
 
             if (not added) then
                 childWidget:Hide()
+                childWidget.anchor:Hide()
             else
                 if (child.enabled) then
                     if (child.type ~= "group") then
-                        childWidget:SetActive(child:enabled(widget, child, group.db))
+                        for k,v in next, group.db do print(k,v) end
+                        local enabled = child:enabled(widget, child, group.db)
+                        print("CreateGroup", name, childName, enabled)
+                        childWidget:SetActive(enabled)
                     else
                         childWidget:SetActive(child.enabled:get(child.db["Enabled"]))
                     end
                 else
                     if (group.enabled) then
-                        childWidget:SetActive(group.enabled:get(group.db["Enabled"]))
+                        local enabled = group.enabled:get(group.db["Enabled"])
+                        childWidget:SetActive(enabled)
                     else
                         childWidget:SetActive(true)
                     end
                 end
 
-                childRelative = childWidget
+                childRelative = childWidget.anchor
             end
         end
     end
@@ -523,7 +699,7 @@ function A:ConstructPreferences(db)
                                             type = "number",
                                             order = 3,
                                             min = 1,
-                                            width = 60,
+                                            width = 40,
                                             max = GetScreenWidth(),
                                             set = function(self, db, value)
                                                 db["Width"] = value
@@ -539,7 +715,7 @@ function A:ConstructPreferences(db)
                                             type = "number",
                                             min = 1,
                                             order = 4,
-                                            width = 60,
+                                            width = 40,
                                             max = GetScreenHeight(),
                                             set = function(self, db, value)
                                                 db["Height"] = value
@@ -598,8 +774,66 @@ function A:ConstructPreferences(db)
                             type = "group",
                             order = 2,
                             children = {
+                                ["Color By"] = {
+                                    type = "dropdown",
+                                    order = 1,
+                                    values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Color By"] = value
+                                    end
+                                },
+                                ["Custom Color"] = {
+                                    enabled = function(self, parent, item, db)
+                                        return db["Color By"] == "Custom"
+                                    end,
+                                    type = "color",
+                                    order = 2,
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Custom Color"] = value
+                                    end
+                                },
+                                ["Background Multiplier"] = {
+                                    type = "number",
+                                    order = 3,
+                                    min = -1,
+                                    max = 1,
+                                    width = 30,
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Background Multiplier"] = value
+                                    end 
+                                },
+                                ["Orientation"] = {
+                                    type = "dropdown",
+                                    order = 4,
+                                    values = createDropdownTable("HORIZONTAL", "VERTICAL"),
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Orientation"] = value
+                                    end 
+                                },
+                                ["Reversed"] = {
+                                    type = "toggle",
+                                    order = 5,
+                                    get = function(self, db) return db end,
+                                    set = function(self, db, value)
+                                        db["Reversed"] = value
+                                    end 
+                                },
+                                ["Texture"] = {
+                                    type = "dropdown",
+                                    order = 6,
+                                    values = media:List("statusbar"),
+                                    get = function(self, db) return db  end,
+                                    set = function(self, db, value)
+                                        db["Texture"] = value
+                                    end
+                                },
                                 ["Position"] = {
                                     type = "group",
+                                    order = 7,
                                     children = {
                                         ["Point"] = {
                                             type = "dropdown",
@@ -638,6 +872,7 @@ function A:ConstructPreferences(db)
                                 },
                                 ["Size"] = {
                                     type = "group",
+                                    order = 8,
                                     children = {
                                         ["Match width"] = {
                                             type = "toggle",
@@ -690,63 +925,6 @@ function A:ConstructPreferences(db)
                                             end     
                                         }
                                     }
-                                },
-                                ["Color By"] = {
-                                    type = "dropdown",
-                                    order = 3,
-                                    values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
-                                    get = function(self, db) return db end,
-                                    set = function(self, db, value)
-                                        db["Color By"] = value
-                                    end
-                                },
-                                ["Custom Color"] = {
-                                    enabled = function(self, parent, item, db)
-                                        return db["Color By"] == "Custom"
-                                    end,
-                                    type = "color",
-                                    order = 4,
-                                    get = function(self, db) return db end,
-                                    set = function(self, db, value)
-                                        db["Custom Color"] = value
-                                    end
-                                },
-                                ["Background Multiplier"] = {
-                                    type = "number",
-                                    order = 5,
-                                    min = -1,
-                                    max = 1,
-                                    width = 30,
-                                    get = function(self, db) return db end,
-                                    set = function(self, db, value)
-                                        db["Background Multiplier"] = value
-                                    end 
-                                },
-                                ["Orientation"] = {
-                                    type = "dropdown",
-                                    order = 6,
-                                    values = createDropdownTable("HORIZONTAL", "VERTICAL"),
-                                    get = function(self, db) return db end,
-                                    set = function(self, db, value)
-                                        db["Orientation"] = value
-                                    end 
-                                },
-                                ["Reversed"] = {
-                                    type = "toggle",
-                                    order = 7,
-                                    get = function(self, db) return db end,
-                                    set = function(self, db, value)
-                                        db["Reversed"] = value
-                                    end 
-                                },
-                                ["Texture"] = {
-                                    type = "dropdown",
-                                    order = 8,
-                                    values = media:List("statusbar"),
-                                    get = function(self, db) return db  end,
-                                    set = function(self, db, value)
-                                        db["Texture"] = value
-                                    end
                                 },
                                 ["Missing Power Bar"] = {
                                     enabled = {
@@ -868,7 +1046,7 @@ function A:ConstructPreferences(db)
 
     local frame = CreateFrame("Frame", nil, A.frameParent)
     frame:SetSize(1, 1)
-    frame:SetPoint("TOPLEFT", 0, -200)
+    frame:SetPoint("TOPLEFT", 0, -300)
     frame.groups = A:OrderedTable()
 
     local relative = frame
@@ -876,15 +1054,23 @@ function A:ConstructPreferences(db)
         local widget = buildDropdown(relative)
                 :atTopLeft()
                 :againstBottomLeft()
-                :size(171, 32)
+                :size(200, 32)
                 :overrideText(name)
                 :rightOfButton()
                 :stayOpenAfterChoosing()
                 :overrideRelative(frame.groups:first())
-                :fontSize(12)
+                :fontSize(11)
                 :addItems(group.children)
                 :backdrop(A.enum.backdrops.editboxborder, bdColor, transparent)
-                :onHover(function(self, d, b)
+                :onItemHover(function(self, motion)
+                    if (self.hover) then
+                        local r, g, b, a = self:GetBackdropColor()
+                        self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
+                    else
+                        self:SetBackdropColor(unpack(bdColor))
+                    end
+                end)
+                :onHover(function(self, motion)
                     if (self.hover) then
                         local r, g, b, a = self:GetBackdropColor()
                         self:SetBackdropColor(r * 0.33, g * 0.33, b * 0.33, 1)
@@ -907,6 +1093,15 @@ function A:ConstructPreferences(db)
                         end)
 
                         first.groups = A:OrderedTable()
+                    end
+
+                    if (first.children) then
+                        first.children:foreach(function(child)
+                            child:Hide()
+                            child.anchor:Hide()
+                        end)
+
+                        first.children = A:OrderedTable()
                     end
 
                     self.dropdown:Open()

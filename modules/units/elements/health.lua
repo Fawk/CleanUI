@@ -24,7 +24,7 @@ end
 
 local function Color(bar, parent)
 
-	local unit = parent.id
+	local unit = parent.id or parent.unit
 	local db = bar.db
 	local r, g, b, t, a
 	local colorType = db["Color By"]
@@ -37,7 +37,7 @@ local function Color(bar, parent)
 	elseif colorType == "Custom" then
 		t = db["Custom Color"]
 	elseif colorType == "Gradient" then
-		r, g, b = oUF.ColorGradient(parent.currentHealth, parent.currentMaxHealth, Gradient(unit))
+		r, g, b = oUF.ColorGradient(parent.currentHealth or UnitHealth(unit), parent.currentMaxHealth or UnitHealthMax(unit), Gradient(unit))
 	end
 	
 	if t then
