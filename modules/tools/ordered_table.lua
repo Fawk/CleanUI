@@ -36,7 +36,7 @@ function OT:add(t)
       t.previous = p
       p.next = t
     end
-    t.parent = self
+    t.__parent = self
     t.index = c
   end
 	self.e[c] = t

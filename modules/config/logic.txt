@@ -10,6 +10,7 @@ prefs = {
 				end,
 				placement = function(self)
 					self:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 0, 0)
+					self.title:SetPoint("LEFT")
 				end,
 				get = function(self)
 					return self.db

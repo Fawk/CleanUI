@@ -1283,13 +1283,16 @@ local function GroupBuilder(parent)
 	function o:build()
 		setPoints(self, self.group)
 
-		self.group:SetSize(self.w or self.h)
+		self.group:SetSize(self.w or 20, self.h or 20)
 
 		self.group.addChild = function(self, child)
 			if type(child) ~= "table" then
 				child = { name = child }
 			end
 
+			if (not self.children:isEmpty()) then
+				child.previous = self.children:last()
+			end
 			child.parent = self
 
 			self.children:add(child)

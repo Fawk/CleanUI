@@ -20,6 +20,10 @@ local function tcount(t)
     return count
 end
 
+local function printTable(t)
+    for k,v in next, t do print(k,v) end
+end
+
 local media = LibStub("LibSharedMedia-3.0")
 
 local bdColor = { 39/255, 37/255, 37/255, 1 }
@@ -1139,7 +1143,9 @@ local function getChildrenInOrder(children)
     local tbl = {}
     for i = 1, tcount(children) do
         local child = children[i]
-        tbl[child.order] = child
+        if (child) then
+            tbl[child.order] = child
+        end
     end
     return tbl
 end
@@ -1155,9 +1161,10 @@ function X:CreateGroup(name, parent, setting, db)
     local group = buildGroup(parent)
             :build()
 
+    group.name = name
     group.db = db
     group.enabled = setting.enabled
-    group.group = setting.placement
+    group.placement = setting.placement
     group.set = setting.set
     group.get = setting.get
 
@@ -1166,6 +1173,10 @@ function X:CreateGroup(name, parent, setting, db)
         local child = X:CreateChild(childName, group, childSetting, db[childName])
 
         group:addChild(child)
+    end
+
+    if (not group.enabled) then
+        group.enabled = function(self) return true end
     end
 
     group:SetActive(group:enabled())
@@ -1210,6 +1221,7 @@ function X:CreateChild(name, parent, setting, db)
             end)
             :build()
 
+        child.name = name
         child.db = db
         child.enabled = setting.enabled
         child.placement = setting.placement
@@ -1230,13 +1242,579 @@ end
 
 function A:CreatePrefs(db)
 
+    local genericEnabled = function(self) return self.db["Enabled"] end
+    local genericGetValue = function(self) return self.db end
+    local genericSetValue = function(self, value) self.parent.db[self.name] = value end
+
+    local prefs = {
+        ["General"] = {
+            type = "group",
+            order = 1,
+            placement = function(self)
+                self:SetPoint("TOPLEFT", self.parent, "TOPLEFT", 10, 0)
+            end,
+            children = {
+
+            }
+        },
+        ["Units"] = {
+            type = "group",
+            order = 2,
+            placement = function(self)
+                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, 0)
+            end,
+            children = {
+                ["Player"] = {
+                    enabled = genericEnabled,
+                    type = "group",
+                    order = 1,
+                    placement = function(self)
+
+                    end,
+                    children = {
+                        ["Health"] = {
+                            enabled = genericEnabled,
+                            type = "group",
+                            order = 1,
+                            placement = function(self)
+
+                            end,
+                            children = {
+                                ["Color By"] = {
+                                    type = "dropdown",
+                                    order = 1,
+                                    placement = function(self)
+
+                                    end,
+                                    values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Custom Color"] = {
+                                    enabled = function(self)
+                                        return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                                    end,
+                                    type = "color",
+                                    order = 2,
+                                    placement = function(self)
+
+                                    end,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 30,
+                                    height = 30
+                                },
+                                ["Background Multiplier"] = {
+                                    type = "number",
+                                    order = 3,
+                                    placement = function(self)
+
+                                    end,
+                                    min = -1,
+                                    max = 1,
+                                    width = 30,
+                                    heigth = 30,
+                                    get = genericGetValue,
+                                    set = genericSetValue
+                                },
+                                ["Orientation"] = {
+                                    type = "dropdown",
+                                    order = 4,
+                                    placement = function(self)
+
+                                    end,
+                                    values = createDropdownTable("HORIZONTAL", "VERTICAL"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Reversed"] = {
+                                    type = "toggle",
+                                    order = 5,
+                                    placement = function(self)
+
+                                    end,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 30,
+                                    height = 30
+                                },
+                                ["Texture"] = {
+                                    type = "dropdown",
+                                    order = 6,
+                                    placement = function(self)
+
+                                    end,
+                                    values = media:List("statusbar"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Position"] = {
+                                    type = "group",
+                                    order = 7,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Point"] = {
+                                            type = "dropdown",
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            values = A.Tools.points,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                        ["Local Point"] = {
+                                            type = "dropdown",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            values = A.Tools.points,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                        ["Relative To"] = {
+                                            type = "dropdown",
+                                            order = 3,
+                                            placement = function(self)
+
+                                            end,
+                                            values = createDropdownTable("Player", "Power"),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                    }
+                                },
+                                ["Size"] = {
+                                    type = "group",
+                                    order = 8,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Match width"] = {
+                                            type = "toggle",
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        },
+                                        ["Match height"] = {
+                                            type = "toggle",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30                                   
+                                        },
+                                        ["Width"] = {
+                                            enabled = function(self) 
+                                                return self.parent:enabled() and not self.parent.db["Match width"]
+                                            end,
+                                            type = "number",
+                                            order = 3,
+                                            placement = function(self)
+
+                                            end,
+                                            min = 1,
+                                            width = 30,
+                                            height = 30,
+                                            max = GetScreenWidth(),
+                                            get = genericGetValue,
+                                            set = genericSetValue
+                                        },
+                                        ["Height"] = {
+                                            enabled = function(self) 
+                                                return self.parent:enabled() and not self.parent.db["Match height"]
+                                            end,
+                                            type = "number",
+                                            min = 1,
+                                            order = 4,
+                                            placement = function(self)
+
+                                            end,
+                                            width = 30,
+                                            height = 30,
+                                            max = GetScreenHeight(),
+                                            get = genericGetValue,
+                                            set = genericSetValue   
+                                        }
+                                    }
+                                },
+                                ["Missing Health Bar"] = {
+                                    enabled = genericEnabled,
+                                    type = "group",
+                                    order = 9,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Custom Color"] = {
+                                            enabled = function(self)
+                                                return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                                            end,
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            type = "color",
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        },
+                                        ["Color By"] = {
+                                            type = "dropdown",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        ["Power"] = {
+                            enabled = genericEnabled,
+                            type = "group",
+                            order = 2,
+                            placement = function(self)
+
+                            end,
+                            children = {
+                                ["Color By"] = {
+                                    type = "dropdown",
+                                    order = 1,
+                                    placement = function(self)
+
+                                    end,
+                                    values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Custom Color"] = {
+                                    enabled = function(self)
+                                        return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                                    end,
+                                    type = "color",
+                                    order = 2,
+                                    placement = function(self)
+
+                                    end,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 30,
+                                    height = 30
+                                },
+                                ["Background Multiplier"] = {
+                                    type = "number",
+                                    order = 3,
+                                    placement = function(self)
+
+                                    end,
+                                    min = -1,
+                                    max = 1,
+                                    width = 30,
+                                    height = 30,
+                                    get = genericGetValue,
+                                    set = genericSetValue
+                                },
+                                ["Orientation"] = {
+                                    type = "dropdown",
+                                    order = 4,
+                                    placement = function(self)
+
+                                    end,
+                                    values = createDropdownTable("HORIZONTAL", "VERTICAL"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Reversed"] = {
+                                    type = "toggle",
+                                    order = 5,
+                                    placement = function(self)
+
+                                    end,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 30,
+                                    height = 30
+                                },
+                                ["Texture"] = {
+                                    type = "dropdown",
+                                    order = 6,
+                                    placement = function(self)
+
+                                    end,
+                                    values = media:List("statusbar"),
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 100,
+                                    height = 30
+                                },
+                                ["Position"] = {
+                                    type = "group",
+                                    order = 7,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Point"] = {
+                                            type = "dropdown",
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            values = A.Tools.points,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                        ["Local Point"] = {
+                                            type = "dropdown",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            values = A.Tools.points,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                        ["Relative To"] = {
+                                            type = "dropdown",
+                                            order = 3,
+                                            placement = function(self)
+
+                                            end,
+                                            values = createDropdownTable("Player", "Health"),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        },
+                                    }
+                                },
+                                ["Size"] = {
+                                    type = "group",
+                                    order = 8,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Match width"] = {
+                                            type = "toggle",
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        },
+                                        ["Match height"] = {
+                                            type = "toggle",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30                                 
+                                        },
+                                        ["Width"] = {
+                                            enabled = function(self) 
+                                                return self.parent:enabled() and not self.parent.db["Match width"]
+                                            end,
+                                            type = "number",
+                                            order = 3,
+                                            placement = function(self)
+
+                                            end,
+                                            min = 1,
+                                            max = GetScreenWidth(),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        },
+                                        ["Height"] = {
+                                            enabled = function(self) 
+                                                return self.parent:enabled() and not self.parent.db["Match height"]
+                                            end,
+                                            type = "number",
+                                            order = 4,
+                                            placement = function(self)
+
+                                            end,
+                                            min = 1,
+                                            max = GetScreenHeight(),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        }
+                                    }
+                                },
+                                ["Missing Power Bar"] = {
+                                    enabled = genericEnabled,
+                                    type = "group",
+                                    order = 9,
+                                    placement = function(self)
+
+                                    end,
+                                    children = {
+                                        ["Custom Color"] = {
+                                            enabled = function(self)
+                                                return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                                            end,
+                                            type = "color",
+                                            order = 1,
+                                            placement = function(self)
+
+                                            end,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 30,
+                                            height = 30
+                                        },
+                                        ["Color By"] = {
+                                            type = "dropdown",
+                                            order = 2,
+                                            placement = function(self)
+
+                                            end,
+                                            values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 100,
+                                            height = 30
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        ["Castbar"] = {
+
+                        },
+                        ["Alternative Power"] = {
+
+                        },
+                        ["Class Power"] = {
+
+                        },
+                        ["Combat"] = {
+
+                        },
+                        ["Stagger"] = {
+
+                        },
+                        ["Buffs"] = {
+
+                        },
+                        ["Debuffs"] = {
+
+                        }
+                    }
+                },
+                ["Target"] = {
+                    enabled = genericEnabled,
+                    type = "group",
+                    order = 2,
+                    placement = function(self)
+
+                    end,
+                    children = {}
+                },
+                ["Target of Target"] = {
+                    enabled = genericEnabled,
+                    type = "group",
+                    order = 3,
+                    placement = function(self)
+
+                    end,
+                    children = {}
+                },
+                ["Pet"] = {
+                    enabled = genericEnabled,
+                    type = "group",
+                    order = 4,
+                    placement = function(self)
+
+                    end,
+                    children = {}
+                }
+            }
+        },
+        ["Group"] = {
+            type = "group",
+            order = 3,
+            placement = function(self)
+
+            end,
+            children = {
+                ["Party"] = {
+                    type = "group",
+                    order = 1,
+                    placement = function(self)
+
+                    end,
+                    children = {}
+                },
+                ["Raid"] = {
+                    type = "group",
+                    order = 2,
+                    placement = function(self)
+
+                    end,
+                    children = {}
+                }
+            }
+        }
+    }
+
     local parent = CreateFrame("Frame", nil, A.frameParent)
     parent:SetSize(1, 1)
     parent:SetPoint("TOPLEFT", 0, -300)
     parent.widgets = A:OrderedTable()
 
     X.UpdateWidgetStates = function(self, widgets)
-        widgets:foreach(function(widget)
+        local iterator = widgets or parent.widgets
+        iterator:foreach(function(widget)
             if (widget.children) then
                 X:UpdateWidgetStates(widget.children)
             end
@@ -1252,6 +1830,13 @@ function A:CreatePrefs(db)
 
         if (type == "group") then
             widget = X:CreateGroup(name, parent, setting, db[name])
+            
+            widget.title = buildText(widget, 11)
+                    :atLeft()
+                    :outline()
+                    :build()
+
+            widget.title:SetText(name)
         else
             widget = X:CreateChild(name, parent, setting, db[name])
         end
