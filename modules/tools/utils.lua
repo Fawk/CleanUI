@@ -161,7 +161,7 @@ function object:leftOf(relative)
 end
 function object:size(w, h)
 	if not h then
-		local relative = w or self.parent
+		local relative = self.aw or self.parent
 		self.w = relative:GetWidth()
 		self.h = relative:GetHeight()
 	else
@@ -507,16 +507,11 @@ local function ButtonBuilder(parent)
 	o.button.active = true
 
 	o.button.SetActive = function(self, boolean)
-		local active = boolean
-		if (o.activeCond) then
-			active = o:activeCond()
-		end
-
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 	end
 	o.button.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
 	function o:build()
@@ -547,6 +542,8 @@ local function ButtonBuilder(parent)
 	end
 
 	function o:backdrop(bd, bdColor, borderColor)
+		if (not bd) then return self end
+
 		self.button:SetBackdrop(bd)
 		self.button:SetBackdropColor(unpack(bdColor))
 		self.button:SetBackdropBorderColor(unpack(borderColor))
@@ -568,13 +565,12 @@ local function EditBoxBuilder(parent)
 	o.textbox.active = true
 
 	o.textbox.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o.activeCond()) or false
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 	end
 
 	o.textbox.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
 	o.textbox.SetValue = function(self, value)
@@ -631,34 +627,44 @@ local function NumberBuilder(parent)
 	o.textbox.active = true
 
 	local increase = CreateFrame("Button", nil, o.textbox)
-	increase:SetSize(5, o.textbox:GetHeight() / 2)
-	increase:SetPoint("TOPRIGHT")
+	increase.text = increase:CreateFontString(nil, "OVERLAY")
+	increase.text:SetFont(media:Fetch("font", "Default"), 12, "OUTLINE")
+	increase.text:SetAllPoints()
+	increase.text:SetText("+")
 	o.textbox.increaseButton = increase
 
 	local decrease = CreateFrame("Button", nil, o.textbox)
-	decrease:SetSize(5, o.textbox:GetHeight() / 2)
-	decrease:SetPoint("TOP", increase, "BOTTOM", 0, 0)
+	decrease.text = decrease:CreateFontString(nil, "OVERLAY")
+	decrease.text:SetFont(media:Fetch("font", "Default"), 14, "OUTLINE")
+	decrease.text:SetAllPoints()
+	decrease.text:SetText("-")
 	o.textbox.decreaseButton = decrease
 
 	o.textbox.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond()) or false
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 	end
 
 	o.textbox.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
 	o.textbox.SetValue = function(self, value)
-		self:SetNumber(value)
+		if (tonumber(value) < o.minValue) then
+			value = o.minValue
+		elseif (tonumber(value) > o.maxValue) then
+			value = o.maxValue
+		end
+
+		self.lastValue = self:GetText()
+		self:SetText(value)
 		if o.onValueChangedFunc then 
-			o:onValueChangedFunc(self, self:GetNumber())
+			o:onValueChangedFunc(self, self:GetText())
 		end
 	end
 
 	o.textbox.GetValue = function(self)
-		return self:GetNumber()
+		return self:GetText()
 	end
 
 	function o:onTextChanged(func)
@@ -686,24 +692,44 @@ local function NumberBuilder(parent)
 		return self
 	end
 
+	function o:stepValue(s)
+		self.step = s
+		return self
+	end
+
+	function o:allowDecimals(decimals)
+		self.decimals = decimals
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
-		self.textbox:SetNumeric(true)
+
+		self.textbox.increaseButton:SetSize(15, self.textbox:GetHeight() / 2)
+		self.textbox.increaseButton:SetPoint("TOPRIGHT", 3, -2)
+		self.textbox.decreaseButton:SetSize(15, self.textbox:GetHeight() / 2)
+		self.textbox.decreaseButton:SetPoint("TOP", self.textbox.increaseButton, "BOTTOM", 0, 3)
 
 		self.textbox.increaseButton:SetScript("OnClick", function(self, b, d)
-			local number = self:GetNumber()
-			if (number < o.maxValue) then
-				self:SetNumber(number + 1)
-				o:valueChanged(self, number + 1)
+			if (not o.textbox.active) then return end
+
+			local number = tonumber(o.textbox:GetText())
+			if ((number + (o.step or 1)) <= o.maxValue) then
+				o.textbox.lastValue = number
+				o.textbox:SetText(number + (o.step or 1))
+				o:valueChanged(o.textbox, number + (o.step or 1))
 			end
 		end)
 
 		self.textbox.decreaseButton:SetScript("OnClick", function(self, b, d)
-			local number = self:GetNumber()
-			if (number > o.minValue) then
-				self:SetNumber(number - 1)
-				o:valueChanged(self, number - 1)
+			if (not o.textbox.active) then return end
+
+			local number = tonumber(o.textbox:GetText())
+			if ((number - (o.step or 1)) >= o.minValue) then
+				o.textbox.lastValue = number
+				o.textbox:SetText(number - (o.step or 1))
+				o:valueChanged(o.textbox, number - (o.step or 1))
 			end
 		end)
 
@@ -712,12 +738,53 @@ local function NumberBuilder(parent)
 
 		self.textbox:SetScript("OnEscapePressed", function(self)
 			self:ClearFocus()
+
+			local text = self:GetText()
+
+			if (tonumber(text) < o.minValue) then
+				text = o.minValue
+			elseif (tonumber(text) > o.maxValue) then
+				text = o.maxValue
+			end
+
+			self:SetText(text)
+			o:valueChanged(self, text)
+		end)
+
+		self.textbox:SetScript("OnEnterPressed", function(self)
+			self:ClearFocus()
+
+			local text = self:GetText()
+
+			if (tonumber(text) < o.minValue) then
+				text = o.minValue
+			elseif (tonumber(text) > o.maxValue) then
+				text = o.maxValue
+			end
+
+			self:SetText(text)
+			o:valueChanged(self, text)
+		end)
+
+		self.textbox:SetScript("OnTextChanged", function(self)
+			local text = self:GetText()
+			if (text) then
+				local formatted = text:match("[0-9"..(o.decimals and "%." or "")..(tostring(o.minValue):match("-") or "").."]+")
+				if (formatted) then
+					if (text ~= formatted) then
+						text = formatted
+					end
+					self:SetText(text)
+					self.lastValue = text
+				end
+			end
 		end)
 
 		self.textbox:SetBackdrop(A.enum.backdrops.editboxborder)
 		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
 		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
 		self.textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+		self.textbox:SetTextInsets(5, 0, 0, 0)
 
 		return self.textbox
 	end
@@ -741,22 +808,15 @@ local function DropdownBuilder(parent)
 	o.dropdown.open = false
 
 	o.dropdown.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o:activeCond()) or false
-
-		local k = self.items:getChildByKey("name", "Missing Health Bar")
-		if (k) then
-			print("FOUND MISSING HEALTH BAR GROUP", self.name, boolean, active)
-		end
-
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 
-		self.selectedButton.active = active
+		self.selectedButton.active = boolean
 		self.selectedButton:SetActive(self.selectedButton.active)
 	end
 
 	o.dropdown.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
 	o.dropdown.SetValue = function(self, value)
@@ -903,7 +963,6 @@ local function DropdownBuilder(parent)
 		self.dropdown:SetScript("OnClick", function(self, b, down)
 			if not down then
 				if (self.active) then
-
 					self.items:foreach(function(item)
 						if (self.open) then
 							if (not o.dontClose) then
@@ -988,7 +1047,6 @@ local function DropdownBuilder(parent)
 			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
 			:onClick(function(self, b, down)
 				if not down then
-					print(o.dropdown.active)
 					if o.dropdown.active then
 
 						o.dropdown.items:foreach(function(item)
@@ -1011,6 +1069,8 @@ local function DropdownBuilder(parent)
 					builder:rightOf(relative)
 				elseif (self.openAtLeft) then
 					builder:leftOf(relative)
+				else
+					builder:below(relative)
 				end
 			else
 				if (self.directionUp) then
@@ -1070,13 +1130,12 @@ local function ColorBuilder(parent)
 	o.color.active = true
 
 	o.color.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o:activeCond()) or false
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 	end
 
 	o.color.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
     o.color.GetValue = function(self) return { self.r, self.g, self.b, self.a } end
@@ -1158,8 +1217,7 @@ local function ToggleBuilder(parent)
 	o.toggle.checked = false
 
 	o.toggle.SetActive = function(self, boolean)
-		local active = (boolean and o.activeCond and o:activeCond()) or false
-		self.active = active
+		self.active = boolean
 		self:SetEnabled(self.active)
 	end
 
@@ -1170,11 +1228,11 @@ local function ToggleBuilder(parent)
 
 		if (self.checked) then
 			self.block:SetPoint("RIGHT", self, "RIGHT", 0, 0)
-			self.text:SetPoint("LEFT", self, "LEFT", 2, 0)
+			self.text:SetPoint("LEFT", self, "LEFT", 4, 0)
 			self.text:SetText(self.onText)
 		else
 			self.block:SetPoint("LEFT", self, "LEFT", 0, 0)
-			self.text:SetPoint("RIGHT", self, "RIGHT", 0, 0)
+			self.text:SetPoint("RIGHT", self, "RIGHT", -2, 0)
 			self.text:SetText(self.offText)
 		end
 
@@ -1188,7 +1246,7 @@ local function ToggleBuilder(parent)
 	end
 
 	o.toggle.IsActive = function(self)
-		return parent:IsActive() and self.active and (self.activeCond and self:activeCond() or true)
+		return parent:IsActive() and self.active
 	end
 
 	function o:onClick(func)
@@ -1205,7 +1263,7 @@ local function ToggleBuilder(parent)
 	function o:build()
 		setPoints(self, self.toggle)
 
-		self.toggle:SetSize(40, 15)
+		self.toggle:SetSize(self.w, self.h)
 		self.toggle:SetScript("OnClick", function(self, button, down)
 			if button == "LeftButton" and not down then
 				if (self.active) then
@@ -1218,15 +1276,15 @@ local function ToggleBuilder(parent)
 		end)
 		self.toggle:SetFrameLevel(8)
 
-		self.toggle.block = A.ButtonBuilder(self.toggle):atRight():size(15, 15)
-		   :backdrop(A.enum.backdrops.editbox, { .5, .5, .5, 0.8 }, { 0, 0, 0 })
+		self.toggle.block = A.ButtonBuilder(self.toggle):atRight():size(self.h, self.h)
+		   :backdrop(A.enum.backdrops.editboxborder, { .1, .1, .1, 1 }, { .3, .3, .3, 1 })
 		   :onClick(function(self, b, d)
 		   		o.toggle:GetScript("OnClick")(o.toggle, "LeftButton", false)
 		   end)
 		   :build()
 
 		self.toggle.path = A.ButtonBuilder(self.toggle):alignAll()
-		   :backdrop(A.enum.backdrops.editbox, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0 }):build()
+		   :backdrop(A.enum.backdrops.editboxborder, { 0.3, 0.3, 0.3, 1 }, { 0, 0, 0, 1 }):build()
 		self.toggle.path:SetFrameLevel(8)
 
 		self.toggle.onText = self.onText
@@ -1248,7 +1306,8 @@ local function GroupBuilder(parent)
 	}
 
 	setmetatable(o, object)
-	o.group = CreateFrame("Frame", nil, parent)
+	o.group = CreateFrame("Button", nil, parent)
+	o.group:RegisterForClicks("AnyUp")
 	o.group.children = A:OrderedTable()
 
 	o.group.parent = parent
@@ -1257,7 +1316,11 @@ local function GroupBuilder(parent)
 	o.group.SetActive = function(self, boolean)
 		self.active = boolean
 		self.children:foreach(function(child)
-			child:SetActive(self.active)
+			if (child.enabled) then
+				child:SetActive(child:enabled())
+			else
+				child:SetActive(self.active)
+			end
 		end)
 	end
 
@@ -1266,11 +1329,16 @@ local function GroupBuilder(parent)
 	end
 
 	o.group.SetValue = function(self)
-		A:Debug("SetValue on group in not supported")
+
 	end
 
 	o.group.GetValue = function(self)
-		A:Debug("GetValue on group in not supported")	
+
+	end
+
+	function o:onClick(func)
+		self.group:SetScript("OnClick", func)
+		return self
 	end
 
 	function o:backdrop(bd, bdColor, borderColor)
@@ -1292,7 +1360,10 @@ local function GroupBuilder(parent)
 
 			if (not self.children:isEmpty()) then
 				child.previous = self.children:last()
+			else
+				self.first = child
 			end
+
 			child.parent = self
 
 			self.children:add(child)

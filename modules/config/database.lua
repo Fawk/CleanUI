@@ -235,7 +235,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.3,
                         ["Hide Blizzard"] = true
                     },
-                    ["Class Icons"] = {
+                    ["Class Power"] = {
                         ["Enabled"] = true,
                         ["Position"] = {
                             ["Relative To"] = "Parent",

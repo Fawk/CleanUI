@@ -217,12 +217,13 @@ function Health(frame, db)
 			local r, g, b, t, a
 			local colorType = db["Color By"]
 			local mult = db["Background Multiplier"]
-			
+
 			if colorType == "Class" then
 				health.colorClass = true
 				r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.default)
 			elseif colorType == "Health" then
 				health.colorHealth = true
+				r, g, b = unpack(oUF.colors.health)
 			elseif colorType == "Custom" then
 				t = db["Custom Color"]
 			elseif colorType == "Gradient" then
@@ -242,6 +243,7 @@ function Health(frame, db)
 				if (db["Background Multiplier"] == -1) then
 					self.bg:Hide()
 				else
+					self.bg:Show()
 					self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
 				end
 			end

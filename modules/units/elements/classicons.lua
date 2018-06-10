@@ -102,7 +102,7 @@ local function Update(bar, event, unit, powerType, func)
 end
 
 local function createIcon(parent, index)
-	local icon = CreateFrame("StatusBar", T:frameName("Class Icons", index), parent)
+	local icon = CreateFrame("StatusBar", T:frameName("Class Power", index), parent)
 
 	icon:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
 	icon:SetSize(parent.iconW, parent.iconH)
@@ -329,7 +329,7 @@ local function UpdateIcons(parent, current, max, maxChanged)
 	end
 end
 
-local function ClassIcons(frame, db)
+local function ClassPower(frame, db)
 
 	local size = db["Size"]
 	local spec, form = GetSpecialization(), GetShapeshiftFormID()
@@ -498,4 +498,4 @@ local function ClassIcons(frame, db)
 	frame.ClassIcons = bar
 end
 
-A["Elements"]:add({ name = "Class Icons", func = ClassIcons })
+A["Elements"]:add({ name = "Class Power", func = ClassPower })

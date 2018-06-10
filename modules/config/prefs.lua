@@ -2,6 +2,7 @@ local A, L = unpack(select(2, ...))
 local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 local CreateFrame = CreateFrame
+local UnitClass = UnitClass
 
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
@@ -1141,43 +1142,76 @@ end
 
 local function getChildrenInOrder(children)
     local tbl = {}
-    for i = 1, tcount(children) do
-        local child = children[i]
-        if (child) then
-            tbl[child.order] = child
+    for k,v in next, children do
+        if (v.order) then
+            tbl[v.order] = { k, v }
         end
     end
-    return tbl
+
+    if (#tbl > 0) then
+        local c = 0
+        return function()
+            c = c + 1
+            if(tbl[c]) then
+                return unpack(tbl[c])
+            end
+        end
+    else
+        return function() end
+    end
 end
 
 local X = {}
 
--- SetActive should look something like:
--- widget:SetActive(widget:enabled())
--- Where widget == self in widget:enabled()
-
 function X:CreateGroup(name, parent, setting, db)
 
     local group = buildGroup(parent)
+            :onClick(function(self, button, down)
+                if (not down) then
+                    if (setting.canToggle and button == "RightButton") then
+                        self.db["Enabled"] = not self:enabled()
+                        if (not self:enabled()) then
+                            self.title:SetTextColor(1, .2, .2, 1)
+                        else
+                            self.title:SetTextColor(1, 1, 1, 1)
+                        end
+
+                        X:UpdateWidgetStates()
+                        A.dbProvider:Save()
+                        A:UpdateDb()
+                    end
+
+                    if (setting.onClick and button == "LeftButton") then
+                        setting.onClick(self)
+                    end
+                end
+            end)
             :build()
 
     group.name = name
     group.db = db
     group.enabled = setting.enabled
-    group.placement = setting.placement
     group.set = setting.set
     group.get = setting.get
 
-    for childName, childSetting in next, getChildrenInOrder(setting.children) do
-
-        local child = X:CreateChild(childName, group, childSetting, db[childName])
-
-        group:addChild(child)
+    group.placement = function(self)
+        setting.placement(self)
+        self.children:foreach(function(child)
+            child:placement()
+        end)
     end
 
     if (not group.enabled) then
         group.enabled = function(self) return true end
     end
+
+    local child
+    for childName, childSetting in getChildrenInOrder(setting.children) do
+        child = X:CreateChild(childName, group, childSetting, db[childName])
+        group:addChild(child)
+    end
+
+    group.last = child
 
     group:SetActive(group:enabled())
 
@@ -1197,16 +1231,22 @@ function X:CreateChild(name, parent, setting, db)
             childBuilder = buildDropdown(parent)
                     :addItems(setting.values)
                     :size(setting.width, setting.height)
+                    :fontSize(11)
+                    :selectedButtonTextHorizontalAlign("RIGHT")
         elseif (type == "text") then
-            childBuilder = buildText(parent, setting.textSize or 10)
+            childBuilder = buildText(parent, setting.textSize or 11)
                     :size(setting.width, setting.height)
         elseif (type == "number") then
-            childBuilder = buildText(parent, setting.textSize or 10)
+            childBuilder = buildNumber(parent, setting.textSize or 11)
                     :min(setting.min)
                     :max(setting.max)
+                    :stepValue(setting.step)
+                    :allowDecimals(setting.decimals)
                     :size(setting.width, setting.height)
         elseif (type == "toggle") then
             childBuilder = buildToggle(parent)
+                    :size(setting.width, setting.height)
+                    :texts("ON", "OFF")
         elseif (type == "color") then
             childBuilder = buildColor(parent)
                     :size(setting.width, setting.height)
@@ -1218,6 +1258,8 @@ function X:CreateChild(name, parent, setting, db)
             :onValueChanged(function(self, widget, value)
                 widget:set(value)
                 X:UpdateWidgetStates()
+                A.dbProvider:Save()
+                A:UpdateDb()
             end)
             :build()
 
@@ -1229,22 +1271,44 @@ function X:CreateChild(name, parent, setting, db)
         child.get = setting.get
     end
 
-    child.title = buildText(child, setting.titleSize or 10)
+    if (not child.enabled) then
+        child.enabled = function(self) 
+            return self.parent:enabled()
+        end
+    end
+
+    child.title = buildText(child, setting.titleSize or 11)
+            :atLeft()
+            :outline()
             :build()
 
     child.title:SetText(name)
 
+    if (not child:enabled()) then
+        child.title:SetTextColor(1, .2, .2, 1)
+    else
+        child.title:SetTextColor(1, 1, 1, 1)
+    end
+
     child:SetActive(child:enabled())
     child:SetValue(db)
+
+    child:SetSize(setting.width or child.title:GetWidth(), setting.height or 20)
 
     return child
 end
 
 function A:CreatePrefs(db)
 
-    local genericEnabled = function(self) return self.db["Enabled"] end
+    local genericEnabled = function(self) return self.parent:enabled() and self.db["Enabled"] end
     local genericGetValue = function(self) return self.db end
     local genericSetValue = function(self, value) self.parent.db[self.name] = value end
+    local hideParentChildrenAndShowSelf = function(self)
+        self.parent.children:foreach(function(child)
+            child:Hide()
+        end)
+        self:Show()
+    end
 
     local prefs = {
         ["General"] = {
@@ -1266,31 +1330,34 @@ function A:CreatePrefs(db)
             children = {
                 ["Player"] = {
                     enabled = genericEnabled,
+                    canToggle = true,
+                    onClick = hideParentChildrenAndShowSelf,
                     type = "group",
                     order = 1,
                     placement = function(self)
-
+                        self:SetPoint("LEFT", self.parent, "RIGHT", 25, 0)
                     end,
                     children = {
                         ["Health"] = {
                             enabled = genericEnabled,
+                            canToggle = true,
                             type = "group",
                             order = 1,
                             placement = function(self)
-
+                                self:SetPoint("LEFT", self.parent, "RIGHT", 25, 0)
                             end,
                             children = {
                                 ["Color By"] = {
                                     type = "dropdown",
                                     order = 1,
                                     placement = function(self)
-
+                                        self:SetPoint("LEFT", self.parent, "RIGHT", 150, 0)
                                     end,
                                     values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Custom Color"] = {
                                     enabled = function(self)
@@ -1299,23 +1366,29 @@ function A:CreatePrefs(db)
                                     type = "color",
                                     order = 2,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 30,
-                                    height = 30
+                                    width = 20,
+                                    height = 20
                                 },
                                 ["Background Multiplier"] = {
                                     type = "number",
                                     order = 3,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
                                     end,
                                     min = -1,
                                     max = 1,
-                                    width = 30,
-                                    heigth = 30,
+                                    width = 50,
+                                    heigth = 20,
+                                    step = 0.1,
+                                    decimals = true,
                                     get = genericGetValue,
                                     set = genericSetValue
                                 },
@@ -1323,79 +1396,93 @@ function A:CreatePrefs(db)
                                     type = "dropdown",
                                     order = 4,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Reversed"] = {
                                     type = "toggle",
                                     order = 5,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 30,
-                                    height = 30
+                                    width = 50,
+                                    height = 20
                                 },
                                 ["Texture"] = {
                                     type = "dropdown",
                                     order = 6,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     values = media:List("statusbar"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Position"] = {
                                     type = "group",
                                     order = 7,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Point"] = {
                                             type = "dropdown",
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = A.Tools.points,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                         ["Local Point"] = {
                                             type = "dropdown",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = A.Tools.points,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                         ["Relative To"] = {
                                             type = "dropdown",
                                             order = 3,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = createDropdownTable("Player", "Power"),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                     }
                                 },
@@ -1403,59 +1490,73 @@ function A:CreatePrefs(db)
                                     type = "group",
                                     order = 8,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Match width"] = {
                                             type = "toggle",
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 50,
+                                            height = 20
                                         },
                                         ["Match height"] = {
                                             type = "toggle",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30                                   
+                                            width = 50,
+                                            height = 20                               
                                         },
                                         ["Width"] = {
                                             enabled = function(self) 
-                                                return self.parent:enabled() and not self.parent.db["Match width"]
+                                                return not self.parent.db["Match width"]
                                             end,
                                             type = "number",
                                             order = 3,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
                                             end,
+                                            width = 50,
+                                            height = 20,
+                                            step = 10,
+                                            decimals = false,
                                             min = 1,
-                                            width = 30,
-                                            height = 30,
                                             max = GetScreenWidth(),
                                             get = genericGetValue,
                                             set = genericSetValue
                                         },
                                         ["Height"] = {
                                             enabled = function(self) 
-                                                return self.parent:enabled() and not self.parent.db["Match height"]
+                                                return not self.parent.db["Match height"]
                                             end,
                                             type = "number",
-                                            min = 1,
                                             order = 4,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                                             end,
-                                            width = 30,
-                                            height = 30,
+                                            width = 50,
+                                            height = 20,
+                                            step = 10,
+                                            decimals = false,
+                                            min = 1,
                                             max = GetScreenHeight(),
                                             get = genericGetValue,
                                             set = genericSetValue   
@@ -1464,10 +1565,13 @@ function A:CreatePrefs(db)
                                 },
                                 ["Missing Health Bar"] = {
                                     enabled = genericEnabled,
+                                    canToggle = true,
                                     type = "group",
                                     order = 9,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Custom Color"] = {
@@ -1476,25 +1580,29 @@ function A:CreatePrefs(db)
                                             end,
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
                                             end,
                                             type = "color",
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 20,
+                                            height = 20
                                         },
                                         ["Color By"] = {
                                             type = "dropdown",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         }
                                     }
                                 }
@@ -1502,10 +1610,11 @@ function A:CreatePrefs(db)
                         },
                         ["Power"] = {
                             enabled = genericEnabled,
+                            canToggle = true,
                             type = "group",
                             order = 2,
                             placement = function(self)
-
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                             end,
                             children = {
                                 ["Color By"] = {
@@ -1517,8 +1626,8 @@ function A:CreatePrefs(db)
                                     values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Custom Color"] = {
                                     enabled = function(self)
@@ -1531,8 +1640,8 @@ function A:CreatePrefs(db)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 30,
-                                    height = 30
+                                    width = 20,
+                                    height = 20
                                 },
                                 ["Background Multiplier"] = {
                                     type = "number",
@@ -1542,8 +1651,10 @@ function A:CreatePrefs(db)
                                     end,
                                     min = -1,
                                     max = 1,
-                                    width = 30,
-                                    height = 30,
+                                    step = 0.1,
+                                    width = 50,
+                                    height = 20,
+                                    decimals = true,
                                     get = genericGetValue,
                                     set = genericSetValue
                                 },
@@ -1556,8 +1667,8 @@ function A:CreatePrefs(db)
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Reversed"] = {
                                     type = "toggle",
@@ -1567,8 +1678,8 @@ function A:CreatePrefs(db)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 30,
-                                    height = 30
+                                    width = 50,
+                                    height = 20
                                 },
                                 ["Texture"] = {
                                     type = "dropdown",
@@ -1579,8 +1690,8 @@ function A:CreatePrefs(db)
                                     values = media:List("statusbar"),
                                     get = genericGetValue,
                                     set = genericSetValue,
-                                    width = 100,
-                                    height = 30
+                                    width = 200,
+                                    height = 20
                                 },
                                 ["Position"] = {
                                     type = "group",
@@ -1598,8 +1709,8 @@ function A:CreatePrefs(db)
                                             values = A.Tools.points,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                         ["Local Point"] = {
                                             type = "dropdown",
@@ -1610,8 +1721,8 @@ function A:CreatePrefs(db)
                                             values = A.Tools.points,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                         ["Relative To"] = {
                                             type = "dropdown",
@@ -1622,8 +1733,8 @@ function A:CreatePrefs(db)
                                             values = createDropdownTable("Player", "Health"),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 200,
+                                            height = 20
                                         },
                                     }
                                 },
@@ -1642,8 +1753,8 @@ function A:CreatePrefs(db)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 50,
+                                            height = 20
                                         },
                                         ["Match height"] = {
                                             type = "toggle",
@@ -1653,45 +1764,50 @@ function A:CreatePrefs(db)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30                                 
+                                            width = 50,
+                                            height = 20                               
                                         },
                                         ["Width"] = {
                                             enabled = function(self) 
-                                                return self.parent:enabled() and not self.parent.db["Match width"]
+                                                return not self.parent.db["Match width"]
                                             end,
                                             type = "number",
                                             order = 3,
                                             placement = function(self)
 
                                             end,
+                                            step = 10,
+                                            decimals = false,
                                             min = 1,
                                             max = GetScreenWidth(),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 50,
+                                            height = 20
                                         },
                                         ["Height"] = {
                                             enabled = function(self) 
-                                                return self.parent:enabled() and not self.parent.db["Match height"]
+                                                return not self.parent.db["Match height"]
                                             end,
                                             type = "number",
                                             order = 4,
                                             placement = function(self)
 
                                             end,
+                                            step = 10,
+                                            decimals = false,
                                             min = 1,
                                             max = GetScreenHeight(),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 50,
+                                            height = 20
                                         }
                                     }
                                 },
                                 ["Missing Power Bar"] = {
                                     enabled = genericEnabled,
+                                    canToggle = true,
                                     type = "group",
                                     order = 9,
                                     placement = function(self)
@@ -1709,8 +1825,8 @@ function A:CreatePrefs(db)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 30,
-                                            height = 30
+                                            width = 20,
+                                            height = 20
                                         },
                                         ["Color By"] = {
                                             type = "dropdown",
@@ -1721,38 +1837,90 @@ function A:CreatePrefs(db)
                                             values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
                                             get = genericGetValue,
                                             set = genericSetValue,
-                                            width = 100,
-                                            height = 30
+                                            width = 150,
+                                            height = 20
                                         }
                                     }
                                 }
                             }
                         },
                         ["Castbar"] = {
-
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 3,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", -1, -5)
+                            end,
+                            children = {}
                         },
                         ["Alternative Power"] = {
-
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 4,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", -1, -5)
+                            end,
+                            children = {}
                         },
                         ["Class Power"] = {
-
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 5,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {}
                         },
-                        ["Combat"] = {
-
+                        ["Combat Indicator"] = {
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 6,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {}
                         },
                         ["Stagger"] = {
-
+                            enabled = function(self)
+                                return self.parent:enabled() and select(2, UnitClass("player")) == "MONK"
+                            end,
+                            canToggle = true,
+                            type = "group",
+                            order = 7,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {}
                         },
                         ["Buffs"] = {
-
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 8,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {}
                         },
                         ["Debuffs"] = {
-
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            type = "group",
+                            order = 9,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {}
                         }
                     }
                 },
                 ["Target"] = {
                     enabled = genericEnabled,
+                    canToggle = true,
                     type = "group",
                     order = 2,
                     placement = function(self)
@@ -1762,6 +1930,7 @@ function A:CreatePrefs(db)
                 },
                 ["Target of Target"] = {
                     enabled = genericEnabled,
+                    canToggle = true,
                     type = "group",
                     order = 3,
                     placement = function(self)
@@ -1771,6 +1940,7 @@ function A:CreatePrefs(db)
                 },
                 ["Pet"] = {
                     enabled = genericEnabled,
+                    canToggle = true,
                     type = "group",
                     order = 4,
                     placement = function(self)
@@ -1784,10 +1954,12 @@ function A:CreatePrefs(db)
             type = "group",
             order = 3,
             placement = function(self)
-
+                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, 0)
             end,
             children = {
                 ["Party"] = {
+                    enabled = genericEnabled,
+                    canToggle = true,
                     type = "group",
                     order = 1,
                     placement = function(self)
@@ -1796,6 +1968,8 @@ function A:CreatePrefs(db)
                     children = {}
                 },
                 ["Raid"] = {
+                    enabled = genericEnabled,
+                    canToggle = true,
                     type = "group",
                     order = 2,
                     placement = function(self)
@@ -1818,18 +1992,27 @@ function A:CreatePrefs(db)
             if (widget.children) then
                 X:UpdateWidgetStates(widget.children)
             end
-            widget:SetActive(widget:enabled())
+
+            local enabled = widget:enabled()
+
+            widget:SetActive(enabled)
+
+            if (not enabled) then
+                widget.title:SetTextColor(1, .2, .2, 1)
+            else
+                widget.title:SetTextColor(1, 1, 1, 1)
+            end
         end)
     end
 
     -- Iterate prefs
-    for name, setting in next, prefs do
+    for name, setting in getChildrenInOrder(prefs) do
         
         local type = setting.type
         local widget
 
         if (type == "group") then
-            widget = X:CreateGroup(name, parent, setting, db[name])
+            widget = X:CreateGroup(name, parent, setting, db)
             
             widget.title = buildText(widget, 11)
                     :atLeft()
@@ -1837,8 +2020,10 @@ function A:CreatePrefs(db)
                     :build()
 
             widget.title:SetText(name)
+
+            widget:SetWidth(widget.title:GetWidth())
         else
-            widget = X:CreateChild(name, parent, setting, db[name])
+            widget = X:CreateChild(name, parent, setting, db)
         end
 
         parent.widgets:add(widget)
