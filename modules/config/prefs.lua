@@ -1169,6 +1169,12 @@ function X:CreateGroup(name, parent, setting, db)
             :onClick(function(self, button, down)
                 if (not down) then
                     if (setting.canToggle and button == "RightButton") then
+                        if (setting.special) then
+                            if (not setting.special(self)) then 
+                                return
+                            end
+                        end
+
                         self.db["Enabled"] = not self:enabled()
                         if (not self:enabled()) then
                             self.title:SetTextColor(1, .2, .2, 1)
@@ -1191,6 +1197,7 @@ function X:CreateGroup(name, parent, setting, db)
     group.name = name
     group.db = db
     group.enabled = setting.enabled
+    group.special = setting.special
     group.set = setting.set
     group.get = setting.get
 
@@ -1266,6 +1273,7 @@ function X:CreateChild(name, parent, setting, db)
         child.name = name
         child.db = db
         child.enabled = setting.enabled
+        child.special = setting.special
         child.placement = setting.placement
         child.set = setting.set
         child.get = setting.get
@@ -1300,20 +1308,60 @@ end
 
 function A:CreatePrefs(db)
 
+    function X:HandleChildren(children, visible, once)
+        if (not children) then return end
+        children:foreach(function(child)
+            if (not once) then
+                X:HandleChildren(child.children, visible)
+            end
+            if (not visible) then 
+                child:Hide()
+            else
+                child:Show()
+            end
+        end)
+    end
+
+    local hideOrShow = function(widget, visible)
+        if (visible) then
+            widget:Show()
+        else
+            widget:Hide()
+        end
+    end
+
+    local handleChildrenTwoLevels = function(self, visible)
+        self.children:foreach(function(child)
+            if (child.children) then
+                child.children:foreach(function(c)
+                    hideOrShow(c, visible)
+                end)
+            end
+            hideOrShow(child, visible)
+        end)
+    end
+
+    local hideParentChildrenAndShowSelf = function(self)
+        self.parent.children:foreach(function(child)
+            X:HandleChildren(child.children, false)
+        end)
+        X:HandleChildren(self.children, true, true)
+    end
+
+    local genericOnClick = function(self)
+        hideParentChildrenAndShowSelf(self, false)
+        handleChildrenTwoLevels(self, true)
+    end
+
     local genericEnabled = function(self) return self.parent:enabled() and self.db["Enabled"] end
     local genericGetValue = function(self) return self.db end
     local genericSetValue = function(self, value) self.parent.db[self.name] = value end
-    local hideParentChildrenAndShowSelf = function(self)
-        self.parent.children:foreach(function(child)
-            child:Hide()
-        end)
-        self:Show()
-    end
 
     local prefs = {
         ["General"] = {
             type = "group",
             order = 1,
+            onClick = hideParentChildrenAndShowSelf,
             placement = function(self)
                 self:SetPoint("TOPLEFT", self.parent, "TOPLEFT", 10, 0)
             end,
@@ -1324,6 +1372,7 @@ function A:CreatePrefs(db)
         ["Units"] = {
             type = "group",
             order = 2,
+            onClick = hideParentChildrenAndShowSelf,
             placement = function(self)
                 self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, 0)
             end,
@@ -1335,23 +1384,24 @@ function A:CreatePrefs(db)
                     type = "group",
                     order = 1,
                     placement = function(self)
-                        self:SetPoint("LEFT", self.parent, "RIGHT", 25, 0)
+                        self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
                     end,
                     children = {
                         ["Health"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 1,
                             placement = function(self)
-                                self:SetPoint("LEFT", self.parent, "RIGHT", 25, 0)
+                                self:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
                             end,
                             children = {
                                 ["Color By"] = {
                                     type = "dropdown",
                                     order = 1,
                                     placement = function(self)
-                                        self:SetPoint("LEFT", self.parent, "RIGHT", 150, 0)
+                                        self:SetPoint("LEFT", self.parent, "RIGHT", 120, 0)
                                     end,
                                     values = createDropdownTable("Class", "Health", "Gradient", "Custom"),
                                     get = genericGetValue,
@@ -1611,6 +1661,7 @@ function A:CreatePrefs(db)
                         ["Power"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 2,
                             placement = function(self)
@@ -1621,7 +1672,7 @@ function A:CreatePrefs(db)
                                     type = "dropdown",
                                     order = 1,
                                     placement = function(self)
-
+                                        self:SetPoint("LEFT", self.parent, "RIGHT", 150, 0)
                                     end,
                                     values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
                                     get = genericGetValue,
@@ -1636,7 +1687,9 @@ function A:CreatePrefs(db)
                                     type = "color",
                                     order = 2,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
@@ -1647,7 +1700,9 @@ function A:CreatePrefs(db)
                                     type = "number",
                                     order = 3,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
                                     end,
                                     min = -1,
                                     max = 1,
@@ -1662,7 +1717,9 @@ function A:CreatePrefs(db)
                                     type = "dropdown",
                                     order = 4,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     values = createDropdownTable("HORIZONTAL", "VERTICAL"),
                                     get = genericGetValue,
@@ -1674,7 +1731,9 @@ function A:CreatePrefs(db)
                                     type = "toggle",
                                     order = 5,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
                                     end,
                                     get = genericGetValue,
                                     set = genericSetValue,
@@ -1685,7 +1744,9 @@ function A:CreatePrefs(db)
                                     type = "dropdown",
                                     order = 6,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     values = media:List("statusbar"),
                                     get = genericGetValue,
@@ -1697,14 +1758,18 @@ function A:CreatePrefs(db)
                                     type = "group",
                                     order = 7,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Point"] = {
                                             type = "dropdown",
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = A.Tools.points,
                                             get = genericGetValue,
@@ -1716,7 +1781,9 @@ function A:CreatePrefs(db)
                                             type = "dropdown",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = A.Tools.points,
                                             get = genericGetValue,
@@ -1728,7 +1795,9 @@ function A:CreatePrefs(db)
                                             type = "dropdown",
                                             order = 3,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = createDropdownTable("Player", "Health"),
                                             get = genericGetValue,
@@ -1742,14 +1811,18 @@ function A:CreatePrefs(db)
                                     type = "group",
                                     order = 8,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Match width"] = {
                                             type = "toggle",
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
@@ -1760,7 +1833,9 @@ function A:CreatePrefs(db)
                                             type = "toggle",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
@@ -1774,7 +1849,9 @@ function A:CreatePrefs(db)
                                             type = "number",
                                             order = 3,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
                                             end,
                                             step = 10,
                                             decimals = false,
@@ -1792,7 +1869,9 @@ function A:CreatePrefs(db)
                                             type = "number",
                                             order = 4,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                                             end,
                                             step = 10,
                                             decimals = false,
@@ -1811,7 +1890,9 @@ function A:CreatePrefs(db)
                                     type = "group",
                                     order = 9,
                                     placement = function(self)
-
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                     end,
                                     children = {
                                         ["Custom Color"] = {
@@ -1821,7 +1902,9 @@ function A:CreatePrefs(db)
                                             type = "color",
                                             order = 1,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
                                             end,
                                             get = genericGetValue,
                                             set = genericSetValue,
@@ -1832,7 +1915,9 @@ function A:CreatePrefs(db)
                                             type = "dropdown",
                                             order = 2,
                                             placement = function(self)
-
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                                             end,
                                             values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
                                             get = genericGetValue,
@@ -1847,26 +1932,29 @@ function A:CreatePrefs(db)
                         ["Castbar"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 3,
                             placement = function(self)
-                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", -1, -5)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                             end,
                             children = {}
                         },
                         ["Alternative Power"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 4,
                             placement = function(self)
-                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", -1, -5)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                             end,
                             children = {}
                         },
                         ["Class Power"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 5,
                             placement = function(self)
@@ -1877,6 +1965,7 @@ function A:CreatePrefs(db)
                         ["Combat Indicator"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 6,
                             placement = function(self)
@@ -1886,9 +1975,13 @@ function A:CreatePrefs(db)
                         },
                         ["Stagger"] = {
                             enabled = function(self)
-                                return self.parent:enabled() and select(2, UnitClass("player")) == "MONK"
+                                return self.parent:enabled() and self:special()
+                            end,
+                            special = function(self)
+                                return select(2, UnitClass("player")) == "MONK"
                             end,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 7,
                             placement = function(self)
@@ -1899,6 +1992,7 @@ function A:CreatePrefs(db)
                         ["Buffs"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 8,
                             placement = function(self)
@@ -1909,6 +2003,7 @@ function A:CreatePrefs(db)
                         ["Debuffs"] = {
                             enabled = genericEnabled,
                             canToggle = true,
+                            onClick = genericOnClick,
                             type = "group",
                             order = 9,
                             placement = function(self)
@@ -1921,30 +2016,33 @@ function A:CreatePrefs(db)
                 ["Target"] = {
                     enabled = genericEnabled,
                     canToggle = true,
+                    onClick = hideParentChildrenAndShowSelf,
                     type = "group",
                     order = 2,
                     placement = function(self)
-
+                        self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                     end,
                     children = {}
                 },
                 ["Target of Target"] = {
                     enabled = genericEnabled,
                     canToggle = true,
+                    onClick = hideParentChildrenAndShowSelf,
                     type = "group",
                     order = 3,
                     placement = function(self)
-
+                        self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                     end,
                     children = {}
                 },
                 ["Pet"] = {
                     enabled = genericEnabled,
                     canToggle = true,
+                    onClick = hideParentChildrenAndShowSelf,
                     type = "group",
                     order = 4,
                     placement = function(self)
-
+                        self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                     end,
                     children = {}
                 }
@@ -1953,6 +2051,7 @@ function A:CreatePrefs(db)
         ["Group"] = {
             type = "group",
             order = 3,
+            onClick = hideParentChildrenAndShowSelf,
             placement = function(self)
                 self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, 0)
             end,
@@ -1984,10 +2083,10 @@ function A:CreatePrefs(db)
     local parent = CreateFrame("Frame", nil, A.frameParent)
     parent:SetSize(1, 1)
     parent:SetPoint("TOPLEFT", 0, -300)
-    parent.widgets = A:OrderedTable()
+    parent.children = A:OrderedTable()
 
     X.UpdateWidgetStates = function(self, widgets)
-        local iterator = widgets or parent.widgets
+        local iterator = widgets or parent.children
         iterator:foreach(function(widget)
             if (widget.children) then
                 X:UpdateWidgetStates(widget.children)
@@ -2013,7 +2112,7 @@ function A:CreatePrefs(db)
 
         if (type == "group") then
             widget = X:CreateGroup(name, parent, setting, db)
-            
+
             widget.title = buildText(widget, 11)
                     :atLeft()
                     :outline()
@@ -2022,14 +2121,16 @@ function A:CreatePrefs(db)
             widget.title:SetText(name)
 
             widget:SetWidth(widget.title:GetWidth())
+
+            X:HandleChildren(widget.children, false)
         else
             widget = X:CreateChild(name, parent, setting, db)
         end
 
-        parent.widgets:add(widget)
+        parent.children:add(widget)
     end
 
-    parent.widgets:foreach(function(widget)
+    parent.children:foreach(function(widget)
         widget:placement()
     end)
 end
