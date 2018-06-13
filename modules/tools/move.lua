@@ -196,6 +196,12 @@ function A:CreateMover(frame, db, overrideName)
 	moveableFrames[name] = moveFrame
 end
 
+function A:DeleteMover(name)
+	if (moveableFrames[name]) then
+		table.remove(moveableFrames, name)
+	end
+end
+
 SLASH_CLEANUI1 = '/cui'
 function SlashCmdList.CLEANUI(msg, editbox)
     local command, arg1, arg2, arg3, arg4, arg5 = T:getWords(msg)

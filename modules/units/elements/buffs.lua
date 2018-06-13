@@ -26,6 +26,7 @@ local Buffs = function(frame, db)
 
 	if attached ~= false then
 		buffs:SetPoint(T.reversedPoints[attached], frame, attached, x, y)
+		A:DeleteMover("Buffs")
 	else
 		A:CreateMover(buffs, db, "Buffs")
 		Units:Position(buffs, db["Position"])
