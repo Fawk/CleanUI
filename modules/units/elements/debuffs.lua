@@ -34,7 +34,7 @@ local Debuffs = function(frame, db)
 
 			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
 				if db["Blacklist"]["Enabled"] then
-					return not db["Blacklist"]["Ids"][spellID] and caster == "player"
+					return not db["Blacklist"]["Ids"][spellID]
 				elseif db["Whitelist"]["Enabled"] then
 					return db["Whitelist"]["Ids"][spellID]
 				end

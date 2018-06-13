@@ -135,9 +135,10 @@ T.points = {
 }
 
 function T:Background(frame, db, anchor, isBackdrop)
+	local target = frame
 	if db["Background"] and db["Background"]["Enabled"] then
 
-		local target = isBackdrop and frame or (anchor.bg or (function() 
+		target = isBackdrop and frame or (anchor.bg or (function() 
 			local f = CreateFrame("Frame", nil, frame)
 			f:SetFrameStrata("LOW")
 			f:SetFrameLevel(2)

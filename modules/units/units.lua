@@ -86,14 +86,12 @@ function Units:UpdateElements(frame, db)
             local name = tbl.name
             local func = tbl.func
             if db[name] then
-                if db[name]["Enabled"] then
-                    if frame.EnableElement then
-                        frame:EnableElement(name)
-                    end
-                    func(frame, db[name])
-                else
-                    if frame.DisableElement then
-                        frame:DisableElement(name)
+                func(frame, db[name])
+                if (frame[name]) then
+                    if (db[name]["Enabled"]) then
+                        frame[name]:Show()
+                    else
+                        frame[name]:Hide()
                     end
                 end
             end
