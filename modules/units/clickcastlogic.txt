@@ -1,0 +1,28 @@
+LMB
+MMB
+RMB
+SHIFT+LMB
+SHIFT+MMB
+SHIFT+RMB
+CTRL+LMB
+CTRL+MMB
+CTRL+RMB
+ALT+LMB
+ALT+MMB
+ALT+RMB
+CTRL+SHIFT+LMB
+CTRL+SHIFT+MMB
+CTRL+SHIFT+RMB
+ALT+CTRL+SHIFT+LMB
+ALT+CTRL+SHIFT+MMB
+ALT+CTRL+SHIFT+RMB
+ALT+CTRL+LMB
+ALT+CTRL+MMB
+ALT+CTRL+RMB
+ALT+SHIFT+LMB
+ALT+SHIFT+MMB
+ALT+SHIFT+RMB
+
+Foreach combination there is custom states that can be applied: [dead/nodead/harm/combat/talent:row/column]
+
+So essentially 24 * 25 for a whopping 600 different combinations, to begin with...

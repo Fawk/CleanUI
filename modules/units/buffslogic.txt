@@ -29,7 +29,7 @@ prefs = {
 			["Icon Options"] = {
 				type = "group",
 				enabled = function(self)
-					return self.parent:enabled() and self.parent["Style"] == "Icon"
+					return self.parent:enabled() and self.parent.db["Style"] == "Icon"
 				end,
 				placement = function(self)
 
@@ -38,16 +38,18 @@ prefs = {
 					-- Size
 					-- horizontal/vertical, grow direction, limit to row/column etc.
 					-- Should cooldown be shown?
+					-- Should cooldown be reversed?
 					-- Should cooldown text be shown?
 					-- Placement of cooldown text if shown
 					-- Different format for the text?
+					-- backdrop or not
 					-- Special effects (etc below 10s start blinking)
 				}
 			},
 			["Bar Options"] = {
 				type = "group",
 				enabled = function(self)
-					return self.parent:enabled() and self.parent["Style"] == "Bar"
+					return self.parent:enabled() and self.parent.db["Style"] == "Bar"
 				end,
 				placement = function(self)
 
@@ -58,6 +60,8 @@ prefs = {
 					-- Should name text be shown? and placement if shown
 					-- Should cooldown text be shown? and placement if shown
 					-- Different format for the text?
+					-- Bar reversed or not, horizontal or vertical orientation
+					-- Background or not, backdrop or not
 					-- Special effects (etc below 10s start blinking)
 				}
 			}
