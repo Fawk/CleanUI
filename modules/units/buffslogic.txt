@@ -1,0 +1,66 @@
+Buffs = {
+	Style = "Bar/Icon"
+}
+
+prefs = {
+	Buffs = {
+		type = "group",
+		enabled = function(self) return parent:enabled() end,
+		placement = function(self)
+
+		end,
+		children = {
+			["Style"] = {
+				type = "dropdown",
+				enabled = function(self)
+					return self.parent:enabled()
+				end,
+				placement = function(self)
+					self:SetPoint("TOPLEFT", self.parent, "BOTTOMLEFT", 0, 0)
+					self.title:SetPoint("LEFT")
+				end,
+				get = function(self)
+					return self.db
+				end,
+				set = function(self, value)
+					self.parent.db[self.name] = value
+				end,
+			},
+			["Icon Options"] = {
+				type = "group",
+				enabled = function(self)
+					return self.parent:enabled() and self.parent["Style"] == "Icon"
+				end,
+				placement = function(self)
+
+				end,
+				children = {
+					-- Size
+					-- horizontal/vertical, grow direction, limit to row/column etc.
+					-- Should cooldown be shown?
+					-- Should cooldown text be shown?
+					-- Placement of cooldown text if shown
+					-- Different format for the text?
+					-- Special effects (etc below 10s start blinking)
+				}
+			},
+			["Bar Options"] = {
+				type = "group",
+				enabled = function(self)
+					return self.parent:enabled() and self.parent["Style"] == "Bar"
+				end,
+				placement = function(self)
+
+				end,
+				children = {
+					-- Size
+					-- horizontal/vertical, grow direction, limit to row/column etc.
+					-- Should name text be shown? and placement if shown
+					-- Should cooldown text be shown? and placement if shown
+					-- Different format for the text?
+					-- Special effects (etc below 10s start blinking)
+				}
+			}
+		}
+	}
+}
