@@ -32,7 +32,7 @@ local conditionMap = {
 	"dead",
 	"nodead",
 	"harm",
-	"combat"
+	"combat",
 	"talent:[1-7]/[1-3]"
 }
 
@@ -48,12 +48,15 @@ local CC = {}
 
 function CC:Init(frame, db)
 	for key, action in next, db do
+
+		local mapped = keyMap[key]
+
 		if (key:equals("LMB", "MMB", "RMB")) then
-			frame:SetAttribute(keyMap[key], "macro")
-			frame:SetAttribute("*macrotext"..keyMap[key]:match("%d"), action)
+			frame:SetAttribute(mapped, "macro")
+			frame:SetAttribute("*macrotext"..mapped:match("%d"), action)
 		else
 			registerAttributeIfNeeded(frame, key)
-			frame:SetAttribute(keyMap[key], action)
+			frame:SetAttribute(mapped, action)
 		end
 	end
 end
@@ -61,23 +64,78 @@ end
 function CC:GetInitString(initString, db)
 	local initiated = {}
 	for key, action in next, db do
+
+		local mapped = keyMap[key]
+
 		if (key:equals("LMB", "MMB", "RMB")) then
-			initString = initString..'\nself:SetAttribute("'..keyMap[key]..'","macro");'
-			initString = initString..'\nself:SetAttribute("*macrotext"'..keyMap[key]:match("%d")..'","'..action..'");'
+			initString = initString..'\nself:SetAttribute("'..mapped..'","macro");'
+			initString = initString..'\nself:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
 			initiated[key] = true
 		else
-			local mapped = keyMap[key]
 			local needed = mapped:matchAny("LMB", "MMB", "RMB")
 			if (not initiated[needed]) then
 				initString = initString..'\nself:SetAttribute("'..keyMap[needed]..'","macro");'
 			end
-			initString = initString..'\nself:SetAttribute("'..keyMap[key]..'","'..action..'");'
+			initString = initString..'\nself:SetAttribute("'..mapped..'","'..action..'");'
 		end
 	end
 	return initString
 end
 
-function CC:GetOptions(enabled, click, order)
+--[[
+
+	"*macrotext1", "/cast [@mouseover,help] Something; [@mouseover,help,dead] Ress; [@mouseover,harm] Harmful Spell"
+
+	will turn into
+
+	LMB + [help] - Something
+	LMB + [help] + [dead] - Ress
+	LMB + [harm] - Harmful Spell
+
+]]
+local function splitActionsByConditions(db)
+	local actions = A:OrderedTable()
+
+	for key, action in next, db do 
+		local split = action:split(";")
+		for _,row in next, split do
+			row = row:trim()
+			local spell = row:match("%s[A-Za-z%s]+"):trim()
+			local conditions = row:match("%[[@%w,]+%]"):sub(2):sub(1, -2):split(",")
+
+			local map = {
+				["spell"] = spell,
+				["conditions"] = A:OrderedTable()
+			}
+			for _,condition in next, conditions do
+				for _,mappedCondition in next, conditionMap do
+					if (condition:match(mappedCondition)) then
+						map.conditions:add(condition)
+					end
+				end
+			end
+
+			actions:add(map)
+		end
+	end
+
+	return actions
+end
+
+function CC:ToggleClickCastWindow(group)
+	-- List the actions
+	-- New action button for key, with save that has to be pressed to verify against existing actions for that key
+	local actions = splitActionsByConditions(group.db)
+	actions:foreach(function(action)
+	--[[
+		Something like this:
+
+		[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available item/spell for use on textChanged ]
+	]]
+	end)
+end
+
+function CC:GetOptions(enabled, order)
 
 	local config = {
 		enabled = enabled,
@@ -87,10 +145,10 @@ function CC:GetOptions(enabled, click, order)
 		placement = function(self)
 
 		end,
-		onClick = click,
-		children = {
-
-		}
+		onClick = function(self)
+			CC:ToggleClickCastWindow(self)
+		end,
+		children = {}
 	}
 
 	return config

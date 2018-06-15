@@ -69,6 +69,15 @@ function T:split(s, delimiter)
   return result
 end
 
+function string.split(self, delimiter)
+    return T:split(self, delimiter)
+end
+
+function string.trim(self)
+    local from = self:match"^%s*()"
+    return from > #self and "" or self:match(".*%S", from)
+end
+
 function string.equals(self, ...)
    local match = false
    for _,value in next, { ... } do
