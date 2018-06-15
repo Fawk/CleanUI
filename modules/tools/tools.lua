@@ -79,6 +79,17 @@ function string.equals(self, ...)
    return match
 end
 
+function string.anyMatch(self, ...)
+	local match
+	for _,value in next, { ... } do
+		local m = self:match(value)
+		if (m) then
+			match = m
+		end
+	end
+	return match
+end
+
 function string.replace(self, t, r)
    local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
    return self:gsub(format, r)
