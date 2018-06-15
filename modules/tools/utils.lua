@@ -1375,6 +1375,82 @@ local function GroupBuilder(parent)
 	return o
 end
 
+local function CheckBoxBuilder(parent)
+	local o = {
+		parent = parent,
+	}
+
+	setmetatable(o, object)
+	o.button = CreateFrame("CheckButton", nil, parent)
+
+	o.button.parent = parent
+	o.button.active = true
+
+	hooksecurefunc(o.button, "SetChecked", function(self, checked)
+		if (checked) then
+			self.x:Show()
+		else
+			self.x:Hide()
+		end
+	end)
+
+	o.button.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(boolean)
+	end
+
+	o.button.IsActive = function(self)
+		return (parent.IsActive and parent:IsActive() or true) and self.active
+	end
+
+	o.button.SetValue = function(self, checked)
+		self:SetChecked(checked)
+	end
+
+	o.button.GetValue = function(self)
+		return self:GetChecked()
+	end
+
+	function o:fontSize(size)
+		o.xSize = size
+		return self
+	end
+
+	function o:outline()
+		self.xOutline = true
+		return self
+	end
+
+	function o:onClick(func)
+		self.button:SetScript("OnClick", func)
+		return self
+	end
+
+	function o:backdrop(bd, bdColor, borderColor)
+		self.button:SetBackdrop(bd)
+		self.button:SetBackdropColor(unpack(bdColor))
+		self.button:SetBackdropBorderColor(unpack(borderColor))
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.button)
+		self.button:SetSize(self.w, self.h)
+		
+		local builder = A.TextBuilder(self.button, o.xSize)
+				:atCenter()
+
+		if (x.Outline) then
+			builder:outline()
+		end
+
+		self.button.x = builder:build()
+		return self.button
+	end
+
+	return o
+end
+
 function A:ColumnBuilder()
 
 	local o = {
@@ -1695,3 +1771,4 @@ A.ToggleBuilder = ToggleBuilder
 A.GroupBuilder = GroupBuilder
 A.NumberBuilder = NumberBuilder
 A.ColorBuilder = ColorBuilder
+A.CheckBoxBuilder = CheckBoxBuilder

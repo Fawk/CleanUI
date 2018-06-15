@@ -1,5 +1,8 @@
 local AddonName = ...
 local A, L = unpack(select(2, ...))
+local buildCheckbox = A.CheckBoxBuilder
+local buildDropdown = A.DropdownBuilder
+local buildEditbox = A.EditBoxBuilder
 
 local keyMap = {
 	["LMB"] = "*type1",
@@ -101,7 +104,7 @@ local function splitActionsByConditions(db)
 		for _,row in next, split do
 			row = row:trim()
 			local spell = row:match("%s[A-Za-z%s]+"):trim()
-			local conditions = row:match("%[[@%w,]+%]"):sub(2):sub(1, -2):split(",")
+			local conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):split(",")
 
 			local map = {
 				["spell"] = spell,
@@ -122,17 +125,122 @@ local function splitActionsByConditions(db)
 	return actions
 end
 
+local function getTalentTable()
+	local talents = { "None" }
+	for tier = 1, 7 do
+		for column = 1, 3 do
+			table.insert(talents, string.format("talent:%d/%d", tier, column))
+		end
+	end
+	return talents
+end
+
 function CC:ToggleClickCastWindow(group)
-	-- List the actions
-	-- New action button for key, with save that has to be pressed to verify against existing actions for that key
+	
+	-- List the existing actions
+	if (A.clickCastWindow) then
+		A.clickCastWindow:Hide()
+		A.clickCastWindow = nil
+	end
+
+	local parent = CreateFrame("Frame", nil, A.frameParent)
+	parent:SetSize(600, 600)
+
+	local relative = parent
+
 	local actions = splitActionsByConditions(group.db)
 	actions:foreach(function(action)
+
+		local row = CreateFrame("Frame", nil, parent)
+		row:SetSize(parent:GetWidth(), 20)
+
+		if (relative == parent) then
+			row:SetPoint("TOPLEFT")
+			row:SetPoint("TOPRIGHT")
+		else
+			row:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, 0)
+			row:SetPoint("TOPRIGHT", relative, "BOTTOMRIGHT", 0, 0)
+		end
+
+		local talent
+		local checkBoxRelative = row
+		action.conditions:foreach(function(condition)
+			if (condition:match("talent:[1-7]/[1-3]")) then
+				talent = condition
+			else
+				local builder = buildCheckbox(row)
+						:onClick(function(self, b, d)
+
+						end)
+						:onValueChanged(function(self, value)
+
+						end)
+				
+				if (checkBoxRelative == row) then
+					builder:atLeft()
+				else
+					builder:rightOf(checkBoxRelative)
+				end
+
+				local widget = builder:build()
+			end
+		end)
+
+		local talents = buildDropdown(row)
+				:addItems(getTalentTable())
+				:onValueChanged(function(self, value)
+
+				end)
+				:build()
+
+		talents:SetValue(talent)
 	--[[
 		Something like this:
 
-		[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available item/spell for use on textChanged ]
+		[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available spell/target/togglemenu for use on textChanged ]
 	]]
+
+		local textbox = buildEditbox(row)
+				:atRight()
+				:x(-10)
+				:size(200, row:GetHeight())
+				:onTextChanged(function(self, text)
+					local command = text:matchAny("target", "togglemenu")
+					if (command) then
+						self.acceptButton:SetEnabled(true)
+					else
+						-- Do the search here
+						local searchResult -- Do stuff...
+						if (searchResult) then
+							if (searchResult:count() > 1) then
+								-- Specific one must be choosen
+							else
+
+								self.acceptButton:SetEnabled(true)
+							end
+						else
+							self.acceptButton:SetEnabled(false)
+						end
+					end
+				end)
+				:onValueChanged(function(self, value)
+
+				end)
+				:build()
+		textbox:SetValue(action.spell)
+		textbox.acceptButton = buildButton(textbox)
+				:atRight()
+				:onClick(function(self, b, d)
+					-- Save to db here
+				end)
+				:build()
+
+		relative = row
 	end)
+
+	-- New action button for key, with save that has to be pressed to verify against existing actions for that key
+
+	A.clickCastWindow = parent
 end
 
 function CC:GetOptions(enabled, order)
