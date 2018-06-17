@@ -608,6 +608,7 @@ local function EditBoxBuilder(parent)
 		self.textbox:SetBackdrop(A.enum.backdrops.editboxborder)
 		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
 		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
+		self.textbox:SetTextInsets(5, 0, 0, 0)
 
 		return self.textbox
 	end
@@ -1754,6 +1755,7 @@ local function MultiDropdownBuilder(parent)
 					:atRight()
 					:x(-5)
 					:fontSize(22)
+					:size(self.h, self.h)
 					:outline()
 					:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
 					:build()
@@ -1770,9 +1772,9 @@ local function MultiDropdownBuilder(parent)
 		end)
 
 		self.dropdown.items:foreach(function(item)
-			if (o.dropdown.selectedItems:contains(item.index)
+			if (o.dropdown.selectedItems:contains(item.index)) then
 				item.checkBox:SetChecked(true)
-			end)
+			end
 		end)
 
 		if (self.override) then

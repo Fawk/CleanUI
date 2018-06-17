@@ -5,6 +5,7 @@ local buildDropdown = A.DropdownBuilder
 local buildEditbox = A.EditBoxBuilder
 local buildButton = A.ButtonBuilder
 local buildText = A.TextBuilder
+local buildMultiDropdown = A.MultiDropdownBuilder
 
 local media = LibStub("LibSharedMedia-3.0")
 
@@ -54,6 +55,14 @@ local function registerAttributeIfNeeded(frame, key)
 	end
 end
 
+local function blizzardCommand(frame, mapped, command, initString)
+	if (initString) then
+		return initString..'\nself:SetAttribute("'..mapped:gsub("macrotext", "type")..'","'..command..'");'
+	else
+		frame:SetAttribute(mapped, command)
+	end
+end
+
 local CC = {}
 
 function CC:Setup(frame, db)
@@ -63,12 +72,17 @@ function CC:Setup(frame, db)
 
 		local mapped = keyMap[key]
 
-		if (key:equals("LMB", "MMB", "RMB")) then
-			frame:SetAttribute(mapped, "macro")
-			frame:SetAttribute("*macrotext"..mapped:match("%d"), action)
+		local command = action:anyMatch("target", "togglemenu")
+		if (command) then
+			blizzardCommand(frame, mapped, command)
 		else
-			registerAttributeIfNeeded(frame, key)
-			frame:SetAttribute(mapped, action)
+			if (key:equals("LMB", "MMB", "RMB")) then
+				frame:SetAttribute(mapped, "macro")
+				frame:SetAttribute("*macrotext"..mapped:match("%d"), action)
+			else
+				registerAttributeIfNeeded(frame, key)
+				frame:SetAttribute(mapped, action)
+			end
 		end
 	end
 end
@@ -81,16 +95,21 @@ function CC:GetInitString(initString, db)
 
 		local mapped = keyMap[key]
 
-		if (key:equals("LMB", "MMB", "RMB")) then
-			initString = initString..'\nself:SetAttribute("'..mapped..'","macro");'
-			initString = initString..'\nself:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
-			initiated[key] = true
+		local command = action:anyMatch("target", "togglemenu")
+		if (command) then
+			initString = blizzardCommand(frame, mapped, command, initString)
 		else
-			local needed = mapped:matchAny("LMB", "MMB", "RMB")
-			if (not initiated[needed]) then
-				initString = initString..'\nself:SetAttribute("'..keyMap[needed]..'","macro");'
+			if (key:equals("LMB", "MMB", "RMB")) then
+				initString = initString..'\nself:SetAttribute("'..mapped..'","macro");'
+				initString = initString..'\nself:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
+				initiated[key] = true
+			else
+				local needed = mapped:matchAny("LMB", "MMB", "RMB")
+				if (not initiated[needed]) then
+					initString = initString..'\nself:SetAttribute("'..keyMap[needed]..'","macro");'
+				end
+				initString = initString..'\nself:SetAttribute("'..mapped..'","'..action..'");'
 			end
-			initString = initString..'\nself:SetAttribute("'..mapped..'","'..action..'");'
 		end
 	end
 	return initString
@@ -147,7 +166,7 @@ local function splitActionsByConditions(db)
 end
 
 local function getTalentTable()
-	local talents = { "Any talent" }
+	local talents = {}
 	for tier = 1, 7 do
 		for column = 1, 3 do
 			table.insert(talents, string.format("talent:%d/%d", tier, column))
@@ -186,55 +205,31 @@ function CC:ToggleClickCastWindow(group)
 			row:SetPoint("TOPRIGHT", relative, "BOTTOMRIGHT", 0, 0)
 		end
 
-		local talent
-		local checkBoxRelative = row
+		local selectedConditions = {}
 		action.conditions:foreach(function(condition)
-			if (condition.text:match("talent:[1-7]/[1-3]")) then
-				talent = condition.text
-			else
-				local builder = buildCheckbox(row)
-						:size(20, 20)
-						:onClick(function(self, b, d)
 
-						end)
-						:onValueChanged(function(self, value)
-
-						end)
-						:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
-						:outline()
-						:fontSize(14)
-				
-				if (checkBoxRelative == row) then
-					builder:atLeft():x(10)
-				else
-					builder:rightOf(checkBoxRelative.title):x(5)
-				end
-
-				local widget = builder:build()
-				widget.title = buildText(widget, 10)
-						:rightOf(widget)
-						:x(3)
-						:outline()
-						:build()
-				widget.title:SetText(condition.text)
-
-				widget:SetValue(condition.active)
-
-				checkBoxRelative = widget
-			end
 		end)
 
-		local talents = buildDropdown(row)
-				:addItems(getTalentTable())
-				:size(50, 20)
-				:onValueChanged(function(self, value)
+		local conditions = {}
+		for _,mappedCondition in next, conditionMap do
+			if (not mappedCondition:find("talent")) then
+				table.insert(conditions, mappedCondition)
+			end
+		end
 
-				end)
+		local talents = getTalentTable()
+		local widget = buildMultiDropdown(row)
+				:atLeft()
+				:x(10)
+				:size(150, 20)
 				:fontSize(10)
-				:rightOf(checkBoxRelative.title)
+				:overrideText("Conditions")
+				:addItems(conditions)
+				:addItems(talents)
 				:build()
 
-		talents:SetValue(talent)
+		widget:SetValue(selectedConditions)
+
 	--[[
 		Something like this:
 

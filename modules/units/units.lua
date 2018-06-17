@@ -138,7 +138,7 @@ local function GetUnitAuras(unit, filter)
 end
 
 local important = {
-    ["BossDebuff"] = function(self, frame, db)
+    ["Boss Debuff"] = function(self, frame, db)
         local size, position, tracked, ignored = db["Size"], db["Position"], db["Tracked"], db["Ignored"]
 
         local debuff = frame["Boss Debuff"]
@@ -189,7 +189,7 @@ local important = {
             debuff:Show()
         end
     end,
-    ["RaidBuffs"] = function(frame, db)   
+    ["Raid Buffs"] = function(frame, db)   
 	
 		local function buffButton(frame, position, size, spellId, obj, unit)
 
@@ -321,7 +321,7 @@ local important = {
             end
         end
         
-        frame["RaidBuffs"] = buffs
+        frame["Raid Buffs"] = buffs
     end
 }
 

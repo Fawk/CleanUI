@@ -154,7 +154,8 @@ function OT:getBy(key, value, steps)
 end
 
 function OT:select(key)
-  local t = {}, i = 1
+  local t = {}
+  local i = 1
   self:foreach(function(item)
     t[i] = item[key]
     i = i + 1
