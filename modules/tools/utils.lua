@@ -1440,12 +1440,351 @@ local function CheckBoxBuilder(parent)
 		local builder = A.TextBuilder(self.button, o.xSize)
 				:atCenter()
 
-		if (x.Outline) then
+		if (o.xOutline) then
 			builder:outline()
 		end
 
 		self.button.x = builder:build()
+		self.button.x:SetJustifyV("MIDDLE")
+		self.button.x:SetJustifyH("CENTER")
+		self.button.x:SetText("x")
 		return self.button
+	end
+
+	return o
+end
+
+local function MultiDropdownBuilder(parent)
+	local o = {
+		parent = parent,
+		items = A:OrderedTable()
+	}
+
+	setmetatable(o, widget)
+	o.dropdown = CreateFrame("Button", nil, parent)
+	o.dropdown.items = A:OrderedTable()
+
+	o.dropdown.parent = parent
+	o.dropdown.active = true
+	o.dropdown.selectedItems = A:OrderedTable()
+	o.dropdown.open = false
+
+	o.dropdown.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+
+		self.selectedButton.active = boolean
+		self.selectedButton:SetActive(self.selectedButton.active)
+	end
+
+	o.dropdown.IsActive = function(self)
+		return parent:IsActive() and self.active
+	end
+
+	o.dropdown.SetValue = function(self, list)
+		if (o.override) then return end;
+
+		self.selectedItems = list
+
+		if o.onValueChangedFunc then 
+			o:onValueChangedFunc(self, self.selectedItems)
+		end
+	end
+
+	o.dropdown.GetValue = function(self)
+		if (self.override) then return self.override end
+		return self.selectedItems
+	end
+
+	o.dropdown.Open = function(self)
+		self.open = true
+		self.items:foreach(function(item)
+			item:Show()
+		end)
+	end
+
+	o.dropdown.Close = function(self)
+		self.open = false
+		self.items:foreach(function(item)
+			item:SetBackdropBorderColor(0, 0, 0, 0)
+			item:Hide()
+		end)
+	end
+
+	function o:addItems(items)
+		for name, item in next, items do
+			if (type(item) == "table" and not item.name) then 
+				item.name = name 
+			end
+			if (item.order) then
+				self.items:addAt(item, item.order)
+			else
+				self.items:add(item)
+			end
+		end
+		return self
+	end
+
+	function o:addItem(item)
+		self.items:add(item)
+		return self
+	end
+
+	function o:fontSize(fontSize)
+		self.fs = fontSize
+		return self
+	end
+
+	function o:onItemClick(func)
+		self.itemFunc = func
+		return self
+	end
+
+	function o:onClick(func)
+		self.func = func
+		return self
+	end
+
+	function o:backdrop(bd, bdColor, borderColor)
+		self.dropdown.bd = bd
+		self.dropdown.bdColor = bdColor
+		self.dropdown.borderColor = borderColor
+		return self
+	end
+
+	function o:overrideText(value)
+		self.override = value
+		return self
+	end
+
+	function o:upwards()
+		self.directionUp = true
+		return self
+	end
+
+	function o:leftOfButton()
+		self.openAtLeft = true
+		return self
+	end
+
+	function o:rightOfButton()
+		self.openAtRight = true
+		return self
+	end
+
+	function o:stayOpenAfterChoosing()
+		self.dontClose = true
+		return self
+	end
+
+	function o:overrideRelative(relative)
+		self.realRelative = relative
+		return self
+	end
+
+	function o:onHover(func)
+		self.hoverFunc = func
+		return self
+	end
+
+	function o:onChildCreation(func)
+		self.childCreation = func
+		return self
+	end
+
+	function o:hideSelectedButtonBackdrop()
+		self.hideSelectedButtonBd = true
+		return self
+	end
+
+	function o:selectedButtonTextHorizontalAlign(halign)
+		self.selectedButtonAlignH = halign
+		return self
+	end
+
+	function o:selectedButtonTextVerticalAlign(valign)
+		self.selectedButtonAlignV = valign
+		return self
+	end
+
+	function o:onItemHover(func)
+		self.itemHover = func
+		return self
+	end
+
+	function o:build()
+		setPoints(self, self.dropdown)
+		self.dropdown:SetSize(self.w, self.h)
+
+		self.dropdown:SetScript("OnClick", function(self, b, down)
+			if not down then
+				if (self.active) then
+					self.items:foreach(function(item)
+						if (self.open) then
+							if (not o.dontClose) then
+								item:Hide()
+							end
+						else
+							item:Show()
+						end
+					end)
+					self.open = not self.open
+
+					if (o.func) then
+						o:func(self, b)
+					end
+				end
+			end
+		end)
+
+		self.itemClick = function(self, item, mouseButton)
+			self.dropdown:SetValue(item.name)
+			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
+			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
+		end
+
+		self.dropdown.selected = 1
+		local selectedButtonBuilder = A.ButtonBuilder(self.dropdown)
+			:size(self.w, self.h)
+			:atTopLeft()
+			:onHover(self.hoverFunc or A.noop)
+			:onClick(function(self, b, d)
+				o.dropdown:GetScript("OnClick")(o.dropdown, b, d)
+			end)
+
+		if (not self.hideSelectedButtonBd) then
+			selectedButtonBuilder
+					:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
+		end
+			
+		local selectedButton = selectedButtonBuilder:build()
+		selectedButton:RegisterForClicks("AnyUp")
+		selectedButton:SetFrameLevel(self.dropdown:GetFrameLevel() + 1)
+
+		local tb = A.TextBuilder(selectedButton, o.fs or 14):outline()
+
+		if (self.selectedButtonAlignH) then
+			local h = self.selectedButtonAlignH
+			if (h == "LEFT") then
+				selectedButton.text = tb:atLeft():x(6)
+			elseif (h == "RIGHT") then
+				selectedButton.text = tb:atRight():x(-6)
+			elseif (h == "CENTER") then
+				selectedButton.text = tb:atCenter()
+			end
+			
+			selectedButton.text = tb:build()
+			selectedButton.text:SetJustifyH(h)
+		end
+		
+		if (self.selectedButtonAlignV) then
+			local v = self.selectedButtonAlignV
+			if (v == "TOP") then
+				selectedButton.text = tb:atTop():y(-6)
+			elseif (v == "BOTTOM") then
+				selectedButton.text = tb:atBottom():y(6)
+			elseif (v == "MIDDLE") then
+				selectedButton.text = tb:atCenter()
+			end
+
+			selectedButton.text = tb:build()
+			selectedButton.text:SetJustifyV(v)
+		end
+
+		if (not selectedButton.text) then
+			selectedButton.text = tb:atLeft():x(6):build()
+		end
+
+		self.items:foreach(function(item)
+
+			local relative = self.dropdown.items:getRelative(self.realRelative or self.dropdown.selectedButton)
+
+			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
+			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
+			:onClick(function(self, b, down)
+				if not down then
+					if o.dropdown.active then
+
+						o.dropdown.items:foreach(function(item)
+							item:SetBackdropBorderColor(0, 0, 0, 0)
+						end)
+
+						o:itemClick(self, b)
+
+						self:SetBackdropBorderColor(1, 1, 1, 1)
+					end
+				end
+			end)
+			
+			if (self.itemHover) then
+				builder:onHover(self.itemHover)
+			end
+
+			if (relative == (self.realRelative or self.dropdown.selectedButton)) then
+				if (self.openAtRight) then
+					builder:rightOf(relative)
+				elseif (self.openAtLeft) then
+					builder:leftOf(relative)
+				else
+					builder:below(relative)
+				end
+			else
+				if (self.directionUp) then
+					builder:above(relative)
+				else
+					builder:below(relative)
+				end
+			end
+
+			local button = builder:build()
+			button:RegisterForClicks("AnyUp")
+			button:SetFrameLevel(10)
+			button.item = item
+
+			if (type(item) == "table") then
+				button.name = item.name
+			else
+				button.name = item
+			end
+
+			button.text = A.TextBuilder(button, o.fs or 14):atLeft():x(6):outline():build()
+			button.text:SetText(button.name)
+
+			button.checkBox = A.CheckBoxBuilder(button)
+					:atRight()
+					:x(-5)
+					:fontSize(22)
+					:outline()
+					:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
+					:build()
+
+			button.checkBox:SetChecked(false)
+
+			if (self.childCreation) then
+				self:childCreation(self, button)
+			end
+
+			button:Hide()
+
+			self.dropdown.items:add(button)
+		end)
+
+		self.dropdown.items:foreach(function(item)
+			if (o.dropdown.selectedItems:contains(item.index)
+				item.checkBox:SetChecked(true)
+			end)
+		end)
+
+		if (self.override) then
+			selectedButton.text:SetText(self.override)
+		else
+			local current = self.dropdown.items:get(self.dropdown.selected)
+			selectedButton.text:SetText(current and current.name or "")
+		end
+
+		self.dropdown.selectedButton = selectedButton
+
+		return self.dropdown
 	end
 
 	return o
@@ -1772,3 +2111,4 @@ A.GroupBuilder = GroupBuilder
 A.NumberBuilder = NumberBuilder
 A.ColorBuilder = ColorBuilder
 A.CheckBoxBuilder = CheckBoxBuilder
+A.MultiDropdownBuilder = MultiDropdownBuilder

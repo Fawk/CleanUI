@@ -9,6 +9,7 @@
     <Script file="reputation.lua"/>
     <Script file="vehicle.lua"/>
     <Script file="petbar.lua"/>
+    <Script file="clickcast.lua"/>
 	<!--<Script file="cooldown.lua"/>-->
 
 </Ui>

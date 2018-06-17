@@ -5,6 +5,7 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
+local CC = A.modules.clickcast
 
 local init = false
 
@@ -80,9 +81,7 @@ function Party:Init()
           self:SetHeight(%d);
     ]]
 
-    for _,binding in next, db["Clickcast"] do
-        initString = initString..'\nself:SetAttribute("'..binding.type..'","'..binding.action..'");'
-    end
+    initString = CC:GetInitString(initString, db["Clickcast"])
 
     local partyHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
@@ -198,7 +197,7 @@ function Party:Update(frame, db)
     if not db["Enabled"] then return end
 
     T:RunNowOrAfterCombat(function() 
-        Units:SetupClickcast(frame, db["Clickcast"])
+        CC:Setup(frame, db["Clickcast"])
     end)
 
     Units:UpdateElements(frame, db)

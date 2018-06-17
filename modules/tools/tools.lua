@@ -69,8 +69,14 @@ function T:split(s, delimiter)
   return result
 end
 
-function string.split(self, delimiter)
-    return T:split(self, delimiter)
+function string.explode(self, sep)
+   local t = {}
+   local i = 1
+   for str in string.gmatch(self, "([^"..sep.."]+)") do
+      t[i] = str
+      i = i + 1
+   end
+   return t
 end
 
 function string.trim(self)
@@ -112,6 +118,15 @@ function T:tcount(tbl)
 	local i = 0
 	for k,v in pairs(tbl) do i=i+1 end
 	return i
+end
+
+function T:contains(tbl, value)
+	for k,v in next, tbl do
+		if (v == value) then
+			return true
+		end
+	end
+	return false
 end
 
 function T:frameName(...)

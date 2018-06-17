@@ -1038,7 +1038,9 @@ function A:ConstructPreferences(db)
 				["Party"] = {
 					type = "group",
                     order = 1,
-					children = {}
+					children = {
+
+                    }
 				},
 				["Raid"] = {
 					type = "group",
@@ -2059,12 +2061,15 @@ function A:CreatePrefs(db)
                 ["Party"] = {
                     enabled = genericEnabled,
                     canToggle = true,
+                    onClick = hideParentChildrenAndShowSelf,
                     type = "group",
                     order = 1,
                     placement = function(self)
-
+                        self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
                     end,
-                    children = {}
+                    children = {
+                        ["Clickcast"] = A.modules.clickcast:GetOptions(genericEnabled, 1),
+                    }
                 },
                 ["Raid"] = {
                     enabled = genericEnabled,

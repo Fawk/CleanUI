@@ -6,6 +6,7 @@ local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
 local Holder
+local CC = A.modules.clickcast
 
 local Raid = {}
 local frameName = "Raid"
@@ -200,7 +201,7 @@ function Raid:Update(frame, db)
     if not db or not db["Enabled"] then return end
 
     T:RunNowOrAfterCombat(function() 
-        Units:SetupClickcast(frame, db["Clickcast"])
+        CC:Setup(frame, db["Clickcast"])
     end)
 
     Units:UpdateElements(frame, db)

@@ -3,6 +3,13 @@ local A, L = unpack(select(2, ...))
 local buildCheckbox = A.CheckBoxBuilder
 local buildDropdown = A.DropdownBuilder
 local buildEditbox = A.EditBoxBuilder
+local buildButton = A.ButtonBuilder
+local buildText = A.TextBuilder
+
+local media = LibStub("LibSharedMedia-3.0")
+
+local E = A.enum
+local T = A.Tools
 
 local keyMap = {
 	["LMB"] = "*type1",
@@ -33,8 +40,8 @@ local keyMap = {
 
 local conditionMap = {
 	"dead",
-	"nodead",
 	"harm",
+	"help",
 	"combat",
 	"talent:[1-7]/[1-3]"
 }
@@ -49,8 +56,10 @@ end
 
 local CC = {}
 
-function CC:Init(frame, db)
-	for key, action in next, db do
+function CC:Setup(frame, db)
+	if (not db["Enabled"]) then return end
+
+	for key, action in next, db["Actions"] do
 
 		local mapped = keyMap[key]
 
@@ -65,8 +74,10 @@ function CC:Init(frame, db)
 end
 
 function CC:GetInitString(initString, db)
+	if (not db["Enabled"]) then return initString end
+
 	local initiated = {}
-	for key, action in next, db do
+	for key, action in next, db["Actions"] do
 
 		local mapped = keyMap[key]
 
@@ -100,24 +111,34 @@ local function splitActionsByConditions(db)
 	local actions = A:OrderedTable()
 
 	for key, action in next, db do 
-		local split = action:split(";")
+		local split = action:explode(";")
+
 		for _,row in next, split do
 			row = row:trim()
 			local spell = row:match("%s[A-Za-z%s]+"):trim()
-			local conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):split(",")
+			local conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
 
 			local map = {
+				["key"] = key,
 				["spell"] = spell,
 				["conditions"] = A:OrderedTable()
 			}
-			for _,condition in next, conditions do
-				for _,mappedCondition in next, conditionMap do
+
+			for _,mappedCondition in next, conditionMap do
+				local cond = { 
+					text = mappedCondition, 
+					active = false
+				}
+				for _,condition in next, conditions do
 					if (condition:match(mappedCondition)) then
-						map.conditions:add(condition)
+						cond.active = true
 					end
 				end
-			end
 
+				if (not mappedCondition:find("talent")) then
+					map.conditions:add(cond)
+				end
+			end
 			actions:add(map)
 		end
 	end
@@ -126,7 +147,7 @@ local function splitActionsByConditions(db)
 end
 
 local function getTalentTable()
-	local talents = { "None" }
+	local talents = { "Any talent" }
 	for tier = 1, 7 do
 		for column = 1, 3 do
 			table.insert(talents, string.format("talent:%d/%d", tier, column))
@@ -136,7 +157,7 @@ local function getTalentTable()
 end
 
 function CC:ToggleClickCastWindow(group)
-	
+
 	-- List the existing actions
 	if (A.clickCastWindow) then
 		A.clickCastWindow:Hide()
@@ -144,11 +165,14 @@ function CC:ToggleClickCastWindow(group)
 	end
 
 	local parent = CreateFrame("Frame", nil, A.frameParent)
+	parent:SetPoint("CENTER")
+	parent:SetBackdrop(A.enum.backdrops.editbox)
+	parent:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 	parent:SetSize(600, 600)
 
 	local relative = parent
 
-	local actions = splitActionsByConditions(group.db)
+	local actions = splitActionsByConditions(group.db["Actions"])
 	actions:foreach(function(action)
 
 		local row = CreateFrame("Frame", nil, parent)
@@ -165,32 +189,49 @@ function CC:ToggleClickCastWindow(group)
 		local talent
 		local checkBoxRelative = row
 		action.conditions:foreach(function(condition)
-			if (condition:match("talent:[1-7]/[1-3]")) then
-				talent = condition
+			if (condition.text:match("talent:[1-7]/[1-3]")) then
+				talent = condition.text
 			else
 				local builder = buildCheckbox(row)
+						:size(20, 20)
 						:onClick(function(self, b, d)
 
 						end)
 						:onValueChanged(function(self, value)
 
 						end)
+						:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
+						:outline()
+						:fontSize(14)
 				
 				if (checkBoxRelative == row) then
-					builder:atLeft()
+					builder:atLeft():x(10)
 				else
-					builder:rightOf(checkBoxRelative)
+					builder:rightOf(checkBoxRelative.title):x(5)
 				end
 
 				local widget = builder:build()
+				widget.title = buildText(widget, 10)
+						:rightOf(widget)
+						:x(3)
+						:outline()
+						:build()
+				widget.title:SetText(condition.text)
+
+				widget:SetValue(condition.active)
+
+				checkBoxRelative = widget
 			end
 		end)
 
 		local talents = buildDropdown(row)
 				:addItems(getTalentTable())
+				:size(50, 20)
 				:onValueChanged(function(self, value)
 
 				end)
+				:fontSize(10)
+				:rightOf(checkBoxRelative.title)
 				:build()
 
 		talents:SetValue(talent)
@@ -204,22 +245,25 @@ function CC:ToggleClickCastWindow(group)
 				:atRight()
 				:x(-10)
 				:size(200, row:GetHeight())
-				:onTextChanged(function(self, text)
-					local command = text:matchAny("target", "togglemenu")
-					if (command) then
-						self.acceptButton:SetEnabled(true)
-					else
-						-- Do the search here
-						local searchResult -- Do stuff...
-						if (searchResult) then
-							if (searchResult:count() > 1) then
-								-- Specific one must be choosen
-							else
-
-								self.acceptButton:SetEnabled(true)
-							end
+				:onTextChanged(function(self)
+					local text = self:GetText()
+					if (text) then
+						local command = text:anyMatch("target", "togglemenu")
+						if (command) then
+							self.acceptButton:SetEnabled(true)
 						else
-							self.acceptButton:SetEnabled(false)
+							-- Do the search here
+							local searchResult -- Do stuff...
+							if (searchResult) then
+								if (searchResult:count() > 1) then
+									-- Specific one must be choosen
+								else
+
+									self.acceptButton:SetEnabled(true)
+								end
+							else
+								self.acceptButton:SetEnabled(false)
+							end
 						end
 					end
 				end)
@@ -227,6 +271,7 @@ function CC:ToggleClickCastWindow(group)
 
 				end)
 				:build()
+		textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
 		textbox:SetValue(action.spell)
 		textbox.acceptButton = buildButton(textbox)
 				:atRight()
@@ -251,7 +296,7 @@ function CC:GetOptions(enabled, order)
 		type = "group",
 		order = order,
 		placement = function(self)
-
+			self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
 		end,
 		onClick = function(self)
 			CC:ToggleClickCastWindow(self)
@@ -262,3 +307,4 @@ function CC:GetOptions(enabled, order)
 	return config
 end
 
+A.modules.clickcast = CC

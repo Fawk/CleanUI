@@ -797,18 +797,10 @@ local defaults =  {
                 },
                 ["Party"] = {
                     ["Clickcast"] = {
-                        { type = "*type1", action = "macro" },
-                        { type = "*macrotext1", action = "/cast [@mouseover,help,nodead] Effuse; [@mouseover,help,dead] Resuscitate" },
-                        { type = "shift-macrotext1", action = "/cast [@mouseover,help,nodead] Enveloping Mist" },
-                        { type = "ctrl-macrotext1", action = "/cast [@mouseover,help,nodead] Life Cocoon" },
-                        { type = "ctrl-shift-type1", action = "target" },
-                        { type = "*type2", action = "macro" },
-                        { type = "*macrotext2", action = "/cast [@mouseover,help,nodead] Renewing Mist" },
-                        { type = "shift-macrotext2", action = "/cast [@mouseover,help,nodead] Vivify" },
-                        { type = "ctrl-shift-type2", action = "togglemenu" },
-                        { type = "*type3", action = "macro" },
-                        { type = "*macrotext3", action = "/cast [@mouseover,help,nodead] Detox" },
-                        { type = "shift-macrotext3", action = "/cast [@mouseover,help,nodead] Sheilun's Gift" }
+                        ["Enabled"] = true,
+                        ["Actions"] = {
+                            ["LMB"] = "/cast [@mouseover,help] Shadow Mend; [@mouseover,help,dead] Ressurection",
+                        }
                     },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",
@@ -907,45 +899,6 @@ local defaults =  {
                     ["Raid Buffs"] = {
                         ["Limit"] = 40,
                         ["Tracked"] = {
-                            [119611] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "TOPRIGHT",
-                                    ["Local Point"] = "TOPRIGHT",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = 0,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = false,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 16
-                            },
-                            [116849] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "TOP",
-                                    ["Local Point"] = "TOP",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = -5,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = true,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 16
-                            },
-                            [191840] = {
-                                ["Own Only"] = true,
-                                ["Position"] = {
-                                    ["Point"] = "LEFT",
-                                    ["Local Point"] = "LEFT",
-                                    ["Offset X"] = 0,
-                                    ["Offset Y"] = 0,
-                                    ["Relative To"] = "Parent"
-                                },
-                                ["Hide Countdown Numbers"] = false,
-                                ["Cooldown Numbers Text Size"] = 9,
-                                ["Size"] = 14
-                            }
                         },
 						["Important"] = true,
                         ["Enabled"] = true
@@ -986,6 +939,10 @@ local defaults =  {
                     ["Enabled"] = true
                 },
                 ["Raid"] = {
+                    ["Clickcast"] = {
+                        ["Enabled"] = true,
+                        ["Actions"] = {}
+                    },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",
                         ["Point"] = "TOPLEFT",
