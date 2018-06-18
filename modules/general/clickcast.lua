@@ -205,10 +205,28 @@ function CC:ToggleClickCastWindow(group)
 			row:SetPoint("TOPRIGHT", relative, "BOTTOMRIGHT", 0, 0)
 		end
 
-		local selectedConditions = {}
-		action.conditions:foreach(function(condition)
+		local keys = {}
+		for key,_ in next, keyMap do
+			table.insert(keys, key)
+		end
 
-		end)
+		local keyDropdown = buildDropdown(row)
+				:atLeft()
+				:x(10)
+				:addItems(keys)
+				:size(200, 20)
+				:fontSize(10)
+				:build()
+
+		keyDropdown:SetValue(action.key)
+
+		local selectedConditions = {}
+		for i = 1, action.conditions:count() do
+			local condition = action.conditions:get(i)
+			if (condition.active) then
+				table.insert(selectedConditions, i)
+			end
+		end
 
 		local conditions = {}
 		for _,mappedCondition in next, conditionMap do
@@ -218,9 +236,9 @@ function CC:ToggleClickCastWindow(group)
 		end
 
 		local talents = getTalentTable()
-		local widget = buildMultiDropdown(row)
-				:atLeft()
-				:x(10)
+		local conditionDropdown = buildMultiDropdown(row)
+				:rightOf(keyDropdown)
+				:x(5)
 				:size(150, 20)
 				:fontSize(10)
 				:overrideText("Conditions")
@@ -228,7 +246,7 @@ function CC:ToggleClickCastWindow(group)
 				:addItems(talents)
 				:build()
 
-		widget:SetValue(selectedConditions)
+		conditionDropdown:SetValue(selectedConditions)
 
 	--[[
 		Something like this:
@@ -251,7 +269,7 @@ function CC:ToggleClickCastWindow(group)
 							local searchResult -- Do stuff...
 							if (searchResult) then
 								if (searchResult:count() > 1) then
-									-- Specific one must be choosen
+									-- Specific one must be chosen
 								else
 
 									self.acceptButton:SetEnabled(true)
@@ -266,14 +284,21 @@ function CC:ToggleClickCastWindow(group)
 
 				end)
 				:build()
+		
 		textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
 		textbox:SetValue(action.spell)
+		
 		textbox.acceptButton = buildButton(textbox)
 				:atRight()
+				:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .8, .8, .8, 1 })
 				:onClick(function(self, b, d)
 					-- Save to db here
+					local value = self:GetParent():GetText()
+					-- Do something with this
 				end)
 				:build()
+		textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+		textbox.acceptButton:SetText("Ok")
 
 		relative = row
 	end)
