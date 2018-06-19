@@ -1483,9 +1483,17 @@ local function MultiDropdownBuilder(parent)
 	end
 
 	o.dropdown.SetValue = function(self, list)
-		if (o.override) then return end;
+		for _,v in next, list do
+			self.selectedItems:add(v)
+		end
 
-		self.selectedItems = list
+		self.selectedItems:foreach(function(i) print(i) end)
+
+		self.items:foreach(function(item)
+			if (self.selectedItems:contains(item.index)) then
+				item.checkBox:SetChecked(true)
+			end
+		end)
 
 		if o.onValueChangedFunc then 
 			o:onValueChangedFunc(self, self.selectedItems)

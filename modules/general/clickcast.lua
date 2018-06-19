@@ -134,8 +134,14 @@ local function splitActionsByConditions(db)
 
 		for _,row in next, split do
 			row = row:trim()
-			local spell = row:match("%s[A-Za-z%s]+"):trim()
-			local conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
+
+			local spell, conditions = nil, {}
+			if (row:anyMatch("target", "togglemenu")) then
+				spell = row
+			else
+				spell = row:match("%s[A-Za-z%s]+"):trim()
+				conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
+			end
 
 			local map = {
 				["key"] = key,
@@ -297,7 +303,7 @@ function CC:ToggleClickCastWindow(group)
 					-- Do something with this
 				end)
 				:build()
-		textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+		--textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
 		textbox.acceptButton:SetText("Ok")
 
 		relative = row
