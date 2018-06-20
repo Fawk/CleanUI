@@ -1423,7 +1423,7 @@ local function CheckBoxBuilder(parent)
 	end
 
 	function o:onClick(func)
-		self.button:SetScript("OnClick", func)
+		self.func = func
 		return self
 	end
 
@@ -1444,6 +1444,13 @@ local function CheckBoxBuilder(parent)
 		if (o.xOutline) then
 			builder:outline()
 		end
+
+		self.button:SetScript("OnClick", function(self, b, d)
+			if (not d) then
+				self:SetValue(not self:GetValue())
+				if (o.func) then o:func(self) end
+			end
+		end)
 
 		self.button.x = builder:build()
 		self.button.x:SetJustifyV("MIDDLE")
@@ -1486,8 +1493,6 @@ local function MultiDropdownBuilder(parent)
 		for _,v in next, list do
 			self.selectedItems:add(v)
 		end
-
-		self.selectedItems:foreach(function(i) print(i) end)
 
 		self.items:foreach(function(item)
 			if (self.selectedItems:contains(item.index)) then
@@ -1630,9 +1635,7 @@ local function MultiDropdownBuilder(parent)
 				if (self.active) then
 					self.items:foreach(function(item)
 						if (self.open) then
-							if (not o.dontClose) then
-								item:Hide()
-							end
+							item:Hide()
 						else
 							item:Show()
 						end
@@ -1647,8 +1650,9 @@ local function MultiDropdownBuilder(parent)
 		end)
 
 		self.itemClick = function(self, item, mouseButton)
-			self.dropdown:SetValue(item.name)
-			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
+			self.dropdown.selectedItems:add(item.index)
+			local cb = self.dropdown.items:get(item.index).checkBox
+			cb:SetValue(not cb:GetValue())
 			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
 		end
 
@@ -1766,6 +1770,11 @@ local function MultiDropdownBuilder(parent)
 					:size(self.h, self.h)
 					:outline()
 					:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
+					:onClick(function(self, b)
+						if o.dropdown.active then
+							o:itemClick(button, b)	
+						end
+					end)
 					:build()
 
 			button.checkBox:SetChecked(false)

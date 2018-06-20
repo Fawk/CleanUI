@@ -250,6 +250,7 @@ function CC:ToggleClickCastWindow(group)
 				:overrideText("Conditions")
 				:addItems(conditions)
 				:addItems(talents)
+				:stayOpenAfterChoosing()
 				:build()
 
 		conditionDropdown:SetValue(selectedConditions)
