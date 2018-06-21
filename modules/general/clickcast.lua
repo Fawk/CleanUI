@@ -181,6 +181,27 @@ local function getTalentTable()
 	return talents
 end
 
+local function mapActionsByKey(actions)
+	local mapped = {}
+	actions:foreach(function(action)
+		if (not mapped[action.key]) then
+			mapped[action.key] = {}
+		end
+
+		table.insert(mapped[action.key], action)
+	end)
+	return mapped
+end
+
+local function createRows(parent)
+	local rows = CreateFrame("Frame", nil, parent)
+	rows:SetPoint("TOPLEFT", 10, -40)
+	rows:SetPoint("TOPRIGHT", -10, -40)
+	rows:SetPoint("BOTTOMLEFT", 10, 10)
+	rows:SetPoint("BOTTOMRIGHT", -10, 10)
+	return rows
+end
+
 function CC:ToggleClickCastWindow(group)
 
 	-- List the existing actions
@@ -193,122 +214,177 @@ function CC:ToggleClickCastWindow(group)
 	parent:SetPoint("CENTER")
 	parent:SetBackdrop(A.enum.backdrops.editbox)
 	parent:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
-	parent:SetSize(600, 600)
+	parent:SetSize(400, 600)
 
-	local relative = parent
+	parent.rows = createRows(parent)
 
 	local actions = splitActionsByConditions(group.db["Actions"])
-	actions:foreach(function(action)
+	local mappedActions = mapActionsByKey(actions)
 
-		local row = CreateFrame("Frame", nil, parent)
-		row:SetSize(parent:GetWidth(), 20)
+	local keys = {}
+	for key,_ in next, keyMap do
+		table.insert(keys, key)
+	end
 
-		if (relative == parent) then
-			row:SetPoint("TOPLEFT")
-			row:SetPoint("TOPRIGHT")
-		else
-			row:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, 0)
-			row:SetPoint("TOPRIGHT", relative, "BOTTOMRIGHT", 0, 0)
-		end
+	local keyDropdown = buildDropdown(parent)
+			:atTopLeft()
+			:x(10)
+			:y(-10)
+			:addItems(keys)
+			:size(150, 20)
+			:fontSize(10)
+			:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+			:onItemClick(function(self, ...)
 
-		local keys = {}
-		for key,_ in next, keyMap do
-			table.insert(keys, key)
-		end
+				parent.rows:Hide()
+				parent.rows = nil
+				parent.rows = createRows(parent)
 
-		local keyDropdown = buildDropdown(row)
-				:atLeft()
-				:x(10)
-				:addItems(keys)
-				:size(200, 20)
-				:fontSize(10)
-				:build()
+				local button, dropdown, mouseButton = ...
 
-		keyDropdown:SetValue(action.key)
+				local relative = parent.rows
+				local mapped = mappedActions[button.name]
+				if (mapped) then
+					for _,action in next, mapped do
 
-		local selectedConditions = {}
-		for i = 1, action.conditions:count() do
-			local condition = action.conditions:get(i)
-			if (condition.active) then
-				table.insert(selectedConditions, i)
-			end
-		end
+						local row = CreateFrame("Frame", nil, parent.rows)
+						row:SetSize(parent.rows:GetWidth(), 20)
 
-		local conditions = {}
-		for _,mappedCondition in next, conditionMap do
-			if (not mappedCondition:find("talent")) then
-				table.insert(conditions, mappedCondition)
-			end
-		end
-
-		local talents = getTalentTable()
-		local conditionDropdown = buildMultiDropdown(row)
-				:rightOf(keyDropdown)
-				:x(5)
-				:size(150, 20)
-				:fontSize(10)
-				:overrideText("Conditions")
-				:addItems(conditions)
-				:addItems(talents)
-				:stayOpenAfterChoosing()
-				:build()
-
-		conditionDropdown:SetValue(selectedConditions)
-
-	--[[
-		Something like this:
-
-		[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available spell/target/togglemenu for use on textChanged ]
-	]]
-
-		local textbox = buildEditbox(row)
-				:atRight()
-				:x(-10)
-				:size(200, row:GetHeight())
-				:onTextChanged(function(self)
-					local text = self:GetText()
-					if (text) then
-						local command = text:anyMatch("target", "togglemenu")
-						if (command) then
-							self.acceptButton:SetEnabled(true)
+						if (relative == parent.rows) then
+							row:SetPoint("TOPLEFT")
+							row:SetPoint("TOPRIGHT")
 						else
-							-- Do the search here
-							local searchResult -- Do stuff...
-							if (searchResult) then
-								if (searchResult:count() > 1) then
-									-- Specific one must be chosen
-								else
+							row:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, 0)
+							row:SetPoint("TOPRIGHT", relative, "BOTTOMRIGHT", 0, 0)
+						end
 
-									self.acceptButton:SetEnabled(true)
-								end
-							else
-								self.acceptButton:SetEnabled(false)
+						local selectedConditions = {}
+						for i = 1, action.conditions:count() do
+							local condition = action.conditions:get(i)
+							if (condition.active) then
+								table.insert(selectedConditions, i)
 							end
 						end
+
+						local conditions = {}
+						for _,mappedCondition in next, conditionMap do
+							if (not mappedCondition:find("talent")) then
+								table.insert(conditions, mappedCondition)
+							end
+						end
+
+						local talents = getTalentTable()
+						local conditionDropdown = buildMultiDropdown(row)
+								:atLeft()
+								:x(5)
+								:size(100, 20)
+								:fontSize(10)
+								:overrideText("Conditions")
+								:addItems(conditions)
+								:addItems(talents)
+								:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+								:stayOpenAfterChoosing()
+								:build()
+
+						conditionDropdown:SetValue(selectedConditions)
+
+					--[[
+						Something like this:
+
+						[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available spell/target/togglemenu for use on textChanged ]
+					]]
+
+						local textbox = buildEditbox(row)
+								:rightOf(conditionDropdown)
+								:x(10)
+								:size(200, row:GetHeight())
+								:build()
+						
+						textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+						textbox:SetValue(action.spell)
+						textbox:SetActive(false)
+
+						local deleteButton = buildButton(row)
+								:rightOf(textbox)
+								:x(10)
+								:size(20, 20)
+								:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0, 1 })
+								:build()
+
+						deleteButton.text = buildText(deleteButton, 22)
+								:atCenter()
+								:build()
+
+						deleteButton.text:SetText("x")
+						deleteButton.text:SetTextColor(1, 0.3, 0.3, 1)
+						deleteButton:SetScript("OnEnter", function(self, userMoved)
+							if (userMoved) then
+								GameTooltip:SetOwner(self)
+								GameTooltip:SetText("Delete")
+							end
+						end)
+						deleteButton:SetScript("OnLeave", function(self, userMoved)
+							if (userMoved) then
+								GameTooltip:Hide()
+							end
+						end)
+
+						relative = row
 					end
-				end)
-				:onValueChanged(function(self, value)
+				end
+			end)
+			:build()
 
-				end)
-				:build()
-		
-		textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-		textbox:SetValue(action.spell)
-		
-		textbox.acceptButton = buildButton(textbox)
-				:atRight()
-				:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .8, .8, .8, 1 })
-				:onClick(function(self, b, d)
-					-- Save to db here
-					local value = self:GetParent():GetText()
-					-- Do something with this
-				end)
-				:build()
-		--textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-		textbox.acceptButton:SetText("Ok")
+	keyDropdown:SetValue("LMB")
+	keyDropdown:SimulateClickOnActiveItem()
+	keyDropdown:Close()
 
-		relative = row
-	end)
+	local textbox = buildEditbox(parent)
+		:atBottomLeft()
+		:alignWith(rows)
+		:x(10)
+		:y(10)
+		:size(200, 20)
+		:onTextChanged(function(self)
+			local text = self:GetText()
+			if (text) then
+				local command = text:anyMatch("target", "togglemenu")
+				if (command) then
+					self.acceptButton:SetEnabled(true)
+				else
+					-- Do the search here
+					local searchResult -- Do stuff...
+					if (searchResult) then
+						if (searchResult:count() > 1) then
+							-- Specific one must be chosen
+						else
+
+							self.acceptButton:SetEnabled(true)
+						end
+					else
+						self.acceptButton:SetEnabled(false)
+					end
+				end
+			end
+		end)
+		:onValueChanged(function(self, value)
+
+		end)
+		:build()
+	
+	textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+	textbox.acceptButton = buildButton(textbox)
+			:atRight()
+			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .8, .8, .8, 1 })
+			:onClick(function(self, b, d)
+				-- Save to db here
+				local value = self:GetParent():GetText()
+				-- Do something with this
+			end)
+			:build()
+	--textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	textbox.acceptButton:SetText("Ok")
 
 	-- New action button for key, with save that has to be pressed to verify against existing actions for that key
 

@@ -982,8 +982,16 @@ local function DropdownBuilder(parent)
 			end
 		end)
 
+		self.dropdown.SimulateClickOnActiveItem = function(self)
+			self.items:foreach(function(item)
+				if (self.selected == item.index) then
+					o:itemClick(item, "LeftButton")
+				end
+			end)
+		end
+
 		self.itemClick = function(self, item, mouseButton)
-			self.dropdown:SetValue(item.name)
+			self.dropdown:SetValue(item.name and item.name or item)
 			self.dropdown:GetScript("OnClick")(self.dropdown, "LeftButton", false)
 			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
 		end
