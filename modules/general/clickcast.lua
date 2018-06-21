@@ -193,6 +193,14 @@ local function mapActionsByKey(actions)
 	return mapped
 end
 
+local function concat(tbl)
+   local t = "[@mouseover"
+   for k,v in next, tbl.conditions do
+      t = t..","..v
+   end
+   return t.."] "..tbl.spell
+end
+
 local function createRows(parent)
 	local rows = CreateFrame("Frame", nil, parent)
 	rows:SetPoint("TOPLEFT", 10, -40)
@@ -283,16 +291,26 @@ function CC:ToggleClickCastWindow(group)
 								:addItems(conditions)
 								:addItems(talents)
 								:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
-								:stayOpenAfterChoosing()
+								:readonly()
 								:build()
 
 						conditionDropdown:SetValue(selectedConditions)
 
-					--[[
-						Something like this:
+						conditionDropdown:SetScript("OnEnter", function(self, userMoved)
+							if (userMoved) then
+								GameTooltip:SetOwner(self)
+								GameTooltip:AddLine("Active Conditions:")
+								self.items:foreach(function(button)
+									GameTooltip:AddLine(button.name)
+								end)
+							end
+						end)
 
-						[ ] Dead [ ] Help [ ] Harm [ ] Combat [ talent dropdown ] [ textbox with that will search for available spell/target/togglemenu for use on textChanged ]
-					]]
+						conditionDropdown:SetScript("OnLeave", function(self, userMoved)
+							if (userMoved) then
+								GameTooltip:Hide()
+							end
+						end)
 
 						local textbox = buildEditbox(row)
 								:rightOf(conditionDropdown)
@@ -309,6 +327,17 @@ function CC:ToggleClickCastWindow(group)
 								:x(10)
 								:size(20, 20)
 								:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0, 1 })
+								:onClick(function(self, b, d)
+									-- Delete this clickcast from the db
+									local con = concat(action)
+
+									print(db["Actions"][action.key]:gsub(con:escape().."[;%s]?", ""))
+
+									-- db["Actions"][action.key] = the gsub value
+									-- A.dbProvider:Save()
+									-- dropdown.selected:SimulateClickOnActiveItem()
+									-- dropdown:Close()
+								end)
 								:build()
 
 						deleteButton.text = buildText(deleteButton, 22)
@@ -339,18 +368,33 @@ function CC:ToggleClickCastWindow(group)
 	keyDropdown:SimulateClickOnActiveItem()
 	keyDropdown:Close()
 
+	local talents = getTalentTable()
+	local conditionDropdown = buildMultiDropdown(parent)
+			:atBottomLeft()
+			:x(10)
+			:y(10)
+			:size(100, 20)
+			:fontSize(10)
+			:overrideText("Conditions")
+			:addItems(conditions)
+			:addItems(talents)
+			:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+			:stayOpenAfterChoosing()
+			:build()
+
+	conditionDropdown:SetValue(selectedConditions)
+
 	local textbox = buildEditbox(parent)
-		:atBottomLeft()
+		:rightOf(conditionDropdown)
 		:alignWith(rows)
 		:x(10)
-		:y(10)
 		:size(200, 20)
 		:onTextChanged(function(self)
 			local text = self:GetText()
 			if (text) then
 				local command = text:anyMatch("target", "togglemenu")
 				if (command) then
-					self.acceptButton:SetEnabled(true)
+					self.createButton:SetEnabled(true)
 				else
 					-- Do the search here
 					local searchResult -- Do stuff...
@@ -359,10 +403,10 @@ function CC:ToggleClickCastWindow(group)
 							-- Specific one must be chosen
 						else
 
-							self.acceptButton:SetEnabled(true)
+							self.createButton:SetEnabled(true)
 						end
 					else
-						self.acceptButton:SetEnabled(false)
+						self.createButton:SetEnabled(false)
 					end
 				end
 			end
@@ -371,22 +415,26 @@ function CC:ToggleClickCastWindow(group)
 
 		end)
 		:build()
-	
-	textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
 
-	textbox.acceptButton = buildButton(textbox)
-			:atRight()
+	local createButton = buildButton(parent)
+			:rightOf(textbox)
 			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .8, .8, .8, 1 })
+			:size(40, 20)
 			:onClick(function(self, b, d)
-				-- Save to db here
-				local value = self:GetParent():GetText()
-				-- Do something with this
+
+				local conditions = conditionDropdown:GetValue()
+				local spell = textbox:GetText()
+
+				-- Save to db here and reload the rows
 			end)
 			:build()
-	--textbox.acceptButton:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-	textbox.acceptButton:SetText("Ok")
 
-	-- New action button for key, with save that has to be pressed to verify against existing actions for that key
+	createButton.text = buildText(createButton, 10)
+			:atCenter()
+			:build()
+
+	createButton.text:SetText("Create")
+	textbox.createButton = createButton
 
 	A.clickCastWindow = parent
 end

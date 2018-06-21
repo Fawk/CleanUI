@@ -594,6 +594,11 @@ local function EditBoxBuilder(parent)
 		return self
 	end
 
+	function o:fontSize(fSize)
+		self.fSize = fSize
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
@@ -609,6 +614,7 @@ local function EditBoxBuilder(parent)
 		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
 		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
 		self.textbox:SetTextInsets(5, 0, 0, 0)
+		self.textbox:SetFont(media:Fetch("font", "Default"), o.fSize or 10, "OUTLINE")
 
 		return self.textbox
 	end
@@ -1634,6 +1640,11 @@ local function MultiDropdownBuilder(parent)
 		return self
 	end
 
+	function o:readonly()
+		self.isReadOnly = true
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.dropdown)
 		self.dropdown:SetSize(self.w, self.h)
@@ -1725,6 +1736,10 @@ local function MultiDropdownBuilder(parent)
 			:onClick(function(self, b, down)
 				if not down then
 					if o.dropdown.active then
+
+						if (o.isReadOnly) then 
+							return
+						end
 
 						o.dropdown.items:foreach(function(item)
 							item:SetBackdropBorderColor(0, 0, 0, 0)

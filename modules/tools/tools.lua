@@ -79,6 +79,21 @@ function string.explode(self, sep)
    return t
 end
 
+function string.escape(self)
+   return (self:gsub('%%', '%%%%')
+            :gsub('^%^', '%%^')
+            :gsub('%$$', '%%$')
+            :gsub('%(', '%%(')
+            :gsub('%)', '%%)')
+            :gsub('%.', '%%.')
+            :gsub('%[', '%%[')
+            :gsub('%]', '%%]')
+            :gsub('%*', '%%*')
+            :gsub('%+', '%%+')
+            :gsub('%-', '%%-')
+            :gsub('%?', '%%?'))
+end
+
 function string.trim(self)
     local from = self:match"^%s*()"
     return from > #self and "" or self:match(".*%S", from)
