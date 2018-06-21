@@ -335,7 +335,7 @@ function CC:ToggleClickCastWindow(group)
 									-- Delete this clickcast from the db
 									local con = concat(action)
 									print(con)
-									print(group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?", ""))
+									print(group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?[%s]?", ""))
 
 									-- db["Actions"][action.key] = the gsub value
 									-- A.dbProvider:Save()
