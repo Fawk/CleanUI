@@ -40,9 +40,9 @@ local keyMap = {
 }
 
 local conditionMap = {
-	"dead",
-	"harm",
 	"help",
+	"harm",
+	"dead",
 	"combat",
 	"talent:[1-7]/[1-3]"
 }
@@ -194,11 +194,14 @@ local function mapActionsByKey(actions)
 end
 
 local function concat(tbl)
-   local t = "[@mouseover"
-   for k,v in next, tbl.conditions do
-      t = t..","..v
-   end
-   return t.."] "..tbl.spell
+   	local t = "[@mouseover"
+   	for i = 1, tbl.conditions:count() do
+   		local condition = tbl.conditions:get(i)
+   		if (condition.active) then
+			t = t..","..condition.text
+		end
+   	end
+   	return t.."] "..tbl.spell
 end
 
 local function createRows(parent)
@@ -232,6 +235,14 @@ function CC:ToggleClickCastWindow(group)
 	local keys = {}
 	for key,_ in next, keyMap do
 		table.insert(keys, key)
+	end
+
+
+	local conditions = {}
+	for _,mappedCondition in next, conditionMap do
+		if (not mappedCondition:find("talent")) then
+			table.insert(conditions, mappedCondition)
+		end
 	end
 
 	local keyDropdown = buildDropdown(parent)
@@ -274,13 +285,6 @@ function CC:ToggleClickCastWindow(group)
 							end
 						end
 
-						local conditions = {}
-						for _,mappedCondition in next, conditionMap do
-							if (not mappedCondition:find("talent")) then
-								table.insert(conditions, mappedCondition)
-							end
-						end
-
 						local talents = getTalentTable()
 						local conditionDropdown = buildMultiDropdown(row)
 								:atLeft()
@@ -296,17 +300,17 @@ function CC:ToggleClickCastWindow(group)
 
 						conditionDropdown:SetValue(selectedConditions)
 
-						conditionDropdown:SetScript("OnEnter", function(self, userMoved)
+						conditionDropdown.selectedButton:SetScript("OnEnter", function(self, userMoved)
 							if (userMoved) then
 								GameTooltip:SetOwner(self)
 								GameTooltip:AddLine("Active Conditions:")
-								self.items:foreach(function(button)
+								self:GetParent().items:foreach(function(button)
 									GameTooltip:AddLine(button.name)
 								end)
 							end
 						end)
 
-						conditionDropdown:SetScript("OnLeave", function(self, userMoved)
+						conditionDropdown.selectedButton:SetScript("OnLeave", function(self, userMoved)
 							if (userMoved) then
 								GameTooltip:Hide()
 							end
@@ -330,8 +334,8 @@ function CC:ToggleClickCastWindow(group)
 								:onClick(function(self, b, d)
 									-- Delete this clickcast from the db
 									local con = concat(action)
-
-									print(db["Actions"][action.key]:gsub(con:escape().."[;%s]?", ""))
+									print(con)
+									print(group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?", ""))
 
 									-- db["Actions"][action.key] = the gsub value
 									-- A.dbProvider:Save()
@@ -382,11 +386,8 @@ function CC:ToggleClickCastWindow(group)
 			:stayOpenAfterChoosing()
 			:build()
 
-	conditionDropdown:SetValue(selectedConditions)
-
 	local textbox = buildEditbox(parent)
 		:rightOf(conditionDropdown)
-		:alignWith(rows)
 		:x(10)
 		:size(200, 20)
 		:onTextChanged(function(self)
@@ -418,8 +419,9 @@ function CC:ToggleClickCastWindow(group)
 
 	local createButton = buildButton(parent)
 			:rightOf(textbox)
-			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .8, .8, .8, 1 })
-			:size(40, 20)
+			:x(10)
+			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .5, .5, .5, 1 })
+			:size(50, 20)
 			:onClick(function(self, b, d)
 
 				local conditions = conditionDropdown:GetValue()
