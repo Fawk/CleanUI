@@ -599,6 +599,11 @@ local function EditBoxBuilder(parent)
 		return self
 	end
 
+	function o:onEditFocusLost(focusLost)
+		self.textbox:SetScript("OnEditFocusLost", focusLost)
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
@@ -852,6 +857,10 @@ local function DropdownBuilder(parent)
 		self.items:foreach(function(item)
 			item:Show()
 		end)
+
+		if (self.itemBackground) then
+			self.itemBackground:Show()
+		end
 	end
 
 	o.dropdown.Close = function(self)
@@ -860,6 +869,10 @@ local function DropdownBuilder(parent)
 			item:SetBackdropBorderColor(0, 0, 0, 0)
 			item:Hide()
 		end)
+
+		if (self.itemBackground) then
+			self.itemBackground:Hide()
+		end
 	end
 
 	function o:addItems(items)
@@ -979,6 +992,15 @@ local function DropdownBuilder(parent)
 							item:Show()
 						end
 					end)
+
+					if (self.itemBackground) then
+						if (self.open) then
+							self.itemBackground:Hide()
+						else
+							self.itemBackground:Show()
+						end
+					end
+
 					self.open = not self.open
 
 					if (o.func) then
@@ -1027,7 +1049,7 @@ local function DropdownBuilder(parent)
 			if (h == "LEFT") then
 				selectedButton.text = tb:atLeft():x(6)
 			elseif (h == "RIGHT") then
-				selectedButton.text = tb:atRight():x(-6)
+				selectedButton.text = tb:atRight():x(-15)
 			elseif (h == "CENTER") then
 				selectedButton.text = tb:atCenter()
 			end
@@ -1054,26 +1076,35 @@ local function DropdownBuilder(parent)
 			selectedButton.text = tb:atLeft():x(6):build()
 		end
 
+		local arrow = A.TextBuilder(selectedButton, 10)
+				:atRight()
+				:outline()
+				:x(-3)
+				:build()
+
+		arrow:SetText("v")
+		arrow:SetTextColor(.6, .6, 1, 1)
+
 		self.items:foreach(function(item)
 
 			local relative = self.dropdown.items:getRelative(self.realRelative or self.dropdown.selectedButton)
 
-			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
-			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
-			:onClick(function(self, b, down)
-				if not down then
-					if o.dropdown.active then
+			local builder = A.ButtonBuilder(self.dropdown)
+					:size(self.w, self.h)
+					:onClick(function(self, b, down)
+						if not down then
+							if o.dropdown.active then
 
-						o.dropdown.items:foreach(function(item)
-							item:SetBackdropBorderColor(0, 0, 0, 0)
-						end)
+								o.dropdown.items:foreach(function(item)
+									item:SetBackdropBorderColor(0, 0, 0, 0)
+								end)
 
-						o:itemClick(self, b)
+								o:itemClick(self, b)
 
-						self:SetBackdropBorderColor(1, 1, 1, 1)
-					end
-				end
-			end)
+								self:SetBackdropBorderColor(1, 1, 1, 1)
+							end
+						end
+					end)
 			
 			if (self.itemHover) then
 				builder:onHover(self.itemHover)
@@ -1126,6 +1157,23 @@ local function DropdownBuilder(parent)
 		end
 
 		self.dropdown.selectedButton = selectedButton
+
+		if (self.dropdown.bd) then
+			self.dropdown.itemBackground = CreateFrame("Frame", nil, self.dropdown)
+
+			if (self.directionUp) then
+				self.dropdown.itemBackground:SetPoint("BOTTOMLEFT", self.dropdown, "TOPLEFT")
+			else
+				self.dropdown.itemBackground:SetPoint("TOPLEFT", self.dropdown, "BOTTOMLEFT")
+			end
+
+			self.dropdown.itemBackground:SetSize(self.w, self.h * self.items:count())
+			self.dropdown.itemBackground:SetBackdrop(self.dropdown.bd)
+			self.dropdown.itemBackground:SetBackdropColor(unpack(self.dropdown.bdColor))
+			self.dropdown.itemBackground:SetBackdropBorderColor(unpack(self.dropdown.borderColor))
+			self.dropdown.itemBackground:SetFrameLevel(10)
+			self.dropdown.itemBackground:Hide()
+		end
 
 		return self.dropdown
 	end
@@ -1504,6 +1552,8 @@ local function MultiDropdownBuilder(parent)
 	end
 
 	o.dropdown.SetValue = function(self, list)
+		self.selectedItems:clear()
+
 		for _,v in next, list do
 			self.selectedItems:add(v)
 		end
@@ -1511,6 +1561,8 @@ local function MultiDropdownBuilder(parent)
 		self.items:foreach(function(item)
 			if (self.selectedItems:contains(item.index)) then
 				item.checkBox:SetChecked(true)
+			else
+				item.checkBox:SetChecked(false)
 			end
 		end)
 
@@ -1529,6 +1581,10 @@ local function MultiDropdownBuilder(parent)
 		self.items:foreach(function(item)
 			item:Show()
 		end)
+
+		if (self.itemBackground) then
+			self.itemBackground:Show()
+		end
 	end
 
 	o.dropdown.Close = function(self)
@@ -1537,6 +1593,10 @@ local function MultiDropdownBuilder(parent)
 			item:SetBackdropBorderColor(0, 0, 0, 0)
 			item:Hide()
 		end)
+
+		if (self.itemBackground) then
+			self.itemBackground:Hide()
+		end
 	end
 
 	function o:addItems(items)
@@ -1659,6 +1719,15 @@ local function MultiDropdownBuilder(parent)
 							item:Show()
 						end
 					end)
+					
+					if (self.itemBackground) then
+						if (self.open) then
+							self.itemBackground:Hide()
+						else
+							self.itemBackground:Show()
+						end
+					end
+
 					self.open = not self.open
 
 					if (o.func) then
@@ -1669,7 +1738,7 @@ local function MultiDropdownBuilder(parent)
 		end)
 
 		self.itemClick = function(self, item, mouseButton)
-			self.dropdown.selectedItems:add(item.index)
+			self.dropdown.selectedItems:addUnique(item.index)
 			local cb = self.dropdown.items:get(item.index).checkBox
 			cb:SetValue(not cb:GetValue())
 			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
@@ -1727,30 +1796,39 @@ local function MultiDropdownBuilder(parent)
 			selectedButton.text = tb:atLeft():x(6):build()
 		end
 
+		local arrow = A.TextBuilder(selectedButton, 10)
+				:atRight()
+				:outline()
+				:x(-3)
+				:build()
+
+		arrow:SetText("v")
+		arrow:SetTextColor(.6, .6, 1, 1)
+
 		self.items:foreach(function(item)
 
 			local relative = self.dropdown.items:getRelative(self.realRelative or self.dropdown.selectedButton)
 
-			local builder = A.ButtonBuilder(self.dropdown):size(self.w, self.h)
-			:backdrop(self.dropdown.bd, self.dropdown.bdColor, self.dropdown.borderColor)
-			:onClick(function(self, b, down)
-				if not down then
-					if o.dropdown.active then
+			local builder = A.ButtonBuilder(self.dropdown)
+					:size(self.w, self.h)
+					:onClick(function(self, b, down)
+						if not down then
+							if o.dropdown.active then
 
-						if (o.isReadOnly) then 
-							return
+								if (o.isReadOnly) then 
+									return
+								end
+
+								o.dropdown.items:foreach(function(item)
+									item:SetBackdropBorderColor(0, 0, 0, 0)
+								end)
+
+								o:itemClick(self, b)
+
+								self:SetBackdropBorderColor(1, 1, 1, 1)
+							end
 						end
-
-						o.dropdown.items:foreach(function(item)
-							item:SetBackdropBorderColor(0, 0, 0, 0)
-						end)
-
-						o:itemClick(self, b)
-
-						self:SetBackdropBorderColor(1, 1, 1, 1)
-					end
-				end
-			end)
+					end)
 			
 			if (self.itemHover) then
 				builder:onHover(self.itemHover)
@@ -1762,7 +1840,11 @@ local function MultiDropdownBuilder(parent)
 				elseif (self.openAtLeft) then
 					builder:leftOf(relative)
 				else
-					builder:below(relative)
+					if (self.directionUp) then
+						builder:above(relative)
+					else
+						builder:below(relative)
+					end
 				end
 			else
 				if (self.directionUp) then
@@ -1789,8 +1871,8 @@ local function MultiDropdownBuilder(parent)
 			button.checkBox = A.CheckBoxBuilder(button)
 					:atRight()
 					:x(-5)
-					:fontSize(22)
-					:size(self.h, self.h)
+					:fontSize(18)
+					:size(self.h - 4, self.h - 4)
 					:outline()
 					:backdrop(E.backdrops.editboxborder, { .1, .1, .1, 1 }, { .6, .6, .6, 1 })
 					:onClick(function(self, b)
@@ -1801,6 +1883,10 @@ local function MultiDropdownBuilder(parent)
 					:build()
 
 			button.checkBox:SetChecked(false)
+
+			if (self.isReadOnly) then
+				button.checkBox:SetActive(false)
+			end
 
 			if (self.childCreation) then
 				self:childCreation(self, button)
@@ -1825,6 +1911,23 @@ local function MultiDropdownBuilder(parent)
 		end
 
 		self.dropdown.selectedButton = selectedButton
+
+		if (self.dropdown.bd) then
+			self.dropdown.itemBackground = CreateFrame("Frame", nil, self.dropdown)
+
+			if (self.directionUp) then
+				self.dropdown.itemBackground:SetPoint("BOTTOMLEFT", self.dropdown, "TOPLEFT")
+			else
+				self.dropdown.itemBackground:SetPoint("TOPLEFT", self.dropdown, "BOTTOMLEFT")
+			end
+
+			self.dropdown.itemBackground:SetSize(self.w, self.h * self.items:count())
+			self.dropdown.itemBackground:SetBackdrop(self.dropdown.bd)
+			self.dropdown.itemBackground:SetBackdropColor(unpack(self.dropdown.bdColor))
+			self.dropdown.itemBackground:SetBackdropBorderColor(unpack(self.dropdown.borderColor))
+			self.dropdown.itemBackground:SetFrameLevel(10)
+			self.dropdown.itemBackground:Hide()
+		end
 
 		return self.dropdown
 	end

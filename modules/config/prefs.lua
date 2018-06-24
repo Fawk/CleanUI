@@ -1242,6 +1242,7 @@ function X:CreateChild(name, parent, setting, db)
                     :size(setting.width, setting.height)
                     :fontSize(11)
                     :selectedButtonTextHorizontalAlign("RIGHT")
+                    :rightOfButton()
         elseif (type == "text") then
             childBuilder = buildText(parent, setting.textSize or 11)
                     :size(setting.width, setting.height)

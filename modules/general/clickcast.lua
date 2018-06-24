@@ -39,6 +39,12 @@ local keyMap = {
 	["ALT-SHIFT-RMB"] = "alt-shift-macrotext2"
 }
 
+local additional = {
+	"type1",
+	"type2",
+	"type3"
+}
+
 local conditionMap = {
 	"help",
 	"harm",
@@ -59,7 +65,7 @@ local function blizzardCommand(frame, mapped, command, initString)
 	if (initString) then
 		return initString..'\nself:SetAttribute("'..mapped:gsub("macrotext", "type")..'","'..command..'");'
 	else
-		frame:SetAttribute(mapped, command)
+		frame:SetAttribute(mapped:gsub("macrotext", "type"), command)
 	end
 end
 
@@ -67,6 +73,21 @@ local CC = {}
 
 function CC:Setup(frame, db)
 	if (not db["Enabled"]) then return end
+
+	for key, attribute in next, keyMap do
+		if (frame:GetAttribute(attribute)) then
+			frame:SetAttribute(attribute, nil)
+		end
+	end
+
+	for _,key in next, additional do
+		for _,extra in next, { "alt-", "ctrl-", "shift-", "alt-ctrl-", "alt-ctrl-shift-", "ctrl-shift-", "alt-shift-" } do
+			local attr = extra..key
+			if (frame:GetAttribute(attr)) then
+				frame:SetAttribute(attr, nil)
+			end
+		end
+	end
 
 	for key, action in next, db["Actions"] do
 
@@ -129,42 +150,48 @@ end
 local function splitActionsByConditions(db)
 	local actions = A:OrderedTable()
 
-	for key, action in next, db do 
-		local split = action:explode(";")
+	for key, action in next, db do
+		if (action) then
 
-		for _,row in next, split do
-			row = row:trim()
+			local split = action:explode(";")
 
-			local spell, conditions = nil, {}
-			if (row:anyMatch("target", "togglemenu")) then
-				spell = row
-			else
-				spell = row:match("%s[A-Za-z%s]+"):trim()
-				conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
-			end
+			for _,row in next, split do
+				row = row:trim()
 
-			local map = {
-				["key"] = key,
-				["spell"] = spell,
-				["conditions"] = A:OrderedTable()
-			}
+				if (row and row:match("[%w]+")) then
 
-			for _,mappedCondition in next, conditionMap do
-				local cond = { 
-					text = mappedCondition, 
-					active = false
-				}
-				for _,condition in next, conditions do
-					if (condition:match(mappedCondition)) then
-						cond.active = true
+					local spell, conditions = nil, {}
+					if (row:anyMatch("target", "togglemenu")) then
+						spell = row
+					else
+						spell = row:match("%s[A-Za-z%s]+"):trim()
+						conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
 					end
-				end
 
-				if (not mappedCondition:find("talent")) then
-					map.conditions:add(cond)
+					local map = {
+						["key"] = key,
+						["spell"] = spell,
+						["conditions"] = A:OrderedTable()
+					}
+
+					for _,mappedCondition in next, conditionMap do
+						local cond = { 
+							text = mappedCondition, 
+							active = false
+						}
+						for _,condition in next, conditions do
+							if (condition:match(mappedCondition)) then
+								cond.active = true
+							end
+						end
+
+						if (not mappedCondition:find("talent")) then
+							map.conditions:add(cond)
+						end
+					end
+					actions:add(map)
 				end
 			end
-			actions:add(map)
 		end
 	end
 
@@ -206,11 +233,49 @@ end
 
 local function createRows(parent)
 	local rows = CreateFrame("Frame", nil, parent)
-	rows:SetPoint("TOPLEFT", 10, -40)
-	rows:SetPoint("TOPRIGHT", -10, -40)
-	rows:SetPoint("BOTTOMLEFT", 10, 10)
-	rows:SetPoint("BOTTOMRIGHT", -10, 10)
+	rows:SetPoint("TOPLEFT", 0, -20)
+	rows:SetPoint("TOPRIGHT", 0, -20)
+	rows:SetPoint("BOTTOMLEFT", 0, 0)
+	rows:SetPoint("BOTTOMRIGHT", 0, 0)
 	return rows
+end
+
+local talentIcons = {
+}
+
+local function search(text)
+	local result = A:OrderedTable()
+
+	-- Search in spellbook
+	local num = GetNumSpellTabs()
+	for i = 1, num do
+		local name, texture, offset, numSpells = GetSpellTabInfo(i)
+		local currentSpec = GetSpecialization()
+		local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec))
+
+		if (name == currentSpecName) then
+			for x = 1, numSpells do
+				local spellName, spellSubName = GetSpellBookItemName(offset + x, BOOKTYPE_SPELL);
+				local spellType, spellId = GetSpellBookItemInfo(spellName)
+				if (not IsPassiveSpell(spellId) and (text ~= "" and spellName:find(text))) then
+					result:addUnique(spellName)
+				end
+			end
+		end
+	end
+
+	-- Search for spells that might active through talent
+	for tier = 1, 7 do
+		for column = 1, 3 do
+			local talentID, name, texture, selected, available, spellID, unknown, row, column, unknown, known = GetTalentInfo(tier, column, 1)
+			if (not IsPassiveSpell(spellID) and (text ~= "" and name:find(text))) then
+				talentIcons[name] = texture
+				result:addUnique(name)
+			end
+		end
+	end
+
+	return result
 end
 
 function CC:ToggleClickCastWindow(group)
@@ -222,21 +287,19 @@ function CC:ToggleClickCastWindow(group)
 	end
 
 	local parent = CreateFrame("Frame", nil, A.frameParent)
-	parent:SetPoint("CENTER")
-	parent:SetBackdrop(A.enum.backdrops.editbox)
-	parent:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
-	parent:SetSize(400, 600)
+	parent:SetPoint("TOPLEFT", group, "TOPRIGHT", 50, 0)
 
 	parent.rows = createRows(parent)
 
 	local actions = splitActionsByConditions(group.db["Actions"])
 	local mappedActions = mapActionsByKey(actions)
 
+	parent:SetSize(350, 20 + (20 * T:tcount(mappedActions["LMB"])))
+
 	local keys = {}
 	for key,_ in next, keyMap do
 		table.insert(keys, key)
 	end
-
 
 	local conditions = {}
 	for _,mappedCondition in next, conditionMap do
@@ -245,14 +308,13 @@ function CC:ToggleClickCastWindow(group)
 		end
 	end
 
+	local lastRow
 	local keyDropdown = buildDropdown(parent)
 			:atTopLeft()
-			:x(10)
-			:y(-10)
 			:addItems(keys)
 			:size(150, 20)
 			:fontSize(10)
-			:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
 			:onItemClick(function(self, ...)
 
 				parent.rows:Hide()
@@ -262,8 +324,12 @@ function CC:ToggleClickCastWindow(group)
 				local button, dropdown, mouseButton = ...
 
 				local relative = parent.rows
+				actions = splitActionsByConditions(group.db["Actions"])
+				mappedActions = mapActionsByKey(actions)
 				local mapped = mappedActions[button.name]
 				if (mapped) then
+					parent:SetHeight(20 + (20 * T:tcount(mapped)))
+
 					for _,action in next, mapped do
 
 						local row = CreateFrame("Frame", nil, parent.rows)
@@ -288,29 +354,29 @@ function CC:ToggleClickCastWindow(group)
 						local talents = getTalentTable()
 						local conditionDropdown = buildMultiDropdown(row)
 								:atLeft()
-								:x(5)
 								:size(100, 20)
 								:fontSize(10)
 								:overrideText("Conditions")
 								:addItems(conditions)
 								:addItems(talents)
-								:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+								:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
 								:readonly()
 								:build()
 
 						conditionDropdown:SetValue(selectedConditions)
 
-						conditionDropdown.selectedButton:SetScript("OnEnter", function(self, userMoved)
+						conditionDropdown.selectedButton:HookScript("OnEnter", function(self, userMoved)
 							if (userMoved) then
 								GameTooltip:SetOwner(self)
 								GameTooltip:AddLine("Active Conditions:")
-								self:GetParent().items:foreach(function(button)
-									GameTooltip:AddLine(button.name)
+								self:GetParent().selectedItems:foreach(function(index)
+									GameTooltip:AddLine(self:GetParent().items:get(index).name)
 								end)
+								GameTooltip:Show()
 							end
 						end)
 
-						conditionDropdown.selectedButton:SetScript("OnLeave", function(self, userMoved)
+						conditionDropdown.selectedButton:HookScript("OnLeave", function(self, userMoved)
 							if (userMoved) then
 								GameTooltip:Hide()
 							end
@@ -318,7 +384,6 @@ function CC:ToggleClickCastWindow(group)
 
 						local textbox = buildEditbox(row)
 								:rightOf(conditionDropdown)
-								:x(10)
 								:size(200, row:GetHeight())
 								:build()
 						
@@ -326,21 +391,43 @@ function CC:ToggleClickCastWindow(group)
 						textbox:SetValue(action.spell)
 						textbox:SetActive(false)
 
+						local icon = select(3, GetSpellInfo(action.spell))
+						if (icon) then
+							textbox.icon = textbox:CreateTexture(nil, "OVERLAY")
+							textbox.icon:SetSize(18, 18)
+							textbox.icon:SetTexture(icon)
+							textbox.icon:SetPoint("LEFT", textbox, "LEFT", 1, 0)
+							textbox.icon:SetTexCoord(0.133,0.867,0.133,0.867)
+							textbox:SetTextInsets(25, 0, 0, 0)
+						else
+							textbox:SetTextInsets(5, 0, 0, 0)
+						end
+
 						local deleteButton = buildButton(row)
 								:rightOf(textbox)
-								:x(10)
 								:size(20, 20)
-								:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { 0, 0, 0, 1 })
+								:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
 								:onClick(function(self, b, d)
 									-- Delete this clickcast from the db
-									local con = concat(action)
-									print(con)
-									print(group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?[%s]?", ""))
+									local command = action.spell:anyMatch("target", "togglemenu")
+									if (command) then
+										group.db["Actions"][action.key] = nil
+									else
+										local con = concat(action)
+										if (T:tcount(group.db["Actions"]) > 1) then 
+											group.db["Actions"][action.key] = group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?[%s]?", "")
+										else
+											group.db["Actions"][action.key] = nil
+										end
+									end
 
-									-- db["Actions"][action.key] = the gsub value
-									-- A.dbProvider:Save()
-									-- dropdown.selected:SimulateClickOnActiveItem()
-									-- dropdown:Close()
+									parent:SetHeight(20 + (20 * T:tcount(group.db["Actions"][action.key]:explode(";"))))
+
+									A.dbProvider:Save()
+									dropdown:SimulateClickOnActiveItem()
+									dropdown:Close()
+									GameTooltip:Hide()
+									A:UpdateDb()
 								end)
 								:build()
 
@@ -363,6 +450,7 @@ function CC:ToggleClickCastWindow(group)
 						end)
 
 						relative = row
+						lastRow = row
 					end
 				end
 			end)
@@ -374,21 +462,36 @@ function CC:ToggleClickCastWindow(group)
 
 	local talents = getTalentTable()
 	local conditionDropdown = buildMultiDropdown(parent)
-			:atBottomLeft()
-			:x(10)
-			:y(10)
+			:atTopLeft()
+			:againstBottomLeft()
 			:size(100, 20)
 			:fontSize(10)
 			:overrideText("Conditions")
 			:addItems(conditions)
 			:addItems(talents)
-			:backdrop(E.backdrops.editbox, { .2, .2, .2, 1 }, { 0.8, 0.8, 0.8, 0 })
+			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
 			:stayOpenAfterChoosing()
 			:build()
 
+	conditionDropdown.selectedButton:HookScript("OnEnter", function(self, userMoved)
+		if (userMoved) then
+			GameTooltip:SetOwner(self)
+			GameTooltip:AddLine("Active Conditions:")
+			self:GetParent().selectedItems:foreach(function(index)
+				GameTooltip:AddLine(self:GetParent().items:get(index).name)
+			end)
+			GameTooltip:Show()
+		end
+	end)
+
+	conditionDropdown.selectedButton:HookScript("OnLeave", function(self, userMoved)
+		if (userMoved) then
+			GameTooltip:Hide()
+		end
+	end)
+
 	local textbox = buildEditbox(parent)
 		:rightOf(conditionDropdown)
-		:x(10)
 		:size(200, 20)
 		:onTextChanged(function(self)
 			local text = self:GetText()
@@ -398,36 +501,155 @@ function CC:ToggleClickCastWindow(group)
 					self.createButton:SetEnabled(true)
 				else
 					-- Do the search here
-					local searchResult -- Do stuff...
-					if (searchResult) then
-						if (searchResult:count() > 1) then
-							-- Specific one must be chosen
-						else
+					local searchResult = search(text)
 
-							self.createButton:SetEnabled(true)
-						end
+					if (self.buttonList) then
+						self.buttonList:Hide()
+						self.buttonList = nil
+					end
+
+					if (searchResult and not searchResult:isEmpty()) then
+
+						local parent = self
+
+						self.buttonList = CreateFrame("Frame", nil, self)
+						self.buttonList:SetPoint("TOP", self, "BOTTOM", 0, 0)
+						self.buttonList:SetSize(200, searchResult:count() * 20)
+						self.buttonList.buttons = A:OrderedTable()
+
+						local relative = self.buttonList
+						searchResult:foreach(function(spellName)
+							local builder = buildButton(self.buttonList)
+									:onClick(function(self, b, d)
+										if (b == "LeftButton" and not d) then
+											parent:SetText(self.text:GetText())
+
+											local icon = select(3, GetSpellInfo(self.text:GetText()))
+											if (icon) then
+												parent.icon:SetTexture(icon)
+												parent:SetTextInsets(25, 0, 0, 0)
+											else
+												parent:SetTextInsets(5, 0, 0, 0)
+											end
+
+											parent.buttonList:Hide()
+											parent.buttonList = nil
+
+											parent.createButton:SetEnabled(true)
+										end
+									end)
+									:backdrop(E.backdrops.editbox, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 0 })
+									:size(200, 20)
+
+							if (relative == self.buttonList) then
+								builder:atTop()
+							else
+								builder:below(relative)
+							end
+
+							local button = builder:build()
+
+							local icon = select(3, GetSpellInfo(spellName))
+
+							button.icon = button:CreateTexture(nil, "OVERLAY")
+							button.icon:SetSize(20, 20)
+							button.icon:SetPoint("LEFT")
+							button.icon:SetTexture(talentIcons[spellName] or icon)
+
+							button.text = buildText(button, 10)
+									:rightOf(button.icon)
+									:x(5)
+									:outline()
+									:build()
+
+							button.text:SetText(spellName)
+
+							relative = button
+
+							self.buttonList.buttons:add(button)
+						end)
 					else
 						self.createButton:SetEnabled(false)
 					end
 				end
 			end
 		end)
-		:onValueChanged(function(self, value)
-
+		:onEditFocusLost(function(self)
+			self.buttonList:Hide()
+			self.buttonList = nil
 		end)
 		:build()
 
+
+	textbox.icon = textbox:CreateTexture(nil, "OVERLAY")
+	textbox.icon:SetSize(20, 20)
+	textbox.icon:SetPoint("LEFT")
+
 	local createButton = buildButton(parent)
 			:rightOf(textbox)
-			:x(10)
-			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .5, .5, .5, 1 })
+			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
 			:size(50, 20)
 			:onClick(function(self, b, d)
 
 				local conditions = conditionDropdown:GetValue()
 				local spell = textbox:GetText()
 
+				local key = keyDropdown:GetValue()
+				local actionTbl = group.db["Actions"][key]
+
+				local command = spell:anyMatch("target", "togglemenu")
+				if (command) then
+					-- Present notification here that conditions does not work for blizzard commands and this will
+					-- also override any other settings for this key combination
+					group.db["Actions"][key] = command
+				else
+					if (actionTbl:find("target") or actionTbl:find("togglemenu")) then
+						-- Present notification here stating that the previous setting has a blizzard command and that
+						-- needs to be removed before you can add something that is not.
+					else
+						local function concatConditions(c)
+							local s = "@mouseover"
+							c:foreach(function(cc)
+								s = s..","..conditionDropdown.items:get(cc).name
+							end)
+							return s
+						end
+
+						local concatted = concatConditions(conditions)
+
+						local toSave
+						if (not actionTbl) then
+							toSave = string.format("/cast [%s] %s", concatted, spell)
+							group.db["Actions"][key] = toSave
+						else
+							if (actionTbl:find(concatted)) then
+								-- Already exists, add a notification of some kind
+							else
+								toSave = string.format("[%s] %s;", concatted, spell)
+								if (actionTbl:sub(-1) ~= ";") then
+									toSave = "; "..toSave
+									group.db["Actions"][key] = actionTbl..toSave
+								else
+									group.db["Actions"][key] = actionTbl.." "..toSave
+								end
+							end
+						end
+					end
+				end
+
+				parent:SetHeight(20 + (20 * T:tcount(group.db["Actions"][key]:explode(";"))))
+
 				-- Save to db here and reload the rows
+				textbox:SetText("")
+				textbox:ClearFocus()
+				textbox.icon:SetTexture(nil)
+				textbox:SetTextInsets(5, 0, 0, 0)
+				conditionDropdown:SetValue({})
+				A.dbProvider:Save()
+				keyDropdown:SimulateClickOnActiveItem()
+				keyDropdown:Close()
+				GameTooltip:Hide()
+				A:UpdateDb()
 			end)
 			:build()
 

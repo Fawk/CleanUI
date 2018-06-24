@@ -798,9 +798,7 @@ local defaults =  {
                 ["Party"] = {
                     ["Clickcast"] = {
                         ["Enabled"] = true,
-                        ["Actions"] = {
-                            ["LMB"] = "/cast [@mouseover,help] Shadow Mend; [@mouseover,help,dead] Ressurection",
-                        }
+                        ["Actions"] = {}
                     },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",

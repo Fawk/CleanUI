@@ -114,6 +114,11 @@ function OT:remove(t)
 	return false
 end
 
+function OT:clear()
+  self.e = {}
+  self.c = 0
+end
+
 function OT:getRelative(default)
   local count = self:count()
   return count == 0 and default or self:get(count)
