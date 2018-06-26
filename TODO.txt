@@ -12,7 +12,13 @@
 [x] Update db with missing health bar
 [x] Implement blizzard default + custom + text role identifiers
 [x] Implement missing health text (hidden if at 100%) eg. -5k
-[ ] Implement visual options (Check psd on drive) right click toggle between enabled or disabled for unitframe/element/group.
+[x] Implement visual options (Check psd on drive) right click toggle between enabled or disabled for unitframe/element/group.
 [ ] Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
+[ ] Implement new logic for all unit frames, already in place for player and target frame + health, power and healprediction, but other elements needed
 [ ] Implement custom health that can vary depending on the level of health, eg. red on <25%, orange on less than 50% and so on.. might be good to reuse gradient...
 [ ] Implement party/raid preview?
+
+[dead] -> [text][color:ff0000]
+[offline] -> [texture][blizzard]
+[ghost] -> [text][color:ffff00]
+[out-of-range] -> [alpha:50]

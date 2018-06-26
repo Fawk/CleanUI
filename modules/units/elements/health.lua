@@ -151,7 +151,7 @@ function NewHealth:Update(...)
 
 	parent:Update(UnitEvent.UPDATE_HEALTH)
 
-	if (event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH") then
+	if (event:anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
