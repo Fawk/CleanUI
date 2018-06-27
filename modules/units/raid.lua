@@ -196,6 +196,19 @@ function Raid:Trigger()
         end
     end
 end
+
+function Raid:Simulate(players)
+    local nameList = UnitName("Player")
+    for i = 2, (players > 40 and 40 or players) do
+        nameList = nameList..","..UnitName("player")
+    end
+    local container = Units:Get(frameName)
+    container:SetManyAttributes(
+        'showPlayer',   true,
+        'showSolo',     true,
+        "namelist",     nameList
+    )
+end
  
 function Raid:Update(frame, db)
     if not db or not db["Enabled"] then return end

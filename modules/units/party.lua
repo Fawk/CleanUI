@@ -186,6 +186,19 @@ function Party:Init()
     Units:DisableBlizzardRaid()
 end
 
+function Party:Simulate(players)
+    local nameList = UnitName("Player")
+    for i = 2, (players > 5 and 5 or players) do
+        nameList = nameList..","..UnitName("player")
+    end
+    local container = Units:Get(frameName)
+    container:SetManyAttributes(
+        'showPlayer',   true,
+        'showSolo',     true,
+        "namelist",     nameList
+    )
+end
+
 function Party:Trigger(db)
     for i = 1, self.updateFuncs:count() do
         local updateFunc = self.updateFuncs:get(i)
