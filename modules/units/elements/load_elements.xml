@@ -12,6 +12,7 @@
     <Script file="combatindicator.lua"/>
     <Script file="buffs.lua"/>
     <Script file="debuffs.lua"/>
+    <Script file="status.lua"/>
     <!-- etc -->
 
 </Ui>

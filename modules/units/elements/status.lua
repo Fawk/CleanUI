@@ -13,16 +13,6 @@ local elementName = "Status"
 local Status = { name = elementName }
 A["Shared Elements"]:add(Status)
 
-local colors = {
-    ["red"] = "ff0000",
-    ["yellow"] = "ffff00",
-    ["white"] = "ffffff",
-    ["green"] = "00ff00",
-    ["black"] = "000000",
-    ["blue"] = "0000ff",
-    ["orange"] = "ff9900"
-}
-
 --Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
 function Status:Init(parent)
 
@@ -39,7 +29,7 @@ function Status:Init(parent)
         status:SetFrameStrata("LOW")
 
         status.tags = A:OrderedTable()
-        status.icon = status:CreateTexture(nil, "OVERLAY")
+        status.icons = A:OrderedTable()
         status.db = db
 
         status.Update = function(self, event, ...)
@@ -56,30 +46,10 @@ function Status:Init(parent)
     parent.orderedElements:add({ key = elementName, element = status })
 end
 
---[[
+local function performAction(status, parent, db, key)
+    status[db["Action"]](parent, db, key)
+end
 
-    Party/Raid = {
-        ["Status"] = {
-            ["Out of range"] = {
-                ["Action"] = "Modify",
-                ["Settings"] = "[alpha:50]"
-            },
-            ["Dead"] = {
-                ["Action"] = "Present",
-                ["Settings"] = "[text,color:ff0000,outline]"
-            },
-            ["Offline"] = {
-                ["Action"] = "Present",
-                ["Settings"] = "[text,color:ff0000,outline]"
-            },
-            ["Ghost"] = {
-                ["Action"] = "Present",
-                ["Settings"] = "[text,color:ffff00,outline]"
-            }
-        }
-    }
-
-]]
 function Status:Update(...)
 
     local this = self
@@ -93,45 +63,91 @@ function Status:Update(...)
     local offline = db["Offline"]
     local ghost = db["Ghost"]
 
-    this[outofrange["Action"]](parent, outofrange)
-    this[dead["Action"]](parent, outofrange)
-    this[offline["Action"]](parent, outofrange)
-    this[ghost["Action"]](parent, outofrange)
+    performAction(this, parent, outofrange, "Out of range", function()
+        if UnitName(parent.unit, true) == UnitName("player", true) then
+            return false
+        else
+            local inRange, checkedRange = UnitInRange(parent.unit)
+            if checkedRange and not inRange then
+                return true
+            else
+                return false
+            end
+        end
+    end)
+    performAction(this, parent, dead, "Dead", function()
+        return UnitIsDead(parent.unit)
+    end)
+    performAction(this, parent, offline, "Offline", function()
+        return not UnitIsConnected(parent.unit)
+    end)
+    performAction(this, parent, ghost, "Ghost", function()
+        if UnitIsDeadOrGhost(parent.unit) then 
+            return not UnitIsDead(parent.unit)
+        end
+    end)
 end
 
-
-function Status:Modify(parent, db)
-
+function Status:Modify(parent, db, key, shouldAct)
     local settings = db["Settings"]
+    local type = settings["Modify Type"]
 
-    -- find target:something or use parent
-    local target = parent
-    if (settings:find("target")) then
-        -- evaluate target
-        local t = settings:match("target:[%w]+"):explode(":")[2]
-        if (parent[t]) then
-            target = parent[t]
-        elseif (parent[t:fupper()]) then
-            target = parent[t:fupper()]
+    if (type == "Alpha") then
+        if (shouldAct()) then
+            parent:SetAlpha(tonumber(settings["Alpha Value"]) / 100)
+        else
+            parent:SetAlpha(1)
+        end
+    elseif (type == "Color") then
+        if (shouldAct()) then
+            if (not parent.oldBackdropColor) then
+                parent.oldBackdropColor = parent:GetBackdropColor()
+            end
+
+            parent:SetBackdropColor(unpack(settings["Color"]))
+        else
+            if (parent.oldBackdropColor) then
+                parent:SetBackdropColor(unpack(parent.oldBackdropColor))
+            end
         end
     end
-
-    if (settings:find("alpha")) then
-        local alpha = settings:match("[0-9][0-9][0-9]?")
-    elseif (settings:find("color")) then
-        local color = settings:match("[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]")
-
-    end
-
 end
 
-function Status:Present(parent, db)
-
+function Status:Present(parent, db, key, shouldAct)
     local settings = db["Settings"]
-    if (settings:find("text")) then
-
-    elseif (settings:find("icon")) then
-
+    local type = settings["Present Type"]
+    local position = settings["Position"]
+    
+    if (self.tags[key]) then
+        self.tags[key]:Hide()
+        self.tags[key] = nil
     end
 
+    if (self.icons[key]) then
+        self.icons[key]:Hide()
+        self.icons[key] = nil
+    end
+
+    if (not shouldAct()) then return end
+
+    if (type == "Text") then
+
+        local fs = parent:CreateFontString(nil, "OVERLAY")
+        fs:SetFont(media:Fetch("font", "Default"), settings["Font Size"], "OUTLINE")
+        fs:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
+        fs:SetTextColor(unpack(settings["Color"]))
+        fs:SetText(key)
+
+        self.tags[key] = fs
+
+    elseif (type == "Icon") then
+        local size = settings["Icon Size"]
+
+        local icon = parent:CreateTexture(nil, "OVERLAY")
+        icon:SetTexture(media:Fetch("icon", settings["Icon"]))
+        icon:SetSize(size, size)
+        icon:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
+
+        self.icons[key] = icon
+    end
 end

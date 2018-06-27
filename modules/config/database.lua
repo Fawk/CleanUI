@@ -800,6 +800,52 @@ local defaults =  {
                         ["Enabled"] = true,
                         ["Actions"] = {}
                     },
+                    ["Status"] = {
+                        ["Out of range"] = {
+                            ["Action"] = "Modify",
+                            ["Settings"] = {
+                                ["Present Type"] = "None",
+                                ["Modify Type"] = "Alpha",
+                                ["Alpha Value"] = 50,
+                                ["Color"] = { 1, 1, 1, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Dead"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 0.7, 0, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Offline"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 0.7, 0, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Ghost"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 1, 0.8, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        }
+                    },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
@@ -940,6 +986,52 @@ local defaults =  {
                     ["Clickcast"] = {
                         ["Enabled"] = true,
                         ["Actions"] = {}
+                    },
+                    ["Status"] = {
+                        ["Out of range"] = {
+                            ["Action"] = "Modify",
+                            ["Settings"] = {
+                                ["Present Type"] = "None",
+                                ["Modify Type"] = "Alpha",
+                                ["Alpha Value"] = 50,
+                                ["Color"] = { 1, 1, 1, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Dead"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 0.7, 0, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Offline"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 0.7, 0, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        },
+                        ["Ghost"] = {
+                            ["Action"] = "Present",
+                            ["Settings"] = {
+                                ["Present Type"] = "Text",
+                                ["Modify Type"] = "None",
+                                ["Alpha Value"] = 100,
+                                ["Color"] = { 1, 0.8, 0, 1 },
+                                ["Icon Size"] = 16,
+                                ["Font Size"] = 10
+                            }
+                        }
                     },
                     ["Position"] = {
                         ["Relative To"] = "FrameParent",
