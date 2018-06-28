@@ -160,12 +160,8 @@ local function Power(frame, db)
 			end
 
 			if r then
-				print(r, g, b)
-
 				self:SetStatusBarColor(r, g, b)
 				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
-
-				print(self:GetStatusBarColor())
 			end
 		end
 

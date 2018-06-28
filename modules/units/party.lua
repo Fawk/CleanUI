@@ -221,7 +221,23 @@ function Party:Simulate(players)
 
     self:Update(player, db)
 
-    print("THIS IS THE WAY", player.Power:GetStatusBarColor())
+    local powerType = UnitPowerType("player")
+    local currentHealth, maxHealth = UnitHealth("player"), UnitHealthMax("player")
+    local currentPower, maxPower = UnitPower("player", powerType), UnitPowerMax("player", powerType)
+    
+    local randomHealth = math.random(0, maxHealth)
+    local randomPower = math.random(0, maxPower)
+
+    print(randomHealth, randomPower)
+
+    player.Health:SetValue(randomHealth)
+    player.Power:SetValue(randomPower)
+
+    print(player.Health:GetValue())
+    print(player.Power:GetValue())
+
+    player.Health:PostUpdate("player", 0, randomHealth)
+    player.Power:PostUpdate("player", 0, randomPower)
 
     fakeUnits:add(player)
 
