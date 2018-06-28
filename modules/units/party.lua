@@ -228,13 +228,11 @@ function Party:Simulate(players)
     local randomHealth = math.random(0, maxHealth)
     local randomPower = math.random(0, maxPower)
 
-    print(randomHealth, randomPower)
-
+    player.Health:SetMinMaxValues(0, maxHealth)
+    player.Power:SetMinMaxValues(0, maxPower)
+    
     player.Health:SetValue(randomHealth)
     player.Power:SetValue(randomPower)
-
-    print(player.Health:GetValue())
-    print(player.Power:GetValue())
 
     player.Health:PostUpdate("player", 0, randomHealth)
     player.Power:PostUpdate("player", 0, randomPower)
