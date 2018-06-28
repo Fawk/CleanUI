@@ -230,6 +230,14 @@ function SlashCmdList.CLEANUI(msg, editbox)
         A["modules"]["Profile"]:Change(arg1)
     end
 
+    if command == "simulateParty" then
+    	A["modules"].party:Simulate(arg1 or 5)
+    end
+
+    if command == "simulateRaid" then
+    	A["modules"].raid:Simulate(arg1 or 40)
+    end
+
     if command == "db" then
     	local f = A["Profile"]["Options"][arg1]
     	if (f) then

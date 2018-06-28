@@ -14,6 +14,8 @@ local frameName = "Party"
 
 Party.updateFuncs = A:OrderedTable()
 
+local fakeUnits = A:OrderedTable()
+
 local function SetTagColor(frame, tag, color)
 	if frame["Tags"][tag] then
 		frame["Tags"][tag].text:SetTextColor(unpack(color))
@@ -86,7 +88,7 @@ function Party:Init()
     local partyHeader = oUF:SpawnHeader(
         A:GetName().."_"..frameName.."Header",
         nil,
-        "party",
+        nil,
         "showPlayer",         db["Show Player"],
         "showSolo",           false,
         "showParty",          true,
@@ -187,16 +189,73 @@ function Party:Init()
 end
 
 function Party:Simulate(players)
-    local nameList = UnitName("Player")
-    for i = 2, (players > 5 and 5 or players) do
-        nameList = nameList..","..UnitName("player")
-    end
     local container = Units:Get(frameName)
-    container:SetManyAttributes(
-        'showPlayer',   true,
-        'showSolo',     true,
-        "namelist",     nameList
-    )
+
+    fakeUnits:foreach(function(unit)
+        unit:Hide()
+    end)
+
+    fakeUnits = A:OrderedTable()
+    local db = container.db
+    local size = db["Size"]
+
+    -- The player
+    local player = CreateFrame("Button", T:frameName(frameName, "FakeUnitButton1"), container, 'SecureUnitButtonTemplate')
+    player.unit = "player"
+    player:SetAttribute("unit", player.unit)
+    player:SetSize(size["Width"], size["Height"])
+
+    if (db["Orientation"] == "HORIZONTAL") then
+        if (db["Growth Direction"] == "Right") then
+            player:SetPoint("LEFT", container, "LEFT", 0, 0)
+        elseif (db["Growth Direction"] == "Left") then
+            player:SetPoint("RIGHT", container, "RIGHT", 0, 0)
+        end
+    else
+        if (db["Growth Direction"] == "Upwards") then
+            player:SetPoint("BOTTOM", container, "BOTTOM", 0, 0)
+        elseif (db["Growth Direction"] == "Downwards") then
+            player:SetPoint("TOP", container, "TOP", 0, 0)
+        end
+    end
+
+    self:Update(player, db)
+
+    print("THIS IS THE WAY", player.Power:GetStatusBarColor())
+
+    fakeUnits:add(player)
+
+    local relative = player
+    for i = 2, players do 
+        -- Create fake unit buttons
+        local uf = CreateFrame("Button", T:frameName(frameName, "FakeUnitButton"..i), container, 'SecureUnitButtonTemplate')
+        
+        uf.unit = "player"
+        uf:SetAttribute("unit", uf.unit)
+        uf:SetSize(size["Width"], size["Height"])
+
+        if (db["Orientation"] == "HORIZONTAL") then
+            if (db["Growth Direction"] == "Right") then
+                uf:SetPoint("LEFT", relative, "RIGHT", db["Offset X"], db["Offset Y"])
+            elseif (db["Growth Direction"] == "Left") then
+                uf:SetPoint("RIGHT", relative, "LEFT", db["Offset X"], db["Offset Y"])
+            end
+        else
+            if (db["Growth Direction"] == "Upwards") then
+                uf:SetPoint("BOTTOM", relative, "TOP", db["Offset X"], db["Offset Y"])
+            elseif (db["Growth Direction"] == "Downwards") then
+                uf:SetPoint("TOP", relative, "BOTTOM", db["Offset X"], db["Offset Y"])
+            end
+        end
+
+        self:Update(uf, db)
+
+        fakeUnits:add(uf)
+
+        relative = uf
+    end
+
+    RegisterStateDriver(container, "visibility", "show")
 end
 
 function Party:Trigger(db)
@@ -221,11 +280,15 @@ function Party:Update(frame, db)
     end
 
     --[[ Name ]]--
-    Units:Tag(frame, "Name", db["Tags"]["Name"])
+    if (frame.Tag) then
+        Units:Tag(frame, "Name", db["Tags"]["Name"])
+    end
 
     --[[ Custom ]]--
     for name, custom in next, db["Tags"]["Custom"] do
-        Units:Tag(frame, name, custom)
+        if (frame.Tag) then
+            Units:Tag(frame, name, custom)
+        end
     end
 
     Units:CreateStatusBorder(frame, "Targeted", {

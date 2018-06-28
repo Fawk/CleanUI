@@ -922,6 +922,7 @@ local defaults =  {
                         ["Height"] = 47
                     },
                     ["Orientation"] = "HORIZONTAL",
+                    ["Growth Direction"] = "Right",
                     ["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "NotoBold",
@@ -1109,6 +1110,7 @@ local defaults =  {
                         ["Height"] = 47
                     },
                     ["Orientation"] = "HORIZONTAL",
+                    ["Growth Direction"] = "Right",
                     ["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "NotoBold",
