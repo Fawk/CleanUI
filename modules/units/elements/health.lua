@@ -200,6 +200,12 @@ function NewHealth:Update(...)
 	Color(self, parent)
 end
 
+function NewHealth:Simulate(class)
+
+	
+
+end
+
 function Health(frame, db)
 
 	local health = frame.Health or (function()
