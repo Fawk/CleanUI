@@ -15,14 +15,14 @@ local elementName = "Health"
 local NewHealth = { name = elementName }
 A["Shared Elements"]:add(NewHealth)
 
-local function Gradient(unit)
+local function Gradient(unit, class)
 	local r1, g1, b1 = unpack(A.colors.health.low)
 	local r2, g2, b2 = unpack(A.colors.health.medium)
-	local r3, g3, b3 = unpack(unit and oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.light)
+	local r3, g3, b3 = unpack(unit and oUF.colors.class[class or select(2, UnitClass(unit))] or A.colors.backdrop.light)
 	return r1, g1, b1, r2, g2, b2, r3, g3, b3
 end
 
-local function Color(bar, parent)
+local function Color(bar, parent, class)
 
 	local unit = parent.id or parent.unit
 	local db = bar.db
@@ -31,7 +31,7 @@ local function Color(bar, parent)
 	local mult = db["Background Multiplier"]
 	
 	if colorType == "Class" then
-		r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.default)
+		r, g, b = unpack(oUF.colors.class[class or select(2, UnitClass(unit))] or A.colors.backdrop.default)
 	elseif colorType == "Health" then
 		r, g, b = unpack(oUF.colors.health)
 	elseif colorType == "Custom" then
@@ -52,7 +52,7 @@ local function Color(bar, parent)
 	end
 end
 
-local function setupMissingHealthBar(health, db, current, max)
+local function setupMissingHealthBar(health, db, current, max, class)
 	if (not db) then return end
 
 	local bar = health.missingHealthBar
@@ -92,7 +92,7 @@ local function setupMissingHealthBar(health, db, current, max)
 		bar:SetValue((parent.currentMaxHealth or max) - (parent.currentHealth or current))
 
 		-- Do coloring based on db
-		Color(bar, parent)
+		Color(bar, parent, class)
 
 		bar:Show()
 	else
@@ -200,9 +200,14 @@ function NewHealth:Update(...)
 	Color(self, parent)
 end
 
-function NewHealth:Simulate(class)
+function NewHealth:Simulate(parent, class)
 
-	
+	local tbl =  parent.orderedElements:getChildByKey("key", elementName)
+	local element = tbl.element
+
+	-- Set the color using the class
+	self:Init(parent)
+	Color(element, class) -- This needs to be broken out and re-written nicer...
 
 end
 
