@@ -5,6 +5,7 @@ local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpeci
 local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
+local UnitExists = UnitExists
 local CC = A.modules.clickcast
 
 local init = false
@@ -188,7 +189,45 @@ function Party:Init()
     Units:DisableBlizzardRaid()
 end
 
+local powerType = {
+    ["WARRIOR"] = "RAGE",
+    ["DEATHKNIGHT"] = "RUNIC_POWER",
+    ["DRUID"] = "MANA",
+    ["MAGE"] = "MANA",
+    ["WARLOCK"] = "MANA",
+    ["PRIEST"] = "MANA",
+    ["MONK"] = "ENERGY",
+    ["ROGUE"] = "ENERGY",
+    ["DEMONHUNTER"] = "FURY",
+    ["HUNTER"] = "FOCUS",
+    ["PALADIN"] = "MANA",
+    ["SHAMAN"] = "MANA",
+}
+
+local function randomClass()
+    local class = CLASS_SORT_ORDER[math.random(1, 12)]
+
+    OldUnitClass = UnitClass
+    UnitClass = function(u)
+        return "", class, 0
+    end
+    OldUnitPowerType = UnitPowerType
+    UnitPowerType = function(u)
+        return powerType[class]
+    end
+end
+
+local function resetClass()
+    UnitClass = OldUnitClass
+    UnitPowerType = OldUnitPowerType
+end
+
 function Party:Simulate(players)
+    if (UnitExists("party1")) then
+        -- Present notification here saying that you cannot simulate party frames while in a party
+        return
+    end
+
     local container = Units:Get(frameName)
 
     fakeUnits:foreach(function(unit)
@@ -234,8 +273,28 @@ function Party:Simulate(players)
     player.Health:SetValue(randomHealth)
     player.Power:SetValue(randomPower)
 
-    player.Health:PostUpdate("player", 0, randomHealth)
-    player.Power:PostUpdate("player", 0, randomPower)
+    player.Health:PostUpdate("player", randomHealth, maxHealth)
+    player.Power:PostUpdate("player", randomPower, maxPower)
+
+    local nameTag = db["Tags"]["Name"] 
+    player.name = player:CreateFontString(nil, "OVERLAY")
+    
+    player.name:SetFont(media:Fetch("font", nameTag["Font"]), nameTag["Size"], nameTag["Outline"] == "SHADOW" and "NONE" or nameTag["Outline"])
+    player.name:SetTextColor(unpack(nameTag["Color"]))
+
+    if nameTag["Outline"] == "SHADOW" then
+        player.name:SetShadowColor(0, 0, 0)
+        player.name:SetShadowOffset(1, -1)
+    end
+
+    local text = nameTag["Text"]
+
+    local tag = text:match("%b[]"):sub(2,-2)
+    local tagFunc = oUF.Tags.Methods[tag]
+
+    player.name:SetText(tagFunc("player"))
+
+    Units:Position(player.name, nameTag["Position"])
 
     fakeUnits:add(player)
 
@@ -263,6 +322,48 @@ function Party:Simulate(players)
         end
 
         self:Update(uf, db)
+
+        uf.Health:SetMinMaxValues(0, maxHealth)
+        uf.Power:SetMinMaxValues(0, maxPower)
+
+        randomHealth = math.random(0, maxHealth)
+        randomPower = math.random(0, maxPower)
+        
+        uf.Health:SetValue(randomHealth)
+        uf.Power:SetValue(randomPower)
+
+        -- Need to implement a Simulate for each element so that blizzard functions can be overridden
+        randomClass()
+
+        uf.Health:PostUpdate("player", randomHealth, maxHealth)
+        uf.Power:PostUpdate("player", randomPower, maxPower)
+
+        uf.name = uf:CreateFontString(nil, "OVERLAY")
+    
+        uf.name:SetFont(media:Fetch("font", nameTag["Font"]), nameTag["Size"], nameTag["Outline"] == "SHADOW" and "NONE" or nameTag["Outline"])
+        uf.name:SetTextColor(unpack(nameTag["Color"]))
+
+        if nameTag["Outline"] == "SHADOW" then
+            uf.name:SetShadowColor(0, 0, 0)
+            uf.name:SetShadowOffset(1, -1)
+        end
+
+        local OldUnitName = UnitName
+        UnitName = function(u)
+            return "Party"..i
+        end
+
+        local text = nameTag["Text"]
+
+        local tag = text:match("%b[]"):sub(2,-2)
+        local tagFunc = oUF.Tags.Methods[tag]
+
+        uf.name:SetText(tagFunc("player"))
+
+        Units:Position(uf.name, nameTag["Position"])
+
+        UnitName = OldUnitName
+        resetClass()
 
         fakeUnits:add(uf)
 
