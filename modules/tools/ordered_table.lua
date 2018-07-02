@@ -229,6 +229,76 @@ function Args:OrderedTable(s)
 	return opt
 end
 
+local MAP = {}
+MAP.__index = MAP
+
+function MAP:set(self, k, v)
+  if (self.e[k]) then 
+    return false
+  else
+    self.c = self.c + 1
+    self.e[k] = v
+    self.i[self.c] = k
+    return true
+  end
+end
+
+function MAP:get(self, k)
+  return self.e[k]
+end
+
+function MAP:foreach(self, func)
+  for x = 1, self.c do
+      local index = self.i[x]
+      func(index, self.e[index])
+  end
+end
+
+function MAP:count()
+  return self.c
+end
+
+function MAP:isEmpty()
+ return self.c == 0
+end
+
+function MAP:hasKey(self, key)
+ return self.e[key] ~= nil
+end
+
+function MAP:computeIfMissing(self, key, func)
+ if (not self:hasKey(key))
+  self:set(key, func(self, key))
+  end
+  return self:get(key)
+end
+
+function MAP:remove(self, key)
+  if (self.e[key]) then
+    self.e[key] = nil
+    local y = {}
+    for x = 1, self.c do
+      if (self.i[x] ~= k) then
+        y[x] = self.i[x]
+      end
+    end
+    self.i = y
+    self.c = self.c - 1
+    return true
+  end
+  return false
+end
+
+function Args:OrderedMap()
+  local opt = {
+    e = {},
+    i = {},
+    c = 0
+  }
+  setmetatable(opt, MAP)
+  return opt
+end
+
 function Args:Option(builder)
   local opt = {
     children = Args:OrderedTable(),

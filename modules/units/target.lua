@@ -16,7 +16,7 @@ function NewTarget:Init()
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
     frame.GetDbName = function(self) return frameName end
     frame.db = db
-    frame.orderedElements = A:OrderedTable()
+    frame.orderedElements = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
         self:Update(UnitEvent.UPDATE_DB, db)
     end)
@@ -60,8 +60,8 @@ function NewTarget:Update(...)
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
-            self.orderedElements:foreach(function(obj)
-                obj.element:Update(event, db[obj.key])
+            self.orderedElements:foreach(function(key, obj)
+                obj:Update(event, db[key])
             end)
         end
     end

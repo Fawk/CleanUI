@@ -1,6 +1,5 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
@@ -8,8 +7,8 @@ local UnitPowerType = UnitPowerType
 
 local elementName = "Power"
 
-local NewPower = { name = elementName }
-A["Shared Elements"]:add(NewPower)
+local Power = { name = elementName }
+A["Shared Elements"]:set(elementName, Power)
 
 local function Color(bar, parent)
 	local db = bar.db
@@ -17,11 +16,11 @@ local function Color(bar, parent)
 	local mult = db["Background Multiplier"]
 	local colorType = db["Color By"]
 	if colorType == "Class" then
-		r, g, b = unpack(oUF.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
+		r, g, b = unpack(A.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
 	elseif colorType == "Power" then
 		t = A.colors.power[parent.powerToken]
 		if not t then
-			t = oUF.colors.power[parent.powerToken]
+			t = A.colors.power[parent.powerToken]
 		end
 	elseif colorType == "Custom" then
 		t = db["Custom Color"]
@@ -36,7 +35,7 @@ local function Color(bar, parent)
 	end
 end
 
-function NewPower:Init(parent)
+function Power:Init(parent)
 
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
@@ -54,7 +53,7 @@ function NewPower:Init(parent)
 		power.tags = A:OrderedTable()
 
 	    power.Update = function(self, event, ...)
-	    	NewPower:Update(self, event, ...)
+	    	Power:Update(self, event, ...)
 	   	end
 
 		power:RegisterEvent("UNIT_POWER_FREQUENT")
@@ -71,13 +70,13 @@ function NewPower:Init(parent)
 	parent.orderedElements:add({ key = elementName, element = power })
 end
 
-function NewPower:Disable(parent)
+function Power:Disable(parent)
 	self:Hide()
 	self:UnregisterAllEvents()
 	parent.orderedElements:remove(self)
 end
 
-function NewPower:Update(...)
+function Power:Update(...)
 	
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
@@ -130,68 +129,3 @@ function NewPower:Update(...)
 
 	Color(self, parent)
 end
-
-local function Power(frame, db)
-
-	local power = frame.Power or (function()
-
-		local power = CreateFrame("StatusBar", frame:GetName().."_Power", frame)
-
-		power:SetFrameStrata("LOW")
-		power.frequentUpdates = true
-		power.bg = power:CreateTexture(nil, "BACKGROUND")
-		power.PostUpdate = function(self, unit, min, max)
-			local r, g, b, t
-			local mult = db["Background Multiplier"]
-			local colorType = db["Color By"]
-			if colorType == "Class" then
-				power.colorClass = true
-			elseif colorType == "Power" then
-				local powerType = select(2, UnitPowerType(unit))
-				t = A.colors.power[powerType]
-				if not t then
-					t = oUF.colors.power[powerType]
-				end
-			elseif colorType == "Custom" then
-				t = db["Custom Color"]
-			end
-			if t then
-				r, g, b = unpack(t)
-			end
-
-			if r then
-				self:SetStatusBarColor(r, g, b)
-				self.bg:SetVertexColor(r * mult, g * mult, b * mult)
-			end
-		end
-
-		local powerType = UnitPowerType(frame.unit)
-		local min, max = UnitPower(frame.unit, powerType), UnitPowerMax(frame.unit, powerType)
-		power:PostUpdate(frame.unit, min, max)
-
-		return power
-
-	end)()
-
-	Units:Position(power, db["Position"])
-
-	local texture = media:Fetch("statusbar", db["Texture"])
-	local size = db["Size"]
-
-	power:SetOrientation(db["Orientation"])
-	power:SetReverseFill(db["Reversed"])
-	power:SetStatusBarTexture(texture)
-	power:SetWidth(size["Match width"] and frame:GetWidth() or size["Width"])
-	power:SetHeight(size["Match height"] and frame:GetHeight() or size["Height"])
-	power.bg:ClearAllPoints()
-	power.bg:SetAllPoints()
-	power.bg:SetTexture(texture)
-
-	if frame.PostPower then
-		frame:PostPower(power)
-	end
-
-	frame.Power = power
-end
-
-A["Elements"]:add({ name = "Power", func = Power })

@@ -237,7 +237,7 @@ function Group:Update(...)
         self:SetSize(size["Width"], size["Height"])
 
         if (not self.orderedElements) then
-    		self.orderedElements = A:OrderedTable()
+    		self.orderedElements = A:OrderedMap()
     	end
 
     	if (not self.Update) then
@@ -248,8 +248,8 @@ function Group:Update(...)
 
     	U:CreateBackground(self, db)
 
-        self.orderedElements:foreach(function(obj)
-            obj.element:Update(event, db[obj.key])
+        self.orderedElements:foreach(function(key, obj)
+            obj:Update(event, db[key])
         end)
     end
 end

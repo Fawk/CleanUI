@@ -193,10 +193,15 @@ local defaults =  {
                         ["Custom"] = {}
                     },
                     ["Heal Prediction"] = {
+                        ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Max Overflow"] = 1,
-                        ["FrequentUpdates"] = true,
-                        ["Enabled"] = true
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
 					["Background"] = {
 						["Color"] = { 0, 0, 0 },
@@ -549,10 +554,15 @@ local defaults =  {
                         }
                     },
                     ["Heal Prediction"] = {
+                        ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Max Overflow"] = 1,
-                        ["Frequent Updates"] = true,
-                        ["Enabled"] = true
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
@@ -949,10 +959,15 @@ local defaults =  {
                         ["Enabled"] = true
                     },
                     ["Heal Prediction"] = {
+                        ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Max Overflow"] = 1,
-                        ["Frequent Updates"] = true,
-                        ["Enabled"] = true
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
                     ["Offset X"] = 2,
                     ["Offset Y"] = 0,
@@ -1172,10 +1187,15 @@ local defaults =  {
                         ["Enabled"] = true
                     },
                     ["Heal Prediction"] = {
+                        ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Max Overflow"] = 1,
-                        ["Frequent Updates"] = true,
-                        ["Enabled"] = true
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
                     ["Offset X"] = 2,
                     ["Offset Y"] = 2,
@@ -1396,10 +1416,15 @@ local defaults =  {
                         }
                     },
                     ["Heal Prediction"] = {
+                        ["Enabled"] = true,
                         ["Texture"] = "Default2",
                         ["Max Overflow"] = 1,
-                        ["Frequent Updates"] = true,
-                        ["Enabled"] = true
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },

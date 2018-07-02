@@ -10,7 +10,7 @@ Addon.noop = function() end
 Addon.OrderedTable = Args.OrderedTable
 
 Addon["Elements"] = Args:OrderedTable()
-Addon["Shared Elements"] = Args:OrderedTable()
+Addon["Shared Elements"] = Args:OrderedMap()
 
 Addon.oUF = Args.oUF or oUF
 local oUF = Addon.oUF
@@ -283,14 +283,14 @@ function Addon:Init()
             if (unit) then
             	if (unit.hasMultipleUnits) then
             		unit:InitUnits(function(self, uf)
-            			Addon["Shared Elements"]:foreach(function(element)
+            			Addon["Shared Elements"]:foreach(function(key, element)
 	                    	element:Init(uf)
 	                	end)
             		end)
             	else
 	                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
 	                Addon.Units:Add(unit, unit:GetDbName())
-	                Addon["Shared Elements"]:foreach(function(element)
+	                Addon["Shared Elements"]:foreach(function(key, element)
 	                    element:Init(unit)
 	                end)
 	            end

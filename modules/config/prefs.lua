@@ -1349,6 +1349,10 @@ function A:CreatePrefs(db)
             X:HandleChildren(child.children, false)
         end)
         X:HandleChildren(self.children, true, true)
+        
+        if (A.clickcastWindow) then
+            A.clickCastWindow:Hide()
+        end
     end
 
     local genericOnClick = function(self)

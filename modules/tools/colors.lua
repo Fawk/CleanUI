@@ -5,7 +5,8 @@ A.colors = {
 		low = { .54, .16, .11 },
 		medium = { .40, .26, .04 },
 		dead = { 100/255, 15/255, 15/255 },
-		disconnected = { .2, .2, .2, }
+		disconnected = { .2, .2, .2, },
+		standard = { 49/255, 207 255, 37/255 }
 	},
 	power = {
 		["MANA"] = { 80/255, 109/255, 155/255 },
@@ -26,20 +27,6 @@ A.colors = {
         light = { .13, .13, .13, 1 },
         border = { .33, .33, .33, 1 }
 	},
-	text = {
-		dead = { 1, 0, 0 },
-		ghost = { 1, 1, 0 },
-		disconnected = { .45, .25, .25 },
-		default = { 1, 1, 1 }
-	},
-	healPrediction = {
-		my = { 0, .827, .765, .5 },
-		all = { 0, .631, .557, .5 },
-		absorb = { .7, .7, 1, .5 },
-		healAbsorb = { .7, .7, 1, .5 },
-		overAbsorb = { 1, 1, .5, .5 },
-		overHealAbsorb = { 1, .7, .7, .5 }
-	},
 	moving = {
 		backdrop = { .1, .1, .1, .7 },
 		border = { .3, .3, .6, .5 }
@@ -54,15 +41,31 @@ A.colors = {
 		["Magic"] = { 33/255, 33/255, 200/255 },
 		["Poison"] = { 33/255, 155/255, 33/255 },
 		["Physical"] = { 155/255, 33/255, 33/255 }
-	},
-	keybindings = {
-		remove = { 1, .13, .13 },
-		states = {
-			modifier = { .13, .13, 1 },
-			help = { .13, 1, .13 },
-			harm = { 1, .13, .13 },
-			state = { .53, .53, 0 }
-		}
-	},
-	castbar = { 0.33, 0.33, 0.53 }
+	}
 }
+
+A.colors.class = {}
+for classToken, color in next, RAID_CLASS_COLORS do
+	A.colors.class[classToken] = {color.r, color.g, color.b}
+end
+
+local function colorsAndPercent(a, b, ...)
+	if(a <= 0 or b == 0) then
+		return nil, ...
+	elseif(a >= b) then
+		return nil, select(select('#', ...) - 2, ...)
+	end
+
+	local num = select('#', ...) / 3
+	local segment, relperc = math.modf((a / b) * (num - 1))
+	return relperc, select((segment * 3) + 1, ...)
+end
+
+function A:ColorGradient(...)
+	local relperc, r1, g1, b1, r2, g2, b2 = colorsAndPercent(...)
+	if(relperc) then
+		return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
+	else
+		return r1, g1, b1
+	end
+end
