@@ -289,7 +289,7 @@ function Addon:Init()
             		end)
             	else
 	                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
-	                Addon.Units:Add(unit)
+	                Addon.Units:Add(unit, unit:GetDbName())
 	                Addon["Shared Elements"]:foreach(function(element)
 	                    element:Init(unit)
 	                end)

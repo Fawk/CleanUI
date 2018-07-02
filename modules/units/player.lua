@@ -14,6 +14,7 @@ function NewPlayer:Init()
     local db = A["Profile"]["Options"][frameName]
 
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
+    frame.GetDbName = function(self) return frameName end
     frame.db = db
     frame.orderedElements = A:OrderedTable()
     frame:SetScript("OnShow", function(self)

@@ -4,11 +4,7 @@ local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
-local UnitIsDeadOrGhost = UnitIsDeadOrGhost
-local UnitIsDead = UnitIsDead
-local UnitIsConnected = UnitIsConnected
 local UnitClass = UnitClass
-local UnitInRange = UnitInRang
 
 local elementName = "Health"
 
