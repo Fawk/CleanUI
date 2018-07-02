@@ -37,8 +37,13 @@ end
 local Unit = {}
 
 function A:CreateUnit(id)
-    local unit = oUF:Spawn(id, id)
+    oUF:DisableBlizzard(id)
+
+    local unit = CreateFrame("Button", T:frameName(id:fupper()), A.frameParent, "SecureUnitButtonTemplate")
+    unit:SetAttribute("unit", id)
     unit.super = Unit
+
+    RegisterUnitWatch(unit)
 
     return unit
 end

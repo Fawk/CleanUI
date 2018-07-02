@@ -13,11 +13,6 @@ function NewPlayer:Init()
 
     local db = A["Profile"]["Options"][frameName]
 
-    oUF:RegisterStyle(frameName, function(frame, unit, notHeader)
-        NewPlayer:Update(frame, UnitEvent.UPDATE_DB, db)
-    end)
-    oUF:SetActiveStyle(frameName)
-
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
     frame.db = db
     frame.orderedElements = A:OrderedTable()

@@ -8,6 +8,7 @@ Boss.updateFuncs = A:OrderedTable()
 
 local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES
 
+-- Implement new Boss frames without oUF
 function Boss:Init()
 
 	local db = A["Profile"]["Options"][frameName]

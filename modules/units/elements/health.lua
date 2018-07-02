@@ -12,8 +12,8 @@ local UnitInRange = UnitInRang
 
 local elementName = "Health"
 
-local NewHealth = { name = elementName }
-A["Shared Elements"]:add(NewHealth)
+local Health = { name = elementName }
+A["Shared Elements"]:add(Health)
 
 local function Gradient(unit, class)
 	local r1, g1, b1 = unpack(A.colors.health.low)
@@ -47,7 +47,12 @@ local function Color(bar, parent, class)
 	if r then
 		bar:SetStatusBarColor(r, g, b, a or 1)
 		if (bar.bg) then
-			bar.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
+			if (mult == -1) then
+				bar.bg:Hide()
+			else
+				bar.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
+				bar.bg:Show()
+			end
 		end
 	end
 end
@@ -100,7 +105,7 @@ local function setupMissingHealthBar(health, db, current, max, class)
 	end
 end
 
-function NewHealth:Init(parent)
+function Health:Init(parent)
 
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
@@ -121,7 +126,7 @@ function NewHealth:Init(parent)
 		health.db = db
 
 	    health.Update = function(self, event, ...)
-	    	NewHealth:Update(self, event, ...)
+	    	Health:Update(self, event, ...)
 	   	end
 
 		health:RegisterEvent("UNIT_HEALTH_FREQUENT")
@@ -138,13 +143,13 @@ function NewHealth:Init(parent)
 	parent.orderedElements:add({ key = elementName, element = health })
 end
 
-function NewHealth:Disable(parent)
+function Health:Disable(parent)
 	self:Hide()
 	self:UnregisterAllEvents()
 	parent.orderedElements:remove(self)
 end
 
-function NewHealth:Update(...)
+function Health:Update(...)
 	
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
@@ -200,7 +205,7 @@ function NewHealth:Update(...)
 	Color(self, parent)
 end
 
-function NewHealth:Simulate(parent, class)
+function Health:Simulate(parent, class)
 
 	local tbl =  parent.orderedElements:getChildByKey("key", elementName)
 	local element = tbl.element
@@ -210,83 +215,3 @@ function NewHealth:Simulate(parent, class)
 	Color(element, class) -- This needs to be broken out and re-written nicer...
 
 end
-
-function Health(frame, db)
-
-	local health = frame.Health or (function()
-
-		local health = CreateFrame("StatusBar", frame:GetName().."_Health", frame)
-		health:SetFrameStrata("LOW")
-		health.frequentUpdates = true
-		health.bg = health:CreateTexture(nil, "BACKGROUND")
-		health.db = db
-		health.missingHealthBar = CreateFrame("StatusBar", T:frameName(frame:GetName(), "Health", "MissingHealthBar"), health)
-		health.missingHealthBar:SetFrameLevel(4)
-
-		health.PostUpdate = function(self, unit, min, max)
-			
-			local r, g, b, t, a
-			local colorType = db["Color By"]
-			local mult = db["Background Multiplier"]
-
-			if colorType == "Class" then
-				health.colorClass = true
-				r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.default)
-			elseif colorType == "Health" then
-				health.colorHealth = true
-				r, g, b = unpack(oUF.colors.health)
-			elseif colorType == "Custom" then
-				t = db["Custom Color"]
-			elseif colorType == "Gradient" then
-				r, g, b = oUF.ColorGradient(min, max, Gradient(unit))
-			end
-			
-			if t then
-				r, g, b, a = unpack(t)
-			end
-
-			self.colorClassNPC = true
-
-			setupMissingHealthBar(health, db["Missing Health Bar"], min, max)
-
-			if r then
-				self:SetStatusBarColor(r, g, b, a or 1)
-				if (db["Background Multiplier"] == -1) then
-					self.bg:Hide()
-				else
-					self.bg:Show()
-					self.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
-				end
-			end
-		end
-
-		return health
-
-	end)()
-
-	Units:Position(health, db["Position"])
-
-	local texture = media:Fetch("statusbar", db["Texture"])
-	local size = db["Size"]
-
-	health:SetOrientation(db["Orientation"])
-	health:SetReverseFill(db["Reversed"])
-	health:SetStatusBarTexture(texture)
-	health:SetWidth(size["Match width"] and frame:GetWidth() or size["Width"])
-	health:SetHeight(size["Match height"] and frame:GetHeight() or size["Height"])
-	health.bg:ClearAllPoints()
-	health.bg:SetAllPoints()
-	health.bg:SetTexture(texture)
-
-	if (db["Background Multiplier"] == -1) then
-			health.bg:Hide()
-		end
-
-	if frame.PostHealth then
-		frame:PostHealth(health)
-	end
-
-	frame.Health = health
-end
-
-A["Elements"]:add({ name = "Health", func = Health })

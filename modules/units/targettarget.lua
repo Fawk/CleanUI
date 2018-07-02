@@ -6,7 +6,8 @@ local InCombatLockdown = InCombatLockdown
 
 local TargetTarget = {}
 local frameName = "Target of Target"
- 
+
+-- Implement new TargetTarget without oUF
 function TargetTarget:Init()
 
 	local db = A["Profile"]["Options"][frameName]
