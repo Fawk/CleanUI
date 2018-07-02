@@ -17,7 +17,7 @@ local function Color(bar, parent)
 	local mult = db["Background Multiplier"]
 	local colorType = db["Color By"]
 	if colorType == "Class" then
-		r, g, b = unpack(oUF.colors.class[select(2, UnitClass(unit))] or A.colors.backdrop.default)
+		r, g, b = unpack(oUF.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
 	elseif colorType == "Power" then
 		t = A.colors.power[parent.powerToken]
 		if not t then
@@ -38,7 +38,7 @@ end
 
 function NewPower:Init(parent)
 
-	local parentName = parent:GetName()
+	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
 
 	local power = parent.orderedElements:getChildByKey("key", elementName)

@@ -39,9 +39,12 @@ local Unit = {}
 function A:CreateUnit(id)
     local unit = oUF:Spawn(id, id)
     unit.super = Unit
-    unit.id = id
 
     return unit
+end
+
+function A:SetUnitMeta(frame)
+    frame.super = Unit
 end
 
 function Unit:Init()
@@ -54,19 +57,18 @@ function Unit:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 
     if (event == UnitEvent.UPDATE_IDENTIFIER) then
-
-        local previous = self.id
+        local previous = self.unit
         local realUnit, modUnit = SecureButton_GetUnit(self), SecureButton_GetModifiedUnit(self)
-        self.id = realUnit
-        self.modId = modUnit
+        self.unit = realUnit
+        self.modUnit = modUnit
         if (self.OnIdentifier) then
             self:OnIdentifier(previous)
         end
     elseif (event == UnitEvent.UPDATE_HEALTH) then
         self.previousHealth = self.currentHealth
         self.previousMaxHealth = self.currentMaxHealth
-        self.currentHealth = UnitHealth(self.id)
-        self.currentMaxHealth = UnitHealthMax(self.id)
+        self.currentHealth = UnitHealth(self.unit)
+        self.currentMaxHealth = UnitHealthMax(self.unit)
 
         if (self.OnHealth) then
             self:OnHealth(...)
@@ -75,9 +77,9 @@ function Unit:Update(...)
         self.previousPower = self.currentPower
         self.previousMaxPower = self.currentMaxPower
 
-        local powerType, powerToken, altR, altG, altB = UnitPowerType(self.id)
-        self.currentPower = UnitPower(self.id, powerType)
-        self.currentMaxPower = UnitPowerMax(self.id, powerType)
+        local powerType, powerToken, altR, altG, altB = UnitPowerType(self.unit)
+        self.currentPower = UnitPower(self.unit, powerType)
+        self.currentMaxPower = UnitPowerMax(self.unit, powerType)
 
         self.powerType = powerType
         self.powerToken = powerToken
@@ -87,35 +89,25 @@ function Unit:Update(...)
         end
     elseif (event == UnitEvent.UPDATE_BUFFS) then
         if (not self.buffs) then self.buffs = {} end
-        fetchAuraData(UnitBuff, self.buffs, self.id)
+        fetchAuraData(UnitBuff, self.buffs, self.unit)
 
         if (self.OnBuffs) then
             self:OnBuffs(...)
         end
     elseif (event == UnitEvent.UPDATE_DEBUFFS) then
         if (not self.debuffs) then self.debuffs = {} end
-        fetchAuraData(UnitDebuff, self.debuffs, self.id)
+        fetchAuraData(UnitDebuff, self.debuffs, self.unit)
 
         if (self.OnDebuffs) then
             self:OnDebuffs(...)
         end
-    elseif (event == UnitEvent.UPDATE_CLICKCAST) then
-        if (arg2 and self.id and self:CanChangeAttribute()) then
-            for _,binding in next, arg2 do
-                local f, t = binding.action:gsub("@unit", "@mouseover")
-                self:SetAttribute(binding.type, f)
-            end
-        end
-        if (self.OnClickCast) then
-            self:OnClickCast(arg2)
-        end
     elseif (event == UnitEvent.UPDATE_HEAL_PREDICTION) then
         
-        local myIncomingHeal = UnitGetIncomingHeals(self.id, 'player') or 0
-        local allIncomingHeal = UnitGetIncomingHeals(self.id) or 0
-        local absorb = UnitGetTotalAbsorbs(self.id) or 0
-        local healAbsorb = UnitGetTotalHealAbsorbs(self.id) or 0
-        local health, maxHealth = UnitHealth(self.id), UnitHealthMax(self.id)
+        local myIncomingHeal = UnitGetIncomingHeals(self.unit, 'player') or 0
+        local allIncomingHeal = UnitGetIncomingHeals(self.unit) or 0
+        local absorb = UnitGetTotalAbsorbs(self.unit) or 0
+        local healAbsorb = UnitGetTotalHealAbsorbs(self.unit) or 0
+        local health, maxHealth = UnitHealth(self.unit), UnitHealthMax(self.unit)
 
         local hasOverHealAbsorb = false
         if(health < healAbsorb) then
@@ -123,7 +115,7 @@ function Unit:Update(...)
             healAbsorb = health
         end
 
-        local maxOverflow = 1.2
+        local maxOverflow = self.maxOverflow or 1.2
 
         if(health - healAbsorb + allIncomingHeal > maxHealth * maxOverflow) then
             allIncomingHeal = maxHealth * maxOverflow - health + healAbsorb
@@ -166,9 +158,5 @@ function Unit:Update(...)
     if (self.AfterUpdate) then
         self:AfterUpdate(...)
     end
-end
-
-function Unit:GetId()
-    return self.id
 end
 

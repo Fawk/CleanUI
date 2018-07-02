@@ -960,6 +960,10 @@ local defaults =  {
                     ["Highlight Target"] = true,
                     ["Show Debuff Border"] = true,
                     ["Debuff Order"] = { "Magic", "Disease", "Curse", "Poison" },
+                    ["Visibility"] = "[@party1,exists] show; hide",
+                    ["Group By"] = "Role",
+                    ["Sort Alphabetically"] = true,
+                    ["Sorting Direction"] = "ASC",
                     ["Group Role Indicator"] = {
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
@@ -968,7 +972,12 @@ local defaults =  {
                             ["Offset Y"] = -2,
                             ["Relative To"] = "Parent"    
                         },
+                        ["Size"] = 20,
                         ["Style"] = "Letter",
+                        ["Text Size"] = 10,
+                        ["Text Color"] = { 1, 1, 1, 1 },
+                        ["Text Style"] = "Outline",
+                        ["Texture"] = nil,
                         ["Enabled"] = true
                     },
                     ["Background"] = {
@@ -988,6 +997,11 @@ local defaults =  {
                         ["Enabled"] = true,
                         ["Actions"] = {}
                     },
+                    ["Visibility"] = "[@raid1,exists] show; hide",
+                    ["Group By"] = "Role",
+                    ["Sort Alphabetically"] = true,
+                    ["Sorting Direction"] = "ASC",
+                    ["Max Columns"] = 5,
                     ["Status"] = {
                         ["Out of range"] = {
                             ["Action"] = "Modify",
@@ -997,7 +1011,13 @@ local defaults =  {
                                 ["Alpha Value"] = 50,
                                 ["Color"] = { 1, 1, 1, 1 },
                                 ["Icon Size"] = 16,
-                                ["Font Size"] = 10
+                                ["Font Size"] = 10,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 2,
+                                    ["Offset Y"] = -2,
+                                },
                             }
                         },
                         ["Dead"] = {
@@ -1008,7 +1028,13 @@ local defaults =  {
                                 ["Alpha Value"] = 100,
                                 ["Color"] = { 0.7, 0, 0, 1 },
                                 ["Icon Size"] = 16,
-                                ["Font Size"] = 10
+                                ["Font Size"] = 10,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 2,
+                                    ["Offset Y"] = -2,
+                                },
                             }
                         },
                         ["Offline"] = {
@@ -1019,7 +1045,13 @@ local defaults =  {
                                 ["Alpha Value"] = 100,
                                 ["Color"] = { 0.7, 0, 0, 1 },
                                 ["Icon Size"] = 16,
-                                ["Font Size"] = 10
+                                ["Font Size"] = 10,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 2,
+                                    ["Offset Y"] = -2,
+                                },
                             }
                         },
                         ["Ghost"] = {
@@ -1030,7 +1062,13 @@ local defaults =  {
                                 ["Alpha Value"] = 100,
                                 ["Color"] = { 1, 0.8, 0, 1 },
                                 ["Icon Size"] = 16,
-                                ["Font Size"] = 10
+                                ["Font Size"] = 10,
+                                ["Position"] = {
+                                    ["Point"] = "TOPLEFT",
+                                    ["Local Point"] = "TOPLEFT",
+                                    ["Offset X"] = 2,
+                                    ["Offset Y"] = -2,
+                                },
                             }
                         }
                     },
@@ -1109,8 +1147,7 @@ local defaults =  {
                         ["Width"] = 63,
                         ["Height"] = 47
                     },
-                    ["Orientation"] = "HORIZONTAL",
-                    ["Growth Direction"] = "Right",
+                    ["Growth Direction"] = "Right Then Down",
                     ["Tags"] = {
                         ["Name"] = {
                             ["Font"] = "NotoBold",
@@ -1154,7 +1191,12 @@ local defaults =  {
                             ["Offset Y"] = -2,
                             ["Relative To"] = "Parent"    
                         },
+                        ["Size"] = 20,
                         ["Style"] = "Letter",
+                        ["Text Size"] = 10,
+                        ["Text Color"] = { 1, 1, 1, 1 },
+                        ["Text Style"] = "Outline",
+                        ["Texture"] = nil,
                         ["Enabled"] = true
                     },
                     ["Background"] = {

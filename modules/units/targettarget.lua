@@ -38,7 +38,7 @@ function TargetTarget:Trigger()
 end
 
 function TargetTarget:Update(frame, db)
-	if not db["Enabled"] then return end
+	if not db or not db["Enabled"] then return end
 
     local position, size = db["Position"], db["Size"]
 

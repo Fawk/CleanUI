@@ -134,4 +134,4 @@ function Target:Update(frame, db)
     end
 end
 
-A.modules["target"] = Target
+A.modules["target"] = NewTarget

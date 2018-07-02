@@ -7,6 +7,7 @@ local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
 local UnitExists = UnitExists
 local CC = A.modules.clickcast
+local Group = A.Group
 
 local init = false
 
@@ -55,6 +56,19 @@ local function Visibility(uf)
             uf.Health:SetStatusBarColor(r, g, b)
         end
     end
+end
+
+local NewParty = {}
+
+function NewParty:Init()
+    local db = A["Profile"]["Options"][frameName]
+    oUF:DisableBlizzard('party')
+    return Group:Init(frameName, 5, db)
+end
+
+function NewParty:Update(...)
+    local container = Units:Get(frameName)
+    container:UpdateUnits()
 end
  
 function Party:Init()
@@ -473,4 +487,4 @@ function Party:Update(frame, db)
     self.updateFuncs:add(frame["StatusBorder"]["Debuff"]["Condition"])
 end
 
-A.modules["party"] = Party
+A.modules["party"] = NewParty

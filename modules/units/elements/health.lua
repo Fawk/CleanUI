@@ -24,7 +24,7 @@ end
 
 local function Color(bar, parent, class)
 
-	local unit = parent.id or parent.unit
+	local unit = parent.unit
 	local db = bar.db
 	local r, g, b, t, a
 	local colorType = db["Color By"]
@@ -102,14 +102,14 @@ end
 
 function NewHealth:Init(parent)
 
-	local parentName = parent:GetName()
+	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
 
 	local tbl =  parent.orderedElements:getChildByKey("key", elementName)
 	local health = tbl and tbl.element or nil
 	if (not health) then
 
-		health = CreateFrame("StatusBar", T:frameName(parentName, elementName), A.frameParent)
+		health = CreateFrame("StatusBar", parent:GetName().."_"..elementName, A.frameParent)
 
 		health:SetParent(parent)
 		health:SetFrameStrata("LOW")
@@ -151,7 +151,7 @@ function NewHealth:Update(...)
 
 	parent:Update(UnitEvent.UPDATE_HEALTH)
 
-	if (event:anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
+	if (tostring(event):anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
@@ -196,7 +196,7 @@ function NewHealth:Update(...)
 		end
 	end
 	
-	setupMissingHealthBar(self, db["Missing Health Bar"])
+	setupMissingHealthBar(self, self.db["Missing Health Bar"])
 	Color(self, parent)
 end
 

@@ -136,4 +136,4 @@ function Player:Update(frame, db)
     end
 end
 
-A.modules["player"] = Player
+A.modules["player"] = NewPlayer

@@ -106,7 +106,7 @@ A["Shared Elements"]:add(_HealthPrediction)
 
 function _HealthPrediction:Init(parent)
 
-	local parentName = parent:GetName()
+	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
 
 	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
@@ -115,7 +115,7 @@ function _HealthPrediction:Init(parent)
 	local healPrediction = tbl and tbl.element or nil
 	if (not healPrediction) then
 
-		healPrediction = CreateFrame("Frame", T:frameName(parentName, elementName), A.frameParent)
+		healPrediction = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
 
 		healPrediction:SetParent(parent)
 		
@@ -191,10 +191,9 @@ end
 function _HealthPrediction:Update(...)
 
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
-	local parent = self:GetParent()		
+	local parent = self:GetParent()
 
 	if (event == UnitEvent.UPDATE_DB) then
-	
 		local db = arg1
 		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
@@ -211,6 +210,9 @@ function _HealthPrediction:Update(...)
 		self.absorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.absorb))
 		self.healAbsorbBar:SetStatusBarColor(unpack(A.colors.healPrediction.healAbsorb))
 
+		parent.maxOverflow = self.maxOverflow
+
+		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
 
 	else

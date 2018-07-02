@@ -279,13 +279,21 @@ end
 function Addon:Init()
 	for modName, module in pairs(self.modules) do
 		if module.Init then 
-	            local unit = module:Init() 
+	        local unit = module:Init() 
             if (unit) then
-                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
-                Units:Add(unit)
-                Addon["Shared Elements"]:foreach(function(element)
-                    element:Init(unit)
-                end)
+            	if (unit.hasMultipleUnits) then
+            		unit:InitUnits(function(self, uf)
+            			Addon["Shared Elements"]:foreach(function(element)
+	                    	element:Init(uf)
+	                	end)
+            		end)
+            	else
+	                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
+	                Addon.Units:Add(unit)
+	                Addon["Shared Elements"]:foreach(function(element)
+	                    element:Init(unit)
+	                end)
+	            end
             end
         end
 	end
@@ -307,14 +315,16 @@ function Addon:UpdateDb()
 
     -- Units
     for key, module in next, self.modules do
-	       if (module.Update) then
+    	if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())
         	if (unit) then
 	        	if (unit.UpdateUnits) then
 	        		unit:UpdateUnits()
 	        	else
-	        		module:Update(unit, unit.db)
-	            	--module:Update(UnitEvent.UPDATE_DB)
+	        		--module:Update(unit, unit.db)
+	            	if (unit.Update) then
+	            		unit:Update(UnitEvent.UPDATE_DB)
+	            	end
 	        	end
 	        else
 	        	Addon:Debug("Could not find unit with key:", key)

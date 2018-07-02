@@ -49,6 +49,7 @@ local conditionMap = {
 	"help",
 	"harm",
 	"dead",
+	"nodead",
 	"combat",
 	"talent:[1-7]/[1-3]"
 }
@@ -63,7 +64,7 @@ end
 
 local function blizzardCommand(frame, mapped, command, initString)
 	if (initString) then
-		return initString..'\nself:SetAttribute("'..mapped:gsub("macrotext", "type")..'","'..command..'");'
+		return initString..'\nframe:SetAttribute("'..mapped:gsub("macrotext", "type")..'","'..command..'");'
 	else
 		frame:SetAttribute(mapped:gsub("macrotext", "type"), command)
 	end
@@ -121,15 +122,15 @@ function CC:GetInitString(initString, db)
 			initString = blizzardCommand(frame, mapped, command, initString)
 		else
 			if (key:equals("LMB", "MMB", "RMB")) then
-				initString = initString..'\nself:SetAttribute("'..mapped..'","macro");'
-				initString = initString..'\nself:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
+				initString = initString..'\nframe:SetAttribute("'..mapped..'","macro");'
+				initString = initString..'\nframe:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
 				initiated[key] = true
 			else
 				local needed = mapped:matchAny("LMB", "MMB", "RMB")
 				if (not initiated[needed]) then
-					initString = initString..'\nself:SetAttribute("'..keyMap[needed]..'","macro");'
+					initString = initString..'\nframe:SetAttribute("'..keyMap[needed]..'","macro");'
 				end
-				initString = initString..'\nself:SetAttribute("'..mapped..'","'..action..'");'
+				initString = initString..'\nframe:SetAttribute("'..mapped..'","'..action..'");'
 			end
 		end
 	end
@@ -175,12 +176,12 @@ local function splitActionsByConditions(db)
 					}
 
 					for _,mappedCondition in next, conditionMap do
-						local cond = { 
-							text = mappedCondition, 
+						local cond = {
+							text = mappedCondition,
 							active = false
 						}
 						for _,condition in next, conditions do
-							if (condition:match(mappedCondition)) then
+							if (condition:match("^"..mappedCondition)) then
 								cond.active = true
 							end
 						end

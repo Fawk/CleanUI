@@ -71,7 +71,7 @@ function Boss:Trigger()
 end
 
 function Boss:Update(frame, db)
-	if not db["Enabled"] then return end
+	if not db or not db["Enabled"] then return end
 
     T:RunNowOrAfterCombat(function() 
         Units:SetupClickcast(frame, db["Clickcast"])

@@ -16,8 +16,10 @@ A["Shared Elements"]:add(Status)
 --Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
 function Status:Init(parent)
 
-    local parentName = parent:GetName()
+    local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
     local db = A["Profile"]["Options"][parentName][elementName]
+
+    if (not db) then return end
 
     local tbl =  parent.orderedElements:getChildByKey("key", elementName)
     local status = tbl and tbl.element or nil
@@ -41,13 +43,13 @@ function Status:Init(parent)
         end)
     end
 
-    status:Update("OnUpdate", self.db)
+    status:Update("OnUpdate", status.db)
 
     parent.orderedElements:add({ key = elementName, element = status })
 end
 
-local function performAction(status, parent, db, key)
-    status[db["Action"]](parent, db, key)
+local function performAction(status, frame, parent, db, key, shouldAct)
+    status[db["Action"]](status, frame, parent, db, key, shouldAct)
 end
 
 function Status:Update(...)
@@ -63,32 +65,36 @@ function Status:Update(...)
     local offline = db["Offline"]
     local ghost = db["Ghost"]
 
-    performAction(this, parent, outofrange, "Out of range", function()
+    performAction(this, self, parent, outofrange, "Out of range", function()
         if UnitName(parent.unit, true) == UnitName("player", true) then
             return false
         else
             local inRange, checkedRange = UnitInRange(parent.unit)
             if checkedRange and not inRange then
-                return true
+                if (not UnitIsConnected(parent.unit)) then
+                    return false
+                else
+                    return true
+                end
             else
                 return false
             end
         end
     end)
-    performAction(this, parent, dead, "Dead", function()
+    performAction(this, self, parent, dead, "Dead", function()
         return UnitIsDead(parent.unit)
     end)
-    performAction(this, parent, offline, "Offline", function()
+    performAction(this, self, parent, offline, "Offline", function()
         return not UnitIsConnected(parent.unit)
     end)
-    performAction(this, parent, ghost, "Ghost", function()
+    performAction(this, self, parent, ghost, "Ghost", function()
         if UnitIsDeadOrGhost(parent.unit) then 
             return not UnitIsDead(parent.unit)
         end
     end)
 end
 
-function Status:Modify(parent, db, key, shouldAct)
+function Status:Modify(frame, parent, db, key, shouldAct)
     local settings = db["Settings"]
     local type = settings["Modify Type"]
 
@@ -113,41 +119,40 @@ function Status:Modify(parent, db, key, shouldAct)
     end
 end
 
-function Status:Present(parent, db, key, shouldAct)
+function Status:Present(frame, parent, db, key, shouldAct)
     local settings = db["Settings"]
     local type = settings["Present Type"]
     local position = settings["Position"]
     
-    if (self.tags[key]) then
-        self.tags[key]:Hide()
-        self.tags[key] = nil
+    if (frame.tags[key]) then
+        frame.tags[key]:Hide()
     end
 
-    if (self.icons[key]) then
-        self.icons[key]:Hide()
-        self.icons[key] = nil
+    if (frame.icons[key]) then
+        frame.icons[key]:Hide()
     end
 
     if (not shouldAct()) then return end
 
     if (type == "Text") then
 
-        local fs = parent:CreateFontString(nil, "OVERLAY")
+        local fs = frame.tags[key] or parent:CreateFontString(nil, "OVERLAY")
         fs:SetFont(media:Fetch("font", "Default"), settings["Font Size"], "OUTLINE")
         fs:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
         fs:SetTextColor(unpack(settings["Color"]))
         fs:SetText(key)
 
-        self.tags[key] = fs
-
+        frame.tags[key] = fs
+        frame.tags[key]:Show()
     elseif (type == "Icon") then
         local size = settings["Icon Size"]
 
-        local icon = parent:CreateTexture(nil, "OVERLAY")
+        local icon = frame.icons[key] or parent:CreateTexture(nil, "OVERLAY")
         icon:SetTexture(media:Fetch("icon", settings["Icon"]))
         icon:SetSize(size, size)
         icon:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
 
-        self.icons[key] = icon
+        frame.icons[key] = icon
+        frame.icons[key]:Show()
     end
 end

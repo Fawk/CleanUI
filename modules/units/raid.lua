@@ -7,6 +7,7 @@ local CreateFrame = CreateFrame
 local GetNumGroupMembers = GetNumGroupMembers
 local Holder
 local CC = A.modules.clickcast
+local Group = A.Group
 
 local Raid = {}
 local frameName = "Raid"
@@ -52,6 +53,19 @@ local function Visibility(uf)
         end
     end
 end
+
+local NewRaid = {}
+
+function NewRaid:Init()
+    local db = A["Profile"]["Options"][frameName]
+    return Group:Init(frameName, 40, db)
+end
+
+function NewRaid:Update(...)
+    local container = Units:Get(frameName)
+    container:UpdateUnits()
+end
+
 
 function Raid:Init()
 
@@ -322,4 +336,4 @@ function Raid:Update(frame, db)
 
 end
 
-A.modules["raid"] = Raid
+A.modules["raid"] = NewRaid

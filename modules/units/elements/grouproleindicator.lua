@@ -4,6 +4,7 @@ local Units = A.Units
 local buildText = A.TextBuilder
 local CreateFrame = CreateFrame
 local GetTexCoordsForRoleSmallCircle = GetTexCoordsForRoleSmallCircle
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local T = A.Tools
 
 local elementName = "Group Role Indicator"
@@ -11,7 +12,7 @@ local Role = { name = elementName }
 A["Shared Elements"]:add(Role)
 
 function Role:Init(parent)
-    local parentName = parent:GetName()
+    local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
     local db = A["Profile"]["Options"][parentName][elementName]
 
     if (not db) then return end
@@ -20,10 +21,10 @@ function Role:Init(parent)
     local role = tbl and tbl.element or nil
     if (not role) then
 
-        role = CreateFrame("Frame", T:frameName(parentName, elementName), A.frameParent)
+        role = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
         role:SetParent(parent)
         role.db = db
-        role.text = role:CreateFontString(nil, "OVERLAY")
+        role.text = role:CreateFontString(nil, "ARTWORK")
         role.texture = role:CreateTexture(nil, "OVERLAY")
         role.texture:SetAllPoints()
         role.Update = function(self, event, ...)
@@ -48,35 +49,42 @@ function Role:Update(...)
     local parent = self:GetParent()  
     local db = self.db or arg1
     local style = db["Style"]
-    local role = UnitGroupRolesAssigned(self.unit)
+    local size = db["Size"]
+    local role = UnitGroupRolesAssigned(parent.unit)
 
-    self:SetSize(db["Size"], db["Size"])
+    self:SetSize(size, size)
     Units:Position(self, db["Position"])
+    
+    self.text:Hide()
+    self.texture:Hide()
 
     if (style == "Blizzard") then
         self.texture:Show()
         self.texture:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])
         self.texture:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
-        self.text:Hide()
     elseif (style == "Letter" or style == "Text") then
-        local textStyle = db["Text style"]
-        local builder = buildText(self, db["Text size"]):alignAll()
+        local textStyle = db["Text Style"]
+        local textExtra = "NONE"
         if (textStyle == "Outline") then
-            builder:outline()
+            textExtra = "OUTLINE"
+            self.text:SetShadowColor(0, 0, 0, 0)
         elseif (textStyle == "Thick Outline") then
-            builder:thickOutline()
+            textExtra = "THICKOUTLINE"
+            self.text:SetShadowColor(0, 0, 0, 0)
         elseif (textStyle == "Shadow") then
-            builder:shadow()
+            textExtra = "NONE"
+            self.text:SetShadowOffset(1, -1)
+            self.text:SetShadowColor(0, 0, 0)
         end
-        self.text = builder:build()
+        self.text:SetFont(media:Fetch("font", "Default"), db["Text Size"], textExtra)
         self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
         self.text:SetTextColor(unpack(db["Text Color"]))
-        self.texture:Hide()
+        self.text:SetAllPoints()
+        self.text:Show()
     elseif (style == "Custom Texture") then
         self.texture:Show()
         self.texture:SetTexture(db["Texture"])
         self.texture:SetTexCoord(0, 1, 0, 1)
-        self.text:Hide()
     end
 end
 
