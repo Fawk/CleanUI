@@ -10,31 +10,6 @@ local elementName = "Power"
 local Power = { name = elementName }
 A["Shared Elements"]:set(elementName, Power)
 
-local function Color(bar, parent)
-	local db = bar.db
-	local r, g, b, a, t
-	local mult = db["Background Multiplier"]
-	local colorType = db["Color By"]
-	if (colorType == "Class") then
-		r, g, b = unpack(A.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
-	elseif (colorType == "Power") then
-		t = A.colors.power[parent.powerToken]
-		if not t then
-			t = A.colors.power[parent.powerType]
-		end
-	elseif (colorType == "Custom") then
-		t = db["Custom Color"]
-	end
-	if t then
-		r, g, b, a = unpack(t)
-	end
-
-	if (r) then
-		bar:SetStatusBarColor(r, g, b, a or 1)
-		bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
-	end
-end
-
 function Power:Init(parent)
 
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
@@ -48,8 +23,8 @@ function Power:Init(parent)
 		power:SetParent(parent)
 		power:SetFrameStrata("LOW")
 		power.bg = power:CreateTexture(nil, "BACKGROUND")
+		power.missingPowerBar = CreateFrame("StatusBar", nil, power)
 		power.db = db
-
 		power.tags = A:OrderedTable()
 
 	    power.Update = function(self, event, ...)
@@ -135,5 +110,6 @@ function Power:Update(...)
 		end
 	end
 
-	Color(self, parent)
+	Units:SetupMissingBar(self, self.db["Missing Power Bar"], "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
+	A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop)
 end

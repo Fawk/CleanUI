@@ -176,6 +176,54 @@ function Units:CreateStatusBorder(frame, name, db)
     end
 end
 
+function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, classOverride)
+    if (not db) then return end
+
+    local bar = parent[key]
+    local parent = parent:GetParent()
+
+    if (db["Enabled"]) then
+        local tex = parent:GetStatusBarTexture()
+        local orientation = parent:GetOrientation()
+        local reversed = parent:GetReverseFill()
+        bar:SetOrientation(orientation)
+        bar:SetReverseFill(reversed)
+        bar:SetStatusBarTexture(tex:GetTexture())
+        bar.db = db
+
+        if (orientation == "HORIZONTAL") then
+            if (reversed) then
+                bar:SetPoint("TOPRIGHT", tex, "TOPLEFT")
+                bar:SetPoint("BOTTOMRIGHT", tex, "BOTTOMLEFT")
+            else
+                bar:SetPoint("TOPLEFT", tex, "TOPRIGHT")
+                bar:SetPoint("BOTTOMLEFT", tex, "BOTTOMRIGHT")
+            end
+        else
+            if (reversed) then
+                bar:SetPoint("TOPRIGHT", tex, "BOTTOMRIGHT")
+                bar:SetPoint("TOPLEFT", tex, "BOTTOMLEFT")
+            else
+                bar:SetPoint("BOTTOMRIGHT", tex, "TOPRIGHT")
+                bar:SetPoint("BOTTOMLEFT", tex, "TOPLEFT")
+            end
+        end
+        
+        bar:SetSize(parent:GetSize())
+
+        -- Calculate value based on missing health
+        bar:SetMinMaxValues(0, max)
+        bar:SetValue(max - min)
+
+        -- Do coloring based on db
+        colorFunc(bar, parent, min, max, gradient, classOverride)
+
+        bar:Show()
+    else
+        bar:Hide()
+    end
+end
+
 local function HideFrame(frame)
 	if InCombatLockdown() then return end
 	

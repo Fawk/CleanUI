@@ -18,84 +18,6 @@ local function Gradient(unit, class)
 	return r1, g1, b1, r2, g2, b2, r3, g3, b3
 end
 
-local function Color(bar, parent, class)
-
-	local unit = parent.unit
-	local db = bar.db
-	local r, g, b, t, a
-	local colorType = db["Color By"]
-	local mult = db["Background Multiplier"]
-	
-	if colorType == "Class" then
-		r, g, b = unpack(A.colors.class[class or select(2, UnitClass(unit))] or A.colors.backdrop.default)
-	elseif colorType == "Health" then
-		r, g, b = unpack(A.colors.health.standard)
-	elseif colorType == "Custom" then
-		t = db["Custom Color"]
-	elseif colorType == "Gradient" then
-		r, g, b = A:ColorGradient(parent.currentHealth, parent.currentMaxHealth, Gradient(unit))
-	end
-	
-	if t then
-		r, g, b, a = unpack(t)
-	end
-
-	if r then
-		bar:SetStatusBarColor(r, g, b, a or 1)
-		if (bar.bg) then
-			bar.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
-		end
-	end
-end
-
-local function setupMissingHealthBar(health, db, current, max, class)
-	if (not db) then return end
-
-	local bar = health.missingHealthBar
-	local parent = health:GetParent()
-
-	if (db["Enabled"]) then
-		local tex = health:GetStatusBarTexture()
-		local orientation = health:GetOrientation()
-		local reversed = health:GetReverseFill()
-		bar:SetOrientation(orientation)
-		bar:SetReverseFill(reversed)
-		bar:SetStatusBarTexture(tex:GetTexture())
-		bar.db = db
-
-		if (orientation == "HORIZONTAL") then
-			if (reversed) then
-				bar:SetPoint("TOPRIGHT", tex, "TOPLEFT")
-				bar:SetPoint("BOTTOMRIGHT", tex, "BOTTOMLEFT")
-			else
-				bar:SetPoint("TOPLEFT", tex, "TOPRIGHT")
-				bar:SetPoint("BOTTOMLEFT", tex, "BOTTOMRIGHT")
-			end
-		else
-			if (reversed) then
-				bar:SetPoint("TOPRIGHT", tex, "BOTTOMRIGHT")
-				bar:SetPoint("TOPLEFT", tex, "BOTTOMLEFT")
-			else
-				bar:SetPoint("BOTTOMRIGHT", tex, "TOPRIGHT")
-				bar:SetPoint("BOTTOMLEFT", tex, "TOPLEFT")
-			end
-		end
-		
-		bar:SetSize(health:GetSize())
-
-		-- Calculate value based on missing health
-		bar:SetMinMaxValues(0, parent.currentMaxHealth or max)
-		bar:SetValue((parent.currentMaxHealth or max) - (parent.currentHealth or current))
-
-		-- Do coloring based on db
-		Color(bar, parent, class)
-
-		bar:Show()
-	else
-		bar:Hide()
-	end
-end
-
 function Health:Init(parent)
 
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
@@ -194,9 +116,9 @@ function Health:Update(...)
 			self.tags:add(tag)
 		end
 	end
-	
-	setupMissingHealthBar(self, self.db["Missing Health Bar"])
-	Color(self, parent)
+
+	Units:SetupMissingBar(self, self.db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+	A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient)
 end
 
 function Health:Simulate(parent, class)
@@ -204,6 +126,5 @@ function Health:Simulate(parent, class)
 
 	-- Set the color using the class
 	self:Init(parent)
-	Color(element, class) -- This needs to be broken out and re-written nicer...
 
 end

@@ -23,83 +23,6 @@ local function CheckEnabled(e, db)
 	end
 end
 
-local function Color(bar, parent)
-	local unit = parent.unit
-	local db = bar.db
-	local r, g, b, t, a
-	local colorType = db["Color By"]
-	local mult = db["Background Multiplier"]
-	
-	if (colorType == "Class") then
-		r, g, b = unpack(A.colors.class[class or select(2, UnitClass(unit))] or A.colors.backdrop.default)
-	elseif (colorType == "Health") then
-		r, g, b = unpack(A.colors.health.standard)
-	elseif (colorType == "Power") then
-		r, g, b = unpack(A.colors.power[parent.powerToken] or A.colors.power[parent.powerType])
-	elseif (colorType == "Custom") then
-		t = db["Custom Color"]
-	end
-	
-	if t then
-		r, g, b, a = unpack(t)
-	end
-
-	if r then
-		bar:SetStatusBarColor(r, g, b, a or 1)
-		if (bar.bg) then
-			bar.bg:SetVertexColor(r * mult, g * mult, b * mult, a or 1)
-		end
-	end
-end
-
-local function setupMissingBar(castbar, db)
-	if (not db) then return end
-
-	local bar = castbar.missingBar
-	local parent = castbar:GetParent()
-
-	if (db["Enabled"]) then
-		local tex = castbar:GetStatusBarTexture()
-		local orientation = castbar:GetOrientation()
-		local reversed = castbar:GetReverseFill()
-		bar:SetOrientation(orientation)
-		bar:SetReverseFill(reversed)
-		bar:SetStatusBarTexture(tex:GetTexture())
-		bar.db = db
-
-		if (orientation == "HORIZONTAL") then
-			if (reversed) then
-				bar:SetPoint("TOPRIGHT", tex, "TOPLEFT")
-				bar:SetPoint("BOTTOMRIGHT", tex, "BOTTOMLEFT")
-			else
-				bar:SetPoint("TOPLEFT", tex, "TOPRIGHT")
-				bar:SetPoint("BOTTOMLEFT", tex, "BOTTOMRIGHT")
-			end
-		else
-			if (reversed) then
-				bar:SetPoint("TOPRIGHT", tex, "BOTTOMRIGHT")
-				bar:SetPoint("TOPLEFT", tex, "BOTTOMLEFT")
-			else
-				bar:SetPoint("BOTTOMRIGHT", tex, "TOPRIGHT")
-				bar:SetPoint("BOTTOMLEFT", tex, "TOPLEFT")
-			end
-		end
-		
-		bar:SetSize(castbar:GetSize())
-
-		-- Calculate value based on missing health
-		bar:SetMinMaxValues(0, parent.castBarMax)
-		bar:SetValue(parent.castBarMax - parent.castbarCurrent)
-
-		-- Do coloring based on db
-		Color(bar, parent)
-
-		bar:Show()
-	else
-		bar:Hide()
-	end
-end
-
 function Castbar:Init(parent)
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
@@ -133,16 +56,34 @@ function Castbar:Init(parent)
 	    	Castbar:Update(self, event, ...)
 	   	end
 
-	   	bar:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	    bar:RegisterEvent("UNIT_MAXHEALTH")
+		bar:RegisterEvent('UNIT_SPELLCAST_START')
+		bar:RegisterEvent('UNIT_SPELLCAST_FAILED')
+		bar:RegisterEvent('UNIT_SPELLCAST_STOP')
+		bar:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED')
+		bar:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE')
+		bar:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE')
+		bar:RegisterEvent('UNIT_SPELLCAST_DELAYED')
+		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START')
+		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
+		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
 	    bar:SetScript("OnEvent", function(self, event, ...)
-	    	self:Update(event, ...)
+	    	self:Update(UnitEvent.UPDATE_CASTBAr, event, ...)
 	    end)
 
 		bar:HookScript("OnShow", function(self)
 			self:SetStatusBarTexture(texture)
 			self.bg:SetTexture(texture)
 		end)
+
+		if (parent.unit == 'player') then
+			CastingBarFrame:UnregisterAllEvents()
+			CastingBarFrame.Show = CastingBarFrame.Hide
+			CastingBarFrame:Hide()
+
+			PetCastingBarFrame:UnregisterAllEvents()
+			PetCastingBarFrame.Show = PetCastingBarFrame.Hide
+			PetCastingBarFrame:Hide()
+		end
 	end
 
 	bar:SetSize(width, height)
@@ -189,7 +130,7 @@ function Castbar:Init(parent)
 
 	bar:Update(UnitEvent.UPDATE_DB, self.db)
 	bar:Update(UnitEvent.UPDATE_TEXTS)
-	bar:Update("UNIT_HEALTH_FREQUENT")
+	bar:Update(UnitEvent.UPDATE_CASTBAR)
 
 	parent.orderedElements:set(elementName, bar)
 end
@@ -215,9 +156,16 @@ function Castbar:Update(...)
 
 		Units:PlaceCastbar(parent, true)
 	else
+		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
+		local name = parent.castBarSpell
+		if (not name) then
+			self:Hide()
+		else
+			self:Show()
+		end
 	end
 
-	Color(self, parent)
-	setupMissingBar(self, self.db["Missing Bar"])
+	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarCurrent, parent.castBarMax, A.noop, A.ColorBar)
+	A:ColorBar(self, parent, parent.castBarCurrent, parent.castBarMax, A.noop)
 end

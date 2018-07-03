@@ -157,6 +157,29 @@ function Unit:Update(...)
         self.healAbsorb = healAbsorb
         self.hasOverAbsorb = hasOverAbsorb
         self.hasOverHealAbsorb = hasOverHealAbsorb
+    elseif (event == UnitEvent.UPDATE_CASTBAR) then
+        if (arg2 ~= self.unit) then return end
+
+        local name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID
+        if (arg1 == 'UNIT_SPELLCAST_START') then
+            name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(self.unit)
+        elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTIBLE') then
+            self.castBarInterruptable = true
+        elseif (arg1 == 'UNIT_SPELLCAST_NOT_INTERRUPTIBLE') then
+            self.castBarInterruptable = false
+        elseif (arg1 == 'UNIT_SPELLCAST_DELAYED') then
+            name, _, _, _, startTime, _, _, castID = UnitCastingInfo(self.unit)
+        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_START') then
+            name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_UPDATE') then
+            name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+
+        self.castBarSpell = name
+        self.castBarSpellId = spellID
+        self.castBarTexture = texture
+        self.castBarStart = startTime
+        self.castBarEnd = endTime
+        self.castBarCastId = castID
     end
 
     if (self.AfterUpdate) then

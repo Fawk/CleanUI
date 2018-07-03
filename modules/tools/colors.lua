@@ -69,3 +69,32 @@ function A:ColorGradient(...)
 		return r1, g1, b1
 	end
 end
+
+function A:ColorBar(bar, parent, min, max, gradient, classOverride)
+	local db = bar.db
+	local r, g, b, a, t
+	local mult = db["Background Multiplier"]
+	local colorType = db["Color By"]
+	if (colorType == "Class") then
+		r, g, b = unpack(A.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
+	elseif (colorType == "Power") then
+		t = A.colors.power[parent.powerToken]
+		if not t then
+			t = A.colors.power[parent.powerType]
+		end
+	elseif (colorType == "Health") then
+		r, g, b = unpack(A.colors.health.standard)
+	elseif (colorType == "Gradient") then
+		r, g, b = A:ColorGradient(min, max, gradient(parent.unit))
+	elseif (colorType == "Custom") then
+		t = db["Custom Color"]
+	end
+	if t then
+		r, g, b, a = unpack(t)
+	end
+
+	if (r) then
+		bar:SetStatusBarColor(r, g, b, a or 1)
+		bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
+	end
+end
