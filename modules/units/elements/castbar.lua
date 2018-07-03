@@ -67,7 +67,7 @@ function Castbar:Init(parent)
 		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
 		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
 	    bar:SetScript("OnEvent", function(self, event, ...)
-	    	self:Update(UnitEvent.UPDATE_CASTBAr, event, ...)
+	    	self:Update(UnitEvent.UPDATE_CASTBAR, event, ...)
 	    end)
 
 		bar:HookScript("OnShow", function(self)
@@ -164,6 +164,8 @@ function Castbar:Update(...)
 		else
 			self:Show()
 		end
+
+		print(parent.castBarSpell)
 	end
 
 	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarCurrent, parent.castBarMax, A.noop, A.ColorBar)

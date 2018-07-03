@@ -7,9 +7,9 @@ local InCombatLockdown = InCombatLockdown
 local Player = {}
 local frameName = "Player"
 
-local NewPlayer = {}
+local Player = {}
 
-function NewPlayer:Init()
+function Player:Init()
 
     local db = A["Profile"]["Options"][frameName]
 
@@ -27,7 +27,7 @@ function NewPlayer:Init()
     A:CreateMover(frame, db, frameName)
 
     frame.Update = function(self, ...)
-        NewPlayer:Update(self, ...)
+        Player:Update(self, ...)
     end
 
     -- Player specific elements
@@ -40,7 +40,7 @@ function NewPlayer:Init()
     return frame
 end
 
-function NewPlayer:Update(...)
+function Player:Update(...)
     local self, event, arg2, arg3, arg4, arg5 = ...
 
     if (self.super) then
@@ -64,6 +64,8 @@ function NewPlayer:Update(...)
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
+            self.Background:SetBackdropColor(0, 0, 0, 0)
+            self.Background:SetBackdropBorderColor(1, 0, 0, 1)
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])
@@ -79,4 +81,4 @@ end
 
 -- https://jsfiddle.net/859zu65s/
 
-A.modules["player"] = NewPlayer
+A.modules["player"] = Player

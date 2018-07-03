@@ -173,6 +173,7 @@ function Unit:Update(...)
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
         elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_UPDATE') then
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+        end
 
         self.castBarSpell = name
         self.castBarSpellId = spellID
@@ -186,4 +187,3 @@ function Unit:Update(...)
         self:AfterUpdate(...)
     end
 end
-

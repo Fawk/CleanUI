@@ -199,20 +199,23 @@ function AB:Init()
 		            	["Background"] = {
 			                ["Color"] = { 0, 0, 0 },
 			                ["Offset"] = {
-			                    ["Top"] = -1,
-			                    ["Bottom"] = -1,
-			                    ["Left"] = -1,
-			                    ["Right"] = -1
+			                    ["Top"] = 1,
+			                    ["Bottom"] = 1,
+			                    ["Left"] = 1,
+			                    ["Right"] = 1
 			                },
 			                ["Enabled"] = true
 		            	}
 		            }
 
 					T:Background(button, db, button, false)
+
+					button.bg:SetBackdropBorderColor(0, 0, 0, 1)
+
 					button.emptySlot = button.emptySlot or button:CreateTexture(nil, "BACKGROUND")
 					button.emptySlot:SetBlendMode("ADD")
 					button.emptySlot:SetPoint("CENTER")
-					button.emptySlot:SetSize(size + 16, size + 16)
+					button.emptySlot:SetSize(size + 12, size + 12)
 					button.emptySlot:SetTexture([[Interface\BUTTONS\UI-EmptySlot-Disabled]])
 					button.emptySlot:SetDrawLayer("BACKGROUND", 1)
 					button.emptySlot:SetVertexColor(1, 1, 1, 0.3)
