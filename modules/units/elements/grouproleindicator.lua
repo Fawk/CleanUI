@@ -9,7 +9,7 @@ local T = A.Tools
 
 local elementName = "Group Role Indicator"
 local Role = { name = elementName }
-A["Shared Elements"]:add(Role)
+A["Shared Elements"]:set(elementName, Role)
 
 function Role:Init(parent)
     local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
@@ -41,7 +41,7 @@ function Role:Init(parent)
     role:Update(UnitEvent.UPDATE_DB, db)
     role:Update("GROUP_ROSTER_UPDATE")
 
-    parent.orderedElements:add({ key = elementName, element = role })
+    parent.orderedElements:set(elementName, role)
 end
 
 function Role:Update(...)
@@ -87,26 +87,3 @@ function Role:Update(...)
         self.texture:SetTexCoord(0, 1, 0, 1)
     end
 end
-
-function GroupRoleIndicator(frame, db)
-	local role = frame.GroupRoleIndicator or (function()
-		local role = CreateFrame("Frame", T:frameName(frame:GetName(), elementName), frame)
-		role:SetSize(14, 14)
-		role:SetFrameLevel(4)
-		local texture = role:CreateTexture(nil, "OVERLAY")
-        role.texture = texture
-        role.PostUpdate = function(self, role)
-            self.texture:SetTexture(media:Fetch("icon", role))
-            self.texture:SetTexCoord(0, 1, 0, 1)
-        end
-        role.SetTexCoord = function(self) end
-		return role
-	end)()
-
-	Units:Position(role, db["Position"])
-	role.texture:SetAllPoints()
-
-	frame.GroupRoleIndicator = role
-end
-
-A["Elements"]:add({ name = elementName, func = GroupRoleIndicator })

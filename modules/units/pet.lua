@@ -1,74 +1,61 @@
 local A, L = unpack(select(2, ...))
 local E, T, U,  Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
-local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
-local InCombatLockdown = InCombatLockdown
 
 local Pet = {}
 local frameName = "Pet"
- 
+
 function Pet:Init()
 
     local db = A["Profile"]["Options"][frameName]
 
-    if not db then return end
-
-    Units:RegisterStyle(frameName, function(frame) 
-        Pet:Update(frame, db)
-    end)
-
-    local frame = Units:Get(frameName) or oUF:Spawn(frameName, frameName)
+    local frame = Units:Get(frameName) or A:CreateUnit(frameName)
+    frame.GetDbName = function(self) return frameName end
     frame.db = db
-    Units:Add(frame)
-
-    A:CreateMover(frame, db)
-end
--- https://jsfiddle.net/859zu65s/
-function Pet:Setup(frame, db)
-    T:RunNowOrAfterCombat(function()
-        self:Update(frame, db)
+    frame.orderedElements = A:OrderedMap()
+    frame:SetScript("OnShow", function(self)
+        self:Update(UnitEvent.UPDATE_DB, db)
     end)
+
+    A:CreateMover(frame, db, frameName)
+
+    frame.Update = function(self, ...)
+        Pet:Update(self, ...)
+    end
+
+    frame:Update(UnitEvent.UPDATE_DB, db)
+
     return frame
 end
 
-function Pet:Trigger()
-    local frame = Units:Get(frameName)
-    if frame then
-        if frame.Buffs then frame.Buffs:ForceUpdate() end -- TODO: This is way too often and could be improved, fix this for all units
-        if frame.Debuffs then frame.Debuffs:ForceUpdate() end
-    end
-end
- 
-function Pet:Update(frame, db)
-    if not db or not db["Enabled"] then return end
+function Pet:Update(...)
+    local self, event, arg2, arg3, arg4, arg5 = ...
 
-    local position, size = db["Position"], db["Size"]
+    if (self.super) then
+        self.super:Update(...)
 
-    Units:Position(frame, position)
-    frame:SetSize(size["Width"], size["Height"])
-    Units:UpdateElements(frame, db)
+        -- Update player specific things based on the event
+        if (event == UnitEvent.UPDATE_DB) then
 
-    --[[ Bindings ]]--
-    frame:RegisterForClicks("AnyUp")
-    frame:SetAttribute("*type1", "target")
-    frame:SetAttribute("*type2", "togglemenu")
+            local db = self.db or arg2
+            local position, size = db["Position"], db["Size"]
 
-    Units:SetupClickcast(frame, db["Clickcast"])
+            Units:Position(self, position)
+            self:SetSize(size["Width"], size["Height"])
 
-    --[[ Background ]]--
-    U:CreateBackground(frame, db)
+            --[[ Bindings ]]--
+            self:RegisterForClicks("AnyUp")
+            self:SetAttribute("*type1", "target")
+            self:SetAttribute("*type2", "togglemenu")
 
-    --[[ Tags ]]--
-    if not frame["Tags"] then
-        frame["Tags"] = {}
-    end
+            A.modules.clickcast:Setup(self, db["Clickcast"])
 
-    --[[ Name ]]--
-    Units:Tag(frame, "Name", db["Tags"]["Name"], 5)
+            --[[ Background ]]--
+            U:CreateBackground(self, db)
 
-    --[[ Custom ]]--
-    for name, custom in next, db["Tags"]["Custom"] do
-        Units:Tag(frame, name, custom)
+            self.orderedElements:foreach(function(key, obj)
+                obj:Update(event, db[key])
+            end)
+        end
     end
 end
 

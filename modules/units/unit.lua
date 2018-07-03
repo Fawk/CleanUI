@@ -1,6 +1,5 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitPower = UnitPower
@@ -37,10 +36,10 @@ end
 local Unit = {}
 
 function A:CreateUnit(id)
-    oUF:DisableBlizzard(id:lower())
+    Units:DisableBlizzard(id:lower())
 
     local unit = CreateFrame("Button", T:frameName(id), A.frameParent, "SecureUnitButtonTemplate")
-    unit:SetAttribute("unit", id)
+    unit:SetAttribute("unit", id:lower())
     unit.super = Unit
 
     RegisterUnitWatch(unit)

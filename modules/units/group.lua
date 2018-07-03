@@ -118,9 +118,10 @@ function Group:Init(name, maxMembers, db)
 
     Units:Add(container, name)
     Units:Position(container, db["Position"])
-    Units:DisableBlizzardRaid()
 
     A:CreateMover(container, db, name)
+
+    Units:DisableBlizzard(name)
 
     return container
 end

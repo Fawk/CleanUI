@@ -42,7 +42,7 @@ end
 
 local function HealPredictionPostUpdate(self, my, all, absorb, healAbsorb)
 	local frame = self:GetParent()
-	local health = frame.orderedElements:getChildByKey("key", "Health").element
+	local health = frame.orderedElements:get("Health")
 	local previous = health:GetStatusBarTexture()
 
 	previous = Update(health, previous, self.myBar, my)
@@ -82,21 +82,21 @@ function HealthPrediction:Init(parent)
 		
 		local health = parent.orderedElements:get("Health")
 		if health then
-			my:SetParent(health.element)
-			all:SetParent(health.element)
-			absorb:SetParent(health.element)
-			healAbsorb:SetParent(health.element)
+			my:SetParent(health)
+			all:SetParent(health)
+			absorb:SetParent(health)
+			healAbsorb:SetParent(health)
 
-		    local overAbsorb = health.element:CreateTexture(nil, "OVERLAY")
+		    local overAbsorb = health:CreateTexture(nil, "OVERLAY")
 		    overAbsorb:SetPoint('TOP')
 		    overAbsorb:SetPoint('BOTTOM')
-		    overAbsorb:SetPoint('LEFT', health.element, 'RIGHT')
+		    overAbsorb:SetPoint('LEFT', health, 'RIGHT')
 		    overAbsorb:SetWidth(10)
 
-			local overHealAbsorb = health.element:CreateTexture(nil, "OVERLAY")
+			local overHealAbsorb = health:CreateTexture(nil, "OVERLAY")
 		    overHealAbsorb:SetPoint('TOP')
 		    overHealAbsorb:SetPoint('BOTTOM')
-		    overHealAbsorb:SetPoint('RIGHT', health.element, 'LEFT')
+		    overHealAbsorb:SetPoint('RIGHT', health, 'LEFT')
 		    overHealAbsorb:SetWidth(10)
 
 		    overAbsorb:Hide()

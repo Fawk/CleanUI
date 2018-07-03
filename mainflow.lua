@@ -8,54 +8,13 @@ Addon.debugging = true
 Addon.noop = function() end
 
 Addon.OrderedTable = Args.OrderedTable
+Addon.OrderedMap = Args.OrderedMap
 
 Addon["Elements"] = Args:OrderedTable()
 Addon["Shared Elements"] = Args:OrderedMap()
-
-Addon.oUF = Args.oUF or oUF
-local oUF = Addon.oUF
+Addon["Player Elements"] = Args:OrderedMap()
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName, false)
-
-local O = {
-	["Minimap"] = 0,
-	["Minimap.Size"] = 0,
-	["Player"] = 0,
-	["Target"] = 0,
-	["Player.Position"] = 0,
-	["Player.Position.LocalPoint"] = 0,
-	["Player.Position.Point"] = 0,
-	["Player.Position.RelativeTo"] = 0,
-	["Player.Position.OffsetX"] = 0,
-	["Player.Position.OffsetY"] = 0,
-	["Player.Size"] = 0,
-	["Player.Size.Width"] = 0,
-	["Player.Size.Height"] = 0,
-	["Player.Health"] = 0,
-	["Player.Health.Size"] = 0,
-	["Player.Health.Size.MatchWidth"] = 0,
-	["Player.Health.Size.MatchHeight"] = 0,
-	["Player.Health.Size.Width"] = 0,
-	["Player.Health.Size.Height"] = 0,
-	["Options"] = 0,
-}	
-
-do
-	local function gen()
-	   return math.floor(math.random() * 100000)
-	end
-
-	local keys = {}
-
-	for k,v in pairs(O) do
-		local key = gen()
-		while (keys[key]) do
-			key = gen()
-		end
-		keys[key] = true
-		O[k] = key
-	end
-end
 
 Args[1] = Addon
 Args[2] = L
@@ -157,91 +116,6 @@ function Addon:OnEnable()
 
 	setScale()
 
-    -- local functions = {
-    --     "SetQuestCurrency",
-    --     "SetQuestLogCurrency",
-    --     "SetQuestItem",
-    --     "SetQuestLogSpecialItem",
-    -- }
-
-    -- UnitIsQuestBoss
-
-    -- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID, startEvent, displayQuestID, isOnMap, hasLocalPOI, isTask, isStory, isHidden = GetQuestLogTitle(questIndex)
-
-    -- for _,func in next, functions do
-    --     hooksecurefunc(GameTooltip, func, function(self, ...)
-    --         print(func, self, unpack({ ... }))
-    --     end)
-    -- end
-
-    -- local f = CreateFrame("Frame")
-    -- f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
-    -- f:SetScript("OnEvent", function(self, event, ...)
-    --     print(event, unpack({...}))
-    --     print(GameTooltip:GetUnit())
-    -- end)
-
-	-- local options, playerOptions, opts, barOptions = Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable(), Addon:OrderedTable()
-  
- --  local testOption = Addon:OptionBuilder()
- --                      :withId("TestId")
- --                      :withName("TestName")
- --                      :withType("Group")
- --                      :addItem("Item")
- --                      :addChildren(Addon:OrderedTable())
- --                      :build()
-                      
-	-- barOptions:add(Options:CreateGroup(O["Player.Position"], "Position", "The position of the player health bar", 1, nil, nil, 
-	-- 	Options:PositionOptions({ 
-	-- 		O["Player.Position.LocalPoint"],
-	-- 		O["Player.Position.RelativeTo"],
-	-- 		O["Player.Position.Point"],
-	-- 		O["Player.Position.OffsetX"],
-	-- 		O["Player.Position.OffsetY"],
-	-- 	}, "player", "health bar", {{ "Player", "Player" }, { "Power", "Power" }})))
-	-- barOptions:add(Options:CreateGroup(O["Player.Health.Size"], "Size", "The size of the player health bar", 1, nil, nil, (function() 
-	-- 	local size = Addon:OrderedTable()
-	-- 	size:add(Options:CreateToggle(O["Player.Health.Size.MatchWidth"], "Match width", "Match width towards relative frame", E.directions.H, 1, nil))
-	-- 	size:add(Options:CreateToggle(O["Player.Health.Size.MatchHeight"], "Match height", "Match height towards relative frame", E.directions.H, 1, nil))
-	-- 	size:add(Options:CreateSlider(O["Player.Health.Size.Width"], "Width", "Set the width of the player health bar", E.directions.H, 50, 500, 250, 1, nil))
-	-- 	size:add(Options:CreateSlider(O["Player.Health.Size.Height"], "Height", "Set the height of the player health bar", E.directions.H, 1, 500, 100, 1, nil))
-	-- 	return size
-	-- end)()))
-
-	-- playerOptions:add(Options:CreateGroup(O["Player.Size"], "Size", "The size of the player frame", 1, nil, nil, (function()
-	-- 	local size = Addon:OrderedTable()
-	-- 	size:add(Options:CreateSlider(O["Player.Size.Width"], "Width", "Set the width of the player frame", E.directions.H, 50, 500, 250, 1, nil))
-	-- 	size:add(Options:CreateSlider(O["Player.Size.Height"], "Height", "Set the height of the player frame", E.directions.H, 1, 500, 100, 1, nil))
-	-- 	return size
-	-- end)()))
-	-- playerOptions:add(Options:CreateGroup(O["Player.Health"], "Health", "Health bar of the player frame", 1, "dropdown", nil, barOptions))
-
-	-- opts:add(Options:CreateGroup(O["Player"], "Player", "This is a collection of player options", 1, "dropdown", nil, playerOptions))
-	-- opts:add(Options:CreateGroup(O["Minimap"], "Minimap", "This is a collection of minimap options", 1, nil, nil, (function()
- --       local minimapOptions = Addon:OrderedTable()
- --       minimapOptions:add(Options:CreateSlider(O["Minimap.Size"], "Size", "Set the size of the minimap", E.directions.H, E.minimap.min, E.minimap.max, 250, 1))
- --       return minimapOptions
-	-- end)()))
-
-	-- options:add(Options:CreateGroup(O["Options"], "Options", "Collection of options", 1, "dropdown", nil, opts))
-
-	-- local optionsWindow = CreateFrame("Frame", "CleanUI-OptionsWindow", UIParent)
-	-- optionsWindow:SetBackdrop(E.backdrops.buttonroundborder)
-	-- optionsWindow:SetBackdropColor(0.10, 0.10, 0.10, 1)
-	-- optionsWindow:SetBackdropBorderColor(0.33, 0.33, 0.33, 1)
-	-- optionsWindow:SetSize(550, 450)
-	-- optionsWindow:SetPoint(E.regions.C)
-	-- optionsWindow:RegisterForDrag("LeftButton")
-	-- optionsWindow:SetScript("OnDragStart", function(self) if self:IsMovable() then self:StartMoving() end end)
-	-- optionsWindow:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-	-- optionsWindow:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
-	-- optionsWindow:SetMovable(true)
-
-	-- optionsWindow:Hide()
-
-	-- local optionsContainer = self.OptionsContainer
-	-- optionsContainer:CreateOptions(optionsWindow, options)
-
     local profile = self.modules["Profile"]
 
 	profile:Init(self.db)
@@ -321,7 +195,6 @@ function Addon:UpdateDb()
 	        	if (unit.UpdateUnits) then
 	        		unit:UpdateUnits()
 	        	else
-	        		--module:Update(unit, unit.db)
 	            	if (unit.Update) then
 	            		unit:Update(UnitEvent.UPDATE_DB)
 	            	end

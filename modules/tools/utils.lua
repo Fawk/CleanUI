@@ -2229,6 +2229,8 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 		local offset = db["Background"]["Offset"]
 		ref:SetBackdrop({
 			bgFile = media:Fetch("statusbar", "Default"),
+			edgeFile = media:Fetch("border", "test-border"),
+			edgeSize = 2,
 			tile = true,
 			tileSize = 16,
 			insets = {

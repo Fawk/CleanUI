@@ -12,25 +12,25 @@ A["Shared Elements"]:set(elementName, Power)
 
 local function Color(bar, parent)
 	local db = bar.db
-	local r, g, b, t
+	local r, g, b, a, t
 	local mult = db["Background Multiplier"]
 	local colorType = db["Color By"]
-	if colorType == "Class" then
+	if (colorType == "Class") then
 		r, g, b = unpack(A.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
-	elseif colorType == "Power" then
+	elseif (colorType == "Power") then
 		t = A.colors.power[parent.powerToken]
 		if not t then
-			t = A.colors.power[parent.powerToken]
+			t = A.colors.power[parent.powerType]
 		end
-	elseif colorType == "Custom" then
+	elseif (colorType == "Custom") then
 		t = db["Custom Color"]
 	end
 	if t then
-		r, g, b = unpack(t)
+		r, g, b, a = unpack(t)
 	end
 
-	if r then
-		bar:SetStatusBarColor(r, g, b)
+	if (r) then
+		bar:SetStatusBarColor(r, g, b, a or 1)
 		bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
 	end
 end
@@ -40,7 +40,7 @@ function Power:Init(parent)
 	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
 	local db = A["Profile"]["Options"][parentName][elementName]
 
-	local power = parent.orderedElements:getChildByKey("key", elementName)
+	local power = parent.orderedElements:get(elementName)
 	if (not power) then
 
 		power = CreateFrame("StatusBar", T:frameName(parentName, elementName), A.frameParent)
@@ -67,7 +67,7 @@ function Power:Init(parent)
 	power:Update(UnitEvent.UPDATE_TEXTS)
 	power:Update("UNIT_POWER_FREQUENT")
 
-	parent.orderedElements:add({ key = elementName, element = power })
+	parent.orderedElements:set(elementName, power)
 end
 
 function Power:Disable(parent)
@@ -92,6 +92,8 @@ function Power:Update(...)
 				:replace("[pp]", parent.currentPower)
 			    :replace("[maxpp]", parent.currentMaxPower)
 			    :replace("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
+			    :replace("[pp:round]", T:round(parent.currentPower))
+			    :replace("[maxpp:round]", T:round(parent.currentMaxPower))
 			)
 		end)
 	elseif (event == UnitEvent.UPDATE_DB) then
@@ -116,6 +118,12 @@ function Power:Update(...)
 
 		self:SetStatusBarColor(.5, 1, .5, 1)
 		self.bg:SetVertexColor(.5 * .3, .5 * .3, .5 * .3, 1)
+
+		if (db["Background Multiplier"] == -1) then
+			self.bg:Hide()
+		else
+			self.bg:Show()
+		end
 
 		self.tags:foreach(function(tag)
 			tag:Hide()

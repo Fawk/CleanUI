@@ -8,4 +8,5 @@ UnitEvent = {
     UPDATE_DEBUFFS    = 4,
     UPDATE_TEXTS      = 6,
     UPDATE_DB         = 7,
+    UPDATE_CASTBAR    = 8,
 }

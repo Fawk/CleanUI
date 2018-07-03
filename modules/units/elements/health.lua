@@ -1,5 +1,6 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
@@ -154,6 +155,8 @@ function Health:Update(...)
 				:replace("[hp]", parent.currentHealth)
 			    :replace("[maxhp]", parent.currentMaxHealth)
 			    :replace("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
+			    :replace("[hp:round]", T:Round(parent.currentHealth))
+    			:replace("[maxhp:round]", T:Round(parent.currentMaxHealth))
 			)
 		end)
 	elseif (event == UnitEvent.UPDATE_DB) then

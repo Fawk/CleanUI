@@ -1,9 +1,17 @@
 local A, L = unpack(select(2, ...))
-local Units, units, oUF = {}, {}, A.oUF
+local Units, units = {}, {}
 local media = LibStub("LibSharedMedia-3.0")
 local T = A.Tools
 
-for key, obj in next, {
+local MAX_ARENA_ENEMIES = MAX_ARENA_ENEMIES or 5
+local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES or 5
+local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS or 4
+
+local hiddenParent = CreateFrame('Frame', nil, UIParent)
+hiddenParent:SetAllPoints()
+hiddenParent:Hide()
+
+local tags = {
     ["3charname"] = {
         method = [[function(u, r)
             if not u and not r then return end
@@ -12,63 +20,8 @@ for key, obj in next, {
             end
         end]],
         events = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
-    },
-    ["hp:round"] = {
-        method = [[function(u, r)
-            if not u and not r then return end
-            if UnitExists(r or u) then
-                local h = UnitHealth(r or u)
-                if h > 1000000000 then
-                        return string.format("%.2f", h/1000000000).."B"
-                elseif h > 1000000 then
-                    return string.format("%.2f", h/1000000).."M"
-                elseif h > 1000 then
-                    return string.format("%.2f", h/1000).."K"
-                else
-                    return h
-                end
-            end
-        end]],
-        events = "UNIT_HEALTH_FREQUENT"
-    },
-    ["maxhp:round"] = {
-        method = [[function(u, r)
-            if not u and not r then return end
-            if UnitExists(r or u) then
-                local h = UnitHealthMax(r or u)
-                if h > 1000000000 then
-                    return string.format("%.2f", h/1000000000).."B"
-                elseif h > 1000000 then
-                    return string.format("%.2f", h/1000000).."M"
-                elseif h > 1000 then
-                    return string.format("%.2f", h/1000).."K"
-                else
-                    return h
-                end
-            end
-        end]],
-        events = "UNIT_MAXHEALTH"
     }
-} do
-    oUF["Tags"]["Methods"][key] = obj.method
-    oUF["Tags"]["Events"][key] = obj.events
-end
-
-function Units:RegisterStyle(name, func)
-    local found = false
-    for style in oUF:IterateStyles() do
-        if (style == name) then
-            found = true
-        end
-    end
-
-    if (not found) then
-        oUF:RegisterStyle(name, function(frame, unit, notHeader)
-            func(frame)
-        end)
-    end
-    oUF:SetActiveStyle(name)
-end
+}
 
 function Units:Get(unit)
     return units[unit]
@@ -78,284 +31,14 @@ function Units:Add(object, overrideName)
     A:Debug("Adding unit:", overrideName or object:GetName())
     units[overrideName or object:GetName()] = object
 end
- 
-function Units:UpdateElements(frame, db)
-    if db then
-        for i = 1, A["Elements"]:count() do
-            local tbl = A["Elements"]:get(i)
-            local name = tbl.name
-            local func = tbl.func
-            if db[name] then
-                func(frame, db[name])
-                if (frame[name]) then
-                    if (db[name]["Enabled"]) then
-                        frame[name]:Show()
-                    else
-                        frame[name]:Hide()
-                    end
-                end
-            end
-        end
-        if frame.UpdateAllElements then
-            frame:UpdateAllElements("OnUpdate")
-        end
-    end
-end
 
-local UpdateTime = function(self, elapsed)
-    self.timeLeft = self.timeLeft - elapsed
-    if(self.nextUpdate > 0) then
-        self.nextUpdate = self.nextUpdate - elapsed
-        return
-    end
-    if self.timeLeft <= 0 then
-        self:Hide()
-    end
-end
-
-local function GetUnitAuras(unit, filter)
-    local auras = {}    
-    for index = 1, 40 do
-        local name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, shouldConsolidate, spellID, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll = UnitAura(unit, index, filter)
-        if name and caster and spellID and duration and duration > 0 then
-            if not auras[spellID] then
-                auras[spellID] = {}
-            end
-            auras[spellID][caster] = {
-                name = name,
-                dtype = dtype,
-                duration = duration,
-                count = count,
-                texture = texture,
-                caster = caster,
-                isBossDebuff = isBossDebuff,
-                expirationTime = expirationTime,
-                casterIsPlayer = casterIsPlayer
-            }
-        end
-    end
-    return auras
-end
-
-local important = {
-    ["Boss Debuff"] = function(self, frame, db)
-        local size, position, tracked, ignored = db["Size"], db["Position"], db["Tracked"], db["Ignored"]
-
-        local debuff = frame["Boss Debuff"]
-        if not debuff then
-            debuff = CreateFrame("Frame", nil, frame)
-            debuff:SetSize(size, size)
-            Units:Position(debuff, position)
-
-            local icon = debuff:CreateTexture(nil, "OVERLAY")
-            icon:SetAllPoints()
-
-            debuff.icon = icon
-            debuff:Hide()
-        end
-
-        for spellId, aura in next, GetUnitAuras(frame.unit, "HARMFUL") do
-            if tracked[spellId] and not ignored[spellId] then
-                debuff.expirationTime = aura.expirationTime
-                debuff.cd:SetCooldown(expirationTime - duration, duration)
-                debuff.cd:SetHideCountdownNumbers(db["Hide Cooldown Numbers"])
-                for _,region in next, {debuff.cd:GetRegions()} do
-                    if region:GetObjectType() == "FontString" then
-                        debuff.cd.cooldownText = region
-                    end
-                end
-                if debuff.cd.cooldownText then
-                    debuff.cd.cooldownText:SetFont(media:Fetch("font", "Noto"), db["Cooldown Numbers Text Size"], "OUTLINE")
-                end
-                if count > 0 then
-                    debuff.count:SetText(count)
-                    debuff.count:Show()
-                end
-                local timeLeft = expirationTime - GetTime()
-                if(not debuff.timeLeft) then
-                    debuff.timeLeft = timeLeft
-                    debuff:SetScript("OnUpdate", UpdateTime)
-                else
-                    debuff.timeLeft = timeLeft
-                end
-
-                debuff.nextUpdate = -1
-                UpdateTime(debuff, 0)
-            else
-                debuff:Hide()
-            end
-            
-            debuff.icon:SetTexture(texture)
-            debuff:Show()
-        end
-    end,
-    ["Raid Buffs"] = function(frame, db)   
-	
-		local function buffButton(frame, position, size, spellId, obj, unit)
-
-			local buff = CreateFrame("Frame", A:GetName().."_UnitBuff_"..GetSpellInfo(spellId).."_"..unit, frame)
-
-			Units:Position(buff, position)
-			buff:SetSize(size, size)
-			buff:SetFrameStrata("HIGH")
-
-			local cd = CreateFrame("Cooldown", "$parentCooldown", buff, "CooldownFrameTemplate")
-			cd:SetAllPoints(buff)
-			cd:SetReverse(true)
-
-			local icon = buff:CreateTexture(nil, "BORDER")
-			icon:SetAllPoints(buff)
-
-			local count = buff:CreateFontString(nil, "OVERLAY")
-			count:SetFontObject(NumberFontNormal)
-			count:SetPoint("BOTTOMRIGHT", buff, "BOTTOMRIGHT", -1, 0)
-			buff.hideNumbers = obj["Hide Countdown Numbers"]
-			buff.trackOnlyPlayer = obj["Own Only"]
-			buff.cdTextSize = obj["Cooldown Numbers Text Size"]
-			buff.icon = icon
-			buff.count = count
-			buff.cd = cd
-
-			buff:Hide()
-			
-			return buff
-		end
-
-        local tracked = db["Tracked"]
-        
-        local buffs = frame["RaidBuffs"]
-        if not buffs then
-            buffs = {}
-        end
-
-        for spellId,_ in next, buffs do	
-            if not tracked[spellId] then
-				for caster, buff in next, buffs[spellId] do
-					buff:Hide()
-				end
-				table.remove(buffs, spellId)
-            end
-        end
-
-        for spellId, obj in next, tracked do
-            if not buffs[spellId] then
-				buffs[spellId] = {}
-            end
-        end
-        
-        local auras = GetUnitAuras(frame.unit, "HELPFUL")
-        if T:tcount(auras) == 0 then
-            for spellId, obj in next, buffs do
-				for unit, buff in next, obj do
-					buff:Hide()
-				end
-            end
-        end
-        
-        for spellId, buff in next, buffs do
-            if not auras[spellId] and buffs[spellId] then
-				for unit, buff in next, buffs[spellId] do
-					buff:Hide()
-				end
-            end
-        end
-		
-		local function visibility(obj, aura)
-		
-			obj.cd:SetCooldown(aura.expirationTime - aura.duration, aura.duration)
-			obj.cd:SetHideCountdownNumbers(obj.hideNumbers or false)
-			for _,region in next, {obj.cd:GetRegions()} do
-				if region:GetObjectType() == "FontString" then
-					obj.cd.cooldownText = region
-				end
-			end
-			if obj.cd.cooldownText then
-				obj.cd.cooldownText:SetFont(media:Fetch("font", "NotoBold"), obj.cdTextSize, "OUTLINE")
-                obj.cd.cooldownText:ClearAllPoints()
-                obj.cd.cooldownText:SetPoint("CENTER", 2, 0)
-			end
-			if aura.count and aura.count > 0 then
-				obj.count:SetText(aura.count)
-				obj.count:Show()
-			end
-			local timeLeft = aura.expirationTime - GetTime()
-			if(not obj.timeLeft) then
-				obj.timeLeft = timeLeft
-				obj:SetScript("OnUpdate", UpdateTime)
-			else
-				obj.timeLeft = timeLeft
-			end
-
-			obj.nextUpdate = -1
-			UpdateTime(obj, 0)
-
-			obj.icon:SetTexture(aura.texture)
-			obj:Show()
-		end
-        
-        for spellId, auraObj in next, auras do
-            for caster, aura in next, auraObj do
-                local obj = tracked[spellId]
-    			
-    			if obj then
-    				
-                    local size, position = tracked[spellId]["Size"], tracked[spellId]["Position"]
-
-    				local playerObj = buffs[spellId]["player"]
-                    if not playerObj then
-                        playerObj = buffButton(frame, position, size, spellId, obj, "player")
-                        buffs[spellId]["player"] = playerObj
-                    end
-
-    				if playerObj.trackOnlyPlayer and aura.caster == "player" then
-    					visibility(playerObj, aura)
-    				elseif not playerObj.trackOnlyPlayer then
-                        if aura.caster ~= "player" then
-                            if not obj[aura.caster] then
-                                buffs[spellId][aura.caster] = buffButton(frame, position, size, spellId, obj, aura.caster)
-                            end
-                            visibility(buffs[spellId][aura.caster], aura)
-                        end
-    				end
-    			end
-            end
-        end
-        
-        frame["Raid Buffs"] = buffs
-    end
-}
-
-function Units:UpdateImportantElements(frame, db)
-    if db then
-        for name, element in next, db do
-            if type(element) == "table" and element["Important"] and element["Enabled"] then
-                important[name](frame, element)
-            end
-        end
-    end
-end
-
-local function getElementByName(t, n)
-    for i = 1, t:count() do
-        local t2 = t:get(i)
-        if t2.name and t2.name == n then
-            return true
-        end
-    end
-    return false
-end
- 
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
     if units[relative] then
         return units[relative]
-    elseif parent.orderedElements then 
-        local k = parent.orderedElements:getChildByKey("key", relative)
-        if (k) then
-            return k.element
-        end
-        return parent
-    elseif getElementByName(A["Elements"], relative) then
+    elseif (parent.orderedElements and parent.orderedElements:get(relative)) then 
+        return parent.orderedElements:get(relative)
+    elseif (A["Shared Elements"]:get(relative)) then
         if frame[relative] then
             return frame[relative]
         elseif parent[relative] then
@@ -363,9 +46,14 @@ function Units:Translate(frame, relative)
         else
             return parent
         end
-    elseif getElementByName(A["Elements"], name) then
-        A:Debug("Could not find relative frame '", relative, "' for element '", name or "Unknown", "', using parent.")
-        return parent
+    elseif (A["Player Elements"]:get(relative)) then
+        if frame[relative] then
+            return frame[relative]
+        elseif parent[relative] then
+            return parent[relative]
+        else
+            return parent
+        end
     elseif relative:equals(parent:GetName(), "Parent") then
         return parent
     elseif relative:equals(parent:GetName(), "FrameParent") then
@@ -383,9 +71,6 @@ function Units:Position(frame, db)
     else
         local x, y = db["Offset X"], db["Offset Y"]
         if db["Relative To"] == "FrameParent" then
-            local scale = UIParent:GetScale()
-            scale = 1
-            --frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x < 1 and ((x * SCREEN_WIDTH) * scale) or x, y < 1 and ((y * SCREEN_HEIGHT) * scale) or y)
             frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
         else
         frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
@@ -418,15 +103,6 @@ function Units:PlaceCastbar(frame, invalidPower, isStagger)
             end
         else
             castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT")
-        end
-    end
-end
- 
-function Units:SetupClickcast(frame, db)
-    if db and frame.unit and frame:CanChangeAttribute() then
-        for _,binding in next, db do
-            local f, t = binding.action:gsub("@unit", "@mouseover")
-            frame:SetAttribute(binding.type, f)
         end
     end
 end
@@ -530,5 +206,111 @@ function Units:DisableBlizzardRaid()
 		HideFrame(CompactRaidFrameManager)
 	end
 end
+
+local function handleFrame(baseName)
+    local frame
+    if(type(baseName) == 'string') then
+        frame = _G[baseName]
+    else
+        frame = baseName
+    end
+
+    if(frame) then
+        frame:UnregisterAllEvents()
+        frame:Hide()
+
+        frame:SetParent(hiddenParent)
+
+        local health = frame.healthBar or frame.healthbar
+        if(health) then
+            health:UnregisterAllEvents()
+        end
+
+        local power = frame.manabar
+        if(power) then
+            power:UnregisterAllEvents()
+        end
+
+        local spell = frame.castBar or frame.spellbar
+        if(spell) then
+            spell:UnregisterAllEvents()
+        end
+
+        local altpowerbar = frame.powerBarAlt
+        if(altpowerbar) then
+            altpowerbar:UnregisterAllEvents()
+        end
+
+        local buffFrame = frame.BuffFrame
+        if(buffFrame) then
+            buffFrame:UnregisterAllEvents()
+        end
+    end
+end
+
+function Units:DisableBlizzard(unit)
+    if(not unit) then return end
+
+    unit = unit:lower()
+
+    if(unit == "player") then
+        handleFrame(PlayerFrame)
+
+        PlayerFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+        PlayerFrame:RegisterEvent("UNIT_ENTERING_VEHICLE")
+        PlayerFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
+        PlayerFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
+        PlayerFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+
+        PlayerFrame:SetUserPlaced(true)
+        PlayerFrame:SetDontSavePosition(true)
+    elseif(unit == "pet") then
+        handleFrame(PetFrame)
+    elseif(unit == "target") then
+        handleFrame(TargetFrame)
+        handleFrame(ComboFrame)
+    elseif(unit == "focus") then
+        handleFrame(FocusFrame)
+        handleFrame(TargetofFocusFrame)
+    elseif(unit == "targettarget") then
+        handleFrame(TargetFrameToT)
+    elseif(unit:match("boss%d?$")) then
+        local id = unit:match("boss(%d)")
+        if(id) then
+            handleFrame("Boss"..id.."TargetFrame")
+        else
+            for i = 1, MAX_BOSS_FRAMES do
+                handleFrame(string.format("Boss%dTargetFrame", i))
+            end
+        end
+    elseif(unit:match("party%d?$")) then
+        local id = unit:match("party(%d)")
+        if(id) then
+            handleFrame("PartyMemberFrame" .. id)
+        else
+            for i = 1, MAX_PARTY_MEMBERS do
+                handleFrame(string.format("PartyMemberFrame%d", i))
+            end
+        end
+    elseif(unit:match("arena%d?$")) then
+        local id = unit:match("arena(%d)")
+        if(id) then
+            handleFrame("ArenaEnemyFrame"..id)
+        else
+            for i = 1, MAX_ARENA_ENEMIES do
+                handleFrame(string.format("ArenaEnemyFrame%d", i))
+            end
+        end
+
+        Arena_LoadUI = function() end
+        SetCVar("showArenaEnemyFrames", "0", "SHOW_ARENA_ENEMY_FRAMES_TEXT")
+    elseif(unit:match("nameplate%d+$")) then
+        local frame = C_NamePlate.GetNamePlateForUnit(unit)
+        if(frame and frame.UnitFrame) then
+            handleFrame(frame.UnitFrame)
+        end
+    end
+end
+
 
 A.Units = Units

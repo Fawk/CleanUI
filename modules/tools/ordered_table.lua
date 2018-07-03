@@ -232,7 +232,7 @@ end
 local MAP = {}
 MAP.__index = MAP
 
-function MAP:set(self, k, v)
+function MAP:set(k, v)
   if (self.e[k]) then 
     return false
   else
@@ -243,11 +243,11 @@ function MAP:set(self, k, v)
   end
 end
 
-function MAP:get(self, k)
+function MAP:get(k)
   return self.e[k]
 end
 
-function MAP:foreach(self, func)
+function MAP:foreach(func)
   for x = 1, self.c do
       local index = self.i[x]
       func(index, self.e[index])
@@ -262,18 +262,18 @@ function MAP:isEmpty()
  return self.c == 0
 end
 
-function MAP:hasKey(self, key)
+function MAP:hasKey(key)
  return self.e[key] ~= nil
 end
 
-function MAP:computeIfMissing(self, key, func)
- if (not self:hasKey(key))
+function MAP:computeIfMissing(key, func)
+ if (not self:hasKey(key)) then
   self:set(key, func(self, key))
   end
   return self:get(key)
 end
 
-function MAP:remove(self, key)
+function MAP:remove(key)
   if (self.e[key]) then
     self.e[key] = nil
     local y = {}

@@ -1,9 +1,8 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local buildText = A.TextBuilder
 
-for key, obj in next, {
+local tags = {
     ["altpp"] = {
         method = [[function(u, r)
             if not u and not r then return end
@@ -22,10 +21,7 @@ for key, obj in next, {
         end]],
         events = "UNIT_MAXPOWER"
     }
-} do
-    oUF["Tags"]["Methods"][key] = obj.method
-    oUF["Tags"]["Events"][key] = obj.events
-end
+}
 
 function AlternativePower(frame, db)
 
@@ -55,7 +51,7 @@ function AlternativePower(frame, db)
 	end
 
 	Units:Position(bar, db["Position"])
-	A:CreateMover(bar, db, "AlternativePower")
+	A:CreateMover(bar, db, "Alternative Power")
 	bar:SetSize(size["Width"], size["Height"])
 	bar:SetStatusBarTexture(texture)
 	bar.bg:SetTexture(texture)

@@ -269,19 +269,34 @@ local defaults =  {
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
+                        ["Missing Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        },
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "ClassIcons",
+                            ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0, 
                         },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
                             ["Width"] = 150,
-                            ["Height"] = 15
+                            ["Height"] = 16
                         },
                         ["Time"] = {
                             ["Enabled"] = true,
@@ -576,14 +591,29 @@ local defaults =  {
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
+                        ["Missing Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        },
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "ClassIcons",
+                            ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0, 
                         },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
@@ -652,6 +682,101 @@ local defaults =  {
                         ["Local Point"] = "BOTTOMLEFT",
                         ["Offset X"] = 0,
                         ["Offset Y"] = 0,
+                    },
+                    ["Castbar"] = {
+                        ["Enabled"] = true,
+                        ["Missing Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        },
+                        ["Texture"] = "Default2",
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Size"] = {
+                            ["Match width"] = true,
+                            ["Match height"] = false,
+                            ["Width"] = 150,
+                            ["Height"] = 16
+                        },
+                        ["Time"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "RIGHT",
+                                ["Local Point"] = "RIGHT",
+                                ["Offset X"] = -5,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 10
+                        },
+                        ["Name"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = {
+                                ["Relative To"] = "Parent",
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 18,
+                                ["Offset Y"] = 0, 
+                            },
+                            ["Font Size"] = 0.7
+                        },
+                        ["Icon"] = {
+                            ["Enabled"] = true,
+                            ["Position"] = "LEFT",
+                            ["Size"] = {
+                                ["Match width"] = false,
+                                ["Match height"] = true,
+                                ["Size"] = 10
+                            },
+                            ["Background"] = {
+                                ["Color"] = { 0, 0, 0 },
+                                ["Offset"] = {
+                                    ["Top"] = -1,
+                                    ["Bottom"] = -1,
+                                    ["Left"] = -1,
+                                    ["Right"] = -1
+                                },
+                                ["Enabled"] = true
+                            }
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Attached"] = true,
+                    },
+                    ["Heal Prediction"] = {
+                        ["Enabled"] = true,
+                        ["Texture"] = "Default2",
+                        ["Max Overflow"] = 1,
+                        ["Colors"] = {
+                            ["My Heals"] = { 0, .827, .765, .5 },
+                            ["All Heals"] = { 0, .631, .557, .5 },
+                            ["Absorb"] = { .7, .7, 1, .5 },
+                            ["Heal Absorb"] = { .7, .7, 1, .5 }
+                        }
                     },
                     ["Health"] = {
                         ["Enabled"] = true,
@@ -1438,6 +1563,16 @@ local defaults =  {
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
+                        ["Missing Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        },
                         ["Texture"] = "Default2",
                         ["Position"] = {
                             ["Relative To"] = "Class Icons",
@@ -1446,6 +1581,11 @@ local defaults =  {
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0, 
                         },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
@@ -1618,19 +1758,34 @@ local defaults =  {
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
+                        ["Missing Bar"] = {
+                            ["Enabled"] = false,
+                            ["Custom Color"] = {
+                                0.5, -- [1]
+                                0.5, -- [2]
+                                0.5, -- [3]
+                                1, -- [4]
+                            },
+                            ["Color By"] = "Custom",
+                        },
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "Parent",
+                            ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0, 
                         },
+                        ["Color By"] = "Class",
+                        ["Custom Color"] = { 1, 1, 1 },
+                        ["Background Multiplier"] = 0.33,
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
                             ["Width"] = 150,
-                            ["Height"] = 15
+                            ["Height"] = 16
                         },
                         ["Time"] = {
                             ["Enabled"] = true,

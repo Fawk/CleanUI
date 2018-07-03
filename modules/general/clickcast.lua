@@ -73,7 +73,7 @@ end
 local CC = {}
 
 function CC:Setup(frame, db)
-	if (not db["Enabled"]) then return end
+	if (not db or not db["Enabled"]) then return end
 
 	for key, attribute in next, keyMap do
 		if (frame:GetAttribute(attribute)) then

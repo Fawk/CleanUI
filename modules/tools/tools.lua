@@ -1,5 +1,7 @@
-    local A, L = unpack(select(2, ...))
+local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
+
+local E = A.enum
 
 A:Debug("Loading tools")
 
@@ -185,27 +187,54 @@ T.points = {
 }
 
 function T:Background(frame, db, anchor, isBackdrop)
-	local target = frame
-	if db["Background"] and db["Background"]["Enabled"] then
-
-		target = isBackdrop and frame or (anchor.bg or (function() 
-			local f = CreateFrame("Frame", nil, frame)
-			f:SetFrameStrata("LOW")
-			f:SetFrameLevel(2)
-			f:SetPoint("CENTER", anchor or frame, "CENTER")
-			local width, height = anchor:GetSize()
-			if not width then
-				width, height = frame:GetSize()
+	local target
+	if (db["Background"] and db["Background"]["Enabled"]) then
+		if (isBackdrop) then
+			target = frame
+		else
+			if (anchor) then
+				if (anchor.bg) then
+					anchor.bg:Hide()
+					target = anchor.bg
+				else
+					local f = CreateFrame("Frame", nil, frame)
+					f:SetFrameStrata("LOW")
+					f:SetFrameLevel(2)
+					f:SetPoint("CENTER", anchor or frame, "CENTER")
+					local width, height = anchor:GetSize()
+					if (not width) then
+						width, height = frame:GetSize()
+					end
+					f:SetSize(width, height)
+					anchor.bg = f
+					target = anchor.bg
+				end
+			else
+				anchor = frame["Background Anchor"]
+				if (anchor) then
+					target = anchor
+				else
+					local f = CreateFrame("Frame", nil, frame)
+					f:SetFrameStrata("LOW")
+					f:SetFrameLevel(2)
+					f:SetPoint("CENTER", anchor or frame, "CENTER")
+					local width, height = anchor:GetSize()
+					if (not width) then
+						width, height = frame:GetSize()
+					end
+					f:SetSize(width, height)
+					anchor = f
+					target = anchor
+					frame["Background Anchor"] = anchor
+				end
 			end
-			f:SetSize(width, height)
-			anchor.bg = f
-			return anchor.bg
-		end)())
-
+		end
 		local offset = db["Background"]["Offset"]
-		if not target:GetBackdrop() then
+		if (not target:GetBackdrop()) then
 			target:SetBackdrop({
 				bgFile = media:Fetch("statusbar", "Default"),
+				edgeFile = media:Fetch("border", "test-border"),
+				edgeSize = 2,
 				tile = true,
 				tileSize = 16,
 				insets = {
@@ -238,7 +267,7 @@ function T:HookSetPoint(frame, position, w, h)
 end
 
 function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
-	local achor = anchor or "TOPLEFT"
+	local anchor = anchor or "TOPLEFT"
 	local top, left, bottom, right, newX, newY = frame:GetTop() or 0, frame:GetLeft() or 0, frame:GetBottom() or 0, frame:GetRight() or 0
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
@@ -371,6 +400,18 @@ function T:Switch(m, ...)
 			return
 		end
 	end
+end
+
+function T:round(value)
+    if (value > 1e9) then
+        return string.format("%.2f", value/1e9).."B"
+    elseif (value > 1e6) then
+        return string.format("%.2f", value/1e6).."M"
+    elseif (value > 1e3) then
+        return string.format("%.2f", value/1e3).."K"
+    else
+        return value
+    end
 end
 
 function Table:shallowCopy(from, to)

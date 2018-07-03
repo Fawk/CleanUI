@@ -1,6 +1,5 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsDead = UnitIsDead
 local UnitIsConnected = UnitIsConnected
@@ -11,7 +10,7 @@ local CreateFrame = CreateFrame
 local elementName = "Status"
 
 local Status = { name = elementName }
-A["Shared Elements"]:add(Status)
+A["Shared Elements"]:set(elementName, Status)
 
 --Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
 function Status:Init(parent)
