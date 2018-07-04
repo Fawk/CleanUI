@@ -13,6 +13,12 @@
     <Script file="buffs.lua"/>
     <Script file="debuffs.lua"/>
     <Script file="status.lua"/>
+    <Script file="runes.lua"/>
+    <Script file="combopoints.lua"/>
+    <Script file="soulshards.lua"/>
+    <Script file="chi.lua"/>
+    <Script file="arcanecharges.lua"/>
+    <Script file="holypower.lua"/>
     <!-- etc -->
 
 </Ui>

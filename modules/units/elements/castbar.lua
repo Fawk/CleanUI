@@ -88,46 +88,6 @@ function Castbar:Init(parent)
 
 	bar:SetSize(width, height)
 
-	local iconW, iconH, iconX, iconY
-	local iconDb = db["Icon"]
-
-	if iconDb["Enabled"] then
-
-		if iconDb["Size"]["Match width"] then
-			iconW = width
-			iconH = width
-		elseif iconDb["Size"]["Match height"] then
-			iconH = height
-			iconW = height
-		else
-			iconW = iconDb["Size"]
-			iconH = iconDb["Size"]
-		end
-
-		bar.Icon:SetSize(iconW, iconH)
-		T:Background(bar, iconDb, bar.Icon, false)
-	end
-
-	if not bar.setup then
-		bar.oldSetPoint = bar.SetPoint
-		bar.SetPoint = function(self, lp, r, p, x, y)
-			if iconDb["Enabled"] then
-				self.Icon:SetPoint(lp, r == self.Icon and self.Icon:GetParent():GetParent() or r, p, x or 0, (y or 0) - 1)
-				local p = iconDb["Position"]
-				if p == "LEFT" then
-					bar:oldSetPoint("LEFT", bar.Icon, "RIGHT", 0, 0)
-				elseif p == "RIGHT" then
-					bar:oldSetPoint("RIGHT", bar.Icon, "LEFT", 0, 0)
-				end
-				width = (size["Match width"] and parent:GetWidth() or size["Width"]) - iconW
-			else
-				bar:oldSetPoint(lp, r, p, x or 0, (y or 0) - 1)
-			end
-			bar:SetSize(width, height)
-		end
-		bar.setup = true
-	end
-
 	bar:Update(UnitEvent.UPDATE_DB, self.db)
 	bar:Update(UnitEvent.UPDATE_TEXTS)
 	bar:Update(UnitEvent.UPDATE_CASTBAR)
@@ -154,20 +114,54 @@ function Castbar:Update(...)
 
 		T:Background(self, db, nil, true)
 
-		Units:PlaceCastbar(parent, true)
+		local iconW, iconH
+		local iconDb = db["Icon"]
+
+		if iconDb["Enabled"] then
+
+			local size = iconDb["Size"]
+			local width, height = parent:GetSize()
+
+			if size["Match width"] then
+				iconW = width
+				iconH = width
+			elseif size["Match height"] then
+				iconH = height
+				iconW = height
+			else
+				iconW = size["Size"]
+				iconH = size["Size"]
+			end
+
+			self.Icon:SetSize(iconW, iconH)
+			T:Background(self, iconDb, self.Icon, false)
+
+			self.Icon:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 1)
+			self:SetPoint("LEFT", self.Icon, "RIGHT", 1, 0)
+		else
+			self:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 1)
+		end
+		
+		--Units:Position(self, db["Position"])
+		--Units:PlaceCastbar(parent, true)
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
 		local name = parent.castBarSpell
 		if (not name) then
 			self:Hide()
-		else
+		else -- Add OnUpdate here...
 			self:Show()
-		end
+			local duration = parent.castBarEnd - parent.castBarStart
+			self.Icon:SetTexture(parent.castBarTexture)
+			self.Text:SetText(name)
+			self.Time:SetText(duration / 1e3)
 
-		print(parent.castBarSpell)
+			self:SetMinMaxValues(parent.castBarStart, parent.castBarEnd)
+			self:SetValue(duration + arg2)
+		end
 	end
 
-	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarCurrent, parent.castBarMax, A.noop, A.ColorBar)
-	A:ColorBar(self, parent, parent.castBarCurrent, parent.castBarMax, A.noop)
+	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarStart, parent.castBarEnd, A.noop, A.ColorBar)
+	A:ColorBar(self, parent, parent.castBarStart, parent.castBarEnd, A.noop)
 end

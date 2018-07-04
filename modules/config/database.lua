@@ -240,7 +240,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.3,
                         ["Hide Blizzard"] = true
                     },
-                    ["Class Power"] = {
+                    ["Runes"] = {
                         ["Enabled"] = true,
                         ["Position"] = {
                             ["Relative To"] = "Parent",
@@ -250,8 +250,36 @@ local defaults =  {
                             ["Offset Y"] = 0, 
                         },
                         ["Size"] = {
-                            ["Match width"] = true,
-                            ["Match height"] = false,
+                            ["Width"] = 20,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Reversed"] = false,
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
+                        ["Attached"] = true
+                    },
+                    ["Combo Points"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
                             ["Width"] = 150,
                             ["Height"] = 15
                         },
@@ -265,8 +293,128 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
                         ["Attached"] = true
                     },
+                    ["Soul Shards"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
+                        ["Attached"] = true
+                    },
+                    ["Chi"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
+                        ["Attached"] = true
+                    },
+                    ["Arcane Charge"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
+                        ["Attached"] = true
+                    },
+                    ["Holy Power"] = {
+                        ["Enabled"] = true,
+                        ["Position"] = {
+                            ["Relative To"] = "Parent",
+                            ["Point"] = "BOTTOM",
+                            ["Local Point"] = "TOP",
+                            ["Offset X"] = 0,
+                            ["Offset Y"] = 0, 
+                        },
+                        ["Size"] = {
+                            ["Width"] = 150,
+                            ["Height"] = 15
+                        },
+                        ["Background"] = {
+                            ["Color"] = { 0, 0, 0 },
+                            ["Offset"] = {
+                                ["Top"] = -1,
+                                ["Bottom"] = -1,
+                                ["Left"] = -1,
+                                ["Right"] = -1
+                            },
+                            ["Enabled"] = true,
+                        },
+                        ["Orientation"] = "HORIZONTAL",
+                        ["Texture"] = "Default2",
+                        ["X Spacing"] = 1,
+                        ["Y Spacing"] = 1,
+                        ["Attached"] = true
+                    },              
                     ["Castbar"] = {
                         ["Enabled"] = true,
                         ["Missing Bar"] = {

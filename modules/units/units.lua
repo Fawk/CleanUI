@@ -70,11 +70,7 @@ function Units:Position(frame, db)
         frame:SetAllPoints()
     else
         local x, y = db["Offset X"], db["Offset Y"]
-        if db["Relative To"] == "FrameParent" then
-            frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
-        else
         frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
-        end
     end
 end
 

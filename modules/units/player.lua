@@ -1,8 +1,5 @@
 local A, L = unpack(select(2, ...))
 local E, T, U,  Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
-local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
-local InCombatLockdown = InCombatLockdown
 
 local Player = {}
 local frameName = "Player"
@@ -73,7 +70,7 @@ function Player:Update(...)
 
             -- Player specific elements
             A["Player Elements"]:foreach(function(key, element)
-                element:Init(frame, db[key])
+                element:Init(self, db[key])
             end)
         end
     end
