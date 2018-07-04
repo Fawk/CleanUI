@@ -123,8 +123,11 @@ function string.anyMatch(self, ...)
 end
 
 function string.replace(self, t, r)
-   local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
-   return self:gsub(format, r)
+    local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
+    while (self:match(format)) do
+        self = self:gsub(format, r)
+    end
+    return self
 end
 
 function string.fupper(self)
@@ -402,17 +405,19 @@ function T:Switch(m, ...)
 	end
 end
 
-function T:round(value)
+function T:short(value, decimals)
+    local decimals = decimals or 0
     if (value > 1e9) then
-        return string.format("%.2f", value/1e9).."B"
+        return string.format("%."..decimals.."f", value/1e9).."B"
     elseif (value > 1e6) then
-        return string.format("%.2f", value/1e6).."M"
+        return string.format("%."..decimals.."f", value/1e6).."M"
     elseif (value > 1e3) then
-        return string.format("%.2f", value/1e3).."K"
+        return string.format("%."..decimals.."f", value/1e3).."K"
     else
         return value
     end
 end
+
 
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do

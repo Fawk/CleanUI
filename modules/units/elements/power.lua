@@ -1,19 +1,22 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+
+--[[ Blizzard ]]
 local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
 
+--[[ Locals ]]
 local elementName = "Power"
-
 local Power = { name = elementName }
+local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER" }
+
 A["Shared Elements"]:set(elementName, Power)
 
 function Power:Init(parent)
 
-	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-	local db = A["Profile"]["Options"][parentName][elementName]
+	local db = parent.db[elementName]
 
 	local power = parent.orderedElements:get(elementName)
 	if (not power) then
@@ -25,14 +28,17 @@ function Power:Init(parent)
 		power.bg = power:CreateTexture(nil, "BACKGROUND")
 		power.missingPowerBar = CreateFrame("StatusBar", nil, power)
 		power.db = db
-		power.tags = A:OrderedTable()
 
 	    power.Update = function(self, event, ...)
 	    	Power:Update(self, event, ...)
 	   	end
 
-		power:RegisterEvent("UNIT_POWER_FREQUENT")
-	    power:RegisterEvent("UNIT_MAXPOWER")
+	   	local tagEventFrame = parent.tagEventFrame
+	   	if (tagEventFrame) then
+	   		Units:RegisterEvents(tagEventFrame, events)
+	   	end
+
+	   	Units:RegisterEvents(power, events, true)
 	    power:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 	    end)
@@ -62,15 +68,14 @@ function Power:Update(...)
 	  	self:SetValue(parent.currentPower)
 	elseif (event == UnitEvent.UPDATE_TEXTS) then
 		parent:Update(UnitEvent.UPDATE_POWER)
-		self.tags:foreach(function(tag)
-			tag:SetText(tag.format
-				:replace("[pp]", parent.currentPower)
-			    :replace("[maxpp]", parent.currentMaxPower)
-			    :replace("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
-			    :replace("[pp:round]", T:round(parent.currentPower))
-			    :replace("[maxpp:round]", T:round(parent.currentMaxPower))
-			)
-		end)
+		local tag = arg1
+		tag.text = tag.format
+			:replace("[pp]", parent.currentPower)
+		    :replace("[maxpp]", parent.currentMaxPower)
+		    :replace("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
+		    :replace("[pp:round]", T:round(parent.currentPower))
+		    :replace("[maxpp:round]", T:round(parent.currentMaxPower))
+		    :replace("[pp:deficit]", parent.deficitPower > 0 and string.format("-%d", T:short(parent.deficitPower, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 
 		self:Update("UNIT_POWER_FREQUENT")

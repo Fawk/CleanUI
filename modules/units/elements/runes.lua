@@ -9,7 +9,7 @@ local GetRuneCooldown = GetRuneCooldown
 
 -- [[ Locals ]]
 local elementName = "Runes"
-local Runes = {}
+local Runes = { isClassPower = true }
 local MAX_RUNES = 6
 
 local function pairsByKeys (t, f)
@@ -126,8 +126,7 @@ function Runes:Init(parent)
 		return
 	end
 
-	local parentName = parent:GetDbName()
-	local db = A["Profile"]["Options"][parentName][elementName]
+	local db = parent.db[elementName]
 
 	local runes = parent.orderedElements:get(elementName)
 	if (not runes) then

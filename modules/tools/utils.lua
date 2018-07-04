@@ -288,16 +288,9 @@ local function shortenValue(value, decimals)
     end
 end
 
-local tags = {
-	["health:deficit"] = {
-		events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH" },
-		func = function(self)
-			local health = self.parent.currentMaxHealth - self.parent.currentHealth
-			return health > 0 and string.format("-%d", shortenValue(health, 0)) or ""
-		end
-	}
-}
-
+-- This wont work, the fontstring does not support events
+-- Move code to common layer on the unit frame instead and have a separate eventFrame
+-- that will update all tags for that unit across all elements instead so we don't get overlapping events
 local function registerEvents(textObj, init)
 	local hasEvents = false
 	local newText = textObj.tag

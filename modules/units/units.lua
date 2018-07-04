@@ -74,33 +74,53 @@ function Units:Position(frame, db)
     end
 end
 
-function Units:PlaceCastbar(frame, invalidPower, isStagger)
-    local playerDB = A["Profile"]["Options"]["Player"]
+function Units:Attach(frame, db, override)
+    local target = override or frame:GetParent()
+    local position = db["Attached Position"]
+    local x = db["Position"]["Offset X"]
+    local y = db["Position"]["Offset Y"]
 
-    local castbar = frame.Castbar
-    if castbar then
-        if frame.unit == "player" then 
-            local cdb = playerDB["Castbar"]
-            local position = cdb["Position"]
+    if (position == "Below") then
+        frame:SetPoint("TOP", target, "BOTTOM", x, y)
+    elseif (position == "Above") then
+        frame:SetPoint("BOTTOM", target, "TOP", x, y)
+    elseif (position == "Right") then
+        frame:SetPoint("LEFT", target, "RIGHT", x, y)
+    elseif (position == "Left") then
+        frame:SetPoint("RIGHT", target, "LEFT", x, y)
+    end
+end
 
-            if cdb["Attached"] and position["Relative To"] == "ClassIcons" then
-                local anchor = frame
-                castbar:ClearAllPoints()
-                if invalidPower == true and not isStagger then
-                    anchor = frame
-                elseif invalidPower == false then
-                    anchor = frame.__castbarAnchor
-                    castbar.placedByClassIcons = true
-                elseif invalidPower == nil and isStagger then
-                    anchor = frame.Stagger
-                    castbar.placedByStagger = true
+local function getClassPowerRelative(frame)
+    A["Player Elements"]:foreach(function(key, element)
+        local target = frame.orderedElements:get(key)
+        if (element.isClassPower and target) then
+            return target
+        end
+    end)
+end
+
+function Units:PlaceCastbar(bar, db)
+    local parent = bar:GetParent()
+    local position = db["Position"]
+    
+    if (parent.unit == "player") then
+        if (db["Attached"]) then
+            
+            bar:ClearAllPoints()
+            
+            local relative = getClassPowerRelative(parent)
+            if (relative) then
+                local attachedPosition = relative.db["Attached Position"]
+                if (attachedPosition == db["Attached Position"]) then
+                    self:Attach(bar, db, relative)
+                    return
                 end
-                castbar:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT")
             end
-        else
-            castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT")
         end
     end
+        
+    self:Attach(bar, db)
 end
 
 function Units:SetupKeybindings(frame, db)
@@ -110,36 +130,25 @@ function Units:SetupKeybindings(frame, db)
     end
 end
 
-function Units:Tag(frame, name, db, framelevel)  
-    local tag = frame["Tags"][name] or CreateFrame("Frame", T:frameName(frame:GetName(), name), frame)
-    local fs = tag.text or tag:CreateFontString(nil, "OVERLAY")
-
-    if framelevel then
-        tag:SetFrameLevel(framelevel)
+function Units:Tag(frame, db)  
+    local name = db["Name"]
+    local tag = frame.tags:get(name)
+    if (not tag) then
+        -- Do stuff here
     end
     
-    fs:SetFont(media:Fetch("font", db["Font"]), db["Size"], db["Outline"] == "SHADOW" and "NONE" or db["Outline"])
-    fs:SetTextColor(unpack(db["Color"]))
+    -- Update generic stuff here
 
-    if db["Outline"] == "SHADOW" then
-        fs:SetShadowColor(0, 0, 0)
-        fs:SetShadowOffset(1, -1)
+    frame.tags:set(name, tag)
+end
+
+function Units:RegisterEvents(frame, events, force)
+    for _, event in next, events do
+        local registered = frame:IsEventRegistered(event)
+        if (registered and force or not registered) then
+            frame:RegisterEvent(event)
+        end
     end
-    
-    tag:SetAllPoints()
-    local position = db["Position"]
-    if position["Local Point"] == "ALL" then
-        fs:SetAllPoints()
-    else
-        fs:SetPoint(position["Local Point"], self:Translate(tag, position["Relative To"]), position["Point"], position["Offset X"], position["Offset Y"])
-    end
-
-    tag.text = fs
-
-    frame:Tag(fs, db["Text"])
-    frame["Tags"][name] = tag
-
-   if not db["Enabled"] then tag:Hide() end
 end
 
 function Units:CreateStatusBorder(frame, name, db)

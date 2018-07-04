@@ -14,6 +14,7 @@ function Player:Init()
     frame.GetDbName = function(self) return frameName end
     frame.db = db
     frame.orderedElements = A:OrderedMap()
+    frame.tags = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
         self:Update(UnitEvent.UPDATE_DB, db)
     end)

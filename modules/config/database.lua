@@ -497,6 +497,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
+                        ["Attached Position"] = "Below",
                         ["Attached"] = true,
                     },
                     ["Stagger"] = {
@@ -819,7 +820,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Attached"] = true,
+                        ["Attached Position"] = "Below"
                     },
                     ["Enabled"] = true
     			},
@@ -913,7 +914,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
@@ -1791,7 +1792,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Attached"] = true,
+                        ["Attached Position"] = "Below"
                     },
                     ["Enabled"] = true
                 },
@@ -1986,7 +1987,7 @@ local defaults =  {
                             },
                             ["Enabled"] = true,
                         },
-                        ["Attached"] = true,
+                        ["Attached Position"] = "Below"
                     },
                     ["Enabled"] = true
                 },

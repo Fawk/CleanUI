@@ -1,14 +1,17 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 
+--[[ Blizzard ]]
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
 local UnitClass = UnitClass
 
+--[[ Locals ]]
 local elementName = "Health"
-
 local Health = { name = elementName }
+local events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH" }
+
 A["Shared Elements"]:set(elementName, Health)
 
 local function Gradient(unit, class)
@@ -20,8 +23,7 @@ end
 
 function Health:Init(parent)
 
-	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-	local db = A["Profile"]["Options"][parentName][elementName]
+	local db = parent.db[elementName]
 
 	local health = parent.orderedElements:get(elementName)
 	if (not health) then
@@ -34,15 +36,18 @@ function Health:Init(parent)
 
 		health.missingHealthBar = CreateFrame("StatusBar", nil, health)
 
-		health.tags = A:OrderedTable()
 		health.db = db
 
 	    health.Update = function(self, event, ...)
 	    	Health:Update(self, event, ...)
 	   	end
 
-		health:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	    health:RegisterEvent("UNIT_MAXHEALTH")
+	   	local tagEventFrame = parent.tagEventFrame
+	   	if (tagEventFrame) then
+	   		Units:RegisterEvents(tagEventFrame, events)
+	   	end
+
+	   	Units:RegisterEvents(health, events, true)
 	    health:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 	    end)
@@ -71,16 +76,16 @@ function Health:Update(...)
 	if (tostring(event):anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
-	elseif (event == UnitEvent.UPDATE_TEXTS) then
-		self.tags:foreach(function(tag)
-			tag:SetText(tag.format
-				:replace("[hp]", parent.currentHealth)
-			    :replace("[maxhp]", parent.currentMaxHealth)
-			    :replace("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
-			    :replace("[hp:round]", T:Round(parent.currentHealth))
-    			:replace("[maxhp:round]", T:Round(parent.currentMaxHealth))
-			)
-		end)
+	elseif (event == UnitEvent.UPDATE_TAGS) then
+		local tag = arg1
+		tag.text = tag.format
+			:replace("[hp]", parent.currentHealth)
+		    :replace("[maxhp]", parent.currentMaxHealth)
+		    :replace("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
+		    :replace("[hp:round]", T:short(parent.currentHealth), 2)
+			:replace("[maxhp:round]", T:short(parent.currentMaxHealth), 2)
+			:replace("[hp:deficit]", parent.deficitHealth > 0 and string.format("-%d", T:short(parent.deficitHealth, 0)) or "")
+		)
 	elseif (event == UnitEvent.UPDATE_DB) then
 		
 		self:Update("UNIT_HEALTH_FREQUENT")

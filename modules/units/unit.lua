@@ -1,5 +1,7 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+
+--[[ Blizzard ]]
 local CreateFrame = CreateFrame
 local UnitHealth = UnitHealth
 local UnitPower = UnitPower
@@ -8,6 +10,11 @@ local UnitBuff = UnitBuff
 local UnitDebuff = UnitDebuff
 local SecureButton_GetUnit = SecureButton_GetUnit
 local SecureButton_GetModifiedUnit = SecureButton_GetModifiedUnit
+local UnitGetIncomingHeals = UnitGetIncomingHeals
+local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
+local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
+local UnitCastingInfo = UnitCastingInfo
+local UnitChannelInfo = UnitChannelInfo
 
 -- name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
 local function fetchAuraData(func, tbl, id)
@@ -42,6 +49,8 @@ function A:CreateUnit(id)
     unit:SetAttribute("unit", id:lower())
     unit.super = Unit
 
+    Unit:Init(unit)
+
     RegisterUnitWatch(unit)
 
     return unit
@@ -49,10 +58,19 @@ end
 
 function A:SetUnitMeta(frame)
     frame.super = Unit
+    Unit:Init(frame)
 end
 
-function Unit:Init()
-
+function Unit:Init(unit)
+    unit.tagEventFrame = CreateFrame("Frame")
+    unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
+        unit.tags:foreach(function(key, tag)
+            unit.orderedElements:foreach(function(k, element)
+                element:Update(UnitEvent.UPDATE_TAGS, tag)
+            end)
+            tag:SetText(tag.text)
+        end)
+    end)
 end
 
 function Unit:Update(...)
@@ -73,6 +91,7 @@ function Unit:Update(...)
         self.previousMaxHealth = self.currentMaxHealth
         self.currentHealth = UnitHealth(self.unit)
         self.currentMaxHealth = UnitHealthMax(self.unit)
+        self.deficitHealth = self.currentMaxHealth - self.currentHealth
 
         if (self.OnHealth) then
             self:OnHealth(...)

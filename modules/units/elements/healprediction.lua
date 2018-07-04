@@ -1,7 +1,16 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
-local CreateFrame = CreateFrame
 local T = A.Tools
+
+--[[ Blizzard ]]
+local CreateFrame = CreateFrame
+
+--[[ Locals ]]
+local elementName = "Heal Prediction"
+local HealPrediction = {}
+local events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH", "UNIT_HEAL_PREDICTION", "UNIT_ABSORB_AMOUNT_CHANGED", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" }
+
+A["Shared Elements"]:set(elementName, HealPrediction)
 
 local function Update(health, previous, current, amount)
 
@@ -51,15 +60,9 @@ local function HealPredictionPostUpdate(self, my, all, absorb, healAbsorb)
 	previous = Update(health, previous, self.healAbsorbBar, healAbsorb)
 end
 
-local elementName = "Heal Prediction"
+function HealPrediction:Init(parent)
 
-local HealthPrediction = { name = elementName }
-A["Shared Elements"]:set(elementName, HealthPrediction)
-
-function HealthPrediction:Init(parent)
-
-	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-	local db = A["Profile"]["Options"][parentName][elementName]
+	local db = parent.db[elementName]
 
 	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
@@ -116,17 +119,16 @@ function HealthPrediction:Init(parent)
 		healPrediction.absorbBar = absorb
 		healPrediction.healAbsorbBar = healAbsorb
 
-		healPrediction.tags = A:OrderedTable()
-
 	    healPrediction.Update = function(self, event, ...)
-	    	HealthPrediction:Update(self, event, ...)
+	    	HealPrediction:Update(self, event, ...)
 		end
 
-		healPrediction:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	    healPrediction:RegisterEvent("UNIT_MAXHEALTH")
-	    healPrediction:RegisterEvent("UNIT_HEAL_PREDICTION")
-		healPrediction:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
-		healPrediction:RegisterEvent("UNIT_HEAL_ABSORB_AMOUNT_CHANGED")
+	   	local tagEventFrame = parent.tagEventFrame
+	   	if (tagEventFrame) then
+	   		Units:RegisterEvents(tagEventFrame, events)
+	   	end
+
+	   	Units:RegisterEvents(healPrediction, events, true)
 	    healPrediction:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 		end)
@@ -139,7 +141,7 @@ function HealthPrediction:Init(parent)
 	parent.orderedElements:set(elementName, healPrediction)
 end
 
-function HealthPrediction:Update(...)
+function HealPrediction:Update(...)
 
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
@@ -165,8 +167,19 @@ function HealthPrediction:Update(...)
 		parent.maxOverflow = self.maxOverflow
 
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
-	elseif (event == UnitEvent.UPDATE_TEXTS) then
-
+	elseif (event == UnitEvent.UPDATE_TAGS) then
+		local tag = arg1
+		tag.text = tag.format
+			:replace("[heal]", parent.myIncomingHeal)
+			:replace("[heal:round]", T:short(parent.myIncomingHeal, 2))
+			:replace("[allheal]", parent.otherIncomingHeal)
+			:replace("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
+			:replace("[absorb]", parent.absorb)
+			:replace("[absorb:round]", T:short(parent.absorb, 2))
+			:replace("[healabsorb]", parent.healAbsorb)
+			:replace("[healabsorb:round]", T:short(parent.healAbsorb, 2))
+			:replace("[perabsorb]", math.floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
+		)
 	else
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 

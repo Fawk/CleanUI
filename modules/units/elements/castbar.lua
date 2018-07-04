@@ -24,8 +24,7 @@ local function CheckEnabled(e, db)
 end
 
 function Castbar:Init(parent)
-	local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-	local db = A["Profile"]["Options"][parentName][elementName]
+	local db = parent.db[elementName]
 
 	local size = db["Size"]
 	local texture = media:Fetch("statusbar", db["Texture"])
@@ -141,9 +140,8 @@ function Castbar:Update(...)
 		else
 			self:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 1)
 		end
-		
-		--Units:Position(self, db["Position"])
-		--Units:PlaceCastbar(parent, true)
+
+		Units:PlaceCastbar(parent, db)
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 

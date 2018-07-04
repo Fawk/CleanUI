@@ -237,6 +237,14 @@ function Group:Update(...)
      	local size = db["Size"]
         self:SetSize(size["Width"], size["Height"])
 
+        if (not self.tags) then
+            self.tags = A:OrderedMap()
+        end
+
+        for _,tag in next, db["Tags"] do
+            Units:Tag(self, tag)
+        end
+
         if (not self.orderedElements) then
     		self.orderedElements = A:OrderedMap()
     	end
