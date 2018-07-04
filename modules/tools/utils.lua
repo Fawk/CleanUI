@@ -276,18 +276,6 @@ local function setPoints(o, frame)
 	end
 end
 
-local function shortenValue(value, decimals)
-    if value > 1e9 then
-        return string.format("%."..decimals.."f", value/1e9).."B"
-    elseif value > 1e6 then
-        return string.format("%."..decimals.."f", value/1e6).."M"
-    elseif value > 1e3 then
-        return string.format("%."..decimals.."f", value/1e3).."K"
-    else
-        return value
-    end
-end
-
 -- This wont work, the fontstring does not support events
 -- Move code to common layer on the unit frame instead and have a separate eventFrame
 -- that will update all tags for that unit across all elements instead so we don't get overlapping events
