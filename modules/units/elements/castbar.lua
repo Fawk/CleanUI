@@ -2,18 +2,16 @@ local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
 local buildText = A.TextBuilder
 
+--[[ Blizzard ]]
 local CreateFrame = CreateFrame
 local UnitClass = UnitClass
+local UnitName = UnitName
 
+--[[ Locals ]]
 local elementName = "Castbar"
-
 local Castbar = { name = elementName }
-A["Shared Elements"]:set(elementName, Castbar)
 
-local opposite = {
-	["LEFT"] = "RIGHT",
-	["RIGHT"] = "LEFT"
-}
+A["Shared Elements"]:set(elementName, Castbar)
 
 local function CheckEnabled(e, db)
 	if not db["Enabled"] then
@@ -76,6 +74,10 @@ function Castbar:Init(parent)
 		container:HookScript("OnShow", function(self)
 			self.bar:SetStatusBarTexture(texture)
 			self.bar.bg:SetTexture(texture)
+		end)
+
+		container:SetScript("OnUpdate", function(self, elapsed)
+			self:Update("OnUpdate", elapsed)
 		end)
 
 		if (parent.unit == "player") then
@@ -168,6 +170,31 @@ function Castbar:Update(...)
 		end
 
 		Units:PlaceCastbar(self, db)
+	elseif (event == "OnUpdate") then
+		if (parent.casting) then
+			local max = parent.castBarEnd - parent.castBarStart
+			local duration = parent.castBarEnd - GetTime()
+
+			if (duration < 0) then
+				duration = 0
+			end
+
+			local current = duration + arg1
+
+			self.Time:SetText(db["Time"]["Format"]
+					:format("[current]", current / 1e3)
+					:format("[max]", max / 1e3)
+					:format("[delay]", "-"..parent.castBarDelay)
+			)
+
+			self.Text:SetText(db["Text"]["Format"]
+					:format("[name]", parent.castBarSpell)
+					:format("[target]", UnitName("target") or "")
+			)
+
+			self:SetMinMaxValues(parent.castBarStart, parent.castBarEnd)
+			self:SetValue(current)
+		end
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
@@ -176,13 +203,7 @@ function Castbar:Update(...)
 			self:Hide()
 		else -- Add OnUpdate here...
 			self:Show()
-			local duration = parent.castBarEnd - parent.castBarStart
 			self.Icon:SetTexture(parent.castBarTexture)
-			self.Text:SetText(name)
-			self.Time:SetText(duration / 1e3)
-
-			--self:SetMinMaxValues(parent.castBarStart, parent.castBarEnd)
-			--self:SetValue(duration + arg2)
 		end
 	end
 

@@ -182,6 +182,7 @@ function Unit:Update(...)
         local name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID
         if (arg1 == 'UNIT_SPELLCAST_START') then
             name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(self.unit)
+            self.castBarDelay = 0
         elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTIBLE') then
             notInterruptible = false
         elseif (arg1 == 'UNIT_SPELLCAST_NOT_INTERRUPTIBLE') then
@@ -190,10 +191,12 @@ function Unit:Update(...)
             name, _, _, _, startTime, _, _, castID = UnitCastingInfo(self.unit)
         elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_START') then
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+            self.castBarDelay = 0
         elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_UPDATE') then
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
         end
 
+        self.castBarDelay = self.castBarDelay + (self.castBarEnd - GetTime()) - (endTime - GetTime())
         self.castBarSpell = name
         self.castBarSpellId = spellID
         self.castBarTexture = texture
@@ -201,6 +204,10 @@ function Unit:Update(...)
         self.castBarEnd = endTime
         self.castBarCastId = castID
         self.castBarInterruptable = not notInterruptible
+
+        if (self.castBarSpell) then
+            self.casting = true
+        end
     end
 
     if (self.AfterUpdate) then

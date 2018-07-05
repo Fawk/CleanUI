@@ -443,7 +443,8 @@ local defaults =  {
                                 ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 10,
+                            ["Format"] = "[current]/[max]"
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -454,7 +455,8 @@ local defaults =  {
                                 ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 0.7
+                            ["Font Size"] = 0.7,
+                            ["Format"] = "[name]"
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
@@ -733,7 +735,8 @@ local defaults =  {
                                 ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 10,
+                            ["Format"] = "[current]/[max]"
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -744,7 +747,8 @@ local defaults =  {
                                 ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 0.7
+                            ["Font Size"] = 0.7,
+                            ["Format"] = "[name]"
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
@@ -827,7 +831,8 @@ local defaults =  {
                                 ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 10,
+                            ["Format"] = "[current]/[max]"
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -838,7 +843,8 @@ local defaults =  {
                                 ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 0.7
+                            ["Font Size"] = 0.7,
+                            ["Format"] = "[name]"
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
@@ -1621,7 +1627,8 @@ local defaults =  {
                                 ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 10,
+                            ["Format"] = "[current]/[max]"
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -1632,7 +1639,8 @@ local defaults =  {
                                 ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 0.7
+                            ["Font Size"] = 0.7,
+                            ["Format"] = "[name]"
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,
@@ -1799,7 +1807,8 @@ local defaults =  {
                                 ["Offset X"] = -5,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 10
+                            ["Font Size"] = 10,
+                            ["Format"] = "[current]/[max]"
                         },
                         ["Name"] = {
                             ["Enabled"] = true,
@@ -1810,7 +1819,8 @@ local defaults =  {
                                 ["Offset X"] = 18,
                                 ["Offset Y"] = 0, 
                             },
-                            ["Font Size"] = 0.7
+                            ["Font Size"] = 0.7,
+                            ["Format"] = "[name]"
                         },
                         ["Icon"] = {
                             ["Enabled"] = true,

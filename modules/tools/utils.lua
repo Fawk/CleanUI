@@ -276,37 +276,6 @@ local function setPoints(o, frame)
 	end
 end
 
--- This wont work, the fontstring does not support events
--- Move code to common layer on the unit frame instead and have a separate eventFrame
--- that will update all tags for that unit across all elements instead so we don't get overlapping events
-local function registerEvents(textObj, init)
-	local hasEvents = false
-	local newText = textObj.tag
-	for tag, tbl in next, tags do
-		if (newText:find("%["..tag.."%]")) then
-			for _,event in next, tbl.events do 
-				textObj:RegisterEvent(event)
-			end
-			hasEvents = true
-			if (init) then
-				newText = newText:replace("["..tag.."]", tbl:func())
-			end
-		end
-	end
-
-	if (hasEvents) then
-		textObj:SetScript("OnEvent", function(self, event, ...)
-			local newText = self.tag
-			for tag, tbl in next, tags do
-				newText = newText:replace("["..tag.."]", tbl:func())
-			end
-			self:SetText(newText)
-		end)
-	end
-
-	self:SetText(newText)	
-end
-
 local function TextBuilder(parent, sizeInPerc)
 	local o = {
 		sizeInPerc = sizeInPerc,
@@ -366,11 +335,6 @@ local function TextBuilder(parent, sizeInPerc)
 		end
 
 		setPoints(self, text)
-		text.tag = nil
-		text.SetTag = function(self, tag)
-			self.tag = tag
-			registerEvents(self, true)
-		end
         text.OldSetText = text.SetText
         text.SetText = function(self, value)
             local isSpecial, font, size = false, nil, 10
