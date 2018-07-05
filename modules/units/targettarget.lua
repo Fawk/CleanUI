@@ -16,6 +16,7 @@ function TargetTarget:Init()
     frame.GetDbName = function(self) return frameName end
     frame.db = db
     frame.orderedElements = A:OrderedMap()
+    frame.tags = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
         self:Update(UnitEvent.UPDATE_DB, db)
     end)
@@ -55,6 +56,10 @@ function TargetTarget:Update(...)
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
+
+            for _,tag in next, db["Tags"] do
+                Units:Tag(self, tag)
+            end
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])

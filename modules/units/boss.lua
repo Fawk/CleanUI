@@ -22,6 +22,7 @@ function Boss:Init()
         frame.db = db
         frame.GetDbName = function(self) return frameName end
         frame.orderedElements = A:OrderedMap()
+        frame.tags = A:OrderedMap()
         frame:SetParent(self.container)
 
         frame.Update = function(self, ...)
@@ -64,7 +65,7 @@ function Boss:Init()
 
     A:CreateMover(self.container, db, "Boss Header")
 
-    return frame
+    return container
 end
 
 function Boss:Update(...)
@@ -91,6 +92,10 @@ function Boss:Update(...)
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
+
+            for _,tag in next, db["Tags"] do
+                Units:Tag(self, tag)
+            end
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])

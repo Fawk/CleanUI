@@ -54,7 +54,6 @@ function Health:Init(parent)
 	end
 
 	health:Update(UnitEvent.UPDATE_DB, self.db)
-	health:Update(UnitEvent.UPDATE_TEXTS)
 	health:Update("UNIT_HEALTH_FREQUENT")
 
 	parent.orderedElements:set(elementName, health)
@@ -85,7 +84,6 @@ function Health:Update(...)
 		    :replace("[hp:round]", T:short(parent.currentHealth), 2)
 			:replace("[maxhp:round]", T:short(parent.currentMaxHealth), 2)
 			:replace("[hp:deficit]", parent.deficitHealth > 0 and string.format("-%d", T:short(parent.deficitHealth, 0)) or "")
-		)
 	elseif (event == UnitEvent.UPDATE_DB) then
 		
 		self:Update("UNIT_HEALTH_FREQUENT")
@@ -110,15 +108,6 @@ function Health:Update(...)
 			self.bg:Hide()
 		else
 			self.bg:Show()
-		end
-
-		self.tags:foreach(function(tag)
-			tag:Hide()
-		end)
-
-		local tags = db["Tags"] or {}
-		for _,tag in next, tags do
-			self.tags:add(tag)
 		end
 	end
 

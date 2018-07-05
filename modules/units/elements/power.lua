@@ -45,7 +45,6 @@ function Power:Init(parent)
 	end
 
 	power:Update(UnitEvent.UPDATE_DB, db)
-	power:Update(UnitEvent.UPDATE_TEXTS)
 	power:Update("UNIT_POWER_FREQUENT")
 
 	parent.orderedElements:set(elementName, power)
@@ -66,7 +65,7 @@ function Power:Update(...)
 		parent:Update(UnitEvent.UPDATE_POWER)
 		self:SetMinMaxValues(0, parent.currentMaxPower)
 	  	self:SetValue(parent.currentPower)
-	elseif (event == UnitEvent.UPDATE_TEXTS) then
+	elseif (event == UnitEvent.UPDATE_TAGS) then
 		parent:Update(UnitEvent.UPDATE_POWER)
 		local tag = arg1
 		tag.text = tag.format
@@ -103,15 +102,6 @@ function Power:Update(...)
 			self.bg:Hide()
 		else
 			self.bg:Show()
-		end
-
-		self.tags:foreach(function(tag)
-			tag:Hide()
-		end)
-
-		local tags = db["Tags"] or {}
-		for _,tag in next, tags do
-			self.tags:add(tag)
 		end
 	end
 

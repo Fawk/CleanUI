@@ -2201,7 +2201,7 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 		if not useBackdrop then
 			ref = frame.Background or CreateFrame("Frame", nil, frame)
 			ref:SetPoint("CENTER", frame, "CENTER", 0, 0)
-			ref:SetSize(frame:GetSize())
+			ref:SetSize(frame:GetWidth() + 3, frame:GetHeight() + 3)
 			ref:SetFrameStrata("LOW")
 			ref:SetFrameLevel(1)
 			ref:Show()
@@ -2209,19 +2209,21 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 		end
 		local offset = db["Background"]["Offset"]
 		ref:SetBackdrop({
-			bgFile = media:Fetch("statusbar", "Default"),
-			edgeFile = media:Fetch("border", "test-border"),
-			edgeSize = 2,
-			tile = true,
-			tileSize = 16,
-			insets = {
-				top = offset["Top"],
-				bottom = offset["Bottom"],
-				left = offset["Left"],
-				right = offset["Right"],
-			}
+	        bgFile = media:Fetch("background", "cui-default-bg"), 
+	        tile = true, 
+	        tileSize = 1,
+	        edgeFile = media:Fetch("border", "test-border"), 
+	        edgeSize = 3, 
+	        insets = { 
+	        	top = offset["Top"], 
+	        	bottom = offset["Bottom"], 
+	        	left = offset["Left"], 
+	        	right = offset["Right"] 
+	        } 
 		})
-		ref:SetBackdropColor(unpack(db["Background"]["Color"]))
+		local r, g, b, a = unpack(db["Background"]["Color"])
+		ref:SetBackdropColor(r, g, b, a or 1)
+        ref:SetBackdropBorderColor(r, g, b, a or 1)
 	else
 		ref:SetBackdrop(nil)
 	end

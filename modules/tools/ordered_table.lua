@@ -233,6 +233,9 @@ local MAP = {}
 MAP.__index = MAP
 
 function MAP:set(k, v)
+  if (not k) then 
+    return error("Map key is nil!")
+  end
   if (self.e[k]) then 
     return false
   else
@@ -250,7 +253,10 @@ end
 function MAP:foreach(func)
   for x = 1, self.c do
       local index = self.i[x]
-      func(index, self.e[index])
+      local r = func(index, self.e[index])
+      if (r) then
+        return r
+      end
   end
 end
 

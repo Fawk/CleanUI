@@ -26,7 +26,7 @@ local defaults =  {
     		["Options"] = {
     			["Player"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = -266.735260009766,
@@ -117,10 +117,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -154,10 +154,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -174,24 +174,7 @@ local defaults =  {
     					["Width"] = 200,
     					["Height"] = 51
     				},
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 14,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "Outline",
-                            ["Text"] = "[name]",
-                            ["Position"] = {
-                                ["Point"] = "TOPLEFT",
-                                ["Local Point"] = "BOTTOMLEFT",
-                                ["Offset X"] = 5,
-                                ["Offset Y"] = 2,
-                                ["Relative To"] = "Player"
-                            },
-                            ["Enabled"] = false
-                        },
-                        ["Custom"] = {}
-                    },
+                    ["Tags"] = {},
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
                         ["Texture"] = "Default2",
@@ -205,12 +188,12 @@ local defaults =  {
                     },
 					["Background"] = {
 						["Color"] = { 0, 0, 0 },
-						["Offset"] = {
-							["Top"] = -1,
-							["Bottom"] = -1,
-							["Left"] = -1,
-							["Right"] = -1
-						},
+                            ["Offset"] = {
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
+                            },
 						["Enabled"] = true,
 					},
                     ["Alternative Power"] = {
@@ -218,10 +201,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Enabled"] = true,
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Color"] = { 0, 0, 0 }
                         },
@@ -250,16 +233,16 @@ local defaults =  {
                             ["Offset Y"] = 0, 
                         },
                         ["Size"] = {
-                            ["Width"] = 20,
+                            ["Width"] = 25,
                             ["Height"] = 15
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -268,7 +251,8 @@ local defaults =  {
                         ["Texture"] = "Default2",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Combo Points"] = {
                         ["Enabled"] = true,
@@ -286,10 +270,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -297,7 +281,8 @@ local defaults =  {
                         ["Texture"] = "Default2",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Soul Shards"] = {
                         ["Enabled"] = true,
@@ -315,10 +300,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -326,7 +311,8 @@ local defaults =  {
                         ["Texture"] = "Default2",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Chi"] = {
                         ["Enabled"] = true,
@@ -344,10 +330,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -355,7 +341,8 @@ local defaults =  {
                         ["Texture"] = "Default2",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Arcane Charge"] = {
                         ["Enabled"] = true,
@@ -373,10 +360,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -384,7 +371,8 @@ local defaults =  {
                         ["Texture"] = "Default2",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below",
                     },
                     ["Holy Power"] = {
                         ["Enabled"] = true,
@@ -402,10 +390,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -429,11 +417,11 @@ local defaults =  {
                         },
                         ["Texture"] = "Default2",
                         ["Position"] = {
-                            ["Relative To"] = "Class Icons",
+                            ["Relative To"] = "FrameParent",
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = -1, 
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -479,10 +467,10 @@ local defaults =  {
                             ["Background"] = {
                                 ["Color"] = { 0, 0, 0 },
                                 ["Offset"] = {
-                                    ["Top"] = -1,
-                                    ["Bottom"] = -1,
-                                    ["Left"] = -1,
-                                    ["Right"] = -1
+                                    ["Top"] = 2,
+                                    ["Bottom"] = 2,
+                                    ["Left"] = 2,
+                                    ["Right"] = 2
                                 },
                                 ["Enabled"] = true
                             }
@@ -490,10 +478,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -519,10 +507,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -535,7 +523,7 @@ local defaults =  {
     			},
     			["Target"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = 265.640625,
@@ -626,10 +614,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -663,10 +651,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -683,40 +671,7 @@ local defaults =  {
     					["Width"] = 200,
     					["Height"] = 51
     				},
-					["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 10,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "OUTLINE",
-                            ["Text"] = "[name]",
-                            ["Position"] = {
-                                ["Point"] = "LEFT",
-                                ["Local Point"] = "LEFT",
-                                ["Offset X"] = 5,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Health"
-                            },
-                            ["Enabled"] = true
-                        },
-                        ["Custom"] = {
-                            ["Health Text"] = {
-                                ["Font"] = "NotoBold",
-                                ["Size"] = 10,
-                                ["Color"] = { 1, 1, 1 },
-                                ["Outline"] = "OUTLINE",
-                                ["Text"] = "[hp:round]",
-                                ["Position"] = {
-                                    ["Point"] = "RIGHT",
-                                    ["Local Point"] = "RIGHT",
-                                    ["Offset X"] = -5,
-                                    ["Offset Y"] = -10,
-                                    ["Relative To"] = "Target"
-                                },
-                                ["Enabled"] = true
-                            } 
-                        }
-                    },
+					["Tags"] = {},
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
                         ["Texture"] = "Default2",
@@ -730,12 +685,12 @@ local defaults =  {
                     },
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
-                        ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
-                        },
+                            ["Offset"] = {
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
+                            },
                         ["Enabled"] = true,
                     },
                     ["Castbar"] = {
@@ -802,10 +757,10 @@ local defaults =  {
                             ["Background"] = {
                                 ["Color"] = { 0, 0, 0 },
                                 ["Offset"] = {
-                                    ["Top"] = -1,
-                                    ["Bottom"] = -1,
-                                    ["Left"] = -1,
-                                    ["Right"] = -1
+                                    ["Top"] = 2,
+                                    ["Bottom"] = 2,
+                                    ["Left"] = 2,
+                                    ["Right"] = 2
                                 },
                                 ["Enabled"] = true
                             }
@@ -813,10 +768,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -826,10 +781,10 @@ local defaults =  {
     			},
                 ["Target of Target"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Target",
-                        ["Point"] = "BOTTOMRIGHT",
-                        ["Local Point"] = "BOTTOMLEFT",
-                        ["Offset X"] = 0,
+                        ["Relative To"] = "FrameParent",
+                        ["Point"] = "CENTER",
+                        ["Local Point"] = "CENTER",
+                        ["Offset X"] = 400,
                         ["Offset Y"] = 0,
                     },
                     ["Castbar"] = {
@@ -896,10 +851,10 @@ local defaults =  {
                             ["Background"] = {
                                 ["Color"] = { 0, 0, 0 },
                                 ["Offset"] = {
-                                    ["Top"] = -1,
-                                    ["Bottom"] = -1,
-                                    ["Left"] = -1,
-                                    ["Right"] = -1
+                                    ["Top"] = 2,
+                                    ["Bottom"] = 2,
+                                    ["Left"] = 2,
+                                    ["Right"] = 2
                                 },
                                 ["Enabled"] = true
                             }
@@ -907,10 +862,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -1049,31 +1004,14 @@ local defaults =  {
                         ["Width"] = 100,
                         ["Height"] = 25
                     },
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 10,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "SHADOW",
-                            ["Text"] = "[name]",
-                            ["Position"] = {
-                                ["Point"] = "LEFT",
-                                ["Local Point"] = "LEFT",
-                                ["Offset X"] = 5,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Health"
-                            },
-                            ["Enabled"] = true
-                        },
-                        ["Custom"] = {}
-                    },
+                    ["Tags"] = {},
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -1207,24 +1145,7 @@ local defaults =  {
                     },
                     ["Orientation"] = "HORIZONTAL",
                     ["Growth Direction"] = "Right",
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 12,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "SHADOW",
-                            ["Text"] = "[3charname]",
-                            ["Position"] = {
-                                ["Point"] = "ALL",
-                                ["Local Point"] = "ALL",
-                                ["Offset X"] = 0,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Parent"
-                            },
-                            ["Enabled"] = true,
-                        },
-                        ["Custom"] = {}
-                    },
+                    ["Tags"] = {},
                     ["Raid Buffs"] = {
                         ["Limit"] = 40,
                         ["Tracked"] = {
@@ -1272,10 +1193,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -1437,24 +1358,7 @@ local defaults =  {
                         ["Height"] = 47
                     },
                     ["Growth Direction"] = "Right Then Down",
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 12,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "SHADOW",
-                            ["Text"] = "[3charname]",
-                            ["Position"] = {
-                                ["Point"] = "ALL",
-                                ["Local Point"] = "ALL",
-                                ["Offset X"] = 0,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Parent"
-                            },
-                            ["Enabled"] = true,
-                        },
-                        ["Custom"] = {}
-                    },
+                    ["Tags"] = {},
                     ["Raid Buffs"] = {
                         ["Tracked"] = {},
                         ["Important"] = true,
@@ -1496,10 +1400,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -1507,7 +1411,7 @@ local defaults =  {
                 },
                 ["Pet"] = {
                     ["Position"] = {
-                        ["Relative To"] = "Parent",
+                        ["Relative To"] = "FrameParent",
                         ["Point"] = "CENTER",
                         ["Local Point"] = "CENTER",
                         ["Offset X"] = -265.640625,
@@ -1598,10 +1502,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -1635,10 +1539,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -1655,40 +1559,7 @@ local defaults =  {
                         ["Width"] = 200,
                         ["Height"] = 22
                     },
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 10,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "OUTLINE",
-                            ["Text"] = "[name]",
-                            ["Position"] = {
-                                ["Point"] = "LEFT",
-                                ["Local Point"] = "LEFT",
-                                ["Offset X"] = 5,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Health"
-                            },
-                            ["Enabled"] = true
-                        },
-                        ["Custom"] = {
-                            ["Health Text"] = {
-                                ["Font"] = "NotoBold",
-                                ["Size"] = 10,
-                                ["Color"] = { 1, 1, 1 },
-                                ["Outline"] = "OUTLINE",
-                                ["Text"] = "[hp:round]",
-                                ["Position"] = {
-                                    ["Point"] = "RIGHT",
-                                    ["Local Point"] = "RIGHT",
-                                    ["Offset X"] = -5,
-                                    ["Offset Y"] = -10,
-                                    ["Relative To"] = "Target"
-                                },
-                                ["Enabled"] = true
-                            } 
-                        }
-                    },
+                    ["Tags"] = {},
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
                         ["Texture"] = "Default2",
@@ -1703,10 +1574,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -1774,10 +1645,10 @@ local defaults =  {
                             ["Background"] = {
                                 ["Color"] = { 0, 0, 0 },
                                 ["Offset"] = {
-                                    ["Top"] = -1,
-                                    ["Bottom"] = -1,
-                                    ["Left"] = -1,
-                                    ["Right"] = -1
+                                    ["Top"] = 2,
+                                    ["Bottom"] = 2,
+                                    ["Left"] = 2,
+                                    ["Right"] = 2
                                 },
                                 ["Enabled"] = true
                             }
@@ -1874,34 +1745,17 @@ local defaults =  {
                         }
                     },
                     ["Orientation"] = "VERTICAL",
-                    ["Tags"] = {
-                        ["Name"] = {
-                            ["Font"] = "NotoBold",
-                            ["Size"] = 10,
-                            ["Color"] = { 1, 1, 1 },
-                            ["Outline"] = "SHADOW",
-                            ["Text"] = "[name]",
-                            ["Position"] = {
-                                ["Point"] = "ALL",
-                                ["Local Point"] = "ALL",
-                                ["Offset X"] = 0,
-                                ["Offset Y"] = 0,
-                                ["Relative To"] = "Parent"
-                            },
-                            ["Enabled"] = true,
-                        },
-                        ["Custom"] = {}
-                    },
+                    ["Tags"] = {},
                     ["Offset X"] = 2,
                     ["Offset Y"] = 0,
                     ["Highlight Target"] = true,
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -1969,10 +1823,10 @@ local defaults =  {
                             ["Background"] = {
                                 ["Color"] = { 0, 0, 0 },
                                 ["Offset"] = {
-                                    ["Top"] = -1,
-                                    ["Bottom"] = -1,
-                                    ["Left"] = -1,
-                                    ["Right"] = -1
+                                    ["Top"] = 2,
+                                    ["Bottom"] = 2,
+                                    ["Left"] = 2,
+                                    ["Right"] = 2
                                 },
                                 ["Enabled"] = true
                             }
@@ -1980,10 +1834,10 @@ local defaults =  {
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0 },
                             ["Offset"] = {
-                                ["Top"] = -1,
-                                ["Bottom"] = -1,
-                                ["Left"] = -1,
-                                ["Right"] = -1
+                                ["Top"] = 2,
+                                ["Bottom"] = 2,
+                                ["Left"] = 2,
+                                ["Right"] = 2
                             },
                             ["Enabled"] = true,
                         },
@@ -2160,10 +2014,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -2189,10 +2043,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -2217,10 +2071,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },
@@ -2246,10 +2100,10 @@ local defaults =  {
                     ["Background"] = {
                         ["Color"] = { 0, 0, 0 },
                         ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
+                            ["Top"] = 2,
+                            ["Bottom"] = 2,
+                            ["Left"] = 2,
+                            ["Right"] = 2
                         },
                         ["Enabled"] = true,
                     },

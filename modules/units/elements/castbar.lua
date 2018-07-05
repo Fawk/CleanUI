@@ -31,50 +31,54 @@ function Castbar:Init(parent)
 	local width = size["Match width"] and parent:GetWidth() or size["Width"]
 	local height = size["Match height"] and parent:GetWidth() or size["Height"]
 
-	local bar = parent.orderedElements:get(elementName)
-	if (not bar) then
-		bar = CreateFrame("StatusBar", T:frameName(parent:GetName(), elementName), parent)
+	local container = parent.orderedElements:get(elementName)
+	if (not container) then
+		container = CreateFrame("Frame", T:frameName(parent:GetName(), elementName), parent)
+		container.db = db
+		
+		local bar = CreateFrame("StatusBar", nil, parent)
 		bar.db = db
-
-		local name = buildText(bar, db["Name"]["Font Size"]):shadow():enforceHeight():build()
-		name:SetText("")
-
-		local time = buildText(bar, db["Time"]["Font Size"]):shadow():build()
-		time:SetText("")
-
-		bar.Text = name
-		bar.Time = time
-		bar.Icon = bar:CreateTexture(nil, "OVERLAY")
-		bar.Icon:SetTexCoord(0.133,0.867,0.133,0.867)
-		bar.bg = bar:CreateTexture(nil, "BORDER")
+		bar.bg = container:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
-		bar.missingBar = CreateFrame("StatusBar", nil, bar)
+		local name = buildText(container, db["Name"]["Font Size"]):shadow():enforceHeight():build()
+		name:SetText("")
 
-		bar.Update = function(self, event, ...)
+		local time = buildText(container, db["Time"]["Font Size"]):shadow():build()
+		time:SetText("")
+
+		container.bar = bar
+		container.Text = name
+		container.Time = time
+		container.Icon = container:CreateTexture(nil, "OVERLAY")
+		container.Icon:SetTexCoord(0.133,0.867,0.133,0.867)
+
+		container.missingBar = CreateFrame("StatusBar", nil, container)
+
+		container.Update = function(self, event, ...)
 	    	Castbar:Update(self, event, ...)
 	   	end
 
-		bar:RegisterEvent('UNIT_SPELLCAST_START')
-		bar:RegisterEvent('UNIT_SPELLCAST_FAILED')
-		bar:RegisterEvent('UNIT_SPELLCAST_STOP')
-		bar:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED')
-		bar:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE')
-		bar:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE')
-		bar:RegisterEvent('UNIT_SPELLCAST_DELAYED')
-		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START')
-		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
-		bar:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
-	    bar:SetScript("OnEvent", function(self, event, ...)
+		container:RegisterEvent('UNIT_SPELLCAST_START')
+		container:RegisterEvent('UNIT_SPELLCAST_FAILED')
+		container:RegisterEvent('UNIT_SPELLCAST_STOP')
+		container:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED')
+		container:RegisterEvent('UNIT_SPELLCAST_INTERRUPTIBLE')
+		container:RegisterEvent('UNIT_SPELLCAST_NOT_INTERRUPTIBLE')
+		container:RegisterEvent('UNIT_SPELLCAST_DELAYED')
+		container:RegisterEvent('UNIT_SPELLCAST_CHANNEL_START')
+		container:RegisterEvent('UNIT_SPELLCAST_CHANNEL_UPDATE')
+		container:RegisterEvent('UNIT_SPELLCAST_CHANNEL_STOP')
+	    container:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(UnitEvent.UPDATE_CASTBAR, event, ...)
 	    end)
 
-		bar:HookScript("OnShow", function(self)
-			self:SetStatusBarTexture(texture)
-			self.bg:SetTexture(texture)
+		container:HookScript("OnShow", function(self)
+			self.bar:SetStatusBarTexture(texture)
+			self.bar.bg:SetTexture(texture)
 		end)
 
-		if (parent.unit == 'player') then
+		if (parent.unit == "player") then
 			CastingBarFrame:UnregisterAllEvents()
 			CastingBarFrame.Show = CastingBarFrame.Hide
 			CastingBarFrame:Hide()
@@ -85,13 +89,12 @@ function Castbar:Init(parent)
 		end
 	end
 
-	bar:SetSize(width, height)
+	container:SetSize(width, height)
 
-	bar:Update(UnitEvent.UPDATE_DB, self.db)
-	bar:Update(UnitEvent.UPDATE_TEXTS)
-	bar:Update(UnitEvent.UPDATE_CASTBAR)
+	container:Update(UnitEvent.UPDATE_DB)
+	container:Update(UnitEvent.UPDATE_CASTBAR)
 
-	parent.orderedElements:set(elementName, bar)
+	parent.orderedElements:set(elementName, container)
 end
 
 function Castbar:Update(...)
@@ -99,32 +102,34 @@ function Castbar:Update(...)
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
 	local db = self.db or arg2
+	local bar = self.bar
 
 	if (event == UnitEvent.UPDATE_DB) then
 		Units:Position(self.Text, db["Name"]["Position"])
 		Units:Position(self.Time, db["Time"]["Position"])
 
-		self:SetStatusBarTexture(texture)
-		self.bg:SetTexture(texture)
+		bar:SetStatusBarTexture(texture)
+		bar.bg:SetTexture(texture)
 
 		CheckEnabled(self.Text, db["Name"])
 		CheckEnabled(self.Time, db["Time"])
 		CheckEnabled(self.Icon, db["Icon"])
 
 		T:Background(self, db, nil, true)
+		self:SetBackdropBorderColor(0, 0, 0, 0)
 
 		local iconW, iconH
 		local iconDb = db["Icon"]
 
-		if iconDb["Enabled"] then
+		if (iconDb["Enabled"]) then
 
 			local size = iconDb["Size"]
-			local width, height = parent:GetSize()
+			local width, height = self:GetSize()
 
-			if size["Match width"] then
+			if (size["Match width"]) then
 				iconW = width
 				iconH = width
-			elseif size["Match height"] then
+			elseif (size["Match height"]) then
 				iconH = height
 				iconW = height
 			else
@@ -134,14 +139,35 @@ function Castbar:Update(...)
 
 			self.Icon:SetSize(iconW, iconH)
 			T:Background(self, iconDb, self.Icon, false)
+			self.Icon.bg:SetBackdropBorderColor(0, 0, 0, 0)
 
-			self.Icon:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 1)
-			self:SetPoint("LEFT", self.Icon, "RIGHT", 1, 0)
+			local iconPosition = iconDb["Position"]
+			if (iconPosition == "LEFT") then
+				self.Icon:SetPoint("LEFT", self, "LEFT", 1, 0)
+				bar:SetPoint("LEFT", self.Icon, "RIGHT", 1, 0)
+				bar:SetPoint("RIGHT", self, "RIGHT", -1, 0)
+			elseif (iconPosition == "RIGHT") then
+				self.Icon:SetPoint("RIGHT", self, "RIGHT", -1, 0)
+				bar:SetPoint("RIGHT", self.Icon, "LEFT", -1, 0)
+				bar:SetPoint("LEFT", self, "LEFT", 1, 0)
+			elseif (iconPosition == "TOP") then
+				self.Icon:SetPoint("TOP", self, "TOP", 0, -1)
+				bar:SetPoint("TOP", self.Icon, "BOTTOM", 0, -1)
+				bar:SetPoint("BOTTOM", self, "BOTTOM", 0, -1)
+			else
+				self.Icon:SetPoint("BOTTOM", self, "BOTTOM", 0, 1)
+				bar:SetPoint("BOTTOM", self.Icon, "TOP", 0, 1)
+				bar:SetPoint("TOP", self, "TOP", 0, 1)
+			end
 		else
-			self:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 1)
+			if (db["Orientation"] == "HORIZONTAL") then
+				bar:SetPoint("LEFT", parent, "LEFT", 1, 0)
+			else
+				bar:SetPoint("BOTTOM", parent, "BOTTOM", 0, 1)
+			end
 		end
 
-		Units:PlaceCastbar(parent, db)
+		Units:PlaceCastbar(self, db)
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
@@ -155,11 +181,11 @@ function Castbar:Update(...)
 			self.Text:SetText(name)
 			self.Time:SetText(duration / 1e3)
 
-			self:SetMinMaxValues(parent.castBarStart, parent.castBarEnd)
-			self:SetValue(duration + arg2)
+			--self:SetMinMaxValues(parent.castBarStart, parent.castBarEnd)
+			--self:SetValue(duration + arg2)
 		end
 	end
 
 	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarStart, parent.castBarEnd, A.noop, A.ColorBar)
-	A:ColorBar(self, parent, parent.castBarStart, parent.castBarEnd, A.noop)
+	A:ColorBar(self.bar, parent, parent.castBarStart, parent.castBarEnd, A.noop)
 end

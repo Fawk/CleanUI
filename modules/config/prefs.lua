@@ -3,6 +3,7 @@ local GetScreenWidth = GetScreenWidth
 local GetScreenHeight = GetScreenHeight
 local CreateFrame = CreateFrame
 local UnitClass = UnitClass
+local GetSpecialization = GetSpecialization
 
 local buildText = A.TextBuilder
 local buildButton = A.ButtonBuilder
@@ -1679,7 +1680,7 @@ function A:CreatePrefs(db)
                                     type = "dropdown",
                                     order = 1,
                                     placement = function(self)
-                                        self:SetPoint("LEFT", self.parent, "RIGHT", 150, 0)
+                                        self:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
                                     end,
                                     values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
                                     get = genericGetValue,
@@ -1958,8 +1959,13 @@ function A:CreatePrefs(db)
                             end,
                             children = {}
                         },
-                        ["Class Power"] = {
-                            enabled = genericEnabled,
+                        ["Runes"] = {
+                            enabled = function(self)
+                                return self.parent:enabled() and self:special()
+                            end,
+                            special = function(self)
+                                return select(2, UnitClass("player")) == "DEATHKNIGHT"
+                            end,
                             canToggle = true,
                             onClick = genericOnClick,
                             type = "group",
@@ -1985,7 +1991,7 @@ function A:CreatePrefs(db)
                                 return self.parent:enabled() and self:special()
                             end,
                             special = function(self)
-                                return select(2, UnitClass("player")) == "MONK"
+                                return select(2, UnitClass("player")) == "MONK" and GetSpecialization() == 1
                             end,
                             canToggle = true,
                             onClick = genericOnClick,
@@ -2017,6 +2023,110 @@ function A:CreatePrefs(db)
                                 self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
                             end,
                             children = {}
+                        },
+                        ["Background"] = {
+                            enabled = genericEnabled,
+                            canToggle = true,
+                            onClick = genericOnClick,
+                            type = "group",
+                            order = 10,
+                            placement = function(self)
+                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                            end,
+                            children = {
+                                ["Color"] = {
+                                    type = "color",
+                                    order = 1,
+                                    placement = function(self)
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
+                                        self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+                                    end,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 20,
+                                    height = 20
+                                },
+                                ["Offset"] = {
+                                    canToggle = false,
+                                    onClick = genericOnClick,
+                                    type = "group",
+                                    order = 2,
+                                    placement = function(self)
+                                        self:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -5)
+                                    end,
+                                    children = {
+                                        ["Top"] = {
+                                            type = "number",
+                                            order = 1,
+                                            placement = function(self)
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                            end,
+                                            step = 1,
+                                            decimals = false,
+                                            min = -100,
+                                            max = 100,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 50,
+                                            height = 20
+                                        },
+                                        ["Bottom"] = {
+                                            type = "number",
+                                            order = 2,
+                                            placement = function(self)
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                            end,
+                                            step = 1,
+                                            decimals = false,
+                                            min = -100,
+                                            max = 100,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 50,
+                                            height = 20
+                                        },
+                                        ["Left"] = {
+                                            type = "number",
+                                            order = 3,
+                                            placement = function(self)
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                            end,
+                                            step = 1,
+                                            decimals = false,
+                                            min = -100,
+                                            max = 100,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 50,
+                                            height = 20
+                                        },
+                                        ["Right"] = {
+                                            type = "number",
+                                            order = 4,
+                                            placement = function(self)
+                                                self.title:ClearAllPoints()
+                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                                self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                            end,
+                                            step = 1,
+                                            decimals = false,
+                                            min = -100,
+                                            max = 100,
+                                            get = genericGetValue,
+                                            set = genericSetValue,
+                                            width = 50,
+                                            height = 20
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 },

@@ -34,39 +34,28 @@ end
 
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
-    if units[relative] then
+    if (units[relative]) then
         return units[relative]
-    elseif (parent.orderedElements and parent.orderedElements:get(relative)) then 
-        return parent.orderedElements:get(relative)
-    elseif (A["Shared Elements"]:get(relative)) then
-        if frame[relative] then
-            return frame[relative]
-        elseif parent[relative] then
-            return parent[relative]
-        else
-            return parent
+    elseif (A["Player Elements"]:get(relative) or A["Shared Elements"]:get(relative)) then
+        if (frame.orderedElements and frame.orderedElements:get(relative)) then
+            return frame.orderedElements:get(relative)
+        elseif (parent.orderedElements and parent.orderedElements:get(relative)) then
+            return parent.orderedElements:get(relative)
         end
-    elseif (A["Player Elements"]:get(relative)) then
-        if frame[relative] then
-            return frame[relative]
-        elseif parent[relative] then
-            return parent[relative]
-        else
-            return parent
-        end
-    elseif relative:equals(parent:GetName(), "Parent") then
         return parent
-    elseif relative:equals(parent:GetName(), "FrameParent") then
-        return A["Frameparent"]
+    elseif (relative:equals(parent:GetName(), "Parent")) then
+        return parent
+    elseif (relative:equals(parent:GetName(), "FrameParent")) then
+        return A.frameParent
     else
         A:Debug("Could not find relative frame '", relative, "' for frame '", name or "Unknown", "' using Frameparent.")
-        return A["Frameparent"]
+        return A.frameParent
     end
 end
  
 function Units:Position(frame, db)
     frame:ClearAllPoints()
-    if db["Local Point"] == "ALL" then
+    if (db["Local Point"] == "ALL") then
         frame:SetAllPoints()
     else
         local x, y = db["Offset X"], db["Offset Y"]
@@ -92,7 +81,7 @@ function Units:Attach(frame, db, override)
 end
 
 local function getClassPowerRelative(frame)
-    A["Player Elements"]:foreach(function(key, element)
+    return A["Player Elements"]:foreach(function(key, element)
         local target = frame.orderedElements:get(key)
         if (element.isClassPower and target) then
             return target
@@ -130,7 +119,7 @@ function Units:SetupKeybindings(frame, db)
     end
 end
 
-function Units:Tag(frame, db)  
+function Units:Tag(frame, db)
     local name = db["Name"]
     local tag = frame.tags:get(name)
     if (not tag) then

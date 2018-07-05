@@ -5,40 +5,92 @@ local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSha
 local CreateFrame = CreateFrame
 local GetSpecialization = GetSpecialization
 local UnitClass = UnitClass
+local UnitStagger = UnitStagger
 
 --[[ Locals ]]
 local elementName = "Stagger"
 local Stagger = { isClassPower = true }
+local events = { "UNIT_POWER_FREQUENT" }
 
 function Stagger:Init(parent)
-	if (select(2, UnitClass("player")) ~= "MONK") then
+	if (select(2, UnitClass("player")) ~= "MONK" or (GetSpecialization() ~= 1)) then
 		return
 	end
 
-	local parentName = parent:GetDbName()
 	local db = parent.db[elementName]
-
 	local size, texture = db["Size"], media:Fetch("statusbar", db["Texture"])
 
-	local stagger = frame.Stagger or (function()
-		local stagger = CreateFrame("StatusBar", T:frameName("Stagger"), frame)
+	local stagger = parent.orderedElements:get(elementName)
+	if (not stagger) then
+		local stagger = CreateFrame("StatusBar", T:frameName(parent:GetName(), "Stagger"), frame)
+		stagger.db = db
 		stagger.bg = stagger:CreateTexture(nil, "BORDER")
 		stagger.bg:SetAllPoints()
 		stagger.bg.multiplier = db["Background Multiplier"] or 0.3
-		return stagger
-	end)()
 
-	Units:Position(stagger, db["Position"])
+		local tagEventFrame = parent.tagEventFrame
+	   	if (tagEventFrame) then
+	   		Units:RegisterEvents(tagEventFrame, events)
+	   	end
 
-	stagger:SetSize(size["Match width"] and frame:GetWidth() or size["Width"], size["Match height"] and frame:GetHeight() or size["Height"])
-	stagger:SetStatusBarTexture(texture)
-	stagger.bg:SetTexture(texture)
+	   	Units:RegisterEvents(stagger, events, true)
+	    stagger:SetScript("OnEvent", function(self, event, ...)
+	    	self:Update(event, ...)
+		end)
 
-	U:CreateBackground(stagger, db, true)
+		MonkStaggerBar:UnregisterEvent('PLAYER_ENTERING_WORLD')
+		MonkStaggerBar:UnregisterEvent('PLAYER_SPECIALIZATION_CHANGED')
+		MonkStaggerBar:UnregisterEvent('UNIT_DISPLAYPOWER')
+		MonkStaggerBar:UnregisterEvent('UPDATE_VEHICLE_ACTION_BAR')
+	end
 
-	Units:PlaceCastbar(frame, nil, true)
+	Stagger:Update(stagger, UnitEvent.UPDATE_DB)
+	Stagger:Update(stagger, UnitEvent.UPDATE_TAGS)
 
-	frame.Stagger = stagger
+	parent.orderedElements:set(elementName, stagger)
 end
 
-A["Player Elements"]:add(elementName, Stagger)
+function Stagger:Update(...)
+	
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+	local parent = self:GetParent()
+
+	local staggerValue = UnitStagger("player")
+
+	if (event == UnitEvent.UPDATE_TAGS) then
+		local tag = arg1
+		tag.text = tag.format
+			:replace("[stagger]", staggerValue)
+	elseif (event == UnitEvent.UPDATE_DB) then
+		local db = self.db or arg1
+		Units:Position(self, db["Position"])
+
+		local texture = media:Fetch("statusbar", db["Texture"])
+		local size = db["Size"]
+
+		self:SetOrientation(db["Orientation"])
+		self:SetReverseFill(db["Reversed"])
+		self:SetStatusBarTexture(texture)
+		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
+		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		
+		self.bg:ClearAllPoints()
+		self.bg:SetAllPoints()
+		self.bg:SetTexture(texture)
+
+		self:SetMinMaxValues(0, parent.currentMaxHealth)
+		self:SetValue(staggerValue)
+		
+		U:CreateBackground(stagger, db, true)
+
+		if (db["Background Multiplier"] == -1) then
+			self.bg:Hide()
+		else
+			self.bg:Show()
+		end
+
+		Units:Attach(self, db)
+	end
+end
+
+A["Player Elements"]:set(elementName, Stagger)

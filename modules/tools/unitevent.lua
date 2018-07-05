@@ -9,4 +9,5 @@ UnitEvent = {
     UPDATE_TAGS       = 6,
     UPDATE_DB         = 7,
     UPDATE_CASTBAR    = 8,
+    UPDATE_STAGGER    = 9,
 }

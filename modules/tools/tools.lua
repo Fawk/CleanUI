@@ -237,9 +237,9 @@ function T:Background(frame, db, anchor, isBackdrop)
 			target:SetBackdrop({
 				bgFile = media:Fetch("statusbar", "Default"),
 				edgeFile = media:Fetch("border", "test-border"),
-				edgeSize = 2,
+				edgeSize = 3,
 				tile = true,
-				tileSize = 16,
+				tileSize = 1,
 				insets = {
 					top = offset["Top"],
 					bottom = offset["Bottom"],
@@ -249,6 +249,7 @@ function T:Background(frame, db, anchor, isBackdrop)
 			})
 		end
 		target:SetBackdropColor(unpack(db["Background"]["Color"]))
+		target:SetBackdropBorderColor(unpack(db["Background"]["Color"]))
 	else
 		target:SetBackdrop(nil)
 	end

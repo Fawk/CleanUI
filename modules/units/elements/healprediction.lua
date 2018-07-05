@@ -1,5 +1,6 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
+local Units = A.Units
 local T = A.Tools
 
 --[[ Blizzard ]]
@@ -135,7 +136,6 @@ function HealPrediction:Init(parent)
 	end
 
 	healPrediction:Update(UnitEvent.UPDATE_DB, db)
-	healPrediction:Update(UnitEvent.UPDATE_TEXTS)
 	healPrediction:Update("UNIT_HEALTH_FREQUENT")
 
 	parent.orderedElements:set(elementName, healPrediction)
@@ -179,7 +179,6 @@ function HealPrediction:Update(...)
 			:replace("[healabsorb]", parent.healAbsorb)
 			:replace("[healabsorb:round]", T:short(parent.healAbsorb, 2))
 			:replace("[perabsorb]", math.floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
-		)
 	else
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 

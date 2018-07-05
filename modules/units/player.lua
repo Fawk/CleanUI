@@ -4,8 +4,6 @@ local E, T, U,  Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSh
 local Player = {}
 local frameName = "Player"
 
-local Player = {}
-
 function Player:Init()
 
     local db = A["Profile"]["Options"][frameName]
@@ -22,18 +20,18 @@ function Player:Init()
         self:Update(UnitEvent.UPDATE_DB, db)
     end)
 
-    A:CreateMover(frame, db, frameName)
-
     frame.Update = function(self, ...)
         Player:Update(self, ...)
     end
 
-    -- Player specific elements
     A["Player Elements"]:foreach(function(key, element)
         element:Init(frame, db[key])
     end)
 
     frame:Update(UnitEvent.UPDATE_DB, db)
+    Units:Position(frame, db["Position"])
+
+    A:CreateMover(frame, db, frameName)
 
     return frame
 end
@@ -48,9 +46,8 @@ function Player:Update(...)
         if (event == UnitEvent.UPDATE_DB) then
             
             local db = self.db or arg2
-            local position, size = db["Position"], db["Size"]
+            local size = db["Size"]
 
-            Units:Position(self, position)
             self:SetSize(size["Width"], size["Height"])
 
             --[[ Bindings ]]--
@@ -62,8 +59,10 @@ function Player:Update(...)
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
-            self.Background:SetBackdropColor(0, 0, 0, 0)
-            self.Background:SetBackdropBorderColor(1, 0, 0, 1)
+
+            for _,tag in next, db["Tags"] do
+                Units:Tag(self, tag)
+            end
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])

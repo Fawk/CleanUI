@@ -145,6 +145,20 @@ function Addon:OnEnable()
 		return control
 	end
 
+	local frame = CreateFrame("Frame", nil, self.frameParent)
+	frame:SetSize(250, 100)
+	--frame:SetPoint("CENTER")
+	frame:SetBackdrop({
+        bgFile = media:Fetch("background", "cui-default-bg"), 
+        tile = true, 
+        tileSize = 1, 
+        edgeFile = media:Fetch("border", "test-border"), 
+        edgeSize = 3, 
+        insets = { top = 2, bottom = 2, left = 2, right = 2 } 
+    })
+    frame:SetBackdropColor(0, 0, 0, 1)
+    frame:SetBackdropBorderColor(1, 0, 0, 1)
+
     Addon:CreatePrefs(Addon["Profile"]["Options"])
 
 	collectgarbage("collect");
