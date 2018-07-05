@@ -116,7 +116,6 @@ function Castbar:Update(...)
 		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
 
 		T:Background(self, db, nil, true)
-		self:SetBackdropBorderColor(0, 0, 0, 1)
 
 		local iconW, iconH
 		local iconDb = db["Icon"]
@@ -145,23 +144,23 @@ function Castbar:Update(...)
 			if (iconPosition == "LEFT") then
 				self.Icon:SetPoint("LEFT", self, "LEFT", 1, 0)
 				bar:SetPoint("TOPLEFT", self.Icon, "TOPRIGHT", 1, 0)
-				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 0)
+				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, -1)
 			elseif (iconPosition == "RIGHT") then
 				self.Icon:SetPoint("RIGHT", self, "RIGHT", -1, 0)
 				bar:SetPoint("TOPRIGHT", self.Icon, "TOPLEFT", -1, 0)
-				bar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 1, 0)
+				bar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 1, -1)
 			elseif (iconPosition == "TOP") then
 				self.Icon:SetPoint("TOP", self, "TOP", 0, -1)
-				bar:SetPoint("TOPLEFT", self.Icon, "BOTTOMLEFT", 1, -1)
+				bar:SetPoint("TOPLEFT", self.Icon, "BOTTOMLEFT", 0, 1)
 				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, -1)
 			else
 				self.Icon:SetPoint("BOTTOM", self, "BOTTOM", 0, 1)
-				bar:SetPoint("BOTTOMLEFT", self.Icon, "TOPLEFT", 1, 1)
+				bar:SetPoint("BOTTOMLEFT", self.Icon, "TOPLEFT", 0, 1)
 				bar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -1, 1)
 			end
 		else
-			bar:SetPoint("TOPLEFT", parent, "TOPLEFT", 1, 1)
-			bar:SetPoint("BOTTOM", parent, "BOTTOM", 0, 1)
+			bar:SetPoint("TOPLEFT", parent, "TOPLEFT", 1, -1)
+			bar:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -1, 1)
 		end
 
 		Units:PlaceCastbar(self, db)

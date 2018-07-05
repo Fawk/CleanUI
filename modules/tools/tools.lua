@@ -208,7 +208,7 @@ function T:Background(frame, db, anchor, isBackdrop)
 					if (not width) then
 						width, height = frame:GetSize()
 					end
-					f:SetSize(width, height)
+					f:SetSize(width + 3, height + 3)
 					anchor.bg = f
 					target = anchor.bg
 				end
@@ -225,7 +225,7 @@ function T:Background(frame, db, anchor, isBackdrop)
 					if (not width) then
 						width, height = frame:GetSize()
 					end
-					f:SetSize(width, height)
+					f:SetSize(width + 3, height + 3)
 					anchor = f
 					target = anchor
 					frame["Background Anchor"] = anchor
