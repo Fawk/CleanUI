@@ -196,17 +196,30 @@ function Unit:Update(...)
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
         end
 
-        self.castBarDelay = self.castBarDelay + (self.castBarEnd - GetTime()) - (endTime - GetTime())
+        if (self.castBarEnd) then
+            self.castBarDelay = self.castBarDelay + (self.castBarEnd - GetTime()) - ((endTime and endTime / 1e3 or 0) - GetTime())
+        else
+            self.castBarDelay = 0
+        end
         self.castBarSpell = name
         self.castBarSpellId = spellID
         self.castBarTexture = texture
-        self.castBarStart = startTime
-        self.castBarEnd = endTime
+        self.castBarStart = (startTime or 0) / 1e3
+        self.castBarEnd = (endTime or 0) / 1e3
+        self.castBarDuration = GetTime() - self.castBarStart
+
+        if (self.castBarDuration < 0) then
+            self.castBarDuration = 0
+        end
+
+        self.castBarMax = self.castBarEnd - self.castBarStart
         self.castBarCastId = castID
         self.castBarInterruptable = not notInterruptible
 
         if (self.castBarSpell) then
             self.casting = true
+        else
+            self.casting = false
         end
     end
 

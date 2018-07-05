@@ -415,7 +415,7 @@ function T:short(value, decimals)
     elseif (value > 1e3) then
         return string.format("%."..decimals.."f", value/1e3).."K"
     else
-        return value
+        return string.format("%."..decimals.."f", value)
     end
 end
 
