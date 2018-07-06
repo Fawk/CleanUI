@@ -84,7 +84,7 @@ local function getClassPowerRelative(frame)
     return A["Player Elements"]:foreach(function(key, element)
         local target = frame.orderedElements:get(key)
         if (element.isClassPower and target and target:IsShown()) then
-            return target
+            return target.ExtraAttachLogic and target:ExtraAttachLogic() or target
         end
     end)
 end

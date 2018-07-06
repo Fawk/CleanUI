@@ -525,6 +525,7 @@ local defaults =  {
                         },
                         ["Background Multiplier"] = 0.33,
                         ["Attached Position"] = "Below",
+                        ["Place After Chi"] = true,
                         ["Attached"] = true
                     },
                     ["Combat Indicator"] = {

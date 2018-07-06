@@ -18,6 +18,22 @@ local function notValid(frame)
 	end
 end
 
+function Stagger:Attach(stagger, parent)
+	local chi = parent.orderedElements:get("Chi")
+	if (chi.db["Attached"]) then
+		if (chi.db["Attached Position"] == stagger.db["Attached Position"]) then
+			if (stagger.db["Place After Chi"]) then
+				Units:Attach(stagger, stagger.db, chi)
+			else
+				Units:Attach(stagger, stagger.db)
+				Units:Attach(chi, chi.db, stagger)
+			end
+		end
+	else
+		Units:Attach(stagger, stagger.db)
+	end
+end
+
 function Stagger:Init(parent)
 	local db = parent.db[elementName]
 	local texture = media:Fetch("statusbar", db["Texture"])
@@ -119,7 +135,7 @@ function Stagger:Update(...)
 		
 		U:CreateBackground(self, db, false)
 
-		Units:Attach(self, db)
+		Stagger:Attach(self, parent)
 	else
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 		self:SetValue(staggerValue)

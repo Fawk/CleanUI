@@ -3,7 +3,6 @@ local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSha
 
 --[[ Blizzard ]]
 local CreateFrame = CreateFrame
-local GetSpecialization = GetSpecialization
 local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
