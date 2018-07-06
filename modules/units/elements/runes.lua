@@ -174,12 +174,13 @@ function Runes:Update(...)
 		local y = db["Y Spacing"] 
 
 		if (orientation == "HORIZONTAL") then
-			width = (width * MAX_RUNES) + (x * MAX_RUNES)
+			width = (width * MAX_RUNES) + (x * (MAX_RUNES - 1))
 		else
-			height = (height * MAX_RUNES) + (y * MAX_RUNES)
+			height = (height * MAX_RUNES) + (y * (MAX_RUNES - 1))
 		end
 		
 		self:SetSize(width, height)
+		U:CreateBackground(self, db, false)
 
 		local r, g, b = unpack(A.colors.power.runes[GetSpecialization()])
 		local texture = media:Fetch("statusbar", db["Texture"])
@@ -194,9 +195,6 @@ function Runes:Update(...)
 
 			rune.bg:SetTexture(texture)
 			rune.bg:SetVertexColor(r * .33, g * .33, b * .33)
-
-			U:CreateBackground(rune, db, true)
-			rune:SetBackdropBorderColor(0, 0, 0, 0)
 		end
 
 		if (not db["Attached"]) then
@@ -205,7 +203,7 @@ function Runes:Update(...)
 			A:DeleteMover(elementName)
 		end
 
-		Units:Position(self, db["Position"])
+		Units:Attach(self, db)
 	else
 		for i = 1, MAX_RUNES do
 			local rune = self.buttons[i]

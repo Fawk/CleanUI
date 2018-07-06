@@ -29,7 +29,8 @@ function Castbar:Init(parent)
 		container = CreateFrame("Frame", T:frameName(parent:GetName(), elementName), parent)
 		container.db = db
 		
-		local bar = CreateFrame("StatusBar", nil, parent)
+		local bar = CreateFrame("StatusBar", nil, container)
+		bar:SetFrameLevel(2)
 		bar.db = db
 		bar.bg = container:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
@@ -115,7 +116,7 @@ function Castbar:Update(...)
 		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
 		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
 
-		T:Background(self, db, nil, true)
+		T:Background(self, db, nil, false)
 
 		local iconW, iconH
 		local iconDb = db["Icon"]
@@ -142,25 +143,25 @@ function Castbar:Update(...)
 
 			local iconPosition = iconDb["Position"]
 			if (iconPosition == "LEFT") then
-				self.Icon:SetPoint("LEFT", self, "LEFT", 1, 0)
+				self.Icon:SetPoint("LEFT", self, "LEFT", 0, 0)
 				bar:SetPoint("TOPLEFT", self.Icon, "TOPRIGHT", 1, 0)
-				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, -1)
+				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
 			elseif (iconPosition == "RIGHT") then
-				self.Icon:SetPoint("RIGHT", self, "RIGHT", -1, 0)
+				self.Icon:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 				bar:SetPoint("TOPRIGHT", self.Icon, "TOPLEFT", -1, 0)
-				bar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 1, -1)
+				bar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
 			elseif (iconPosition == "TOP") then
 				self.Icon:SetPoint("TOP", self, "TOP", 0, -1)
 				bar:SetPoint("TOPLEFT", self.Icon, "BOTTOMLEFT", 0, 1)
-				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, -1)
+				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
 			else
 				self.Icon:SetPoint("BOTTOM", self, "BOTTOM", 0, 1)
 				bar:SetPoint("BOTTOMLEFT", self.Icon, "TOPLEFT", 0, 1)
-				bar:SetPoint("TOPRIGHT", self, "TOPRIGHT", -1, 1)
+				bar:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
 			end
 		else
-			bar:SetPoint("TOPLEFT", parent, "TOPLEFT", 1, -1)
-			bar:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", -1, 1)
+			bar:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+			bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
 		end
 
 		Units:PlaceCastbar(self, db)
@@ -175,7 +176,7 @@ function Castbar:Update(...)
 
 			self.Time:SetText(db["Time"]["Format"]
 					:replace("[current]", T:short(duration, 1))
-					:replace("[max]", parent.castBarMax)
+					:replace("[max]", T:short(parent.castBarMax, 1))
 					:replace("[delay]", "-"..parent.castBarDelay)
 			)
 

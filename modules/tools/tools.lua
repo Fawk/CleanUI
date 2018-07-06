@@ -221,7 +221,7 @@ function T:Background(frame, db, anchor, isBackdrop)
 					f:SetFrameStrata("LOW")
 					f:SetFrameLevel(2)
 					f:SetPoint("CENTER", anchor or frame, "CENTER")
-					local width, height = anchor:GetSize()
+					local width, height = frame:GetSize()
 					if (not width) then
 						width, height = frame:GetSize()
 					end

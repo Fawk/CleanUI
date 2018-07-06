@@ -16,7 +16,11 @@ function Player:Init()
     frame:SetScript("OnShow", function(self)
         self:Update(UnitEvent.UPDATE_DB, db)
     end)
-    frame:RegisterEvent("PLAYER_ENTERING_WORLD", function(self)
+
+    frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    frame:RegisterEvent("PLAYER_TALENT_UPDATE")
+    frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    frame:SetScript("OnEvent", function(self, event, ...)
         self:Update(UnitEvent.UPDATE_DB, db)
     end)
 
@@ -25,7 +29,7 @@ function Player:Init()
     end
 
     A["Player Elements"]:foreach(function(key, element)
-        element:Init(frame, db[key])
+        element:Init(frame)
     end)
 
     frame:Update(UnitEvent.UPDATE_DB, db)
@@ -40,6 +44,9 @@ function Player:Update(...)
     local self, event, arg2, arg3, arg4, arg5 = ...
 
     if (self.super) then
+        
+        self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
+
         self.super:Update(...)
 
         -- Update player specific things based on the event
@@ -70,7 +77,7 @@ function Player:Update(...)
 
             -- Player specific elements
             A["Player Elements"]:foreach(function(key, element)
-                element:Init(self, db[key])
+                element:Init(self)
             end)
         end
     end

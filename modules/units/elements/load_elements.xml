@@ -2,7 +2,7 @@
     
     <Script file="health.lua"/>
     <Script file="power.lua"/>
-    <Script file="raidbuffs.lua"/>
+    <Script file="groupbuffs.lua"/>
     <Script file="healprediction.lua"/>
     <Script file="grouproleindicator.lua"/>
     <Script file="alternativepower.lua"/>
