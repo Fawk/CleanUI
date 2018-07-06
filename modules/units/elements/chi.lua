@@ -46,7 +46,7 @@ function Chi:Init(parent)
         chis.ExtraAttachLogic = function(self)
             local stagger = parent.orderedElements:get("Stagger")
                 if (stagger and stagger:IsShown()) then
-                    if (stagger.db["Attached"] and stagger.db["Attached Position"] == self.db["Attached Position"] and not stagger.db["Place After Chi"]) then
+                    if (stagger.db["Attached"] and stagger.db["Attached Position"] == self.db["Attached Position"] and stagger.db["Place After Chi"]) then
                         return stagger
                     end
                 end
@@ -64,6 +64,7 @@ end
 function Chi:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local db = self.db
+    local realMax = UnitPowerMax("player", SPELL_POWER_CHI)
 
     if (event == UnitEvent.UPDATE_DB) then
         
@@ -75,9 +76,9 @@ function Chi:Update(...)
         local y = db["Y Spacing"] 
 
         if (orientation == "HORIZONTAL") then
-            width = (width * MAX_CHI) + (x * (MAX_CHI - 1))
+            width = width + (x * (realMax - 1))
         else
-            height = (height * MAX_CHI) + (y * (MAX_CHI - 1))
+            height = height + (y * (realMax - 1))
         end
         
         self:SetSize(width, height)
@@ -88,7 +89,6 @@ function Chi:Update(...)
 
         for i = 1, MAX_CHI do
             local chi = self.buttons[i]
-            chi:SetSize(size["Width"], size["Height"])
             chi:SetOrientation(orientation)
             chi:SetReverseFill(db["Reversed"])
             chi:SetStatusBarTexture(texture)
@@ -101,16 +101,26 @@ function Chi:Update(...)
                 else
                     chi:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
                 end
+                width = width / realMax
             else
                 if (i == 1) then
                     chi:SetPoint("TOP", self, "TOP", 0, 0)
                 else
                     chi:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
                 end
+                height = height / realMax
             end
 
             chi.bg:SetTexture(texture)
             chi.bg:SetVertexColor(r * .33, g * .33, b * .33)
+
+            chi:SetSize(width, height)
+
+            if (i > realMax) then
+                chi:Hide()
+            else
+                chi:Show()
+            end
         end
 
         if (not db["Attached"]) then
@@ -123,6 +133,10 @@ function Chi:Update(...)
     else
         local current = UnitPower("player", SPELL_POWER_CHI)
 
+        if (realMax ~= self.oldMax) then
+            self:Update(UnitEvent.UPDATE_DB)
+        end
+
         for i = 1, MAX_CHI do
             local chi = self.buttons[i]
             if (i <= current) then
@@ -131,6 +145,8 @@ function Chi:Update(...)
                 chi:SetValue(0)
             end
         end
+
+        self.oldMax = realMax
     end
 end
 

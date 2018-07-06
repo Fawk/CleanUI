@@ -12,7 +12,7 @@ local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
 local elementName = "Soul Shards"
 local SoulShards = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR" }
-local MAX_SHARDS = 5
+local MAX_SOUL_SHARDS = 5
 
 function SoulShards:Init(parent)
 	if (select(2, UnitClass("player")) ~= "WARLOCK") then
@@ -27,7 +27,7 @@ function SoulShards:Init(parent)
 		shards.buttons = {}
 		shards.db = db
 
-		for i = 1, MAX_SHARDS do
+		for i = 1, MAX_SOUL_SHARDS do
 			local shard = CreateFrame("StatusBar", T:frameName(parentName, "Soul Shard"..i), parent)
 			shard.bg = shard:CreateTexture(nil, "BORDER")
 			shard.bg:SetAllPoints()
@@ -64,9 +64,9 @@ function SoulShards:Update(...)
 		local y = db["Y Spacing"] 
 
 		if (orientation == "HORIZONTAL") then
-			width = (width * MAX_SHARDS) + (x * (MAX_SHARDS - 1))
+			width = width + (x * (MAX_SOUL_SHARDS - 1))
 		else
-			height = (height * MAX_SHARDS) + (y * (MAX_SHARDS - 1))
+			height = height + (y * (MAX_SOUL_SHARDS - 1))
 		end
 		
 		self:SetSize(width, height)
@@ -75,9 +75,8 @@ function SoulShards:Update(...)
 		local r, g, b = unpack(A.colors.power[SPELL_POWER_SOUL_SHARDS])
 		local texture = media:Fetch("statusbar", db["Texture"])
 
-		for i = 1, MAX_SHARDS do
+		for i = 1, MAX_SOUL_SHARDS do
 			local shard = self.buttons[i]
-			shard:SetSize(size["Width"], size["Height"])
 			shard:SetOrientation(orientation)
 			shard:SetReverseFill(db["Reversed"])
 			shard:SetStatusBarTexture(texture)
@@ -85,21 +84,25 @@ function SoulShards:Update(...)
 			shard:SetMinMaxValues(0, 10)
 
 			if (orientation == "HORIZONTAL") then
-				if (i == 1) then
-					shard:SetPoint("LEFT", self, "LEFT", 0, 0)
-				else
-					shard:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-				end
-			else
-				if (i == 1) then
-					shard:SetPoint("TOP", self, "TOP", 0, 0)
-				else
-					shard:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-				end
-			end
+	            if (i == 1) then
+	                shard:SetPoint("LEFT", self, "LEFT", 0, 0)
+	            else
+	                shard:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
+	            end
+	            width = width / MAX_SOUL_SHARDS
+	        else
+	            if (i == 1) then
+	                shard:SetPoint("TOP", self, "TOP", 0, 0)
+	            else
+	                shard:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
+	            end
+	            height = height / MAX_SOUL_SHARDS
+	        end
 
 			shard.bg:SetTexture(texture)
 			shard.bg:SetVertexColor(r * .33, g * .33, b * .33)
+
+			shard:SetSize(width, height)
 		end
 
 		if (not db["Attached"]) then
@@ -114,7 +117,7 @@ function SoulShards:Update(...)
 		local current = UnitPower("player", SPELL_POWER_SOUL_SHARDS)
 		local nomod = UnitPower("player", SPELL_POWER_SOUL_SHARDS, true)
 
-		for i = 1, MAX_SHARDS do
+		for i = 1, MAX_SOUL_SHARDS do
 			local shard = self.buttons[i]
 			if (mod) then
 				if ((i * mod) <= nomod) then

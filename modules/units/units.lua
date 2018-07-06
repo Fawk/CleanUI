@@ -69,6 +69,11 @@ function Units:Attach(frame, db, override)
     local x = db["Position"]["Offset X"]
     local y = db["Position"]["Offset Y"]
 
+    if (not position) then
+        A:Debug("No Attached Position for frame:", frame:GetName())
+        return Units:Position(frame, db["Position"])
+    end
+
     if (position == "Below") then
         frame:SetPoint("TOP", target, "BOTTOM", x, y)
     elseif (position == "Above") then

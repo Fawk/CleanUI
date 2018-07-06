@@ -233,7 +233,7 @@ local defaults =  {
                             ["Offset Y"] = -1, 
                         },
                         ["Size"] = {
-                            ["Width"] = 33,
+                            ["Width"] = 200,
                             ["Height"] = 15
                         },
                         ["Background"] = {
@@ -261,10 +261,10 @@ local defaults =  {
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = -1, 
                         },
                         ["Size"] = {
-                            ["Width"] = 150,
+                            ["Width"] = 200,
                             ["Height"] = 15
                         },
                         ["Background"] = {
@@ -294,7 +294,7 @@ local defaults =  {
                             ["Offset Y"] = -1, 
                         },
                         ["Size"] = {
-                            ["Width"] = 33,
+                            ["Width"] = 200,
                             ["Height"] = 15
                         },
                         ["Background"] = {
@@ -321,7 +321,7 @@ local defaults =  {
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = -1, 
                         },
                         ["Size"] = {
                             ["Width"] = 150,
@@ -381,10 +381,10 @@ local defaults =  {
                             ["Point"] = "BOTTOM",
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = -1, 
                         },
                         ["Size"] = {
-                            ["Width"] = 150,
+                            ["Width"] = 200,
                             ["Height"] = 15
                         },
                         ["Background"] = {

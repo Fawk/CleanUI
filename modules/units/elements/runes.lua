@@ -174,9 +174,9 @@ function Runes:Update(...)
 		local y = db["Y Spacing"] 
 
 		if (orientation == "HORIZONTAL") then
-			width = (width * MAX_RUNES) + (x * (MAX_RUNES - 1))
+			width = width + (x * (MAX_RUNES - 1))
 		else
-			height = (height * MAX_RUNES) + (y * (MAX_RUNES - 1))
+			height = height + (y * (MAX_RUNES - 1))
 		end
 		
 		self:SetSize(width, height)
@@ -187,14 +187,31 @@ function Runes:Update(...)
 
 		for i = 1, MAX_RUNES do
 			local rune = self.buttons[i]
-			rune:SetSize(size["Width"], size["Height"])
 			rune:SetOrientation(orientation)
 			rune:SetReverseFill(db["Reversed"])
 			rune:SetStatusBarTexture(texture)
 			rune:SetStatusBarColor(r, g, b)
 
+			if (orientation == "HORIZONTAL") then
+	            if (i == 1) then
+	                rune:SetPoint("LEFT", self, "LEFT", 0, 0)
+	            else
+	                rune:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
+	            end
+	            width = width / MAX_RUNES
+	        else
+	            if (i == 1) then
+	                rune:SetPoint("TOP", self, "TOP", 0, 0)
+	            else
+	                rune:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
+	            end
+	            height = height / MAX_RUNES
+	        end
+
 			rune.bg:SetTexture(texture)
 			rune.bg:SetVertexColor(r * .33, g * .33, b * .33)
+
+			rune:SetSize(width, height)
 		end
 
 		if (not db["Attached"]) then
