@@ -4,7 +4,13 @@ local _G, E, media = _G, A.enum, LibStub("LibSharedMedia-3.0")
 local iconLib = LibStub("LibDBIcon-1.0", true)
 local Tools = A.Tools
 local buildText = A.TextBuilder
-local oUF = oUF or A.oUF
+
+local CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA
+local CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA
+local CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA
+local CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA = CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA
+local CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA
+local CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA
 
 local backdrops = { "DropDownList1MenuBackdrop", "DropDownList2MenuBackdrop", "GameTooltip", "GameMenuFrame" }
 local shoppingTexts = {
@@ -788,7 +794,7 @@ local function setStyle()
 					charFrame.level = level
 
 					local class = buildText(textBackground, 13):rightOf(level):x(3):build()
-					class:SetTextColor(unpack(oUF.colors.class[select(2, UnitClass("player"))]))
+					class:SetTextColor(unpack(A.colors.class[select(2, UnitClass("player"))]))
 					class:SetText(UnitClass("player"))
 
 					charFrame.class = class

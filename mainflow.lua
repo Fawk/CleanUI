@@ -152,9 +152,9 @@ function Addon:OnEnable()
         bgFile = media:Fetch("background", "cui-default-bg"), 
         tile = true, 
         tileSize = 1, 
-        edgeFile = media:Fetch("border", "test-border"), 
-        edgeSize = 3, 
-        insets = { top = 2, bottom = 2, left = 2, right = 2 } 
+        edgeFile = media:Fetch("border", "test-border2"), 
+        edgeSize = 2, 
+        insets = { top = 1, bottom = 1, left = 1, right = 1 } 
     })
     frame:SetBackdropColor(0, 0, 0, 1)
     frame:SetBackdropBorderColor(1, 0, 0, 1)

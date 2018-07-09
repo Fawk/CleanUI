@@ -10,7 +10,7 @@ local UnitPowerType = UnitPowerType
 --[[ Locals ]]
 local elementName = "Power"
 local Power = { name = elementName }
-local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER" }
+local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM" }
 
 A["Shared Elements"]:set(elementName, Power)
 
@@ -21,7 +21,7 @@ function Power:Init(parent)
 	local power = parent.orderedElements:get(elementName)
 	if (not power) then
 
-		power = CreateFrame("StatusBar", T:frameName(parentName, elementName), A.frameParent)
+		power = CreateFrame("StatusBar", parent:GetName().."_"..elementName, A.frameParent)
 
 		power:SetParent(parent)
 		power:SetFrameStrata("LOW")
@@ -45,7 +45,6 @@ function Power:Init(parent)
 	end
 
 	power:Update(UnitEvent.UPDATE_DB, db)
-	power:Update("UNIT_POWER_FREQUENT")
 
 	parent.orderedElements:set(elementName, power)
 end
@@ -61,20 +60,22 @@ function Power:Update(...)
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
 
-	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER") then
+	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" or event == "UPDATE_SHAPESHIFT_FORM") then
 		parent:Update(UnitEvent.UPDATE_POWER)
-		self:SetMinMaxValues(0, parent.currentMaxPower)
-	  	self:SetValue(parent.currentPower)
+
+		if (parent.powerToken or parent.powerType) then
+			self:SetMinMaxValues(0, parent.currentMaxPower)
+		  	self:SetValue(parent.currentPower)
+	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 		parent:Update(UnitEvent.UPDATE_POWER)
 		local tag = arg1
-		tag.text = tag.format
-			:replace("[pp]", parent.currentPower)
-		    :replace("[maxpp]", parent.currentMaxPower)
-		    :replace("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
-		    :replace("[pp:round]", T:round(parent.currentPower))
-		    :replace("[maxpp:round]", T:round(parent.currentMaxPower))
-		    :replace("[pp:deficit]", parent.deficitPower > 0 and string.format("-%d", T:short(parent.deficitPower, 0)) or "")
+		tag:AddReplaceLogic("[pp]", parent.currentPower)
+		tag:AddReplaceLogic("[maxpp]", parent.currentMaxPower)
+		tag:AddReplaceLogic("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
+		tag:AddReplaceLogic("[pp:round]", T:short(parent.currentPower, 1))
+		tag:AddReplaceLogic("[maxpp:round]", T:short(parent.currentMaxPower, 1))
+		tag:AddReplaceLogic("[pp:deficit]", parent.deficitPower > 0 and string.format("-%d", T:short(parent.deficitPower, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 
 		self:Update("UNIT_POWER_FREQUENT")
@@ -95,9 +96,6 @@ function Power:Update(...)
 		self.bg:SetAllPoints()
 		self.bg:SetTexture(texture)
 
-		self:SetStatusBarColor(.5, 1, .5, 1)
-		self.bg:SetVertexColor(.5 * .3, .5 * .3, .5 * .3, 1)
-
 		if (db["Background Multiplier"] == -1) then
 			self.bg:Hide()
 		else
@@ -106,5 +104,41 @@ function Power:Update(...)
 	end
 
 	Units:SetupMissingBar(self, self.db["Missing Power Bar"], "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
-	A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop)
+	A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
+end
+
+local powerType = {
+    ["WARRIOR"] = "RAGE",
+    ["DEATHKNIGHT"] = "RUNIC_POWER",
+    ["DRUID"] = "MANA",
+    ["MAGE"] = "MANA",
+    ["WARLOCK"] = "MANA",
+    ["PRIEST"] = "MANA",
+    ["MONK"] = "ENERGY",
+    ["ROGUE"] = "ENERGY",
+    ["DEMONHUNTER"] = "FURY",
+    ["HUNTER"] = "FOCUS",
+    ["PALADIN"] = "MANA",
+    ["SHAMAN"] = "MANA",
+}
+
+function Power:Simulate(parent, class)
+
+	local oldUnitClass = UnitClass
+	UnitClass = function(self, unit)
+		return "", class, 0
+	end
+
+    local maxPower = UnitPowerMax("player")
+    local randomPower = math.random(0, maxPower)
+
+    parent.powerType = powerType[class]
+    parent.currentPower = randomPower
+    parent.currentMaxPower = maxPower
+    parent.deficitPower = maxPower - randomPower
+    parent.classOverride = class
+
+    self:Init(parent)
+
+    UnitClass = oldUnitClass
 end

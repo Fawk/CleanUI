@@ -3,6 +3,7 @@ local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0
 
 --[[ Blizzard ]]
 local CreateFrame = CreateFrame
+local UnitName = UnitName
 local UnitHealth = UnitHealth
 local UnitPower = UnitPower
 local UnitPowerType = UnitPowerType
@@ -15,6 +16,30 @@ local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
 local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
+
+function A:FormatTag(tag)
+    local replaceLogic = A:OrderedMap()
+    replaceLogic:set("[name]", UnitName(tag:GetParent().unit))
+    replaceLogic:set("[name:%d+]", UnitName(tag:GetParent().unit):sub(1, tag.format:match("%d+")))
+
+    for key, color in next, A.colors.text do
+        replaceLogic:set("[color:"..key.."]", color)
+    end
+
+    A:AddColorReplaceLogicIfNeeded(tag)
+    
+    tag.replaceLogics:foreach(function(key, replace)
+        replaceLogic:set(key, replace)
+    end)
+
+    local replaced = tag.format
+    
+    replaceLogic:foreach(function(key, replaceString)
+        replaced = replaced:replace(key, replaceString)
+    end)
+    
+    tag.text = replaced
+end
 
 -- name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
 local function fetchAuraData(func, tbl, id)
@@ -63,11 +88,15 @@ end
 
 function Unit:Init(unit)
     unit.tagEventFrame = CreateFrame("Frame")
+    unit.ForceTagUpdate = function(self)
+        self.tagEventFrame:GetScript("OnEvent")(self.tagEventFrame, "IGNORED")
+    end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         unit.tags:foreach(function(key, tag)
             unit.orderedElements:foreach(function(k, element)
                 element:Update(UnitEvent.UPDATE_TAGS, tag)
             end)
+            A:FormatTag(tag)
             tag:SetText(tag.text)
         end)
     end)
@@ -103,6 +132,7 @@ function Unit:Update(...)
         local powerType, powerToken, altR, altG, altB = UnitPowerType(self.unit)
         self.currentPower = UnitPower(self.unit, powerType)
         self.currentMaxPower = UnitPowerMax(self.unit, powerType)
+        self.deficitPower = self.currentMaxPower - self.currentPower
 
         self.powerType = powerType
         self.powerToken = powerToken
@@ -183,17 +213,39 @@ function Unit:Update(...)
         if (arg1 == 'UNIT_SPELLCAST_START') then
             name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(self.unit)
             self.castBarDelay = 0
+            if (not name) then
+                return
+            end
         elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTIBLE') then
             notInterruptible = false
         elseif (arg1 == 'UNIT_SPELLCAST_NOT_INTERRUPTIBLE') then
             notInterruptible = true
         elseif (arg1 == 'UNIT_SPELLCAST_DELAYED') then
             name, _, _, _, startTime, _, _, castID = UnitCastingInfo(self.unit)
+            if(not startTime or not self.casting) then return end
         elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_START') then
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+            if (not name) then
+                return
+            end
             self.castBarDelay = 0
         elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_UPDATE') then
             name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
+        elseif (arg1 == 'UNIT_SPELLCAST_FAILED') then
+            if(self.castBarCastId ~= arg5) then
+                return
+            end
+        elseif (arg1 == 'UNIT_SPELLCAST_STOP') then
+            if(self.castBarCastId ~= arg5) then
+                return
+            end
+        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_STOP') then
+            self.casting = false
+            return
+        elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTED') then
+            if(self.castBarCastId ~= arg5) then
+                return
+            end
         end
 
         if (self.castBarEnd) then

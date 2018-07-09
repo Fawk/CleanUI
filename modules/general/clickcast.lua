@@ -664,7 +664,7 @@ function CC:ToggleClickCastWindow(group)
 	A.clickCastWindow = parent
 end
 
-function CC:GetOptions(enabled, order)
+function CC:GetOptions(enabled, extraClick, order)
 
 	local config = {
 		enabled = enabled,
@@ -675,6 +675,7 @@ function CC:GetOptions(enabled, order)
 			self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
 		end,
 		onClick = function(self)
+			extraClick(self)
 			CC:ToggleClickCastWindow(self)
 		end,
 		children = {}

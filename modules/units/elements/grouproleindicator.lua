@@ -87,3 +87,13 @@ function Role:Update(...)
         self.texture:SetTexCoord(0, 1, 0, 1)
     end
 end
+
+local roles = { "TANK", "HEALER", "DAMAGER" }
+
+function Role:Simulate(parent)
+    local oldUnitGroupRolesAssigned = UnitGroupRolesAssigned
+
+    
+    
+    UnitGroupRolesAssigned = oldUnitGroupRolesAssigned
+end

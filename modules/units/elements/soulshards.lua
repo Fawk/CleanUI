@@ -28,7 +28,7 @@ function SoulShards:Init(parent)
 		shards.db = db
 
 		for i = 1, MAX_SOUL_SHARDS do
-			local shard = CreateFrame("StatusBar", T:frameName(parentName, "Soul Shard"..i), parent)
+			local shard = CreateFrame("StatusBar", T:frameName(parentName, "Soul Shard"..i), shards)
 			shard.bg = shard:CreateTexture(nil, "BORDER")
 			shard.bg:SetAllPoints()
 			shards.buttons[i] = shard
@@ -75,6 +75,12 @@ function SoulShards:Update(...)
 		local r, g, b = unpack(A.colors.power[SPELL_POWER_SOUL_SHARDS])
 		local texture = media:Fetch("statusbar", db["Texture"])
 
+		if (orientation == "HORIZONTAL") then
+			width = math.floor((width - x) / MAX_SOUL_SHARDS)
+		else
+	        height = math.floor((height - y) / MAX_SOUL_SHARDS)
+		end
+
 		for i = 1, MAX_SOUL_SHARDS do
 			local shard = self.buttons[i]
 			shard:SetOrientation(orientation)
@@ -83,21 +89,7 @@ function SoulShards:Update(...)
 			shard:SetStatusBarColor(r, g, b)
 			shard:SetMinMaxValues(0, 10)
 
-			if (orientation == "HORIZONTAL") then
-	            if (i == 1) then
-	                shard:SetPoint("LEFT", self, "LEFT", 0, 0)
-	            else
-	                shard:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-	            end
-	            width = width / MAX_SOUL_SHARDS
-	        else
-	            if (i == 1) then
-	                shard:SetPoint("TOP", self, "TOP", 0, 0)
-	            else
-	                shard:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-	            end
-	            height = height / MAX_SOUL_SHARDS
-	        end
+			width, height = T:PositionClassPowerIcon(self, shard, orientation, width, height, MAX_SOUL_SHARDS, i, x, y)
 
 			shard.bg:SetTexture(texture)
 			shard.bg:SetVertexColor(r * .33, g * .33, b * .33)

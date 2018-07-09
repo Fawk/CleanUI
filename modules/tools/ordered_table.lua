@@ -232,11 +232,15 @@ end
 local MAP = {}
 MAP.__index = MAP
 
-function MAP:set(k, v)
+function MAP:set(k, v, overwrite)
   if (not k) then 
     return error("Map key is nil!")
   end
   if (self.e[k]) then 
+    if (overwrite) then
+      self.e[k] = v
+      return true
+    end
     return false
   else
     self.c = self.c + 1
@@ -268,6 +272,18 @@ function MAP:isEmpty()
  return self.c == 0
 end
 
+function MAP:first()
+  return self:get(self.i[1])
+end
+
+function MAP:keySet()
+  return self.i
+end
+
+function MAP:firstKey()
+  return self.i[1]
+end
+
 function MAP:hasKey(key)
  return self.e[key] ~= nil
 end
@@ -288,6 +304,13 @@ function MAP:remove(key)
         y[x] = self.i[x]
       end
     end
+    local e = {}
+    for k,v in next, self.e do
+      if (v) then
+        e[k] = v
+      end
+    end
+    self.e = e
     self.i = y
     self.c = self.c - 1
     return true

@@ -169,16 +169,15 @@ function HealPrediction:Update(...)
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 		local tag = arg1
-		tag.text = tag.format
-			:replace("[heal]", parent.myIncomingHeal)
-			:replace("[heal:round]", T:short(parent.myIncomingHeal, 2))
-			:replace("[allheal]", parent.otherIncomingHeal)
-			:replace("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
-			:replace("[absorb]", parent.absorb)
-			:replace("[absorb:round]", T:short(parent.absorb, 2))
-			:replace("[healabsorb]", parent.healAbsorb)
-			:replace("[healabsorb:round]", T:short(parent.healAbsorb, 2))
-			:replace("[perabsorb]", math.floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
+		tag:AddReplaceLogic("[heal]", parent.myIncomingHeal)
+		tag:AddReplaceLogic("[heal:round]", T:short(parent.myIncomingHeal, 2))
+		tag:AddReplaceLogic("[allheal]", parent.otherIncomingHeal)
+		tag:AddReplaceLogic("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
+		tag:AddReplaceLogic("[absorb]", parent.absorb)
+		tag:AddReplaceLogic("[absorb:round]", T:short(parent.absorb, 2))
+		tag:AddReplaceLogic("[healabsorb]", parent.healAbsorb)
+		tag:AddReplaceLogic("[healabsorb:round]", T:short(parent.healAbsorb, 2))
+		tag:AddReplaceLogic("[perabsorb]", math.floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
 	else
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 
@@ -212,4 +211,10 @@ function HealPrediction:Update(...)
 
 		HealPredictionPostUpdate(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
 	end
+end
+
+function HealPrediction:Simulate(parent)
+
+	
+
 end

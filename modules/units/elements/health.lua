@@ -9,7 +9,7 @@ local UnitClass = UnitClass
 
 --[[ Locals ]]
 local elementName = "Health"
-local Health = { name = elementName }
+local Health = {}
 local events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH" }
 
 A["Shared Elements"]:set(elementName, Health)
@@ -70,20 +70,20 @@ function Health:Update(...)
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
 
-	parent:Update(UnitEvent.UPDATE_HEALTH)
-
 	if (tostring(event):anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
+		parent:Update(UnitEvent.UPDATE_HEALTH)
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
+		self:Update("UNIT_HEALTH_FREQUENT")
+
 		local tag = arg1
-		tag.text = tag.format
-			:replace("[hp]", parent.currentHealth)
-		    :replace("[maxhp]", parent.currentMaxHealth)
-		    :replace("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
-		    :replace("[hp:round]", T:short(parent.currentHealth), 2)
-			:replace("[maxhp:round]", T:short(parent.currentMaxHealth), 2)
-			:replace("[hp:deficit]", parent.deficitHealth > 0 and string.format("-%d", T:short(parent.deficitHealth, 0)) or "")
+		tag:AddReplaceLogic("[hp]", parent.currentHealth)
+		tag:AddReplaceLogic("[maxhp]", parent.currentMaxHealth)
+		tag:AddReplaceLogic("[perhp]", math.floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
+		tag:AddReplaceLogic("[hp:round]", T:short(parent.currentHealth, 1))
+		tag:AddReplaceLogic("[maxhp:round]", T:short(parent.currentMaxHealth, 1))
+		tag:AddReplaceLogic("[hp:deficit]", parent.deficitHealth > 0 and string.format("-%s", T:short(parent.deficitHealth, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 		
 		self:Update("UNIT_HEALTH_FREQUENT")
@@ -112,13 +112,25 @@ function Health:Update(...)
 	end
 
 	Units:SetupMissingBar(self, self.db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
-	A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient)
+	A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 end
 
 function Health:Simulate(parent, class)
-	local element = parent.orderedElements:get(elementName)
+	
+	local oldUnitClass = UnitClass
+	UnitClass = function(self, unit)
+		return "", class, 0
+	end
 
-	-- Set the color using the class
-	self:Init(parent)
+    local maxHealth = UnitHealthMax("player")
+    local randomHealth = math.random(0, maxHealth)
 
+    parent.currentHealth = randomHealth
+    parent.currentMaxHealth = maxHealth
+    parent.deficitHealth = maxHealth - randomHealth
+    parent.classOverride = class
+
+    self:Init(parent)
+
+    UnitClass = oldUnitClass
 end

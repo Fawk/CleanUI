@@ -21,7 +21,8 @@ A.colors = {
 		[SPELL_POWER_SOUL_SHARDS] = { 128/255, 82/255, 105/255 },
 		[SPELL_POWER_CHI] = { 181/255, 255/255, 235/255 },
 		[SPELL_POWER_HOLY_POWER] = { 242/255, 230/255, 153/255 },
-		[SPELL_POWER_ARCANE_CHARGES] = { 26/255, 26/255, 250/255 }
+		[SPELL_POWER_ARCANE_CHARGES] = { 26/255, 26/255, 250/255 },
+		[SPELL_POWER_LUNAR_POWER] = { 77/255, 133/255, 230/255 },
 		runes = {
 			[1] = { .67, .13, .13 },
 			[2] = { 0, .67, .99 },
@@ -50,8 +51,29 @@ A.colors = {
 		["Magic"] = { 33/255, 33/255, 200/255 },
 		["Poison"] = { 33/255, 155/255, 33/255 },
 		["Physical"] = { 155/255, 33/255, 33/255 }
+	},
+	text = {
+		["white"]	= "|cFFFFFFFF",
+		["black"]	= "|cFF000000",
+		["red"]		= "|cFFFF0000",
+		["green"]	= "|cFF00FF00",
+		["blue"]	= "|cFF0000FF",
+		["yellow"]	= "|cFFFFFF00",
+		["purple"]	= "|cFFFF00FF",
+		["cyan"]	= "|cFF00FFFF",
+		["orange"]	= "|cFFFF8000",
+		["pink"] 	= "|cFFFF0080"
 	}
 }
+
+local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
+function A:AddColorReplaceLogicIfNeeded(tag)
+	local x, y = tag.format:find("%[color:"..colorPattern.."%]")
+	if (x and y) then
+		local m = tag.format:sub(x, y)
+		tag:AddReplaceLogic(m, "|cFF"..m:match(colorPattern))
+	end
+end
 
 A.colors.class = {}
 for classToken, color in next, RAID_CLASS_COLORS do
@@ -85,7 +107,7 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	local mult = db["Background Multiplier"]
 	local colorType = db["Color By"]
 	if (colorType == "Class") then
-		r, g, b = unpack(A.colors.class[select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
+		r, g, b = unpack(A.colors.class[classOverride or select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
 	elseif (colorType == "Power") then
 		t = A.colors.power[parent.powerToken]
 		if not t then
@@ -104,6 +126,10 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 
 	if (r) then
 		bar:SetStatusBarColor(r, g, b, a or 1)
-		bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
+		if (tonumber(mult) >= 0) then
+			bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
+		else
+			bar.bg:Hide()
+		end
 	end
 end

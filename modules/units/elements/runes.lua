@@ -135,7 +135,7 @@ function Runes:Init(parent)
 		runes.db = db
 
 		for i = 1, MAX_RUNES do
-			local rune = CreateFrame("StatusBar", T:frameName(parentName, "Rune"..i), parent)
+			local rune = CreateFrame("StatusBar", T:frameName(parentName, "Rune"..i), runes)
 			rune.bg = rune:CreateTexture(nil, "BORDER")
 			rune.bg:SetAllPoints()
 			runes.buttons[i] = rune
@@ -174,16 +174,22 @@ function Runes:Update(...)
 		local y = db["Y Spacing"] 
 
 		if (orientation == "HORIZONTAL") then
-			width = width + (x * (MAX_RUNES - 1))
+			width = math.floor((width - x) / MAX_RUNES)
 		else
-			height = height + (y * (MAX_RUNES - 1))
+	        height = math.floor((height - y) / MAX_RUNES)
 		end
-		
+
 		self:SetSize(width, height)
 		U:CreateBackground(self, db, false)
 
 		local r, g, b = unpack(A.colors.power.runes[GetSpecialization()])
 		local texture = media:Fetch("statusbar", db["Texture"])
+
+		if (orientation == "HORIZONTAL") then
+			width = width / MAX_RUNES
+		else
+	        height = height / MAX_RUNES
+		end
 
 		for i = 1, MAX_RUNES do
 			local rune = self.buttons[i]
@@ -192,21 +198,7 @@ function Runes:Update(...)
 			rune:SetStatusBarTexture(texture)
 			rune:SetStatusBarColor(r, g, b)
 
-			if (orientation == "HORIZONTAL") then
-	            if (i == 1) then
-	                rune:SetPoint("LEFT", self, "LEFT", 0, 0)
-	            else
-	                rune:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-	            end
-	            width = width / MAX_RUNES
-	        else
-	            if (i == 1) then
-	                rune:SetPoint("TOP", self, "TOP", 0, 0)
-	            else
-	                rune:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-	            end
-	            height = height / MAX_RUNES
-	        end
+			width, height = T:PositionClassPowerIcon(self, rune, orientation, width, height, MAX_RUNES, i, x, y)
 
 			rune.bg:SetTexture(texture)
 			rune.bg:SetVertexColor(r * .33, g * .33, b * .33)

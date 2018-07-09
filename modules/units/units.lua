@@ -89,7 +89,7 @@ local function getClassPowerRelative(frame)
     return A["Player Elements"]:foreach(function(key, element)
         local target = frame.orderedElements:get(key)
         if (element.isClassPower and target and target:IsShown()) then
-            return target.ExtraAttachLogic and target:ExtraAttachLogic() or target
+            return target
         end
     end)
 end
@@ -124,16 +124,31 @@ function Units:SetupKeybindings(frame, db)
     end
 end
 
-function Units:Tag(frame, db)
-    local name = db["Name"]
+function Units:Tag(frame, name, db)
     local tag = frame.tags:get(name)
     if (not tag) then
-        -- Do stuff here
-    end
-    
-    -- Update generic stuff here
+        tag = frame:CreateFontString(nil, "OVERLAY")
+        tag.text = ""
+        tag.replaceLogics = A:OrderedMap()
+        tag.AddReplaceLogic = function(self, key, replace)
+            self.replaceLogics:set(key, replace, true)
+        end
 
-    frame.tags:set(name, tag)
+        frame.tags:set(name, tag)
+    end
+
+    tag:SetFont(media:Fetch("font", "Default"), db["Size"], "OUTLINE")
+    tag.format = db["Format"]
+
+    local position = {
+        ["Local Point"] = db["Local Point"],
+        ["Point"] = db["Point"],
+        ["Relative To"] = db["Relative To"],
+        ["Offset X"] = db["Offset X"],
+        ["Offset Y"] = db["Offset Y"]
+    }
+
+    Units:Position(tag, position)
 end
 
 function Units:RegisterEvents(frame, events, force)

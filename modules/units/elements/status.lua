@@ -1,5 +1,7 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
+
+--[[ Blizzard ]]
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsDead = UnitIsDead
 local UnitIsConnected = UnitIsConnected
@@ -7,24 +9,24 @@ local UnitName = UnitName
 local UnitInRange = UnitInRange
 local CreateFrame = CreateFrame
 
-local elementName = "Status"
+--[[ Lua ]]
+local rand = math.random
 
-local Status = { name = elementName }
+--[[ Locals ]]
+local elementName = "Status"
+local Status = {}
 A["Shared Elements"]:set(elementName, Status)
 
---Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
 function Status:Init(parent)
 
-    local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-    local db = A["Profile"]["Options"][parentName][elementName]
+    local db = parent.db[elementName]
 
     if (not db) then return end
 
-    local tbl =  parent.orderedElements:getChildByKey("key", elementName)
-    local status = tbl and tbl.element or nil
+    local status = parent.orderedElements:get(elementName)
     if (not status) then
 
-        status = CreateFrame("Frame", T:frameName(parentName, elementName), A.frameParent)
+        status = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
 
         status:SetParent(parent)
         status:SetFrameStrata("LOW")
@@ -44,7 +46,7 @@ function Status:Init(parent)
 
     status:Update("OnUpdate", status.db)
 
-    parent.orderedElements:add({ key = elementName, element = status })
+    parent.orderedElements:set(elementName, status)
 end
 
 local function performAction(status, frame, parent, db, key, shouldAct)
@@ -89,6 +91,34 @@ function Status:Update(...)
     performAction(this, self, parent, ghost, "Ghost", function()
         if UnitIsDeadOrGhost(parent.unit) then 
             return not UnitIsDead(parent.unit)
+        end
+    end)
+end
+
+function Status:Simulate(parent)
+    self:Init(parent)
+    local status = parent.orderedElements:get(elementName)
+    status:SetScript("OnUpdate", nil)
+
+    local this = self
+    local db = status.db
+
+    local waitFrame = CreateFrame("Frame")
+    waitFrame.timer = 0
+    waitFrame:SetScript("OnUpdate", function(self, elapsed)
+        self.timer = self.timer + elapsed
+        if (self.timer > 1) then
+
+            local randomBool = function()
+                return rand(1, 2) == 1 and true or false
+            end
+
+            performAction(this, status, parent, db["Out of range"], "Out of range", randomBool)
+            performAction(this, status, parent, db["Dead"], "Dead", randomBool)
+            performAction(this, status, parent, db["Offline"], "Offline", randomBool)
+            performAction(this, status, parent, db["Ghost"], "Ghost", randomBool)
+
+            waitFrame:SetScript("OnUpdate", nil)
         end
     end)
 end

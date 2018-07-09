@@ -22,6 +22,10 @@ local function notValid(frame)
 end
 
 function HolyPower:Init(parent)
+    if (select(2, UnitClass("player")) ~= "PALADIN") then
+        return
+    end
+
     local db = parent.db[elementName]
 
     local holypower = parent.orderedElements:get(elementName)
@@ -31,7 +35,7 @@ function HolyPower:Init(parent)
         holypower.db = db
 
         for i = 1, MAX_HOLY_POWER do
-            local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), parent)
+            local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), holypower)
             power.bg = power:CreateTexture(nil, "BORDER")
             power.bg:SetAllPoints()
             holypower.buttons[i] = power
@@ -46,12 +50,13 @@ function HolyPower:Init(parent)
             HolyPower:Update(self, ...)
         end)
 
-        if (notValid()) then 
-            holypower:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-            holypower:SetScript("OnEvent", function(self, event, ...)
+        if (notValid()) then
+            local frame = CreateFrame("Frame")
+            frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+            frame:SetScript("OnEvent", function(self, event, ...)
                 if (notValid()) then return end
                 HolyPower:Init(parent)
-                holypower:SetScript("OnEvent", nil)
+                frame:SetScript("OnEvent", nil)
             end)
         end
     end
@@ -62,7 +67,7 @@ function HolyPower:Init(parent)
     parent.orderedElements:set(elementName, holypower)
 end
 
-function SoulShards:Update(...)
+function HolyPower:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local db = self.db
 
@@ -94,6 +99,12 @@ function SoulShards:Update(...)
         local r, g, b = unpack(A.colors.power[SPELL_POWER_HOLY_POWER])
         local texture = media:Fetch("statusbar", db["Texture"])
 
+        if (orientation == "HORIZONTAL") then
+            width = math.floor((width - x) / MAX_HOLY_POWER)
+        else
+            height = math.floor((height - y) / MAX_HOLY_POWER)
+        end
+
         for i = 1, MAX_HOLY_POWER do
             local power = self.buttons[i]
             power:SetOrientation(orientation)
@@ -102,21 +113,7 @@ function SoulShards:Update(...)
             power:SetStatusBarColor(r, g, b)
             power:SetMinMaxValues(0, 10)
 
-            if (orientation == "HORIZONTAL") then
-                if (i == 1) then
-                    power:SetPoint("LEFT", self, "LEFT", 0, 0)
-                else
-                    power:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-                end
-                width = width / MAX_HOLY_POWER
-            else
-                if (i == 1) then
-                    power:SetPoint("TOP", self, "TOP", 0, 0)
-                else
-                    power:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-                end
-                height = height / MAX_HOLY_POWER
-            end
+            width, height = T:PositionClassPowerIcon(self, power, orientation, width, height, MAX_HOLY_POWER, i, x, y)
 
             power.bg:SetTexture(texture)
             power.bg:SetVertexColor(r * .33, g * .33, b * .33)

@@ -22,6 +22,10 @@ local function notValid(frame)
 end
 
 function ArcaneCharges:Init(parent)
+    if (select(2, UnitClass("player")) ~= "MAGE") then
+        return
+    end
+
     local db = parent.db[elementName]
 
     local charges = parent.orderedElements:get(elementName)
@@ -31,7 +35,7 @@ function ArcaneCharges:Init(parent)
         charges.db = db
 
         for i = 1, MAX_ARCANE_CHARGES do
-            local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), parent)
+            local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), charges)
             power.bg = power:CreateTexture(nil, "BORDER")
             power.bg:SetAllPoints()
             charges.buttons[i] = power
@@ -46,12 +50,13 @@ function ArcaneCharges:Init(parent)
             ArcaneCharges:Update(self, ...)
         end)
 
-        if (notValid()) then 
-            charges:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-            charges:SetScript("OnEvent", function(self, event, ...)
+        if (notValid()) then
+            local frame = CreateFrame("Frame")
+            frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+            frame:SetScript("OnEvent", function(self, event, ...)
                 if (notValid()) then return end
                 ArcaneCharges:Init(parent)
-                charges:SetScript("OnEvent", nil)
+                frame:SetScript("OnEvent", nil)
             end)
         end
     end
@@ -62,7 +67,7 @@ function ArcaneCharges:Init(parent)
     parent.orderedElements:set(elementName, charges)
 end
 
-function SoulShards:Update(...)
+function ArcaneCharges:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local db = self.db
 
@@ -94,29 +99,21 @@ function SoulShards:Update(...)
         local r, g, b = unpack(A.colors.power[SPELL_POWER_ARCANE_CHARGES])
         local texture = media:Fetch("statusbar", db["Texture"])
 
+        if (orientation == "HORIZONTAL") then
+            width = math.floor((width - x) / MAX_ARCANE_CHARGES)
+        else
+            height = math.floor((height - y) / MAX_ARCANE_CHARGES)
+        end
+
         for i = 1, MAX_ARCANE_CHARGES do
             local power = self.buttons[i]
             power:SetOrientation(orientation)
             power:SetReverseFill(db["Reversed"])
             power:SetStatusBarTexture(texture)
             power:SetStatusBarColor(r, g, b)
-            power:SetMinMaxValues(0, 10)
+            power:SetMinMaxValues(0, 1)
 
-            if (orientation == "HORIZONTAL") then
-                if (i == 1) then
-                    power:SetPoint("LEFT", self, "LEFT", 0, 0)
-                else
-                    power:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-                end
-                width = width / MAX_ARCANE_CHARGES
-            else
-                if (i == 1) then
-                    power:SetPoint("TOP", self, "TOP", 0, 0)
-                else
-                    power:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-                end
-                height = height / MAX_ARCANE_CHARGES
-            end
+            width, height = T:PositionClassPowerIcon(self, power, orientation, width, height, MAX_ARCANE_CHARGES, i, x, y)
 
             power.bg:SetTexture(texture)
             power.bg:SetVertexColor(r * .33, g * .33, b * .33)

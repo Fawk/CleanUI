@@ -44,22 +44,34 @@ function TargetTarget:Update(...)
             local db = self.db or arg2
             local position, size = db["Position"], db["Size"]
 
-            Units:Position(self, position)
-            self:SetSize(size["Width"], size["Height"])
+            if (not InCombatLockdown()) then
+                Units:Position(self, position)
+                self:SetSize(size["Width"], size["Height"])
+                self:SetAttribute("*type1", "target")
+                self:SetAttribute("*type2", "togglemenu")
+                A.modules.clickcast:Setup(self, db["Clickcast"])
+            end
 
             --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
-            self:SetAttribute("*type1", "target")
-            self:SetAttribute("*type2", "togglemenu")
 
             A.modules.clickcast:Setup(self, db["Clickcast"])
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
-            for _,tag in next, db["Tags"] do
-                Units:Tag(self, tag)
+            self.tags:foreach(function(key, tag)
+                if (not db["Tags"][key]) then
+                    tag:Hide()
+                    self.tags:remove(key)
+                end
+            end)
+
+            for name,tag in next, db["Tags"] do
+                Units:Tag(self, name, tag)
             end
+
+            self:ForceTagUpdate()
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])

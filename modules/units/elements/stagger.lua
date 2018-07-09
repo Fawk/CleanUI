@@ -18,22 +18,6 @@ local function notValid(frame)
 	end
 end
 
-function Stagger:Attach(stagger, parent)
-	local chi = parent.orderedElements:get("Chi")
-	if (chi.db["Attached"]) then
-		if (chi.db["Attached Position"] == stagger.db["Attached Position"]) then
-			if (stagger.db["Place After Chi"]) then
-				Units:Attach(stagger, stagger.db, chi)
-			else
-				Units:Attach(stagger, stagger.db)
-				Units:Attach(chi, chi.db, stagger)
-			end
-		end
-	else
-		Units:Attach(stagger, stagger.db)
-	end
-end
-
 function Stagger:Init(parent)
 	local db = parent.db[elementName]
 	local texture = media:Fetch("statusbar", db["Texture"])
@@ -76,12 +60,13 @@ function Stagger:Init(parent)
 		MonkStaggerBar:UnregisterEvent('UNIT_DISPLAYPOWER')
 		MonkStaggerBar:UnregisterEvent('UPDATE_VEHICLE_ACTION_BAR')
 
-		if (notValid()) then 
-	   		stagger:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	   		stagger:SetScript("OnEvent", function(self, event, ...)
+		if (notValid()) then
+			local frame = CreateFrame("Frame")
+	   		frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	   		frame:SetScript("OnEvent", function(self, event, ...)
 	   			if (notValid()) then return end
 		    	Stagger:Init(parent)
-		    	stagger:SetScript("OnEvent", nil)
+		    	frame:SetScript("OnEvent", nil)
 			end)
 	   	end
 	end
@@ -109,8 +94,7 @@ function Stagger:Update(...)
 
 	if (event == UnitEvent.UPDATE_TAGS) then
 		local tag = arg1
-		tag.text = tag.format
-			:replace("[stagger]", staggerValue)
+		tag:AddReplaceLogic("[stagger]", staggerValue)
 	elseif (event == UnitEvent.UPDATE_DB) then
 		local texture = media:Fetch("statusbar", db["Texture"])
 		local size = db["Size"]
@@ -135,7 +119,7 @@ function Stagger:Update(...)
 		
 		U:CreateBackground(self, db, false)
 
-		Stagger:Attach(self, parent)
+		Units:Attach(self, self.db)
 	else
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 		self:SetValue(staggerValue)

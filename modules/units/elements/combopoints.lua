@@ -6,16 +6,22 @@ local CreateFrame = CreateFrame
 local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
+local GetShapeshiftForm = GetShapeshiftForm
 local SPELL_POWER_COMBO_POINTS = SPELL_POWER_COMBO_POINTS
 
 --[[ Locals ]]
 local elementName = "Combo Points"
 local ComboPoints = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR", "PLAYER_TALENT_UPDATE" }
-local MAX_COMBO_POINTS = 6
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR", "PLAYER_TALENT_UPDATE", "UPDATE_SHAPESHIFT_FORM" }
+local MAX_COMBO_POINTS = 10
+
+local function notValid()
+    return select(2, UnitClass("player")) == "DRUID" and GetShapeshiftForm() ~= 2
+end
 
 function ComboPoints:Init(parent)
-    if (select(2, UnitClass("player")) ~= "ROGUE") then
+    local class = select(2, UnitClass("player"))
+    if (class ~= "ROGUE" and class ~= "DRUID") then
         return
     end
 
@@ -28,7 +34,7 @@ function ComboPoints:Init(parent)
         points.db = db
 
         for i = 1, MAX_COMBO_POINTS do
-            local point = CreateFrame("StatusBar", T:frameName(parentName, "Combo Point"..i), parent)
+            local point = CreateFrame("StatusBar", T:frameName(parentName, "Combo Point"..i), points)
             point.bg = point:CreateTexture(nil, "BORDER")
             point.bg:SetAllPoints()
             points.buttons[i] = point
@@ -42,6 +48,16 @@ function ComboPoints:Init(parent)
         points:SetScript("OnEvent", function(self, ...)
             ComboPoints:Update(self, ...)
         end)
+
+        if (notValid()) then
+            local frame = CreateFrame("Frame")
+            frame:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+            frame:SetScript("OnEvent", function(self, ...)
+                if (notValid()) then return end
+                ComboPoints:Init(parent)
+                frame:SetScript("OnEvent", nil)
+            end)
+        end
     end
 
     self:Update(points, UnitEvent.UPDATE_DB)
@@ -53,6 +69,14 @@ end
 function ComboPoints:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local db = self.db
+    
+    if (notValid()) then
+        self:Hide()
+        return
+    else
+        self:Show()
+    end
+
     local realMax = UnitPowerMax("player", SPELL_POWER_COMBO_POINTS)
 
     if (event == UnitEvent.UPDATE_DB) then
@@ -65,9 +89,9 @@ function ComboPoints:Update(...)
         local y = db["Y Spacing"] 
 
         if (orientation == "HORIZONTAL") then
-            width = (width * realMax) + (x * (realMax - 1))
+            width = width + (x * (realMax - 1))
         else
-            height = (height * realMax) + (y * (realMax - 1))
+            height = height + (y * (realMax - 1))
         end
         
         self:SetSize(width, height)
@@ -75,6 +99,12 @@ function ComboPoints:Update(...)
 
         local r, g, b = unpack(A.colors.power[SPELL_POWER_COMBO_POINTS])
         local texture = media:Fetch("statusbar", db["Texture"])
+
+        if (orientation == "HORIZONTAL") then
+            width = math.floor((width - x) / realMax)
+        else
+            height = math.floor((height - y) / realMax)
+        end
 
         for i = 1, MAX_COMBO_POINTS do
             local point = self.buttons[i]
@@ -84,21 +114,7 @@ function ComboPoints:Update(...)
             point:SetStatusBarColor(r, g, b)
             point:SetMinMaxValues(0, 1)
 
-            if (orientation == "HORIZONTAL") then
-                if (i == 1) then
-                    point:SetPoint("LEFT", self, "LEFT", 0, 0)
-                else
-                    point:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-                end
-                width = width / realMax
-            else
-                if (i == 1) then
-                    point:SetPoint("TOP", self, "TOP", 0, 0)
-                else
-                    point:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-                end
-                height = height / realMax
-            end
+            width, height = T:PositionClassPowerIcon(self, point, orientation, width, height, realMax, i, x, y)
 
             point.bg:SetTexture(texture)
             point.bg:SetVertexColor(r * .33, g * .33, b * .33)

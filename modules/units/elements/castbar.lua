@@ -171,6 +171,8 @@ function Castbar:Update(...)
 			local duration = parent.castBarDuration + arg1
 			if(duration >= parent.castBarMax) then
 				parent.casting = nil
+				parent.castBarCastId = nil
+
 				self:Hide()
 			end
 
@@ -187,18 +189,26 @@ function Castbar:Update(...)
 
 			parent.castBarDuration = duration
 			bar:SetValue(duration)
+		else
+			parent.casting = nil
+			parent.castBarCastId = nil
+
+			self:Hide()
 		end
+
+		return
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
-		if (not parent.casting) then
-			self:Hide()
-		else
-			self:Show()
+		if (parent.castBarSpell and (arg1 == 'UNIT_SPELLCAST_START' or arg1 == 'UNIT_SPELLCAST_CHANNEL_START')) then
 			self.Icon:SetTexture(parent.castBarTexture)
 			bar:SetMinMaxValues(0, parent.castBarMax)
 			bar:SetValue(0)
+
+			self:Show()
 		end
+
+		return
 	end
 
 	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", parent.castBarDuration, parent.castBarMax, A.noop, A.ColorBar)

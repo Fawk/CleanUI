@@ -236,7 +236,7 @@ function T:Background(frame, db, anchor, isBackdrop)
 		if (not target:GetBackdrop()) then
 			target:SetBackdrop({
 				bgFile = media:Fetch("statusbar", "Default"),
-				edgeFile = media:Fetch("border", "test-border"),
+				edgeFile = media:Fetch("border", "test-border2"),
 				edgeSize = 3,
 				tile = true,
 				tileSize = 1,
@@ -268,6 +268,33 @@ function T:HookSetPoint(frame, position, w, h)
 	frame:ClearAllPoints()
 	frame:SetParent(A.frameParent)
 	frame:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+end
+
+function T:PositionClassPowerIcon(parent, icon, orientation, width, height, max, i, x, y)
+	icon:ClearAllPoints()
+    if (orientation == "HORIZONTAL") then
+        if (i == 1) then
+            icon:SetPoint("LEFT", parent, "LEFT", 0, 0)
+        else
+            icon:SetPoint("LEFT", parent.buttons[i-1], "RIGHT", x, 0)
+
+            if (i == max and (((width * i) + x) < parent:GetWidth())) then
+                width = width + (parent:GetWidth() - ((width * i) + (i - x)))
+            end
+        end
+    else
+        if (i == 1) then
+            icon:SetPoint("TOP", parent, "TOP", 0, 0)
+        else
+            icon:SetPoint("TOP", parent.buttons[i-1], "BOTTOM", 0, -y)
+
+            if (i == max and (((height * i) + y) < parent:GetWidth())) then
+                height = height + (parent:GetWidth() - ((height * i) + (i - y)))
+            end
+        end
+    end
+
+    return width, height
 end
 
 function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)

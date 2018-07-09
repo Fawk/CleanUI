@@ -1349,10 +1349,12 @@ function A:CreatePrefs(db)
         self.parent.children:foreach(function(child)
             X:HandleChildren(child.children, false)
         end)
-        X:HandleChildren(self.children, true, true)
-        
+        X:HandleChildren(self.children, true, true)        
         if (A.clickcastWindow) then
             A.clickCastWindow:Hide()
+        end
+        if (A.tagsWindow) then
+            A.tagsWindow:Hide()
         end
     end
 
@@ -2061,7 +2063,7 @@ function A:CreatePrefs(db)
                                             order = 1,
                                             placement = function(self)
                                                 self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                                                self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 150, 0)
                                                 self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                                             end,
                                             step = 1,
@@ -2125,9 +2127,29 @@ function A:CreatePrefs(db)
                                             height = 20
                                         }
                                     }
+                                },
+                                ["Edge Size"] = {
+                                    type = "number",
+                                    order = 3,
+                                    placement = function(self)
+                                        self.title:ClearAllPoints()
+                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                        self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                    end,
+                                    step = 1,
+                                    decimals = false,
+                                    min = 1,
+                                    max = 100,
+                                    get = genericGetValue,
+                                    set = genericSetValue,
+                                    width = 50,
+                                    height = 20
                                 }
                             }
-                        }
+                        },
+                        ["Tags"] = A.modules.tags:GetOptions(function(self) 
+                            return self.parent:enabled() 
+                        end, hideParentChildrenAndShowSelf, 11),
                     }
                 },
                 ["Target"] = {
@@ -2183,7 +2205,7 @@ function A:CreatePrefs(db)
                         self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
                     end,
                     children = {
-                        ["Clickcast"] = A.modules.clickcast:GetOptions(genericEnabled, 1),
+                        ["Clickcast"] = A.modules.clickcast:GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 1),
                     }
                 },
                 ["Raid"] = {

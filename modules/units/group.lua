@@ -55,26 +55,31 @@ function Group:Init(name, maxMembers, db)
         self:UpdateUnits()
 	end
 	container.UpdateUnits = function(self)
-        for i = 1, maxMembers do
-            local uf = self.header:GetAttribute("child"..i)
-            if (uf and self.initFunc) then
-	            if (not uf.init) then
-	            	uf.init = true
-	            	uf.db = db
-					uf:RegisterForClicks("AnyUp")
-                	uf.unit = uf:GetAttribute("unit")
-	            	uf.GetDbName = function(self) 
-	            		return name 
-	            	end
+		if (A.groupSimulating) then
+			self.init = true
+			A.modules[A.groupSimulating:lower()]:Simulate(self.maxMembers)
+		else
+	        for i = 1, maxMembers do
+	            local uf = self.header:GetAttribute("child"..i)
+	            if (uf and self.initFunc) then
+		            if (not uf.init) then
+		            	uf.init = true
+		            	uf.db = db
+						uf:RegisterForClicks("AnyUp")
+	                	uf.unit = uf:GetAttribute("unit")
+		            	uf.GetDbName = function(self) 
+		            		return name 
+		            	end
 
-					Group:Update(uf, UnitEvent.UPDATE_DB, self)
-	            	self:initFunc(uf)
+						Group:Update(uf, UnitEvent.UPDATE_DB, self)
+		            	self:initFunc(uf)
+		            end
+
+	                uf:Update(UnitEvent.UPDATE_DB, self)
+	                self.init = true
 	            end
-
-                uf:Update(UnitEvent.UPDATE_DB, self)
-                self.init = true
-            end
-        end
+	        end
+	    end
     end
 
     container:SetAttribute("UpdateSize", ([[
@@ -217,9 +222,24 @@ function Group:UpdateHeader(container)
 	RegisterAttributeDriver(header, 'state-visibility', db["Visibility"])
 end
 
+function Group:SimulateTags(frame)
+    frame.tags:foreach(function(key, tag)
+        frame.orderedElements:foreach(function(k, element)
+            element:Update(UnitEvent.UPDATE_TAGS, tag)
+        end)
+        A:FormatTag(tag)
+        tag:SetText(tag.text)
+    end)
+end
+
 function Group:Update(...)
 	local this = self
     local self, event, arg2, arg3, arg4, arg5 = ...
+
+    local simulating = arg3 == "SIMULATE"
+    if (simulating) then
+    	A.groupSimulating = arg2.name
+    end
 
     if (not self.super) then
     	A:SetUnitMeta(self)
@@ -232,17 +252,30 @@ function Group:Update(...)
     if (event == UnitEvent.UPDATE_DB) then
         
         local db = self.db
-        Group:UpdateHeader(arg2)
+
+        if (not simulating) then
+        	Group:UpdateHeader(arg2)
+        end
 
      	local size = db["Size"]
-        self:SetSize(size["Width"], size["Height"])
+        if (not InCombatLockdown()) then
+            self:SetSize(size["Width"], size["Height"])
+            A.modules.clickcast:Setup(self, db["Clickcast"])
+        end
 
         if (not self.tags) then
             self.tags = A:OrderedMap()
         end
 
-        for _,tag in next, db["Tags"] do
-            Units:Tag(self, tag)
+        self.tags:foreach(function(key, tag)
+            if (not db["Tags"][key]) then
+                tag:Hide()
+                self.tags:remove(key)
+            end
+        end)
+
+        for name,tag in next, db["Tags"] do
+            Units:Tag(self, name, tag)
         end
 
         if (not self.orderedElements) then
@@ -257,9 +290,11 @@ function Group:Update(...)
 
     	U:CreateBackground(self, db)
 
-        self.orderedElements:foreach(function(key, obj)
-            obj:Update(event, db[key])
-        end)
+    	if (not simulating) then
+	        self.orderedElements:foreach(function(key, obj)
+	            obj:Update(event, db[key])
+	        end)
+	    end
     end
 end
 

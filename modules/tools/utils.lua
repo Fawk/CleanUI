@@ -182,9 +182,6 @@ end
 
 object.__index = object
 
-local widget = setmetatable({}, object)
-widget.__index = object
-
 local points = {
 	["atC"] = E.regions.C,
 	["atT"] = E.regions.T,
@@ -445,7 +442,7 @@ local function ButtonBuilder(parent)
 		parent = parent
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.button = CreateFrame("Button", nil, parent)
 
 	o.button.parent = parent
@@ -503,7 +500,7 @@ local function EditBoxBuilder(parent)
 		parent = parent
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
 	o.textbox.parent = parent
@@ -577,7 +574,7 @@ local function NumberBuilder(parent)
 		parent = parent
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.textbox = CreateFrame("EditBox", nil, parent)
 
 	o.textbox.parent = parent
@@ -634,11 +631,6 @@ local function NumberBuilder(parent)
 		return self
 	end
 
-	function o:onValueChanged(func)
-		self.valueChanged = func
-		return self
-	end
-
 	function o:min(minValue)
 		self.minValue = minValue
 		return self
@@ -675,7 +667,9 @@ local function NumberBuilder(parent)
 			if ((number + (o.step or 1)) <= o.maxValue) then
 				o.textbox.lastValue = number
 				o.textbox:SetText(number + (o.step or 1))
-				o:valueChanged(o.textbox, number + (o.step or 1))
+				if o.onValueChangedFunc then 
+					o:onValueChangedFunc(o.textbox, number + (o.step or 1))
+				end
 			end
 		end)
 
@@ -686,7 +680,9 @@ local function NumberBuilder(parent)
 			if ((number - (o.step or 1)) >= o.minValue) then
 				o.textbox.lastValue = number
 				o.textbox:SetText(number - (o.step or 1))
-				o:valueChanged(o.textbox, number - (o.step or 1))
+				if o.onValueChangedFunc then
+					o:onValueChangedFunc(o.textbox, number - (o.step or 1))
+				end
 			end
 		end)
 
@@ -705,7 +701,9 @@ local function NumberBuilder(parent)
 			end
 
 			self:SetText(text)
-			o:valueChanged(self, text)
+			if o.onValueChangedFunc then 
+				o:onValueChangedFunc(self, text)
+			end
 		end)
 
 		self.textbox:SetScript("OnEnterPressed", function(self)
@@ -720,7 +718,9 @@ local function NumberBuilder(parent)
 			end
 
 			self:SetText(text)
-			o:valueChanged(self, text)
+			if o.onValueChangedFunc then 
+				o:valueChangedFunc(self, text)
+			end
 		end)
 
 		self.textbox:SetScript("OnTextChanged", function(self)
@@ -749,13 +749,99 @@ local function NumberBuilder(parent)
 	return o
 end
 
+local function SelectBoxBuilder(parent)
+	local o = {
+		parent = parent,
+	}
+
+	setmetatable(o, object)
+
+	o.box = CreateFrame("Frame", nil, parent)
+	o.box.items = A:OrderedMap()
+
+	o.box.parent = parent
+	o.box.active = true
+	o.box.selected = nil
+
+	o.box.SetActive = function(self, boolean)
+		self.active = boolean
+		self:SetEnabled(self.active)
+
+		self.selectedButton.active = boolean
+		self.selectedButton:SetActive(self.selectedButton.active)
+	end
+
+	o.box.IsActive = function(self)
+		return parent:IsActive() and self.active
+	end
+
+	o.box.SetSelected = function(self, value)
+		self.selected = value
+		self.items:foreach(function(key, item)
+			if (key == self.selected) then
+				item:SetBackdropColor(unpack(o.selectedColor))
+			else
+				item:SetBackdropColor(unpack(o.defaultColor))
+			end
+		end)
+	end
+
+	o.box.SetValue = function(self, value)
+		self:SetSelected(value)
+
+		if o.onValueChangedFunc then
+			o:onValueChangedFunc(self, self.selected)
+		end
+	end
+
+	o.box.AddItem = function(self, item)
+		local name = item["Name"]
+		if (not name) then
+			for k,v in next, item do print(k, v) end
+			return error("Could not find name for item added to SelectBox!")
+		end
+
+		local button
+		if (self.items:isEmpty()) then
+			button = A.ButtonBuilder(self)
+					:size(self.w, 20)
+					:atTop()
+					:y(-2)
+					:onClick(function(self, b, d)
+						local item = self.item
+
+					end)
+					:build()
+		else
+
+		end
+
+		self.items:add(name, item)
+	end
+
+	o.box.SelectFirst = function(self)
+		if (not self.items:isEmpty()) then
+			self:SetSelected(self.items:firstKey())
+		end
+	end
+
+	function o:build()
+		setPoints(self, self.box)
+		self.box:SetSize(self.w, self.h)
+
+		return self.box
+	end
+
+	return o
+end
+
 local function DropdownBuilder(parent)
 	local o = {
 		parent = parent,
 		items = A:OrderedTable()
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.dropdown = CreateFrame("Button", nil, parent)
 	o.dropdown.items = A:OrderedTable()
 
@@ -918,6 +1004,11 @@ local function DropdownBuilder(parent)
 
 	function o:onItemHover(func)
 		self.itemHover = func
+		return self
+	end
+
+	function o:firstItemIsSpecialColor(color)
+		self.firstItemSpecial = color
 		return self
 	end
 
@@ -1094,6 +1185,11 @@ local function DropdownBuilder(parent)
 			self.dropdown.items:add(button)
 		end)
 
+		if (self.firstItemSpecial) then
+			local r, g, b, a = unpack(self.firstItemSpecial)
+			self.dropdown.items:get(1).text:SetTextColor(r, g, b, a)
+		end
+
 		if (self.override) then
 			selectedButton.text:SetText(self.override)
 		else
@@ -1131,7 +1227,7 @@ local function ColorBuilder(parent)
 		parent = parent,
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.color = CreateFrame("Button", nil, parent)
 
 	o.color.parent = parent
@@ -1217,7 +1313,7 @@ local function ToggleBuilder(parent)
 		parent = parent,
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.toggle = CreateFrame("Button", nil, parent)
 
 	o.toggle.parent = parent
@@ -1475,7 +1571,7 @@ local function MultiDropdownBuilder(parent)
 		items = A:OrderedTable()
 	}
 
-	setmetatable(o, widget)
+	setmetatable(o, object)
 	o.dropdown = CreateFrame("Button", nil, parent)
 	o.dropdown.items = A:OrderedTable()
 
@@ -2176,8 +2272,8 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 	        bgFile = media:Fetch("background", "cui-default-bg"), 
 	        tile = true, 
 	        tileSize = 1,
-	        edgeFile = media:Fetch("border", "test-border"), 
-	        edgeSize = 3, 
+	        edgeFile = media:Fetch("border", "test-border2"), 
+	        edgeSize = db["Background"]["Edge Size"] or 3, 
 	        insets = { 
 	        	top = offset["Top"], 
 	        	bottom = offset["Bottom"], 

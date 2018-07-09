@@ -6,13 +6,20 @@ local CreateFrame = CreateFrame
 local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
+local GetSpecialization = GetSpecialization
 local SPELL_POWER_CHI = SPELL_POWER_CHI
 
 --[[ Locals ]]
 local elementName = "Chi"
 local Chi = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR", "PLAYER_TALENT_UPDATE" }
-local MAX_CHI = 5
+local MAX_CHI = 6
+
+local function notValid(frame)
+	if (select(2, UnitClass("player")) ~= "MONK" or (GetSpecialization() ~= 3)) then
+		return true
+	end
+end
 
 function Chi:Init(parent)
     if (select(2, UnitClass("player")) ~= "MONK") then
@@ -28,7 +35,7 @@ function Chi:Init(parent)
         chis.db = db
 
         for i = 1, MAX_CHI do
-            local chi = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), parent)
+            local chi = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), chis)
             chi.bg = chi:CreateTexture(nil, "BORDER")
             chi.bg:SetAllPoints()
             chis.buttons[i] = chi
@@ -43,16 +50,15 @@ function Chi:Init(parent)
             Chi:Update(self, ...)
         end)
 
-        chis.ExtraAttachLogic = function(self)
-            local stagger = parent.orderedElements:get("Stagger")
-                if (stagger and stagger:IsShown()) then
-                    if (stagger.db["Attached"] and stagger.db["Attached Position"] == self.db["Attached Position"] and stagger.db["Place After Chi"]) then
-                        return stagger
-                    end
-                end
-            end
-            return self
-        end
+        if (notValid()) then
+        	local frame = CreateFrame("Frame")
+	   		frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	   		frame:SetScript("OnEvent", function(self, event, ...)
+	   			if (notValid()) then return end
+		    	Chi:Init(parent)
+		    	frame:SetScript("OnEvent", nil)
+			end)
+	   	end
     end
 
     self:Update(chis, UnitEvent.UPDATE_DB)
@@ -64,6 +70,14 @@ end
 function Chi:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local db = self.db
+    
+    if (notValid()) then
+		self:Hide()
+		return
+	else
+		self:Show()
+	end
+
     local realMax = UnitPowerMax("player", SPELL_POWER_CHI)
 
     if (event == UnitEvent.UPDATE_DB) then
@@ -87,6 +101,12 @@ function Chi:Update(...)
         local r, g, b = unpack(A.colors.power[SPELL_POWER_CHI])
         local texture = media:Fetch("statusbar", db["Texture"])
 
+		if (orientation == "HORIZONTAL") then
+			width = math.floor((width - x) / realMax)
+		else
+	        height = math.floor((height - y) / realMax)
+		end
+
         for i = 1, MAX_CHI do
             local chi = self.buttons[i]
             chi:SetOrientation(orientation)
@@ -95,21 +115,7 @@ function Chi:Update(...)
             chi:SetStatusBarColor(r, g, b)
             chi:SetMinMaxValues(0, 1)
 
-            if (orientation == "HORIZONTAL") then
-                if (i == 1) then
-                    chi:SetPoint("LEFT", self, "LEFT", 0, 0)
-                else
-                    chi:SetPoint("LEFT", self.buttons[i-1], "RIGHT", x, 0)
-                end
-                width = width / realMax
-            else
-                if (i == 1) then
-                    chi:SetPoint("TOP", self, "TOP", 0, 0)
-                else
-                    chi:SetPoint("TOP", self.buttons[i-1], "BOTTOM", 0, -y)
-                end
-                height = height / realMax
-            end
+			width, height = T:PositionClassPowerIcon(self, chi, orientation, width, height, realMax, i, x, y)
 
             chi.bg:SetTexture(texture)
             chi.bg:SetVertexColor(r * .33, g * .33, b * .33)
