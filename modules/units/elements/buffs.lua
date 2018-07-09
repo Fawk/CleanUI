@@ -1,13 +1,59 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
+
+--[[ Blizzard ]]
+
+--[[ Lua ]]
+
+--[[ Locals ]]
+local elementName = "Buffs"
+local Buffs = {}
 local buildText = A.TextBuilder
 
-local Buffs = function(frame, db)
+function Buffs:Init(parent)
 
+	local db = parent.db[elementName]
+
+	if (not db) then return end
+
+	local buffs = parent.orderedElements:get(elementName)
+	if (not buffs) then
+		
+		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, frame)
+		buffs:SetSize(16, 16)
+		buffs.db = db
+		buffs.active = A:OrderedMap()
+
+		buffs.Update = function(self, ...)
+			Buffs:Update(self, ...)
+		end
+
+		local updateFrame = CreateFrame("Frame")
+		updateFrame:SetScript("OnUpdate", function(self, elapsed)
+			-- Here we want to update the values of active buffs
+			-- Text values and bar values
+			buffs.active:foreach(function(key, buff)
+				
+			end)
+		end)
+
+		buffs.updateFrame = updateFrame
+
+		buffs:RegisterEvent("UNIT_AURA")
+		buffs:SetScript("OnEvent", function(self, event, ...)
+			self:Update(event, ...)
+		end)
+	end
+
+	buffs:Update(UnitEvent.UPDATE_DB)
+	buffs:Update(UnitEvent.UPDATE_BUFFS)
+
+	parent.orderedElements:set(elementName, buffs)
+
+--[[
 	local growth, attached, style, size = db["Growth"], db["Attached"], db["Style"], db["Size"]
 	local buffs = frame.Buffs or (function()
-		local buffs = CreateFrame("Frame", T:frameName(frame.unit, "Buffs"), frame)
+		local buffs = 
 		buffs:SetSize(frame:GetWidth(), 300)
 		return buffs
 	end)()
@@ -241,8 +287,35 @@ local Buffs = function(frame, db)
 				end
 			end
 		end)
-
-	frame.Buffs = buffs
+		--]]
 end
 
-A["Elements"]:add({ name = "Buffs", func = Buffs })
+function Buffs:Update(...)
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+	local parent = self:GetParent()
+	local db = self.db
+
+	if (event == UnitEvent.UPDATE_DB) then
+
+	else
+		local ownAppliedBuffs = parent.buffs.own
+		for spellId, aura in next, ownAppliedBuffs do
+			local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
+					canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
+			
+			
+		end
+
+		if (not db["Own only"]) then
+			local othersAppliedBuffs = parent.buffs.others
+			for spellId, aura in next, othersAppliedBuffs do
+				local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
+						canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
+				
+				
+			end
+		end
+	end
+end
+
+A["Shared Elements"]:set(elementName, Buffs)

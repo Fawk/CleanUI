@@ -93,7 +93,11 @@ local roles = { "TANK", "HEALER", "DAMAGER" }
 function Role:Simulate(parent)
     local oldUnitGroupRolesAssigned = UnitGroupRolesAssigned
 
-    
+    UnitGroupRolesAssigned = function(self)
+        return roles[math.random(1, 3)]
+    end
+
+    self:Init(parent)
     
     UnitGroupRolesAssigned = oldUnitGroupRolesAssigned
 end

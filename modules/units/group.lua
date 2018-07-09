@@ -81,6 +81,9 @@ function Group:Init(name, maxMembers, db)
 	        end
 	    end
     end
+    container.getMoverSize = function(self)
+        return Group:GetMoverSize(self, self.maxMembers, self.db)
+    end
 
     container:SetAttribute("UpdateSize", ([[
         self:SetWidth(%d)

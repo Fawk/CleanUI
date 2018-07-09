@@ -6,6 +6,11 @@ local T = A.Tools
 --[[ Blizzard ]]
 local CreateFrame = CreateFrame
 
+--[[ Lua ]]
+local rand = math.random
+local floor = math.floor
+local unpack = unpack
+
 --[[ Locals ]]
 local elementName = "Heal Prediction"
 local HealPrediction = {}
@@ -177,7 +182,7 @@ function HealPrediction:Update(...)
 		tag:AddReplaceLogic("[absorb:round]", T:short(parent.absorb, 2))
 		tag:AddReplaceLogic("[healabsorb]", parent.healAbsorb)
 		tag:AddReplaceLogic("[healabsorb:round]", T:short(parent.healAbsorb, 2))
-		tag:AddReplaceLogic("[perabsorb]", math.floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
+		tag:AddReplaceLogic("[perabsorb]", floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
 	else
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 
@@ -215,6 +220,10 @@ end
 
 function HealPrediction:Simulate(parent)
 
-	
+    parent.myIncomingHeal = rand(0, parent.deficitHealth)
+    parent.otherIncomingHeal = rand(0, parent.deficitHealth)
+    parent.absorb = rand(0, parent.deficitHealth)
+    parent.healAbsorb = rand(0, parent.deficitHealth)
 
+    self:Init(parent)
 end
