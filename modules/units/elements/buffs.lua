@@ -10,6 +10,8 @@ local elementName = "Buffs"
 local Buffs = {}
 local buildText = A.TextBuilder
 
+local buttonPool = {}
+
 function Buffs:Init(parent)
 
 	local db = parent.db[elementName]
@@ -27,23 +29,6 @@ function Buffs:Init(parent)
 		buffs.Update = function(self, ...)
 			Buffs:Update(self, ...)
 		end
-
-		--local updateFrame = CreateFrame("Frame")
-		--updateFrame:SetScript("OnUpdate", function(self, elapsed)
-			-- Here we want to update the values of active buffs
-			-- Text values and bar values
-			--buffs.active:foreach(function(key, buff)
-				
-			--end)
-		--end)
-
-		--buffs.updateFrame = updateFrame
-
-		A:QueueUpdate(buffs:GetName(), function(elapsed)
-			buffs.active:foreach(function(key, buff)
-				
-			end)
-		end)
 
 		buffs:RegisterEvent("UNIT_AURA")
 		buffs:SetScript("OnEvent", function(self, event, ...)
@@ -311,7 +296,20 @@ function Buffs:Update(...)
 			local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
 					canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
 
+			--[[
+SetScript("OnUpdate", function(self, elapsed)
+			-- Here we want to update the values of active buffs
+			-- Text values and bar values
+			buffs.active:foreach(function(key, buff)
+				
+			end)
+		end)
 
+			]]
+
+			-- Take a button from pool
+			-- Here want to add OnUpdate script to the button if the duration is not 0
+			-- Then remove the OnUpdate when the button's duration reaches 0
 		end
 
 		if (not db["Own only"]) then
@@ -321,6 +319,9 @@ function Buffs:Update(...)
 						canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
 				
 				
+			-- Take a button from pool
+				-- Here want to add OnUpdate script to the button if the duration is not 0
+				-- Then remove the OnUpdate when the button's duration reaches 0
 			end
 		end
 	end

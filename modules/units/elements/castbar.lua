@@ -74,14 +74,6 @@ function Castbar:Init(parent)
 			self.bar.bg:SetTexture(media:Fetch("statusbar", db["Texture"]))
 		end)
 
-		--container:SetScript("OnUpdate", function(self, elapsed)
-			--self:Update("OnUpdate", elapsed)
-		--end)
-
-		A:QueueUpdate(container:GetName(), function(elapsed)
-			container:Update("OnUpdate", elapsed)
-		end)
-
 		if (parent.unit == "player") then
 			CastingBarFrame:UnregisterAllEvents()
 			CastingBarFrame.Show = CastingBarFrame.Hide
@@ -91,6 +83,8 @@ function Castbar:Init(parent)
 			PetCastingBarFrame.Show = PetCastingBarFrame.Hide
 			PetCastingBarFrame:Hide()
 		end
+
+		container:Hide()
 	end
 
 	container:Update(UnitEvent.UPDATE_DB)
@@ -179,6 +173,8 @@ function Castbar:Update(...)
 				parent.casting = nil
 				parent.castBarCastId = nil
 
+				self:SetScript("OnUpdate", nil)
+
 				self:Hide()
 			end
 
@@ -199,6 +195,8 @@ function Castbar:Update(...)
 			parent.casting = nil
 			parent.castBarCastId = nil
 
+			self:SetScript("OnUpdate", nil)
+
 			self:Hide()
 		end
 
@@ -210,6 +208,10 @@ function Castbar:Update(...)
 			self.Icon:SetTexture(parent.castBarTexture)
 			bar:SetMinMaxValues(0, parent.castBarMax)
 			bar:SetValue(0)
+
+			self:SetScript("OnUpdate", function(self, elapsed)
+				self:Update("OnUpdate", elapsed)
+			end)
 
 			self:Show()
 		end

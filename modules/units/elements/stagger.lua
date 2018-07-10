@@ -19,6 +19,10 @@ local function notValid(frame)
 end
 
 function Stagger:Init(parent)
+	if (select(2, UnitClass("player")) ~= "MONK") then
+		return
+	end
+
 	local db = parent.db[elementName]
 	local texture = media:Fetch("statusbar", db["Texture"])
 
@@ -51,13 +55,6 @@ function Stagger:Init(parent)
 	    stagger:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 		end)
-		--stagger:SetScript("OnUpdate", function(self, elapsed)
-			--self:Update("OnUpdate")
-		--end)
-
-		A:QueueUpdate(stagger:GetName(), function(elapsed)
-			stagger:Update("OnUpdate")
-		end)
 
 		MonkStaggerBar:UnregisterEvent('PLAYER_ENTERING_WORLD')
 		MonkStaggerBar:UnregisterEvent('PLAYER_SPECIALIZATION_CHANGED')
@@ -71,6 +68,9 @@ function Stagger:Init(parent)
 	   			if (notValid()) then return end
 		    	Stagger:Init(parent)
 		    	frame:SetScript("OnEvent", nil)
+				stagger:SetScript("OnUpdate", function(self, elapsed)
+					self:Update("OnUpdate")
+				end)
 			end)
 	   	end
 	end
@@ -93,7 +93,6 @@ function Stagger:Update(...)
 		self:Show()
 	end
 
-	parent:Update(UnitEvent.UPDATE_HEALTH)
 	local staggerValue = UnitStagger("player")
 
 	if (event == UnitEvent.UPDATE_TAGS) then

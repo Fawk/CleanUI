@@ -10,19 +10,6 @@ Addon.noop = function() end
 Addon.OrderedTable = Args.OrderedTable
 Addon.OrderedMap = Args.OrderedMap
 
-Addon.updateThread = CreateFrame("Frame")
-Addon.updateThread.queue = Addon:OrderedMap()
-Addon.updateThread:SetScript("OnUpdate", function(self, elapsed)
-	self.queue:foreach(function(key, func)
-		func(elapsed)
-	end)
-end)
-
-Addon.QueueUpdate = function(self, key, updateFunc)
-	self.updateThread.queue:set(key, updateFunc)
-end
-
-Addon["Elements"] = Args:OrderedTable()
 Addon["Shared Elements"] = Args:OrderedMap()
 Addon["Player Elements"] = Args:OrderedMap()
 
@@ -134,7 +121,7 @@ function Addon:OnEnable()
 	profile:Load()
 
 	self:Init()
-	self:SetStyle()
+	--self:SetStyle()
 
     Addon:CreatePrefs(Addon["Profile"]["Options"])
 

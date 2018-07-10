@@ -39,12 +39,13 @@ function Status:Init(parent)
             Status:Update(self, event, ...)
         end
 
-        --status:SetScript("OnUpdate", function(self, elapsed)
-            --self:Update("OnUpdate", self.db, elapsed)
-        --end)
-
-        A:QueueUpdate(status:GetName(), function(elapsed)
-            status:Update("OnUpdate", elapsed)
+        status.timer = 0
+        status:SetScript("OnUpdate", function(self, elapsed)
+            self.timer = self.timer + elapsed
+            if (self.timer > .5) then
+                self:Update("OnUpdate", self.db, elapsed)
+                self.timer = 0
+            end
         end)
     end
 

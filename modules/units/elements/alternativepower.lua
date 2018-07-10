@@ -71,4 +71,4 @@ function AlternativePower(frame, db)
 	frame.AlternativePower = bar
 end
 
-A["Elements"]:add({ name = "AlternativePower", func = AlternativePower })
+--A["Player Elements"]:set({ name = "AlternativePower", func = AlternativePower })

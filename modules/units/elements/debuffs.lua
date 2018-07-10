@@ -243,4 +243,4 @@ local Debuffs = function(frame, db)
 	frame.Debuffs = debuffs
 end
 
-A["Elements"]:add({ name = "Debuffs", func = Debuffs })
+--A["Elements"]:add({ name = "Debuffs", func = Debuffs })
