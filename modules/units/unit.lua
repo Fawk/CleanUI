@@ -51,11 +51,17 @@ local function fetchAuraData(func, tbl, id)
 
     for i = 1, 40 do
         local aura = {func(id, i)}
-        if (aura[1]) then
-            if (aura[8] == id) then
-                tbl.own[aura[11]] = aura
-            else
-                tbl.others[aura[11]] = aura
+        if (tbl.own[aura[11]]) then
+            tbl.own[aura[11]][6] = aura[6]
+        elseif (tbl.others[aura[11]]) then
+            tbl.others[aura[11]][6] = aura[6]
+        else
+            if (aura[1]) then
+                if (aura[8] == id) then
+                    tbl.own[aura[11]] = aura
+                else
+                    tbl.others[aura[11]] = aura
+                end
             end
         end
     end
