@@ -56,7 +56,7 @@ local conditionMap = {
 
 local function registerAttributeIfNeeded(frame, key)
 	local mapped = keyMap[key]
-	local needed = mapped:matchAny("LMB", "MMB", "RMB")
+	local needed = mapped:anyMatch("LMB", "MMB", "RMB")
 	if (needed and not frame:GetAttribute(keyMap[needed])) then
 		frame:SetAttribute(keyMap[needed], "macro")
 	end
@@ -126,8 +126,8 @@ function CC:GetInitString(initString, db)
 				initString = initString..'\nframe:SetAttribute("*macrotext'..mapped:match("%d")..'","'..action..'");'
 				initiated[key] = true
 			else
-				local needed = mapped:matchAny("LMB", "MMB", "RMB")
-				if (not initiated[needed]) then
+				local needed = mapped:anyMatch("LMB", "MMB", "RMB")
+				if (needed and not initiated[needed]) then
 					initString = initString..'\nframe:SetAttribute("'..keyMap[needed]..'","macro");'
 				end
 				initString = initString..'\nframe:SetAttribute("'..mapped..'","'..action..'");'
@@ -165,7 +165,7 @@ local function splitActionsByConditions(db)
 					if (row:anyMatch("target", "togglemenu")) then
 						spell = row
 					else
-						spell = row:match("%s[A-Za-z%s]+"):trim()
+						spell = row:match("%s[:A-Za-z%s]+"):trim()
 						conditions = row:match("%[[@%w,:/]+%]"):sub(2):sub(1, -2):explode(",")
 					end
 
@@ -295,7 +295,7 @@ function CC:ToggleClickCastWindow(group)
 	local actions = splitActionsByConditions(group.db["Actions"])
 	local mappedActions = mapActionsByKey(actions)
 
-	parent:SetSize(350, 20 + (20 * T:tcount(mappedActions["LMB"])))
+	parent:SetSize(350, 20 + (20 * T:tcount(mappedActions["LMB"] or {})))
 
 	local keys = {}
 	for key,_ in next, keyMap do
@@ -422,7 +422,12 @@ function CC:ToggleClickCastWindow(group)
 										end
 									end
 
-									parent:SetHeight(20 + (20 * T:tcount(group.db["Actions"][action.key]:explode(";"))))
+									local rowCount = 0
+									if (group.db["Actions"][action.key]) then
+										rowCount =  T:tcount(group.db["Actions"][action.key]:explode(";"))
+									end
+
+									parent:SetHeight(20 + (20 * rowCount))
 
 									A.dbProvider:Save()
 									dropdown:SimulateClickOnActiveItem()
@@ -453,6 +458,8 @@ function CC:ToggleClickCastWindow(group)
 						relative = row
 						lastRow = row
 					end
+				else
+					parent:SetHeight(20)
 				end
 			end)
 			:build()
@@ -576,8 +583,10 @@ function CC:ToggleClickCastWindow(group)
 			end
 		end)
 		:onEditFocusLost(function(self)
-			self.buttonList:Hide()
-			self.buttonList = nil
+			if (self.buttonList) then
+				self.buttonList:Hide()
+				self.buttonList = nil
+			end
 		end)
 		:build()
 
@@ -604,7 +613,7 @@ function CC:ToggleClickCastWindow(group)
 					-- also override any other settings for this key combination
 					group.db["Actions"][key] = command
 				else
-					if (actionTbl:find("target") or actionTbl:find("togglemenu")) then
+					if (actionTbl and (actionTbl:find("target") or actionTbl:find("togglemenu"))) then
 						-- Present notification here stating that the previous setting has a blizzard command and that
 						-- needs to be removed before you can add something that is not.
 					else

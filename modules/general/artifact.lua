@@ -25,11 +25,11 @@ end
 local function getNumAvailableTraits(self)
     local points, current, tier, numTraits, cost = 0, self.current, self.tier, self.numTraits, self.nextCost
 
-    while cost < current do
-        points = points + 1
-        numTraits = numTraits + 1
-        cost = cost + C_ArtifactUI.GetCostForPointAtRank(numTraits, tier)
-    end
+    -- while cost < current do
+    --     points = points + 1
+    --     numTraits = numTraits + 1
+    --     cost = cost + C_ArtifactUI.GetCostForPointAtRank(numTraits, tier)
+    -- end
 
     return points
 end

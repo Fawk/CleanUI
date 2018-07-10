@@ -19,7 +19,7 @@ function Buffs:Init(parent)
 	local buffs = parent.orderedElements:get(elementName)
 	if (not buffs) then
 		
-		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, frame)
+		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		buffs:SetSize(16, 16)
 		buffs.db = db
 		buffs.active = A:OrderedMap()
@@ -28,16 +28,22 @@ function Buffs:Init(parent)
 			Buffs:Update(self, ...)
 		end
 
-		local updateFrame = CreateFrame("Frame")
-		updateFrame:SetScript("OnUpdate", function(self, elapsed)
+		--local updateFrame = CreateFrame("Frame")
+		--updateFrame:SetScript("OnUpdate", function(self, elapsed)
 			-- Here we want to update the values of active buffs
 			-- Text values and bar values
+			--buffs.active:foreach(function(key, buff)
+				
+			--end)
+		--end)
+
+		--buffs.updateFrame = updateFrame
+
+		A:QueueUpdate(buffs:GetName(), function(elapsed)
 			buffs.active:foreach(function(key, buff)
 				
 			end)
 		end)
-
-		buffs.updateFrame = updateFrame
 
 		buffs:RegisterEvent("UNIT_AURA")
 		buffs:SetScript("OnEvent", function(self, event, ...)
@@ -298,12 +304,14 @@ function Buffs:Update(...)
 	if (event == UnitEvent.UPDATE_DB) then
 
 	else
+		parent:Update(UnitEvent.UPDATE_BUFFS)
+
 		local ownAppliedBuffs = parent.buffs.own
 		for spellId, aura in next, ownAppliedBuffs do
 			local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
 					canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
-			
-			
+
+
 		end
 
 		if (not db["Own only"]) then

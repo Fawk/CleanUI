@@ -298,6 +298,10 @@ function Group:Update(...)
 	            obj:Update(event, db[key])
 	        end)
 	    end
+
+	    if (not simulating) then
+        	self:ForceTagUpdate()
+        end
     end
 end
 

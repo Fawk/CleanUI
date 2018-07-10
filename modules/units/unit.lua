@@ -19,8 +19,11 @@ local UnitChannelInfo = UnitChannelInfo
 
 function A:FormatTag(tag)
     local replaceLogic = A:OrderedMap()
-    replaceLogic:set("[name]", UnitName(tag:GetParent().unit))
-    replaceLogic:set("[name:%d+]", UnitName(tag:GetParent().unit):sub(1, tag.format:match("%d+")))
+
+    local name = UnitName(tag:GetParent().unit) or ""
+
+    replaceLogic:set("[name]", name)
+    replaceLogic:set("[name:%d+]", name:sub(1, tag.format:match("%d+")))
 
     for key, color in next, A.colors.text do
         replaceLogic:set("[color:"..key.."]", color)
@@ -43,13 +46,16 @@ end
 
 -- name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
 local function fetchAuraData(func, tbl, id)
+    if (not tbl.own) then tbl.own = {} end
+    if (not tbl.others) then tbl.others = {} end
+
     for i = 1, 40 do
         local aura = {func(id, i)}
         if (aura[1]) then
             if (aura[8] == id) then
-                tbl.own[aura[11]] = aura[6] > 0 and aura or nil
+                tbl.own[aura[11]] = aura
             else
-                tbl.others[aura[11]] = aura[6] > 0 and aura or nil
+                tbl.others[aura[11]] = aura
             end
         end
     end

@@ -12,13 +12,12 @@ local Role = { name = elementName }
 A["Shared Elements"]:set(elementName, Role)
 
 function Role:Init(parent)
-    local parentName = parent.GetDbName and parent:GetDbName() or parent:GetName()
-    local db = A["Profile"]["Options"][parentName][elementName]
+
+    local db = parent.db[elementName]
 
     if (not db) then return end
 
-    local tbl =  parent.orderedElements:getChildByKey("key", elementName)
-    local role = tbl and tbl.element or nil
+    local role = parent.orderedElements:get(elementName)
     if (not role) then
 
         role = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
@@ -52,39 +51,43 @@ function Role:Update(...)
     local size = db["Size"]
     local role = UnitGroupRolesAssigned(parent.unit)
 
-    self:SetSize(size, size)
-    Units:Position(self, db["Position"])
-    
-    self.text:Hide()
-    self.texture:Hide()
+    if (event == UnitEvent.UPDATE_TAGS) then
+        -- No tags here
+    else
+        self:SetSize(size, size)
+        Units:Position(self, db["Position"])
+        
+        self.text:Hide()
+        self.texture:Hide()
 
-    if (style == "Blizzard") then
-        self.texture:Show()
-        self.texture:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])
-        self.texture:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
-    elseif (style == "Letter" or style == "Text") then
-        local textStyle = db["Text Style"]
-        local textExtra = "NONE"
-        if (textStyle == "Outline") then
-            textExtra = "OUTLINE"
-            self.text:SetShadowColor(0, 0, 0, 0)
-        elseif (textStyle == "Thick Outline") then
-            textExtra = "THICKOUTLINE"
-            self.text:SetShadowColor(0, 0, 0, 0)
-        elseif (textStyle == "Shadow") then
-            textExtra = "NONE"
-            self.text:SetShadowOffset(1, -1)
-            self.text:SetShadowColor(0, 0, 0)
+        if (style == "Blizzard") then
+            self.texture:Show()
+            self.texture:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])
+            self.texture:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+        elseif (style == "Letter" or style == "Text") then
+            local textStyle = db["Text Style"]
+            local textExtra = "NONE"
+            if (textStyle == "Outline") then
+                textExtra = "OUTLINE"
+                self.text:SetShadowColor(0, 0, 0, 0)
+            elseif (textStyle == "Thick Outline") then
+                textExtra = "THICKOUTLINE"
+                self.text:SetShadowColor(0, 0, 0, 0)
+            elseif (textStyle == "Shadow") then
+                textExtra = "NONE"
+                self.text:SetShadowOffset(1, -1)
+                self.text:SetShadowColor(0, 0, 0)
+            end
+            self.text:SetFont(media:Fetch("font", "Default"), db["Text Size"], textExtra)
+            self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
+            self.text:SetTextColor(unpack(db["Text Color"]))
+            self.text:SetAllPoints()
+            self.text:Show()
+        elseif (style == "Custom Texture") then
+            self.texture:Show()
+            self.texture:SetTexture(db["Texture"])
+            self.texture:SetTexCoord(0, 1, 0, 1)
         end
-        self.text:SetFont(media:Fetch("font", "Default"), db["Text Size"], textExtra)
-        self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
-        self.text:SetTextColor(unpack(db["Text Color"]))
-        self.text:SetAllPoints()
-        self.text:Show()
-    elseif (style == "Custom Texture") then
-        self.texture:Show()
-        self.texture:SetTexture(db["Texture"])
-        self.texture:SetTexCoord(0, 1, 0, 1)
     end
 end
 

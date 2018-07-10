@@ -10,6 +10,18 @@ Addon.noop = function() end
 Addon.OrderedTable = Args.OrderedTable
 Addon.OrderedMap = Args.OrderedMap
 
+Addon.updateThread = CreateFrame("Frame")
+Addon.updateThread.queue = Addon:OrderedMap()
+Addon.updateThread:SetScript("OnUpdate", function(self, elapsed)
+	self.queue:foreach(function(key, func)
+		func(elapsed)
+	end)
+end)
+
+Addon.QueueUpdate = function(self, key, updateFunc)
+	self.updateThread.queue:set(key, updateFunc)
+end
+
 Addon["Elements"] = Args:OrderedTable()
 Addon["Shared Elements"] = Args:OrderedMap()
 Addon["Player Elements"] = Args:OrderedMap()
@@ -122,42 +134,7 @@ function Addon:OnEnable()
 	profile:Load()
 
 	self:Init()
-
 	self:SetStyle()
-
-	local buildText = self.TextBuilder
-    
-	local function constructControl(type, desc, optionsParent, relative)
-		local control = CreateFrame(type, nil, optionsParent)
-		local builder = buildText(optionsParent, 0.3):alignWith(relative):atTopLeft()
-
-		if relative == optionsParent then
-			builder:againstTopLeft()
-		else
-			builder:againstBottomLeft()
-		end
-
-		local text = builder:build()
-		text:SetText(desc)
-
-		control:SetPoint(E.regions.T, text, E.regions.B, 0, 0)
-
-		return control
-	end
-
-	local frame = CreateFrame("Frame", nil, self.frameParent)
-	frame:SetSize(250, 100)
-	--frame:SetPoint("CENTER")
-	frame:SetBackdrop({
-        bgFile = media:Fetch("background", "cui-default-bg"), 
-        tile = true, 
-        tileSize = 1, 
-        edgeFile = media:Fetch("border", "test-border2"), 
-        edgeSize = 2, 
-        insets = { top = 1, bottom = 1, left = 1, right = 1 } 
-    })
-    frame:SetBackdropColor(0, 0, 0, 1)
-    frame:SetBackdropBorderColor(1, 0, 0, 1)
 
     Addon:CreatePrefs(Addon["Profile"]["Options"])
 
@@ -220,16 +197,16 @@ function Addon:UpdateDb()
     end
 end
 
-local frame = CreateFrame("Frame")
-frame.collect = 0
-frame:SetScript("OnUpdate", function(self, elapsed)
-	Addon:Update()
-    self.collect = self.collect + elapsed
-    if self.collect > 3 then
-        self.collect = 0
-    	collectgarbage("collect");
-    end
-end)
+-- local frame = CreateFrame("Frame")
+-- frame.collect = 0
+-- frame:SetScript("OnUpdate", function(self, elapsed)
+-- 	Addon:Update()
+--     self.collect = self.collect + elapsed
+--     if self.collect > 3 then
+--         self.collect = 0
+--     	collectgarbage("collect");
+--     end
+-- end)
 
 
 function Addon:OnDisable()

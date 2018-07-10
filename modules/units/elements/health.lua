@@ -59,16 +59,18 @@ function Health:Init(parent)
 	parent.orderedElements:set(elementName, health)
 end
 
-function Health:Disable(parent)
-	self:Hide()
-	self:UnregisterAllEvents()
-	parent.orderedElements:remove(self)
-end
-
 function Health:Update(...)
 	
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
+	local db = self.db
+
+	if (not db["Enabled"]) then
+		self:Hide()
+		return
+	else
+		self:Show()
+	end
 
 	if (tostring(event):anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
 		parent:Update(UnitEvent.UPDATE_HEALTH)
@@ -88,7 +90,6 @@ function Health:Update(...)
 		
 		self:Update("UNIT_HEALTH_FREQUENT")
 
-		local db = self.db or arg1
 		Units:Position(self, db["Position"])
 
 		local texture = media:Fetch("statusbar", db["Texture"])
@@ -111,7 +112,7 @@ function Health:Update(...)
 		end
 	end
 
-	Units:SetupMissingBar(self, self.db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+	Units:SetupMissingBar(self, db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
 	A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 end
 

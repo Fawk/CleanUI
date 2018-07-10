@@ -170,7 +170,10 @@ end
 
 function OT:foreach(func)
   for i = 1, self.c do
-    func(self.e[i])
+    local x = self.e[i]
+    if (x) then
+      func(x)
+    end
   end
 end
 

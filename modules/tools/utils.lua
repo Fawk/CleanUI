@@ -1779,9 +1779,15 @@ local function MultiDropdownBuilder(parent)
 		end)
 
 		self.itemClick = function(self, item, mouseButton)
-			self.dropdown.selectedItems:addUnique(item.index)
 			local cb = self.dropdown.items:get(item.index).checkBox
 			cb:SetValue(not cb:GetValue())
+
+			if (cb:GetValue()) then
+				self.dropdown.selectedItems:addUnique(item.index)
+			else
+				self.dropdown.selectedItems:remove(item.index)
+			end
+
 			if (o.itemFunc) then o:itemFunc(item, self.dropdown, mouseButton) end
 		end
 

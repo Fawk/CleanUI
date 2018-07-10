@@ -24,6 +24,8 @@ end
 function Castbar:Init(parent)
 	local db = parent.db[elementName]
 
+	if (not db) then return end
+
 	local container = parent.orderedElements:get(elementName)
 	if (not container) then
 		container = CreateFrame("Frame", T:frameName(parent:GetName(), elementName), parent)
@@ -72,8 +74,12 @@ function Castbar:Init(parent)
 			self.bar.bg:SetTexture(media:Fetch("statusbar", db["Texture"]))
 		end)
 
-		container:SetScript("OnUpdate", function(self, elapsed)
-			self:Update("OnUpdate", elapsed)
+		--container:SetScript("OnUpdate", function(self, elapsed)
+			--self:Update("OnUpdate", elapsed)
+		--end)
+
+		A:QueueUpdate(container:GetName(), function(elapsed)
+			container:Update("OnUpdate", elapsed)
 		end)
 
 		if (parent.unit == "player") then

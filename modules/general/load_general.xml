@@ -11,6 +11,7 @@
     <Script file="petbar.lua"/>
     <Script file="clickcast.lua"/>
     <Script file="tags.lua"/>
+    <Script file="addonstats.lua"/>
 	<!--<Script file="cooldown.lua"/>-->
 
 </Ui>
