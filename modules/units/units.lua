@@ -11,18 +11,6 @@ local hiddenParent = CreateFrame('Frame', nil, UIParent)
 hiddenParent:SetAllPoints()
 hiddenParent:Hide()
 
-local tags = {
-    ["3charname"] = {
-        method = [[function(u, r)
-            if not u and not r then return end
-            if UnitExists(r or u) then
-                return string.utf8sub(UnitName(r or u), 1, 3)
-            end
-        end]],
-        events = "UNIT_NAME_UPDATE GROUP_ROSTER_UPDATE"
-    }
-}
-
 function Units:Get(unit)
     return units[unit]
 end

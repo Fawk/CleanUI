@@ -55,17 +55,16 @@ function Player:Update(...)
             local db = self.db or arg2
             local position, size = db["Position"], db["Size"]
 
+            --[[ Bindings ]]--
+            self:RegisterForClicks("AnyUp")
+
             if (not InCombatLockdown()) then
                 Units:Position(self, position)
                 self:SetSize(size["Width"], size["Height"])
+                self:SetAttribute("*type1", "target")
+                self:SetAttribute("*type2", "togglemenu")
+                A.modules.clickcast:Setup(self, db["Clickcast"])
             end
-
-            --[[ Bindings ]]--
-            self:RegisterForClicks("AnyUp")
-            self:SetAttribute("*type1", "target")
-            self:SetAttribute("*type2", "togglemenu")
-
-            A.modules.clickcast:Setup(self, db["Clickcast"])
 
             --[[ Background ]]--
             U:CreateBackground(self, db)

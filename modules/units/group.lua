@@ -73,10 +73,11 @@ function Group:Init(name, maxMembers, db)
 
 						Group:Update(uf, UnitEvent.UPDATE_DB, self)
 		            	self:initFunc(uf)
-		            end
-
-	                uf:Update(UnitEvent.UPDATE_DB, self)
-	                self.init = true
+		            else
+    	                uf:Update(UnitEvent.UPDATE_DB, self)
+                    end
+	                
+                    self.init = true
 	            end
 	        end
 	    end
@@ -102,7 +103,7 @@ function Group:Init(name, maxMembers, db)
         T:RunNowOrAfterCombat(function()
             self:Execute([[ this:RunAttribute("UpdateSize") ]])
         end)
-    	Group:UpdateHeader(self)
+    	--Group:UpdateHeader(self)
         self:UpdateUnits()
     end)
 
