@@ -289,14 +289,14 @@ function Buffs:Update(...)
 	if (event == UnitEvent.UPDATE_DB) then
 
 	else
-		parent:Update(UnitEvent.UPDATE_BUFFS)
+		--[[parent:Update(UnitEvent.UPDATE_BUFFS)
 
 		local ownAppliedBuffs = parent.buffs.own
 		for spellId, aura in next, ownAppliedBuffs do
 			local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
 					canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
 
-			--[[
+			
 SetScript("OnUpdate", function(self, elapsed)
 			-- Here we want to update the values of active buffs
 			-- Text values and bar values
@@ -305,12 +305,12 @@ SetScript("OnUpdate", function(self, elapsed)
 			end)
 		end)
 
-			]]
+			
 
 			-- Take a button from pool
 			-- Here want to add OnUpdate script to the button if the duration is not 0
 			-- Then remove the OnUpdate when the button's duration reaches 0
-		end
+			end
 
 		if (not db["Own only"]) then
 			local othersAppliedBuffs = parent.buffs.others
@@ -323,7 +323,7 @@ SetScript("OnUpdate", function(self, elapsed)
 				-- Here want to add OnUpdate script to the button if the duration is not 0
 				-- Then remove the OnUpdate when the button's duration reaches 0
 			end
-		end
+		end--]]
 	end
 end
 

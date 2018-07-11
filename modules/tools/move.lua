@@ -135,6 +135,7 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
 	moveFrame:SetSize(size["Width"], size["Height"])
+	moveFrame:SetFrameStrata("HIGH")
 	moveFrame:SetFrameLevel(8)
 
     local lp, r, p, x, y = frame:GetPoint(1)

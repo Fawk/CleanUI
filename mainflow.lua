@@ -184,18 +184,6 @@ function Addon:UpdateDb()
     end
 end
 
--- local frame = CreateFrame("Frame")
--- frame.collect = 0
--- frame:SetScript("OnUpdate", function(self, elapsed)
--- 	Addon:Update()
---     self.collect = self.collect + elapsed
---     if self.collect > 3 then
---         self.collect = 0
---     	collectgarbage("collect");
---     end
--- end)
-
-
 function Addon:OnDisable()
 
 end

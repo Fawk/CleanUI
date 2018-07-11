@@ -7,6 +7,8 @@ local buildText = A.TextBuilder
 local bindingMode = false
 local capture = CreateFrame("Frame", "KeyBinder", A.frameParent)
 
+local _G = _G
+
 local AB = {
 	bars = A:OrderedTable()
 }
@@ -111,10 +113,132 @@ local function setupCapture()
 	end)
 end
 
+local bars = {
+	[1] = "ActionButton",
+	[2] = "MultiBarBottomLeftButton",
+	[3] = "MultiBarBottomRightButton",
+	[4] = "MultiBarRightButton",
+	[5] = "MultiBarLeftButton"
+}
+
+local emptySlots = { 
+	[1] = {},
+	[2] = {},
+	[3] = {},
+	[4] = {},
+	[5] = {}
+}
+
+local barAnchors = {}
+
 function AB:Init()
+	if true then
+
+		self:HideArt()
+
+		local db = A["Profile"]["Options"]["Actionbars"]
+
+		if (not db["Enabled"]) then
+			return
+		end
+
+		for x = 1, 5 do
+
+			local bar = db["Bars"][x]
+			local position = bar["Position"]
+			local orientation = bar["Orientation"]
+			local size = bar["Size"]
+
+			local anchor = barAnchors[x]
+			if (not anchor) then
+				anchor = CreateFrame("Frame", A:GetName().."Bar"..x, A.frameParent)
+				barAnchors[x] = anchor
+			end
+
+			local width, height -- Spacings here and limits here....
+			if (orientation == "HORIZONTAL") then
+				width, height = (size * 12), size
+			else
+				width, height = size, (size * 12)
+			end
+
+			anchor:SetSize(width, height)
+			A.Units:Position(anchor, position, "FrameParent")
+
+			anchor.getMoverSize = function(self) return width, height end
+			A:CreateMover(anchor, bar, "Bar "..x)
+
+			local relative = anchor
+			for i = 1, 12 do
+				_G[bars[x]..i]:SetSize(size, size)
+				_G[bars[x]..i.."Icon"]:SetTexCoord(0.133,0.867,0.133,0.867)
+				_G[bars[x]..i.."NormalTexture"]:SetTexture(nil)
+				_G[bars[x]..i.."HotKey"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+				_G[bars[x]..i.."Name"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+				_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+
+				if (not emptySlots[x][i]) then
+					emptySlots[x][i] = anchor:CreateTexture(nil, "BACKGROUND")
+					emptySlots[x][i]:SetPoint("CENTER", _G[bars[x]..i], "CENTER", 0, 0)
+					emptySlots[x][i]:SetTexture([[Interface\BUTTONS\UI-EmptySlot-Disabled]])
+					emptySlots[x][i]:SetVertexColor(0.3, 0.3, 0.3, 1)
+					emptySlots[x][i]:SetSize(size + size, size + size)
+				end
+
+				if(_G[bars[x]..i.."FloatingBG"]) then
+					_G[bars[x]..i.."FloatingBG"]:SetTexture(nil)
+				end
+
+				_G[bars[x]..i]:ClearAllPoints()
+
+				if (i == 1) then
+					hooksecurefunc(_G[bars[x]..i], "SetPoint", function(self, lp, r, p, x, y)
+						if (r ~= anchor) then
+							if (orientation == "HORIZONTAL") then
+								self:SetPoint("LEFT", anchor, "LEFT", 0, 0)
+							else
+								self:SetPoint("TOP", anchor, "TOP", 0, 0)
+							end
+						end
+					end)
+				end
+
+				if (orientation == "HORIZONTAL") then
+					if (i == 1) then
+						_G[bars[x]..i]:SetPoint("LEFT", relative, "LEFT", 0, 0)
+					else
+						_G[bars[x]..i]:SetPoint("LEFT", relative, "RIGHT", 10, 0)
+					end
+				else
+					if (i == 1) then
+						_G[bars[x]..i]:SetPoint("TOP", relative, "TOP", 0, 0)
+					else
+						_G[bars[x]..i]:SetPoint("TOP", relative, "BOTTOM", 0, -2)
+					end
+				end
+
+				relative = _G[bars[x]..i]
+			end
+		end
+
+		-- local delayedUpdate = CreateFrame("Frame")
+		-- delayedUpdate:SetScript("OnUpdate", function(self, elapsed)
+		-- 	self.elapsed = (self.elapsed or 0) + elapsed
+		-- 	if (self.elapsed > 0.5) then
+		-- 		for x = 1, 5 do
+		-- 			for i = 1, 12 do
+		-- 				ActionButton_UpdateAction(_G[bars[x]..i], true)
+		-- 				ActionButton_Update(_G[bars[x]..i])
+		-- 			end
+		-- 		end
+		-- 		delayedUpdate:SetScript("OnUpdate", nil)
+		-- 	end
+		-- end)
+
+		return
+	end
 
 	A:Debug("Actionbars Init")
-	self:DisableBlizzard()
 
 	for x = 1, 5 do
 
@@ -370,110 +494,36 @@ function AB:SetupBindings(bindings)
 	end
 end
 
-function AB:DisableBlizzard()
+function AB:HideArt()
 	-- Hidden parent frame
 	local UIHider = CreateFrame("Frame")
 	UIHider:Hide()
-
-	MultiBarBottomLeft:SetParent(UIHider)
-	MultiBarBottomRight:SetParent(UIHider)
-	MultiBarLeft:SetParent(UIHider)
-	MultiBarRight:SetParent(UIHider)
 	
-	--Look into what this does
 	ArtifactWatchBar:SetParent(UIHider)
 	HonorWatchBar:SetParent(UIHider)
 
-	-- Hide MultiBar Buttons, but keep the bars alive
-	for i=1,12 do
-		_G["ActionButton" .. i]:Hide()
-		_G["ActionButton" .. i]:UnregisterAllEvents()
-		_G["ActionButton" .. i]:SetAttribute("statehidden", true)
-
-		_G["MultiBarBottomLeftButton" .. i]:Hide()
-		_G["MultiBarBottomLeftButton" .. i]:UnregisterAllEvents()
-		_G["MultiBarBottomLeftButton" .. i]:SetAttribute("statehidden", true)
-
-		_G["MultiBarBottomRightButton" .. i]:Hide()
-		_G["MultiBarBottomRightButton" .. i]:UnregisterAllEvents()
-		_G["MultiBarBottomRightButton" .. i]:SetAttribute("statehidden", true)
-
-		_G["MultiBarRightButton" .. i]:Hide()
-		_G["MultiBarRightButton" .. i]:UnregisterAllEvents()
-		_G["MultiBarRightButton" .. i]:SetAttribute("statehidden", true)
-
-		_G["MultiBarLeftButton" .. i]:Hide()
-		_G["MultiBarLeftButton" .. i]:UnregisterAllEvents()
-		_G["MultiBarLeftButton" .. i]:SetAttribute("statehidden", true)
-
-		if _G["VehicleMenuBarActionButton" .. i] then
-			_G["VehicleMenuBarActionButton" .. i]:Hide()
-			_G["VehicleMenuBarActionButton" .. i]:UnregisterAllEvents()
-			_G["VehicleMenuBarActionButton" .. i]:SetAttribute("statehidden", true)
-		end
-
-		if _G['OverrideActionBarButton'..i] then
-			_G['OverrideActionBarButton'..i]:Hide()
-			_G['OverrideActionBarButton'..i]:UnregisterAllEvents()
-			_G['OverrideActionBarButton'..i]:SetAttribute("statehidden", true)
-		end
-
-		_G['MultiCastActionButton'..i]:Hide()
-		_G['MultiCastActionButton'..i]:UnregisterAllEvents()
-		_G['MultiCastActionButton'..i]:SetAttribute("statehidden", true)
-	end
-
-	ActionBarController:UnregisterAllEvents()
-	ActionBarController:RegisterEvent('UPDATE_EXTRA_ACTIONBAR')
-
-	MainMenuBar:EnableMouse(false)
-	MainMenuBar:SetAlpha(0)
 	MainMenuExpBar:UnregisterAllEvents()
 	MainMenuExpBar:Hide()
 	MainMenuExpBar:SetParent(UIHider)
 
-	for i=1, MainMenuBar:GetNumChildren() do
-		local child = select(i, MainMenuBar:GetChildren())
-		if child then
-			child:UnregisterAllEvents()
-			child:Hide()
-			child:SetParent(UIHider)
-		end
-	end
-
 	ReputationWatchBar:UnregisterAllEvents()
 	ReputationWatchBar:Hide()
 	ReputationWatchBar:SetParent(UIHider)
-
-	MainMenuBarArtFrame:UnregisterEvent("ACTIONBAR_PAGE_CHANGED")
-	MainMenuBarArtFrame:UnregisterEvent("ADDON_LOADED")
-	MainMenuBarArtFrame:Hide()
-	MainMenuBarArtFrame:SetParent(UIHider)
-
-	StanceBarFrame:UnregisterAllEvents()
-	StanceBarFrame:Hide()
-	StanceBarFrame:SetParent(UIHider)
-
-	OverrideActionBar:UnregisterAllEvents()
-	OverrideActionBar:Hide()
-	OverrideActionBar:SetParent(UIHider)
-
-	PossessBarFrame:UnregisterAllEvents()
-	PossessBarFrame:Hide()
-	PossessBarFrame:SetParent(UIHider)
-
-	PetActionBarFrame:UnregisterAllEvents()
-	PetActionBarFrame:Hide()
-	PetActionBarFrame:SetParent(UIHider)
-
-	MultiCastActionBarFrame:UnregisterAllEvents()
-	MultiCastActionBarFrame:Hide()
-	MultiCastActionBarFrame:SetParent(UIHider)
-
-	--This frame puts spells on the damn actionbar, fucking obliterate that shit
 	IconIntroTracker:UnregisterAllEvents()
 	IconIntroTracker:Hide()
 	IconIntroTracker:SetParent(UIHider)
+
+	MainMenuBarLeftEndCap:Hide()
+	MainMenuBarRightEndCap:Hide()
+	MainMenuBarTexture0:Hide()
+	MainMenuBarTexture1:Hide()
+	MainMenuBarTexture2:Hide()
+	MainMenuBarTexture3:Hide()
+	MainMenuBarBackpackButtonNormalTexture:SetTexture(nil)
+
+	for i = 0, 3 do
+		_G["CharacterBag"..i.."SlotNormalTexture"]:SetTexture(nil)
+	end
 
 	InterfaceOptionsActionBarsPanelAlwaysShowActionBars:EnableMouse(false)
 	InterfaceOptionsActionBarsPanelPickupActionKeyDropDownButton:SetScale(0.0001)
@@ -483,8 +533,7 @@ function AB:DisableBlizzard()
 	InterfaceOptionsActionBarsPanelLockActionBars:SetAlpha(0)
 	InterfaceOptionsActionBarsPanelPickupActionKeyDropDown:SetAlpha(0)
 	InterfaceOptionsActionBarsPanelPickupActionKeyDropDown:SetScale(0.0001)
-	--self:SecureHook('BlizzardOptionsPanel_OnEvent')
-	--InterfaceOptionsFrameCategoriesButton6:SetScale(0.00001)
+
 	if PlayerTalentFrame then
 		PlayerTalentFrame:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 	else

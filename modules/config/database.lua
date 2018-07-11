@@ -2013,70 +2013,59 @@ local defaults =  {
                     }
                 },
                 ["Actionbars"] = {
-                    [1] = { 
-                        ["Enabled"] = true,
-                        ["Position"] = {
-                            ["Relative To"] = "FrameParent",
-                            ["Point"] = "TOPLEFT",
-                            ["Local Point"] = "TOPLEFT",
-                            ["Offset X"] = 500,
-                            ["Offset Y"] = -50,
+                   ["Enabled"] = true,
+                   ["Show Grid"] = true,
+                   ["Bars"] = {
+                        [1] = {
+                            ["Position"] = {
+                                ["Point"] = "BOTTOM",
+                                ["Local Point"] = "BOTTOM",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = 0
+                            },
+                            ["Orientation"] = "HORIZONTAL",
+                            ["Size"] = 24,
                         },
-                        ["Icon Size"] = 24,
-                        ["Vertical Limit"] = 12,
-                        ["Horizontal Limit"] = 1
-                    },
-                    [2] = { 
-                        ["Enabled"] = true,
-                        ["Position"] = {
-                            ["Relative To"] = "FrameParent",
-                            ["Point"] = "TOPLEFT",
-                            ["Local Point"] = "TOPLEFT",
-                            ["Offset X"] = 500,
-                            ["Offset Y"] = -83,
+                        [2] = {
+                            ["Position"] = {
+                                ["Point"] = "BOTTOM",
+                                ["Local Point"] = "BOTTOM",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = -16
+                            },
+                            ["Orientation"] = "HORIZONTAL",
+                            ["Size"] = 24,
                         },
-                        ["Icon Size"] = 32,
-                        ["Vertical Limit"] = 12,
-                        ["Horizontal Limit"] = 1
-                    },
-                    [3] = { 
-                        ["Enabled"] = true,
-                        ["Position"] = {
-                            ["Relative To"] = "FrameParent",
-                            ["Point"] = "TOPLEFT",
-                            ["Local Point"] = "TOPLEFT",
-                            ["Offset X"] = 500,
-                            ["Offset Y"] = -116,
+                        [3] = {
+                            ["Position"] = {
+                                ["Point"] = "BOTTOM",
+                                ["Local Point"] = "BOTTOM",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = -32
+                            },
+                            ["Orientation"] = "HORIZONTAL",
+                            ["Size"] = 24,
                         },
-                        ["Icon Size"] = 32,
-                        ["Vertical Limit"] = 12,
-                        ["Horizontal Limit"] = 1
-                    },
-                    [4] = { 
-                        ["Enabled"] = true,
-                        ["Position"] = {
-                            ["Relative To"] = "FrameParent",
-                            ["Point"] = "TOPLEFT",
-                            ["Local Point"] = "TOPLEFT",
-                            ["Offset X"] = 500,
-                            ["Offset Y"] = -149,
+                        [4] = {
+                            ["Position"] = {
+                                ["Point"] = "BOTTOM",
+                                ["Local Point"] = "BOTTOM",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = -48
+                            },
+                            ["Orientation"] = "HORIZONTAL",
+                            ["Size"] = 24,
                         },
-                        ["Icon Size"] = 32,
-                        ["Vertical Limit"] = 12,
-                        ["Horizontal Limit"] = 1
-                    },
-                    [5] = { 
-                        ["Enabled"] = true,
-                        ["Position"] = {
-                            ["Relative To"] = "FrameParent",
-                            ["Point"] = "TOPLEFT",
-                            ["Local Point"] = "TOPLEFT",
-                            ["Offset X"] = 500,
-                            ["Offset Y"] = -186,
-                        },
-                        ["Icon Size"] = 32,
-                        ["Vertical Limit"] = 12,
-                        ["Horizontal Limit"] = 1
+                        [5] = {
+                            ["Position"] = {
+                                ["Point"] = "BOTTOM",
+                                ["Local Point"] = "BOTTOM",
+                                ["Offset X"] = 0,
+                                ["Offset Y"] = -64
+                            },
+                            ["Orientation"] = "HORIZONTAL",
+                            ["Size"] = 24,
+                        }
                     }
                 },
                 ["Pet Bar"] = {

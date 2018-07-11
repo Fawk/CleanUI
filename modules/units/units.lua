@@ -41,13 +41,13 @@ function Units:Translate(frame, relative)
     end
 end
  
-function Units:Position(frame, db)
+function Units:Position(frame, db, overrideRelative)
     frame:ClearAllPoints()
     if (db["Local Point"] == "ALL") then
         frame:SetAllPoints()
     else
         local x, y = db["Offset X"], db["Offset Y"]
-        frame:SetPoint(db["Local Point"], self:Translate(frame, db["Relative To"]), db["Point"], x, y)
+        frame:SetPoint(db["Local Point"], self:Translate(frame, overrideRelative or db["Relative To"]), db["Point"], x, y)
     end
 end
 
@@ -175,6 +175,13 @@ function Units:CreateStatusBorder(frame, name, db)
         border:SetAllPoints()
         border:SetAlpha(0)
         border:Show()
+    end
+end
+
+function Units:UpdateMissingBar(parent, key, min, max)
+    if (parent[key]) then
+        parent[key]:SetMinMaxValues(0, max)
+        parent[key]:SetValue(max - min)
     end
 end
 
