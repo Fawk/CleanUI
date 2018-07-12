@@ -178,6 +178,15 @@ function AB:Init()
 				_G[bars[x]..i.."HotKey"]:SetPoint("TOPRIGHT", _G[bars[x]..i], "TOPRIGHT", 0, 0)
 				_G[bars[x]..i.."Name"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 				_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+				_G[bars[x]..i.."Border"]:SetSize(size + size, size + size)
+				_G[bars[x]..i.."Cooldown"]:SetSize(size, size)
+				hooksecurefunc(_G[bars[x]..i.."Cooldown"], "SetCooldown", function(self, start, duration)
+					for region in next, { self:GetRegions() } do  
+						if (type(region) ~= "number") then
+							print(region:GetObjectType())
+						end
+					end
+				end)
 
 				if (not emptySlots[x][i]) then
 					emptySlots[x][i] = anchor:CreateTexture(nil, "BACKGROUND")
