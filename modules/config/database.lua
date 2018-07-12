@@ -2024,6 +2024,8 @@ local defaults =  {
                                 ["Offset Y"] = 0
                             },
                             ["Orientation"] = "HORIZONTAL",
+                            ["X Spacing"] = 7,
+                            ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
                         [2] = {
@@ -2034,6 +2036,8 @@ local defaults =  {
                                 ["Offset Y"] = -16
                             },
                             ["Orientation"] = "HORIZONTAL",
+                            ["X Spacing"] = 7,
+                            ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
                         [3] = {
@@ -2044,6 +2048,8 @@ local defaults =  {
                                 ["Offset Y"] = -32
                             },
                             ["Orientation"] = "HORIZONTAL",
+                            ["X Spacing"] = 7,
+                            ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
                         [4] = {
@@ -2054,6 +2060,8 @@ local defaults =  {
                                 ["Offset Y"] = -48
                             },
                             ["Orientation"] = "HORIZONTAL",
+                            ["X Spacing"] = 7,
+                            ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
                         [5] = {
@@ -2064,6 +2072,8 @@ local defaults =  {
                                 ["Offset Y"] = -64
                             },
                             ["Orientation"] = "HORIZONTAL",
+                            ["X Spacing"] = 7,
+                            ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         }
                     }
@@ -2202,17 +2212,6 @@ local defaults =  {
                         ["Offset X"] = 100,
                         ["Offset Y"] = -500,
                     },
-                },
-                ["Key Bindings"] = {
-                    ["1"] = AddonName.."_ActionBar1Button1",
-                    ["2"] = AddonName.."_ActionBar1Button2",
-                    ["3"] = AddonName.."_ActionBar1Button3",
-                    ["4"] = AddonName.."_ActionBar1Button4",
-                    ["5"] = AddonName.."_ActionBar1Button5",
-                    ["6"] = AddonName.."_ActionBar1Button6",
-                    ["7"] = AddonName.."_ActionBar1Button7",
-                    ["8"] = AddonName.."_ActionBar1Button8",
-                    ["9"] = AddonName.."_ActionBar1Button9"
                 }
     		}
 	    }

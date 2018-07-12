@@ -151,6 +151,8 @@ function HealPrediction:Update(...)
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
 
+	parent:Update(self, UnitEvent.UPDATE_IDENTIFIER)
+
 	if (event == UnitEvent.UPDATE_DB) then
 		local db = arg1
 		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")

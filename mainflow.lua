@@ -161,7 +161,7 @@ function Addon:UpdateDb()
     -- General
     for key, module in next, self.general do
         if (module.Update) then
-            module:Update(UnitEvent.UPDATE_DB)
+            module:Update(UnitEvent.UPDATE_DB, UnitEvent.UPDATE_DB)
         end
     end
 
@@ -171,7 +171,7 @@ function Addon:UpdateDb()
         	local unit = Addon.Units:Get(key:fupper())
         	if (unit) then
 	        	if (unit.UpdateUnits) then
-	        		unit:UpdateUnits()
+	        		unit:UpdateUnits(UnitEvent.UPDATE_DB)
 	        	else
 	            	if (unit.Update) then
 	            		unit:Update(UnitEvent.UPDATE_DB)

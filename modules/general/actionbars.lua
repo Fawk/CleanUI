@@ -155,11 +155,11 @@ function AB:Init()
 				barAnchors[x] = anchor
 			end
 
-			local width, height -- Spacings here and limits here....
+			local width, height
 			if (orientation == "HORIZONTAL") then
-				width, height = (size * 12), size
+				width, height = (size * 12) + (bar["X Spacing"] * 11), size
 			else
-				width, height = size, (size * 12)
+				width, height = size, (size * 12) + (bar["Y Spacing"] * 11)
 			end
 
 			anchor:SetSize(width, height)
@@ -174,6 +174,8 @@ function AB:Init()
 				_G[bars[x]..i.."Icon"]:SetTexCoord(0.133,0.867,0.133,0.867)
 				_G[bars[x]..i.."NormalTexture"]:SetTexture(nil)
 				_G[bars[x]..i.."HotKey"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+				_G[bars[x]..i.."HotKey"]:ClearAllPoints()
+				_G[bars[x]..i.."HotKey"]:SetPoint("TOPRIGHT", _G[bars[x]..i], "TOPRIGHT", 0, 0)
 				_G[bars[x]..i.."Name"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 				_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 
@@ -207,13 +209,13 @@ function AB:Init()
 					if (i == 1) then
 						_G[bars[x]..i]:SetPoint("LEFT", relative, "LEFT", 0, 0)
 					else
-						_G[bars[x]..i]:SetPoint("LEFT", relative, "RIGHT", 10, 0)
+						_G[bars[x]..i]:SetPoint("LEFT", relative, "RIGHT", bar["X Spacing"], 0)
 					end
 				else
 					if (i == 1) then
 						_G[bars[x]..i]:SetPoint("TOP", relative, "TOP", 0, 0)
 					else
-						_G[bars[x]..i]:SetPoint("TOP", relative, "BOTTOM", 0, -2)
+						_G[bars[x]..i]:SetPoint("TOP", relative, "BOTTOM", 0, bar["Y Spacing"])
 					end
 				end
 

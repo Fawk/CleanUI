@@ -72,10 +72,15 @@ function Health:Update(...)
 		self:Show()
 	end
 
-	if (tostring(event):anyMatch("UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH")) then
+	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
+
+	if (event == "UNIT_HEALTH_FREQUENT" or event == "UNIT_MAXHEALTH" or event == UnitEvent.GROUP_UPDATE) then
 		parent:Update(UnitEvent.UPDATE_HEALTH)
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
+
+		Units:SetupMissingBar(self, db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 		self:Update("UNIT_HEALTH_FREQUENT")
 
@@ -110,10 +115,10 @@ function Health:Update(...)
 		else
 			self.bg:Show()
 		end
-	end
 
-	Units:SetupMissingBar(self, db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
-	A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+		Units:SetupMissingBar(self, db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+	end
 end
 
 function Health:Simulate(parent, class)

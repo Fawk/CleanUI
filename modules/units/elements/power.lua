@@ -61,7 +61,16 @@ function Power:Update(...)
 	local parent = self:GetParent()
 	local db = self.db or arg1
 
-	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" or event == "UPDATE_SHAPESHIFT_FORM") then
+	if (not db["Enabled"]) then
+		self:Hide()
+		return
+	else
+		self:Show()
+	end
+
+	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
+
+	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" or event == "UPDATE_SHAPESHIFT_FORM" or event == UnitEvent.UPDATE_GROUP) then
 		parent:Update(UnitEvent.UPDATE_POWER)
 
 		if (parent.powerToken or parent.powerType) then
@@ -71,6 +80,8 @@ function Power:Update(...)
 		  	if (db["Missing Power Bar"]["Enabled"]) then
 		  		Units:UpdateMissingBar(self, "missingPowerBar", parent.currentPower, parent.currentMaxPower)
 		  	end
+
+			A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 		parent:Update(UnitEvent.UPDATE_POWER)

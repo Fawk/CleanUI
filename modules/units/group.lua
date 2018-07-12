@@ -54,15 +54,15 @@ function Group:Init(name, maxMembers, db)
     	self.initFunc = initFunc
         self:UpdateUnits()
 	end
-	container.UpdateUnits = function(self)
+	container.UpdateUnits = function(self, event)
 		if (A.groupSimulating) then
 			self.init = true
 			A.modules[A.groupSimulating:lower()]:Simulate(self.maxMembers)
 		else
 	        for i = 1, maxMembers do
 	            local uf = self.header:GetAttribute("child"..i)
-	            if (uf and self.initFunc) then
-		            if (not uf.init) then
+	            if (uf) then
+	            	if (not uf.init and self.initFunc) then
 		            	uf.init = true
 		            	uf.db = db
 						uf:RegisterForClicks("AnyUp")
@@ -73,11 +73,13 @@ function Group:Init(name, maxMembers, db)
 
 						Group:Update(uf, UnitEvent.UPDATE_DB, self)
 		            	self:initFunc(uf)
-		            else
-    	                uf:Update(UnitEvent.UPDATE_DB, self)
-                    end
-	                
-                    self.init = true
+
+		            	self.init = true
+		            elseif (event == UnitEvent.UPDATE_DB) then
+						uf:Update(UnitEvent.UPDATE_DB, self)
+		            elseif (event == UnitEvent.UPDATE_GROUP) then
+		            	uf:Update(UnitEvent.UPDATE_GROUP, self)
+		            end
 	            end
 	        end
 	    end
@@ -103,8 +105,7 @@ function Group:Init(name, maxMembers, db)
         T:RunNowOrAfterCombat(function()
             self:Execute([[ this:RunAttribute("UpdateSize") ]])
         end)
-    	--Group:UpdateHeader(self)
-        self:UpdateUnits()
+        self:UpdateUnits(UnitEvent.UPDATE_GROUP)
     end)
 
     RegisterStateDriver(container, "visibility", db["Visibility"])
@@ -239,7 +240,8 @@ end
 function Group:Update(...)
 	local this = self
     local self, event, arg2, arg3, arg4, arg5 = ...
-
+    local db = self.db
+    
     local simulating = arg3 == "SIMULATE"
     if (simulating) then
     	A.groupSimulating = arg2.name
@@ -247,15 +249,13 @@ function Group:Update(...)
 
     if (not self.super) then
     	A:SetUnitMeta(self)
-    	this:Update(self, UnitEvent.UPDATE_IDENTIFIER)
 	end
-
+	
+	self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
 	self.super:Update(...)
 
     -- Update player specific things based on the event
     if (event == UnitEvent.UPDATE_DB) then
-        
-        local db = self.db
 
         if (not simulating) then
         	Group:UpdateHeader(arg2)
@@ -292,17 +292,23 @@ function Group:Update(...)
 		    end
     	end
 
-    	U:CreateBackground(self, db)
-
     	if (not simulating) then
 	        self.orderedElements:foreach(function(key, obj)
 	            obj:Update(event, db[key])
 	        end)
+
+			self:ForceTagUpdate()
 	    end
 
-	    if (not simulating) then
-        	self:ForceTagUpdate()
-        end
+    	U:CreateBackground(self, db)
+    elseif (event == UnitEvent.UPDATE_GROUP) then
+    	if (not simulating) then
+	        self.orderedElements:foreach(function(key, obj)
+	            obj:Update(event, db[key])
+	        end)
+
+			self:ForceTagUpdate()
+	    end
     end
 end
 

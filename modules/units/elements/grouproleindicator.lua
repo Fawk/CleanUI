@@ -8,7 +8,7 @@ local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local T = A.Tools
 
 local elementName = "Group Role Indicator"
-local Role = { name = elementName }
+local Role = {}
 A["Shared Elements"]:set(elementName, Role)
 
 function Role:Init(parent)
@@ -49,6 +49,8 @@ function Role:Update(...)
     local db = self.db or arg1
     local style = db["Style"]
     local size = db["Size"]
+    
+    parent:Update(UnitEvent.UPDATE_IDENTIFIER)
     local role = UnitGroupRolesAssigned(parent.unit)
 
     if (event == UnitEvent.UPDATE_TAGS) then

@@ -10,4 +10,5 @@ UnitEvent = {
     UPDATE_DB         = 7,
     UPDATE_CASTBAR    = 8,
     UPDATE_STAGGER    = 9,
+    UPDATE_GROUP  	  = 10,
 }

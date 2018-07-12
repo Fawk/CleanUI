@@ -23,6 +23,7 @@ A.colors = {
 		[SPELL_POWER_HOLY_POWER] = { 242/255, 230/255, 153/255 },
 		[SPELL_POWER_ARCANE_CHARGES] = { 26/255, 26/255, 250/255 },
 		[SPELL_POWER_LUNAR_POWER] = { 77/255, 133/255, 230/255 },
+		[SPELL_POWER_INSANITY] = { 102/255,	0, 204/255 },
 		runes = {
 			[1] = { .67, .13, .13 },
 			[2] = { 0, .67, .99 },
