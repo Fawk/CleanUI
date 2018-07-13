@@ -101,7 +101,6 @@ function Addon:OnInitialize()
 	self.frameParent:SetSize(UIParent:GetSize())
 	self.frameParent:SetFrameLevel(UIParent:GetFrameLevel())
 	self.frameParent:SetAllPoints(UIParent)
-	--self.frameParent:SetScale(UIParent:GetScale())
     
     self.hiddenFrame = CreateFrame("Frame")
     self.hiddenFrame:Hide()
@@ -161,7 +160,7 @@ function Addon:UpdateDb()
     -- General
     for key, module in next, self.general do
         if (module.Update) then
-            module:Update(UnitEvent.UPDATE_DB, UnitEvent.UPDATE_DB)
+            module:Update(UnitEvent.UPDATE_DB)
         end
     end
 
@@ -177,8 +176,6 @@ function Addon:UpdateDb()
 	            		unit:Update(UnitEvent.UPDATE_DB)
 	            	end
 	        	end
-	        else
-	        	Addon:Debug("Could not find unit with key:", key)
 	        end
 	    end
     end

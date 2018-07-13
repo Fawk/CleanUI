@@ -180,14 +180,10 @@ function AB:Init()
 				_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 				_G[bars[x]..i.."Border"]:SetSize(size + size, size + size)
 				_G[bars[x]..i.."Cooldown"]:SetSize(size, size)
-				hooksecurefunc(_G[bars[x]..i.."Cooldown"], "SetCooldown", function(self, start, duration)
-					for region in next, { self:GetRegions() } do  
-						if (type(region) ~= "number") then
-							print(region:GetObjectType())
-						end
-					end
-				end)
-
+				
+				local cd = _G[bars[x]..i.."Cooldown"]:GetRegions()
+				cd:SetFont(media:Fetch("font", "NotoBold"), 14, "OUTLINE")
+				
 				if (not emptySlots[x][i]) then
 					emptySlots[x][i] = anchor:CreateTexture(nil, "BACKGROUND")
 					emptySlots[x][i]:SetPoint("CENTER", _G[bars[x]..i], "CENTER", 0, 0)
@@ -231,20 +227,6 @@ function AB:Init()
 				relative = _G[bars[x]..i]
 			end
 		end
-
-		-- local delayedUpdate = CreateFrame("Frame")
-		-- delayedUpdate:SetScript("OnUpdate", function(self, elapsed)
-		-- 	self.elapsed = (self.elapsed or 0) + elapsed
-		-- 	if (self.elapsed > 0.5) then
-		-- 		for x = 1, 5 do
-		-- 			for i = 1, 12 do
-		-- 				ActionButton_UpdateAction(_G[bars[x]..i], true)
-		-- 				ActionButton_Update(_G[bars[x]..i])
-		-- 			end
-		-- 		end
-		-- 		delayedUpdate:SetScript("OnUpdate", nil)
-		-- 	end
-		-- end)
 
 		return
 	end

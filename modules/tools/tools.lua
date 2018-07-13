@@ -354,7 +354,7 @@ function T:FadeIn(frame, seconds)
         frame.timer = frame.timer + elapsed
         if frame.timer > .01 then
             if frame:GetAlpha() >= 1 then
-                self:SetScript("OnUpdate", nil)
+                f:SetScript("OnUpdate", nil)
             else
             	local alpha = frame:GetAlpha() + ((100 / ((seconds * 1000) * .01)) / 100)
             	if alpha > 1 then
@@ -375,7 +375,7 @@ function T:FadeOut(frame, seconds)
         frame.timer = frame.timer + elapsed
         if frame.timer > .01  then
             if frame:GetAlpha() <= 0 then
-                self:SetScript("OnUpdate", nil)
+                f:SetScript("OnUpdate", nil)
             else
             	local alpha = frame:GetAlpha() - ((100 / ((seconds * 1000) * .01)) / 100)
             	if alpha < 0 then
@@ -412,12 +412,11 @@ end
 
 function T:delayedCall(func, delay)
     local f = CreateFrame("Frame")
-    f.timer = 0
     f:SetScript("OnUpdate", function(self, elapsed)
-        self.timer = self.timer + elapsed
-        if self.timer >= delay then
+        self.timer = (self.timer or 0) + elapsed
+        if (self.timer >= delay) then
             func()
-            self:SetScript("OnUpdate", nil)
+            f:SetScript("OnUpdate", nil)
             self:Hide()
         end
     end)

@@ -1,22 +1,5 @@
 local AddonName = ...
 local A, L = unpack(select(2, ...))
-local rawset = rawset
-local rawget = rawget
-local pairs = pairs
-local smatch = string.match
-local setmetatable = setmetatable
-
-local Database = {
-    prepared = {}
-}
-
-Database.TYPE_CHARACTER = "Characters"
-
-for k,v in pairs(Database) do
-    if smatch(k, "%a+_%a+") then
-        Database.prepared[Database[k]] = {}
-    end
-end
 
 local global = _G[AddonName.."_DB"]
 
@@ -2216,128 +2199,10 @@ local defaults =  {
     		}
 	    }
 	},
-	["Characters"] = {}
+	["Characters"] = {},
+    ["Global"] = {
+        scale = 1
+    }
 }
 
 A.defaults = defaults
-
-local function deepCopy(object)
-    local lookup_table = {}
-    local function _copy(object)
-        if type(object) ~= "table" then
-            return object
-        elseif lookup_table[object] then
-            return lookup_table[object]
-        end
-        local new_table = {}
-        lookup_table[object] = new_table
-        for index, value in pairs(object) do
-            new_table[_copy(index)] = _copy(value)
-        end
-        return setmetatable(new_table, getmetatable(object))
-    end
-    return _copy(object)
-end
-
-local function iter(old, new)
-    for k,v in pairs(old) do
-        if type(v) == "table" then
-            iter(v, new[k]) 
-        else
-            if v ~= new[k] then
-                old[k] = new[k]
-            end
-        end
-    end
-end
-
-local function merge(t1, t2)
-    for k,v in pairs(t2) do
-        if type(v) == "table" then
-            if type(t1[k] or false) == "table" then
-                merge(t1[k] or {}, t2[k] or {})
-            else
-                t1[k] = v
-            end
-        else
-            t1[k] = v
-        end
-    end
-    return t1
-end
-
-local defaultsMeta = {
-    __index = function(t, k)
-        if not rawget(t, k) and rawget(defaults, k) then
-            rawset(t, k, deepCopy(rawget(defaults, k)))
-        end
-        return rawget(t, k)
-    end
-}
-
-local function scan(tbl, d)
-    for k,v in pairs(d) do
-        if type(v) == "table" then
-            if not tbl[k] then
-                tbl[k] = setmetatable({}, {
-                    __index = function(t, kv)
-                        if not rawget(t, kv) and rawget(v, kv) then
-                            rawset(t, kv, deepCopy(rawget(v, kv)))
-                        end
-                        return rawget(t, kv)
-                    end
-                })
-            end
-            scan(tbl[k], v)
-        else
-            if not tbl[k] then
-                tbl[k] = v
-            end
-        end
-    end
-end
-
-for profile, tbl in next, defaults["Profiles"] do
-    if profile ~= "Default" then
-        scan(tbl, defaults["Profiles"]["Default"])
-    end
-end
-
-function Database:Prepare(type, value)
-    if not self.prepared[type] then
-        self.prepared[type] = {}
-    end
-    self.prepared[type] = value
-end
-
-function Database:GetDefaults(profile)
-    return defaults["Profiles"][profile]
-end
-
-function Database:Save()
-    local activeProfile = A["Modules"]["Profile"]:GetActive()
-    local save = setmetatable({}, defaultsMeta)
-    save[self.TYPE_CHARACTER] = deepCopy(defaults[self.TYPE_CHARACTER])
-
-    for k,v in pairs(self.prepared) do
-        if not save["Profiles"][activeProfile] then
-            save["Profiles"][activeProfile] = deepCopy(A.db["Profiles"][activeProfile])
-        end
-        save["Profiles"][activeProfile]["Options"][k] = v
-    end
-    
-    --A:DebugTable(save["Profiles"][activeProfile]["Options"]["Minimap"])
-
-    global = save
-end
-
-function Database:CreateDatabase()
-	if global == nil then 
-		global = {}
-        return deepCopy(defaults)
-	else
-        return merge(deepCopy(defaults), deepCopy(global))
-    end
-end
-
-A["Database"] = Database
