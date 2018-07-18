@@ -38,7 +38,7 @@ function Power:Init(parent)
 	   		Units:RegisterEvents(tagEventFrame, events)
 	   	end
 
-	   	Units:RegisterEvents(power, events, true)
+	   	Units:RegisterEvents(power, events)
 	    power:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
 	    end)
@@ -70,7 +70,9 @@ function Power:Update(...)
 
 	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
 
-	if (event == "UNIT_POWER_FREQUENT" or event == "UNIT_MAXPOWER" or event == "UPDATE_SHAPESHIFT_FORM" or event == UnitEvent.UPDATE_GROUP) then
+	if (T:anyOf(event, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", UnitEvent.UPDATE_GROUP)) then
+		if (parent.unit ~= arg1) then return end
+		
 		parent:Update(UnitEvent.UPDATE_POWER)
 
 		if (parent.powerToken or parent.powerType) then
@@ -84,6 +86,11 @@ function Power:Update(...)
 			A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
+
+		if (not T:anyOf(arg2, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM")) then
+			return
+		end
+
 		parent:Update(UnitEvent.UPDATE_POWER)
 		local tag = arg1
 		tag:AddReplaceLogic("[pp]", parent.currentPower)
@@ -94,7 +101,7 @@ function Power:Update(...)
 		tag:AddReplaceLogic("[pp:deficit]", parent.deficitPower > 0 and string.format("-%d", T:short(parent.deficitPower, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 
-		self:Update("UNIT_POWER_FREQUENT")
+		self:Update("UNIT_POWER_FREQUENT", parent.unit)
 
 		Units:Position(self, db["Position"])
 

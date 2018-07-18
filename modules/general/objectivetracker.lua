@@ -30,9 +30,9 @@ end
 local function setBlockFonts(block)
     for _,child in next, { block:GetChildren() } do
         if (child.lines) then
-            S:Font(child.HeaderText, 11)
+            S:Font(child.HeaderText, 12, "SHADOW")
             for _,line in next, child.lines do
-                S:Font(line.Text, 10)
+                S:Font(line.Text, 11, "SHADOW")
             end
         end
     end
@@ -96,19 +96,46 @@ function Tracker:Init()
 
     hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
         skinBlockItem(block)
-        setBlockFonts(ObjectiveTrackerBlocksFrame)
     end)
     
     hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", function(_, block)
         skinBlockItem(block)
-        setBlockFonts(ObjectiveTrackerBlocksFrame)
     end)
 
     A:CreateMover(ObjectiveTrackerFrame, db, "Objective Tracker")
+
+    --[[
+        
+        SetMapToCurrentZone()
+        GetPlayerMapPosition("player")
+
+        Normal Quest -- QuestPOIGetIconInfo
+        World Quest  -- x, y variable on the POI
+
+        Let's iterate over the children of WorldMapPOIFrame
+    
+    ]]
+
+    --SetMapToCurrentZone()
+    --local playerX, playerY = GetPlayerMapPosition("player")
+    --print(playerX, playerY)
+
+    --QuestMapFrame_UpdateAll()
+
+    -- for _,child in next, { WorldMapPOIFrame:GetChildren() } do
+    --     if (child.questID) then
+    --         if (child.x) then -- World Quest
+    --             print(child.x, child.y)
+    --         else -- Normal Quest
+    --             local x, y = QuestPOIGetIconInfo(child.questID)
+    --             print(x, y)
+    --         end
+    --     end
+    -- end
 end
 
 function Tracker:Update(event)
 
 end
 
-A.modules.objectivetracker = Tracker
+A.general.objectivetracker = Tracker

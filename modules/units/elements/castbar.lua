@@ -1,5 +1,6 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
+local U = A.Utils
 local buildText = A.TextBuilder
 
 --[[ Blizzard ]]
@@ -99,11 +100,12 @@ function Castbar:Update(...)
 	local parent = self:GetParent()
 	local db = self.db or arg2
 	local bar = self.bar
-	local texture = media:Fetch("statusbar", db["Texture"])
 
 	if (event == UnitEvent.UPDATE_DB) then
 		Units:Position(self.Text, db["Name"]["Position"])
 		Units:Position(self.Time, db["Time"]["Position"])
+
+		local texture = media:Fetch("statusbar", db["Texture"])
 
 		bar:SetStatusBarTexture(texture)
 		bar.bg:SetTexture(texture)
@@ -116,7 +118,7 @@ function Castbar:Update(...)
 		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
 		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
 
-		T:Background(self, db, nil, false)
+		U:CreateBackground(self, db, false)
 
 		local iconW, iconH
 		local iconDb = db["Icon"]
@@ -138,8 +140,8 @@ function Castbar:Update(...)
 			end
 
 			self.Icon:SetSize(iconW, iconH)
-			T:Background(self, iconDb, self.Icon, false)
-			self.Icon.bg:SetBackdropBorderColor(0, 0, 0, 0)
+			U:CreateBackground(self.Icon, iconDb, false)
+			self.Icon.Background:SetBackdropBorderColor(0, 0, 0, 0)
 
 			local iconPosition = iconDb["Position"]
 			if (iconPosition == "LEFT") then
@@ -204,7 +206,7 @@ function Castbar:Update(...)
 	else
 		parent:Update(event, arg1, arg2, arg3, arg4, arg5)
 
-		if (parent.castBarSpell and (arg1 == 'UNIT_SPELLCAST_START' or arg1 == 'UNIT_SPELLCAST_CHANNEL_START')) then
+		if (parent.castBarSpell and T:anyOf(arg1, 'UNIT_SPELLCAST_START', 'UNIT_SPELLCAST_CHANNEL_START')) then
 			self.Icon:SetTexture(parent.castBarTexture)
 			bar:SetMinMaxValues(0, parent.castBarMax)
 			bar:SetValue(0)

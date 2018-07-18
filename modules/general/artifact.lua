@@ -82,7 +82,7 @@ local function setup(name, artifact, db)
     local mult = db["Background Multiplier"]
     artifact.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
-    U:CreateBackground(artifact, db, true)
+    U:CreateBackground(artifact, db, false)
 
     if not HasArtifactEquipped() then
         artifact:Hide()
@@ -155,8 +155,11 @@ function Artifact:Init()
                 self:SetScript("OnUpdate", nil)
             end
         end
-    end)
-    
+    end) 
 end
 
-A.modules.artifact = Artifact
+function Artifact:Update(...)
+
+end
+
+A.general.artifact = Artifact

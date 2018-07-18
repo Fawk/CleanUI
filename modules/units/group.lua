@@ -1,7 +1,9 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local CC = A.modules.clickcast
+local CC = A.general.clickcast
 local initFrame = CreateFrame("Frame")
+
+local UnitExists = UnitExists
 
 local directions = {
 	["Left"] = "RIGHT",
@@ -75,10 +77,8 @@ function Group:Init(name, maxMembers, db)
 		            	self:initFunc(uf)
 
 		            	self.init = true
-		            elseif (event == UnitEvent.UPDATE_DB) then
-						uf:Update(UnitEvent.UPDATE_DB, self)
-		            elseif (event == UnitEvent.UPDATE_GROUP) then
-		            	uf:Update(UnitEvent.UPDATE_GROUP, self)
+		            else
+		            	uf:Update(event, self)
 		            end
 	            end
 	        end
@@ -252,6 +252,11 @@ function Group:Update(...)
 	end
 	
 	self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
+
+	if (not UnitExists(self.unit)) then
+		return
+	end
+
 	self.super:Update(...)
 
     -- Update player specific things based on the event
@@ -264,7 +269,7 @@ function Group:Update(...)
      	local size = db["Size"]
         if (not InCombatLockdown()) then
             self:SetSize(size["Width"], size["Height"])
-            A.modules.clickcast:Setup(self, db["Clickcast"])
+            A.general.clickcast:Setup(self, db["Clickcast"])
         end
 
         if (not self.tags) then
@@ -304,7 +309,7 @@ function Group:Update(...)
     elseif (event == UnitEvent.UPDATE_GROUP) then
     	if (not simulating) then
 	        self.orderedElements:foreach(function(key, obj)
-	            obj:Update(event, db[key])
+	            obj:Update(event, arg1)
 	        end)
 
 			self:ForceTagUpdate()

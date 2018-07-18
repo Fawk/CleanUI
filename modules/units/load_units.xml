@@ -1,16 +1,14 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-    
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="units.lua"/>
     <Script file="unit.lua"/>
     <Include file="elements\load_elements.xml"/>
     <Script file="player.lua"/>
     <Script file="target.lua"/>
     <Script file="targettarget.lua"/>
-    <Script file="focus.lua"/>
+    <!--<Script file="focus.lua"/>-->
     <Script file="boss.lua"/>
     <Script file="group.lua"/>
     <Script file="party.lua"/>
     <Script file="raid.lua"/>
     <Script file="pet.lua"/>
-
 </Ui>

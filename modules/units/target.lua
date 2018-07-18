@@ -27,6 +27,11 @@ function Target:Init()
         Target:Update(self, ...)
     end
 
+    frame:RegisterEvent("PLAYER_TARGET_CHANGED")
+    frame:SetScript("OnEvent", function(self, ...)
+        self:Update(UnitEvent.UPDATE_DB)
+    end)
+
     frame:Update(UnitEvent.UPDATE_DB, db)
 
     return frame
@@ -38,7 +43,8 @@ function Target:Update(...)
     if (self.super) then
         self.super:Update(...)
 
-        -- Update player specific things based on the event
+        self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
+
         if (event == UnitEvent.UPDATE_DB) then
 
             local db = self.db or arg2
@@ -49,13 +55,11 @@ function Target:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.modules.clickcast:Setup(self, db["Clickcast"])
+                A.general.clickcast:Setup(self, db["Clickcast"])
             end
 
-            --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
 
-            --[[ Background ]]--
             U:CreateBackground(self, db)
 
             self.tags:foreach(function(key, tag)

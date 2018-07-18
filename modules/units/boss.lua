@@ -85,7 +85,7 @@ function Boss:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.modules.clickcast:Setup(self, db["Clickcast"])
+                A.general.clickcast:Setup(self, db["Clickcast"])
             end
 
             --[[ Bindings ]]--

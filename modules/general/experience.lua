@@ -134,4 +134,10 @@ function E:Init()
 	A.frames.experienceBar = experience
 end
 
-A.modules.experience = E
+function E:Update(...)
+
+    
+
+end
+
+A.general.experience = E

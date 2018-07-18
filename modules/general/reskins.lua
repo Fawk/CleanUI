@@ -5,13 +5,6 @@ local iconLib = LibStub("LibDBIcon-1.0", true)
 local Tools = A.Tools
 local buildText = A.TextBuilder
 
-local CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA
-local CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA
-local CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA
-local CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA = CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA
-local CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA = CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA
-local CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA
-
 local backdrops = { "DropDownList1MenuBackdrop", "DropDownList2MenuBackdrop", "GameTooltip", "GameMenuFrame" }
 local shoppingTexts = {
 	"ShoppingTooltip1TextLeft1",
@@ -109,90 +102,6 @@ local function setStyle()
 	end
 
 	--ChallengerKeyStoneFrame:SetFrameStrata("HIGH")
-
-	--Chat
-	do
-		CHAT_FRAME_TAB_SELECTED_MOUSEOVER_ALPHA = 1.0;
-		CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0;
-		CHAT_FRAME_TAB_ALERTING_MOUSEOVER_ALPHA = 1.0;
-		CHAT_FRAME_TAB_ALERTING_NOMOUSE_ALPHA = 0.4;
-		CHAT_FRAME_TAB_NORMAL_MOUSEOVER_ALPHA = 0.6;
-		CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0;
-		
-		local db = A["Profile"]["Options"]["Chat"]
-	
-		for _,name in pairs(CHAT_FRAMES) do
-			local frame = _G[name]
-			if frame then
-	
-				if db["Hide In Combat"] then
-		
-					frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-					frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-					frame:HookScript("OnEvent", function(self, event, ...)
-						if event == "PLAYER_REGEN_DISABLED" then
-							self:SetAlpha(0)
-							local tab = _G[name.."Tab"]
-							if tab then
-								tab:SetAlpha(0)
-							end
-						elseif event == "PLAYER_REGEN_ENABLED" then
-							self:SetAlpha(1)
-							local tab = _G[name.."Tab"]
-							if tab then
-								tab:SetAlpha(1)
-							end
-						end
-					end)
-					
-				end
-
-				local bf = _G[name.."ButtonFrame"]
-				if bf then 
-					kill(bf)
-					bf:Hide()
-				end
-				frame:SetClampedToScreen(false)
-				kill(frame)
-				--frame:SetFont(font(12))
-				frame:SetFont(media:Fetch("font", "NotoBold"), 10, "NONE")
-				local tab = _G[name.."Tab"]
-				if tab then
-					kill(tab)
-					tab.text = _G[name.."TabText"]
-					tab.text:SetFont(font(10))
-					tab.text:SetTextColor(1, 1, 1)
-					hooksecurefunc(tab.text, "SetTextColor", function(t, r, g, b, a)
-						if r ~= 1 or g ~= 1 or b ~= 1 then
-							t:SetTextColor(1, 1, 1)
-						end
-					end)
-				end
-				local editbox = _G[name.."EditBox"]
-				if editbox then
-					for i = 1, editbox:GetNumRegions() do
-						local region = select(i, editbox:GetRegions())
-						if region:GetObjectType() == "Texture" then 
-							if region:GetTexture() ~= "Color-ffffffff-CSimpleTexture" then
-								region:SetTexture(nil)
-							end
-						end
-					end	
-					editbox:SetHeight(24)
-					editbox:SetFont(font(10))
-					editbox:SetBackdrop(backdrop(3, 1))
-					editbox:SetPoint(E.regions.TL, frame, E.regions.BL, 0, -5)
-					editbox:SetPoint(E.regions.TR, frame, E.regions.BR, 0, -5)
-					local r, g, b, a = unpack(A.colors.backdrop.default)
-					editbox:SetBackdropColor(r, g, b, 0.67)
-					editbox:SetBackdropBorderColor(unpack(A.colors.backdrop.border))
-					_G[name.."EditBoxHeader"]:SetFont(font(10))
-				end
-			end
-		end
-		QuickJoinToastButton:Hide()
-		ChatFrameMenuButton:Hide()
-	end
 
 	--GameTooltip
 	do

@@ -1,6 +1,6 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
+local U = A.Utils
 local CreateFrame = CreateFrame
 local buildText = A.TextBuilder
 local bindingMode = false
@@ -120,20 +120,7 @@ function PetBar:Init()
                 button:SetSize(size, size)
                 button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
 
-                local db = {
-                    ["Background"] = {
-                        ["Color"] = { 0, 0, 0 },
-                        ["Offset"] = {
-                            ["Top"] = -1,
-                            ["Bottom"] = -1,
-                            ["Left"] = -1,
-                            ["Right"] = -1
-                        },
-                        ["Enabled"] = true
-                    }
-                }
-
-                T:Background(button, db, button, false)
+                U:CreateBackground(button, db, false)
                 button.emptySlot = button.emptySlot or button:CreateTexture(nil, "BACKGROUND")
                 button.emptySlot:SetBlendMode("ADD")
                 button.emptySlot:SetPoint("CENTER")
@@ -193,4 +180,4 @@ function PetBar:Init()
     A:CreateMover(bar, db, "PetBar")
 end
 
-A.modules["PetBar"] = PetBar
+A.general.petbar = PetBar

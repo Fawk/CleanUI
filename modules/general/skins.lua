@@ -26,7 +26,7 @@ function Skins:Kill(frame)
 end
 
 function Skins:Font(fs, size, style)
-	if (not fs.SetFont) then return end
+	if (not fs or not fs.SetFont) then return end
 	style = style or "OUTLINE"
 	fs:SetFont(media:Fetch("font", "Default"), size, style == "SHADOW" and "NONE" or style)
 	if (style == "SHADOW") then

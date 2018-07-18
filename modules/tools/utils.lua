@@ -1,6 +1,7 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
+local T = A.Tools
 
 function string.trim()
   return (self:gsub("^%s*(.-)%s*$", "%1"))
@@ -719,7 +720,7 @@ local function NumberBuilder(parent)
 
 			self:SetText(text)
 			if o.onValueChangedFunc then 
-				o:valueChangedFunc(self, text)
+				o:onValueChangedFunc(self, text)
 			end
 		end)
 
@@ -873,7 +874,7 @@ local function DropdownBuilder(parent)
 			end
 		end
 
-		if o.onValueChangedFunc then 
+		if o.onValueChangedFunc then
 			o:onValueChangedFunc(self, self.selectedButton.text:GetText())
 		end
 	end
@@ -2265,9 +2266,24 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 	local ref = frame
 	if db["Background"] and db["Background"]["Enabled"] then 
 		if not useBackdrop then
-			ref = frame.Background or CreateFrame("Frame", nil, frame)
-			ref:SetPoint("CENTER", frame, "CENTER", 0, 0)
-			ref:SetSize(frame:GetWidth() + 3, frame:GetHeight() + 3)
+
+			local width = db["Background"]["Match width"] and frame:GetWidth() or db["Background"]["Width"]
+			local height = db["Background"]["Match height"] and frame:GetHeight() or db["Background"]["Height"]
+
+			local x = math.max(frame:GetWidth(), width) - math.min(frame:GetWidth(), width)
+			local y = math.max(frame:GetHeight(), height) - math.min(frame:GetHeight(), height)
+
+			x = x / 2
+			y = y / 2
+
+			if (frame:GetObjectType() == "Texture") then
+				ref = frame.Background or CreateFrame("Frame", nil, frame:GetParent())
+			else
+				ref = frame.Background or CreateFrame("Frame", nil, frame)
+			end
+
+			ref:SetPoint("TOPLEFT", frame, "TOPLEFT", -x, y)
+			ref:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", x, -y)
 			ref:SetFrameStrata("LOW")
 			ref:SetFrameLevel(1)
 			ref:Show()
@@ -2275,10 +2291,11 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 		end
 		local offset = db["Background"]["Offset"]
 		ref:SetBackdrop({
-	        bgFile = media:Fetch("background", "cui-default-bg"), 
+	        bgFile = media:Fetch("background", "bg"), 
 	        tile = true, 
 	        tileSize = 1,
-	        edgeFile = media:Fetch("border", "test-border2"), 
+	        --edgeFile = media:Fetch("border", "test-border3"), 
+	        edgeFile = media:Fetch("background", "bg"), 
 	        edgeSize = db["Background"]["Edge Size"] or 3, 
 	        insets = { 
 	        	top = offset["Top"], 

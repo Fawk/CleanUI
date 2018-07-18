@@ -51,14 +51,13 @@ function Tags:ToggleTagsWindow(group)
 
 	local previousEditedTag
 
-	-- List the existing actions
 	if (A.tagsWindow) then
 		previousEditedTag = A.tagsWindow.tagDropdown:GetValue()
 		A.tagsWindow:Hide()
 		A.tagsWindow = nil
 	end
 
-	local parent = CreateFrame("Frame", nil, A.frameParent)
+	local parent = CreateFrame("Frame", T:frameName(group.parent.name, "Tags"), A.frameParent)
 	parent:SetPoint("TOPLEFT", group, "TOPRIGHT", 200, 0)
 	parent:SetSize(250, 100)
 
@@ -351,4 +350,4 @@ function Tags:GetOptions(enabled, extraClick, order)
 	return config
 end
 
-A.modules.tags = Tags
+A.general.tags = Tags

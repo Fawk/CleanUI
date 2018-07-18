@@ -70,13 +70,13 @@ function HealPrediction:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
+	local texture = media:Fetch("statusbar", db["Texture"] or "Default")
 
 	local healPrediction = parent.orderedElements:get(elementName)
 	if (not healPrediction) then
 
 		healPrediction = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
-
+		healPrediction.db = db
 		healPrediction:SetParent(parent)
 		
 		local my = CreateFrame("StatusBar", nil, parent)
@@ -140,7 +140,7 @@ function HealPrediction:Init(parent)
 		end)
 	end
 
-	healPrediction:Update(UnitEvent.UPDATE_DB, db)
+	healPrediction:Update(UnitEvent.UPDATE_DB)
 	healPrediction:Update("UNIT_HEALTH_FREQUENT")
 
 	parent.orderedElements:set(elementName, healPrediction)
@@ -150,11 +150,19 @@ function HealPrediction:Update(...)
 
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
+	local db = self.db
 
-	parent:Update(self, UnitEvent.UPDATE_IDENTIFIER)
+	if (not db["Enabled"]) then
+		self.myBar:Hide()
+		self.otherBar:Hide()
+		self.absorbBar:Hide()
+		self.healAbsorbBar:Hide()
+		return
+	end
+
+	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
 
 	if (event == UnitEvent.UPDATE_DB) then
-		local db = arg1
 		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
 
 		self.maxOverflow = db["Max Overflow"]
@@ -175,6 +183,11 @@ function HealPrediction:Update(...)
 
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
+
+		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "UNIT_HEAL_PREDICTION", "UNIT_ABSORB_AMOUNT_CHANGED", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED")) then
+			return
+		end
+
 		local tag = arg1
 		tag:AddReplaceLogic("[heal]", parent.myIncomingHeal)
 		tag:AddReplaceLogic("[heal:round]", T:short(parent.myIncomingHeal, 2))
@@ -186,6 +199,8 @@ function HealPrediction:Update(...)
 		tag:AddReplaceLogic("[healabsorb:round]", T:short(parent.healAbsorb, 2))
 		tag:AddReplaceLogic("[perabsorb]", floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
 	else
+		if (parent.unit ~= arg1) then return end
+		
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
 
 		if(parent.hasOverAbsorb and self.overAbsorb) then

@@ -14,7 +14,7 @@ function Pet:Init()
     frame.orderedElements = A:OrderedMap()
     frame.tags = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
-        self:Update(UnitEvent.UPDATE_DB, db)
+        self:Update(UnitEvent.UPDATE_DB)
     end)
 
     A:CreateMover(frame, db, frameName)
@@ -23,7 +23,7 @@ function Pet:Init()
         Pet:Update(self, ...)
     end
 
-    frame:Update(UnitEvent.UPDATE_DB, db)
+    frame:Update(UnitEvent.UPDATE_DB)
 
     return frame
 end
@@ -34,10 +34,9 @@ function Pet:Update(...)
     if (self.super) then
         self.super:Update(...)
 
-        -- Update player specific things based on the event
         if (event == UnitEvent.UPDATE_DB) then
 
-            local db = self.db or arg2
+            local db = self.db
             local position, size = db["Position"], db["Size"]
             
             if (not InCombatLockdown()) then
@@ -45,15 +44,11 @@ function Pet:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.modules.clickcast:Setup(self, db["Clickcast"])
+                A.general.clickcast:Setup(self, db["Clickcast"])
             end
 
-            --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
 
-            A.modules.clickcast:Setup(self, db["Clickcast"])
-
-            --[[ Background ]]--
             U:CreateBackground(self, db)
 
             self.tags:foreach(function(key, tag)

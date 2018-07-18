@@ -3,7 +3,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 A:Debug("Loading enums")
 
-local defaultBg = media:Fetch("background", "cui-default-bg")
+local defaultBg = media:Fetch("background", "bg")
 
 local enum = {
     colors = {
@@ -36,44 +36,44 @@ local enum = {
     },
     backdrops = {
         editbox = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1
         },
         editboxborder = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1, 
-            edgeFile = media:Fetch("border", "test-border"), 
-            edgeSize = 2, 
+            edgeFile = media:Fetch("background", "bg"), 
+            edgeSize = 1, 
             insets = { top = 1, bottom = 1, left = 1, right = 1 } 
         },
         editboxborder2 = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1, 
-            edgeFile = media:Fetch("border", "test-border"), 
+            edgeFile = media:Fetch("background", "bg"), 
             edgeSize = 4, 
             insets = { top = 5, bottom = 5, left = 5, right = 5 } 
         },
         editboxborder3 = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1, 
-            edgeFile = media:Fetch("border", "test-border"), 
+            edgeFile = media:Fetch("background", "bg"), 
             edgeSize = 2, 
             insets = { top = 3, bottom = 3, left = 3, right = 3 } 
         },
         optiongroupborder = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1, 
-            edgeFile = media:Fetch("border", "test-border"), 
+            edgeFile = media:Fetch("background", "bg"), 
             edgeSize = 2, 
             insets = { top = -5, bottom = -5, left = -5, right = -5 } 
         },
         buttonroundborder = { 
-            bgFile = media:Fetch("background", "cui-default-bg"), 
+            bgFile = media:Fetch("background", "bg"), 
             tile = true, 
             tileSize = 1, 
             edgeFile = media:Fetch("border", "cui-round-border2"), 
@@ -81,13 +81,13 @@ local enum = {
             insets = { top = 1, bottom = 1, left = 1, right = 1 } 
         },
         statusborder = {
-            bgFile = media:Fetch("background", "cui-default-bg"),
+            bgFile = media:Fetch("background", "bg"),
             tile = true,
             tileSize = 16,
             insets  = { top = -1, bottom = -1, left = -1, right = -1 }
         },
         statusborder2 = {
-            bgFile = media:Fetch("background", "cui-default-bg"),
+            bgFile = media:Fetch("background", "bg"),
             tile = true,
             tileSize = 16,
             edgeFile = media:Fetch("border", "cui-round-border2"), 

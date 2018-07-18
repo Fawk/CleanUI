@@ -17,22 +17,22 @@ local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 
-function A:FormatTag(tag)
-    local replaceLogic = A:OrderedMap()
+local replaceLogic = A:OrderedMap()
 
+for key, color in next, A.colors.text do
+    replaceLogic:set("[color:"..key.."]", color)
+end
+
+function A:FormatTag(tag)
     local name = UnitName(tag:GetParent().unit) or ""
 
-    replaceLogic:set("[name]", name)
-    replaceLogic:set("[name:%d+]", name:sub(1, tag.format:match("%d+")))
-
-    for key, color in next, A.colors.text do
-        replaceLogic:set("[color:"..key.."]", color)
-    end
+    replaceLogic:set("[name]", name, true)
+    replaceLogic:set("[name:%d+]", name:sub(1, tag.format:match("%d+")), true)
 
     A:AddColorReplaceLogicIfNeeded(tag)
     
     tag.replaceLogics:foreach(function(key, replace)
-        replaceLogic:set(key, replace)
+        replaceLogic:set(key, replace, true)
     end)
 
     local replaced = tag.format
@@ -104,9 +104,10 @@ function Unit:Init(unit)
         self.tagEventFrame:GetScript("OnEvent")(self.tagEventFrame, "IGNORED")
     end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
+        local event = ...
         unit.tags:foreach(function(key, tag)
             unit.orderedElements:foreach(function(k, element)
-                element:Update(UnitEvent.UPDATE_TAGS, tag)
+                element:Update(UnitEvent.UPDATE_TAGS, tag, event)
             end)
             A:FormatTag(tag)
             tag:SetText(tag.text)

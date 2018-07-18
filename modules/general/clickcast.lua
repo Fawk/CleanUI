@@ -287,7 +287,7 @@ function CC:ToggleClickCastWindow(group)
 		A.clickCastWindow = nil
 	end
 
-	local parent = CreateFrame("Frame", nil, A.frameParent)
+	local parent = CreateFrame("Frame", T:frameName(group.parent.name, "Clickcast"), A.frameParent)
 	parent:SetPoint("TOPLEFT", group, "TOPRIGHT", 50, 0)
 
 	parent.rows = createRows(parent)
@@ -693,4 +693,4 @@ function CC:GetOptions(enabled, extraClick, order)
 	return config
 end
 
-A.modules.clickcast = CC
+A.general.clickcast = CC

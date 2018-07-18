@@ -73,7 +73,8 @@ end
 
 Addon:Debug("Created mainflow")
 
-local function setScale()
+function Addon:SetScale()
+
 	local resolution = {GetScreenResolutions()}
 	resolution = resolution[GetCurrentResolution()]
 	local matches = {}
@@ -82,7 +83,10 @@ local function setScale()
 	local w, h = unpack(matches)
 	SCREEN_HEIGHT = h
 	SCREEN_WIDTH = w
-	UIParent:SetScale(768 / h)
+
+	local newScale = 768 / h
+
+	UIParent:SetScale(newScale)
 end
 
 function Addon:OnInitialize()
@@ -93,8 +97,6 @@ function Addon:OnInitialize()
 	local h, w = GetScreenHeight() or 1080, GetScreenWidth() or 1920
 	SCREEN_HEIGHT = math.floor(h / uiscale)
 	SCREEN_WIDTH = math.floor(w / uiscale)
-
-	setScale()
 
 	self.frameParent = CreateFrame("Frame", Addon:GetName().."_MainContainer", UIParent, 'SecureHandlerStateTemplate')
 	RegisterStateDriver(self.frameParent, "visibility", "[petbattle] hide; show")
@@ -112,12 +114,12 @@ function Addon:OnEnable()
 
 	local E, T, Options, Units = self.enum, self.Tools, self.Options, self.Units
 
-	setScale()
-
     local profile = self.modules["Profile"]
 
 	profile:Init(self.db)
 	profile:Load()
+
+	self:SetScale()
 
 	self:Init()
 	--self:SetStyle()
@@ -125,12 +127,20 @@ function Addon:OnEnable()
     Addon:CreatePrefs(Addon["Profile"]["Options"])
 
 	collectgarbage("collect");
+	collectgarbage("collect");
 end
 
 function Addon:Init()
+
+	for key, module in next, self.general do
+        if (module.Init) then
+            module:Init()
+        end
+    end
+
 	for modName, module in pairs(self.modules) do
-		if module.Init then 
-	        local unit = module:Init() 
+		if module.Init then
+	        local unit = module:Init()
             if (unit) then
             	if (unit.hasMultipleUnits) then
             		unit:InitUnits(function(self, uf)
@@ -147,12 +157,6 @@ function Addon:Init()
 	            end
             end
         end
-	end
-end
-
-function Addon:Update()
-	for key, module in pairs(self.modules) do
-		if module.Trigger then module:Trigger() end
 	end
 end
 

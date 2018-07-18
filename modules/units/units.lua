@@ -47,6 +47,12 @@ function Units:Position(frame, db, overrideRelative)
         frame:SetAllPoints()
     else
         local x, y = db["Offset X"], db["Offset Y"]
+
+        if (db["Relative To"] == "FrameParent" or (db["Relative To"] == "Parent" and frame:GetParent() == A.frameParent)) then
+            x = T:Scale(x)
+            y = T:Scale(y)
+        end
+
         frame:SetPoint(db["Local Point"], self:Translate(frame, overrideRelative or db["Relative To"]), db["Point"], x, y)
     end
 end
@@ -189,7 +195,7 @@ function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, c
     if (not db) then return end
 
     local bar = parent[key]
-    local parent = parent:GetParent()
+    local unit = parent:GetParent()
 
     if (db["Enabled"]) then
         local tex = parent:GetStatusBarTexture()
@@ -225,7 +231,7 @@ function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, c
         bar:SetValue(max - min)
 
         -- Do coloring based on db
-        colorFunc(bar, parent, min, max, gradient, classOverride)
+        colorFunc(A, bar, parent, min, max, gradient, classOverride)
 
         bar:Show()
     else

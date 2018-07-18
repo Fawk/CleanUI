@@ -122,6 +122,13 @@ function string.anyMatch(self, ...)
 	return match
 end
 
+function T:anyOf(x, ...)
+	for _,arg in next, { ... } do
+		if (x == arg) then return true end
+	end
+	return false
+end
+
 function string.replace(self, t, r)
     local format = t:gsub("%[", "%%["):gsub("%]", "%%]")
     while (self:match(format)) do
@@ -188,72 +195,6 @@ T.points = {
 	["BOTTOMRIGHT"] = "BOTTOMRIGHT",
 	["CENTER"] = "CENTER"
 }
-
-function T:Background(frame, db, anchor, isBackdrop)
-	local target
-	if (db["Background"] and db["Background"]["Enabled"]) then
-		if (isBackdrop) then
-			target = frame
-		else
-			if (anchor) then
-				if (anchor.bg) then
-					anchor.bg:Hide()
-					target = anchor.bg
-				else
-					local f = CreateFrame("Frame", nil, frame)
-					f:SetFrameStrata("LOW")
-					f:SetFrameLevel(2)
-					f:SetPoint("CENTER", anchor or frame, "CENTER")
-					local width, height = anchor:GetSize()
-					if (not width) then
-						width, height = frame:GetSize()
-					end
-					f:SetSize(width + 3, height + 3)
-					anchor.bg = f
-					target = anchor.bg
-				end
-			else
-				anchor = frame["Background Anchor"]
-				if (anchor) then
-					target = anchor
-				else
-					local f = CreateFrame("Frame", nil, frame)
-					f:SetFrameStrata("LOW")
-					f:SetFrameLevel(2)
-					f:SetPoint("CENTER", anchor or frame, "CENTER")
-					local width, height = frame:GetSize()
-					if (not width) then
-						width, height = frame:GetSize()
-					end
-					f:SetSize(width + 3, height + 3)
-					anchor = f
-					target = anchor
-					frame["Background Anchor"] = anchor
-				end
-			end
-		end
-		local offset = db["Background"]["Offset"]
-		if (not target:GetBackdrop()) then
-			target:SetBackdrop({
-				bgFile = media:Fetch("statusbar", "Default"),
-				edgeFile = media:Fetch("border", "test-border2"),
-				edgeSize = 3,
-				tile = true,
-				tileSize = 1,
-				insets = {
-					top = offset["Top"],
-					bottom = offset["Bottom"],
-					left = offset["Left"],
-					right = offset["Right"],
-				}
-			})
-		end
-		target:SetBackdropColor(unpack(db["Background"]["Color"]))
-		target:SetBackdropBorderColor(unpack(db["Background"]["Color"]))
-	else
-		target:SetBackdrop(nil)
-	end
-end
 
 function T:HookSetPoint(frame, position, w, h)
 	
@@ -369,22 +310,23 @@ end
 
 function T:FadeOut(frame, seconds)
 	local seconds = seconds or 1
-	frame.timer = frame.timer or 0
     local f = CreateFrame("Frame")
+    f.timer = 0
+    local step = (1 - frame:GetAlpha()) / (GetFramerate() * seconds)
     f:SetScript("OnUpdate", function(self, elapsed)
-        frame.timer = frame.timer + elapsed
-        if frame.timer > .01  then
-            if frame:GetAlpha() <= 0 then
-                f:SetScript("OnUpdate", nil)
-            else
-            	local alpha = frame:GetAlpha() - ((100 / ((seconds * 1000) * .01)) / 100)
-            	if alpha < 0 then
-            		alpha = 0
-    			end
-                frame:SetAlpha(alpha) 
-            end
-            frame.timer = 0
-        end
+    	self.timer = self.timer + elapsed
+    	if (self.timer > step) then
+	        if frame:GetAlpha() <= 0 then
+	            f:SetScript("OnUpdate", nil)
+	        else
+	        	local alpha = frame:GetAlpha() - step
+	        	if alpha < 0 then
+	        		alpha = 0
+				end
+	            frame:SetAlpha(alpha) 
+	        end
+	        self.timer = 0
+	    end
     end)
 end
 
@@ -429,6 +371,14 @@ function T:Switch(m, ...)
 			t[next(t, i)]()
 			return
 		end
+	end
+end
+
+function T:Scale(x)
+	if (A.ratio) then
+		return A.ratio * x
+	else
+		return x
 	end
 end
 

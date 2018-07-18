@@ -1,74 +1,108 @@
 local A, L = unpack(select(2, ...))
-local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
+
+--[[ Blizzard ]]
+local SPELL_POWER_ALTERNATE_POWER = SPELL_POWER_ALTERNATE_POWER
+local CreateFrame = CreateFrame
+local UnitPower = UnitPower
+local UnitPowerMax = UnitPowerMax
+
+--[[ Lua ]]
+local unpack = unpack
+local format = string.format
+
+--[[ Locals ]]
+local E = A.enum
+local T = A.Tools
+local U = A.Utils
+local Units = A.Units
+local media = LibStub("LibSharedMedia-3.0")
 local buildText = A.TextBuilder
+local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER", "PLAYER_ENTERING_WORLD", "UNIT_DISPLAYPOWER", "UPDATE_VEHICLE_ACTIONBAR" }
+local elementName = "Alternative Power"
 
-local tags = {
-    ["altpp"] = {
-        method = [[function(u, r)
-            if not u and not r then return end
-            if UnitExists(r or u) then
-				return UnitPower(r or u, SPELL_POWER_ALTERNATE_POWER)
-            end
-        end]],
-        events = "UNIT_POWER_FREQUENT"
-    },
-    ["altppmax"] = {
-        method = [[function(u, r)
-            if not u and not r then return end
-            if UnitExists(r or u) then
-            	return UnitPowerMax(r or u, SPELL_POWER_ALTERNATE_POWER)
-            end
-        end]],
-        events = "UNIT_MAXPOWER"
-    }
-}
+local AlternativePower = {}
 
-function AlternativePower(frame, db)
+function AlternativePower:Init(parent)
+	local db = parent.db[elementName]
 
-	local mult = db["Background Multiplier"]
-	local texture = media:Fetch("statusbar", db["Texture"])
-	local size = db["Size"]
-
-	local bar = frame.AlternativePower or (function()
-		local bar = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", frame)
-		bar.value = buildText(bar, 10):shadow():atCenter():build()
-		bar.value:SetText("")
-		bar.bg = bar:CreateTexture(nil, "BACKGROUND")
-		bar.PostUpdate = function(self, min, cur, max)
-			local r, g, b = self:GetStatusBarColor()
-			if r > 0.95 and g > 0.95 and b > 0.95 then
-				r, g, b = 0.67, 0.13, 0.13
-			end
-			self.bg:SetVertexColor(r * mult, g * mult, b * mult)
-			self:SetStatusBarColor(r, g, b)
-		end
-		return bar
-	end)()
-
-	if not db["Enabled"] then
-		bar:Hide()
+	if (not db["Enabled"]) then
 		return
 	end
 
-	Units:Position(bar, db["Position"])
-	A:CreateMover(bar, db, "Alternative Power")
-	bar:SetSize(size["Width"], size["Height"])
-	bar:SetStatusBarTexture(texture)
-	bar.bg:SetTexture(texture)
-	bar.bg:SetAllPoints(bar)
+	local altpower = parent.orderedElements:get(elementName)
+	if (not altpower) then
+		altpower = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", parent)
+		altpower.db = db
+		altpower.value = buildText(altpower, 10):shadow():atCenter():build()
+		altpower.value:SetText("")
+		altpower.bg = altpower:CreateTexture(nil, "BACKGROUND")
 
-	U:CreateBackground(bar, db, true)
-
-	if db["Hide Blizzard"] then
 		PlayerPowerBarAlt:UnregisterAllEvents()
 		PlayerPowerBarAlt:SetAlpha(0)
+
+		altpower.Update = function(self, ...)
+			AlternativePower:Update(self, ...)
+		end
+
+		Units:RegisterEvents(altpower, events)
+		altpower:SetScript("OnEvent", function(self, event, ...)
+			self:Update(event, ...)
+		end)
+
+		A:CreateMover(altpower, db, elementName)
+		Units:Position(altpower, db["Position"])
+
+		altpower:Hide()
 	end
 
-	frame:Tag(bar.value, "[altpp] / [altppmax]")
+	altpower:Update(UnitEvent.UPDATE_DB)
 
-	bar:Hide()
-
-	frame.AlternativePower = bar
+	parent.orderedElements:set(elementName, altpower)
 end
 
---A["Player Elements"]:set({ name = "AlternativePower", func = AlternativePower })
+function AlternativePower:Update(...)
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+	local parent = self:GetParent()
+	local db = self.db
+
+	local mult = db["Background Multiplier"]
+	local r, g, b, a = unpack(db["Color"])
+
+	if (not db["Enabled"]) then
+		Units:RegisterEvents(PlayerPowerBarAlt, events)
+		PlayerPowerBarAlt:SetAlpha(100)
+
+		self:Hide()
+		return
+	end
+
+	if (event == UnitEvent.UPDATE_DB) then
+
+		local texture = media:Fetch("statusbar", db["Texture"])
+		local size = db["Size"]
+
+		self:SetSize(size["Width"], size["Height"])
+		self:SetStatusBarTexture(texture)
+		self.bg:SetTexture(texture)
+		self.bg:SetAllPoints()
+
+		U:CreateBackground(self, db, false)
+	else
+		local value = UnitPower("player", SPELL_POWER_ALTERNATE_POWER)
+		local max = UnitPowerMax("player", SPELL_POWER_ALTERNATE_POWER)
+
+		self:SetMinMaxValues(0, max)
+		self:SetValue(value)
+		self.value:SetText(format("%d / %d", value, max))
+	end
+
+	if (mult == -1) then
+		self.bg:Hide()
+	else
+		self.bg:SetVertexColor(r * mult, g * mult, b * mult)
+	end
+	
+	self:SetStatusBarColor(r, g, b, a)
+end
+
+A["Player Elements"]:set(elementName, AlternativePower)

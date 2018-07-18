@@ -54,7 +54,7 @@ function V:Init()
 
     vehicle:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
 
-    T:Background(vehicle, db, vehicle, false)
+    U:CreateBackground(vehicle, db, false)
 
     vehicle.db = db
 
@@ -67,4 +67,4 @@ function V:Init()
     A.frames.vehicleLeaveButton = vehicle
 end
 
-A.modules.vehicle = V
+A.general.vehicle = V

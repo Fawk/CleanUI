@@ -27,7 +27,7 @@ function A:UpdateMoveableFrames()
 
 			moveFrame:ClearAllPoints()
 			moveFrame.affecting:ClearAllPoints()
-			moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], p["Offset X"], p["Offset Y"])
+			moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], T:Scale(p["Offset X"]), T:Scale(p["Offset Y"]))
 		end
 	end
 end
@@ -206,10 +206,6 @@ end
 SLASH_CLEANUI1 = '/cui'
 function SlashCmdList.CLEANUI(msg, editbox)
     local command, arg1, arg2, arg3, arg4, arg5 = T:getWords(msg)
-	
-    if command == "bind" then
-		A["modules"]["Actionbars"]:BindingMode()
-	end
 
     if command == "move" then
        A:InitMove() 
@@ -260,5 +256,12 @@ function SlashCmdList.CLEANUI(msg, editbox)
     		print(p:GetActive(), A["Profile"])
     	end
     end
-end
 
+    if command == "refreshScale" then
+    	A:SetScale()
+    end
+
+    if command == "printScale" then
+    	print("UiScale", UIParent:GetScale())
+    end
+end

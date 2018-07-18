@@ -35,7 +35,7 @@ local defaults =  {
                         ["Background Multiplier"] = -1,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -67,7 +67,7 @@ local defaults =  {
                         ["Background Multiplier"] = -1,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -98,14 +98,19 @@ local defaults =  {
                             ["Height"] = 16
                         },
                         ["Background"] = {
-                            ["Color"] = { 0, 0, 0 },
+                            ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
                                 ["Top"] = 1,
                                 ["Bottom"] = 1,
                                 ["Left"] = 1,
                                 ["Right"] = 1
                             },
-                            ["Enabled"] = true,
+                            ["Edge Size"] = 3,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -135,14 +140,19 @@ local defaults =  {
                             ["Height"] = 16
                         },
                         ["Background"] = {
-                            ["Color"] = { 0, 0, 0 },
+                            ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
                                 ["Top"] = 1,
                                 ["Bottom"] = 1,
                                 ["Left"] = 1,
                                 ["Right"] = 1
                             },
-                            ["Enabled"] = true,
+                            ["Edge Size"] = 3,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -170,7 +180,7 @@ local defaults =  {
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -179,8 +189,8 @@ local defaults =  {
                             ["Heal Absorb"] = { .7, .7, 1, .5 }
                         }
                     },
-					["Background"] = {
-						["Color"] = { 0, 0, 0, 0 },
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0, 1 },
                         ["Offset"] = {
                             ["Top"] = 1,
                             ["Bottom"] = 1,
@@ -188,19 +198,28 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-						["Enabled"] = true,
-					},
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
+                    },
                     ["Alternative Power"] = {
                         ["Enabled"] = true,
                         ["Background"] = {
-                            ["Enabled"] = true,
+                            ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
                                 ["Top"] = 1,
                                 ["Bottom"] = 1,
                                 ["Left"] = 1,
                                 ["Right"] = 1
                             },
-                            ["Color"] = { 0, 0, 0 }
+                            ["Edge Size"] = 3,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Position"] = {
                             ["Point"] = "TOPLEFT",
@@ -213,9 +232,9 @@ local defaults =  {
                             ["Width"] = 200,
                             ["Height"] = 20
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Background Multiplier"] = 0.3,
-                        ["Hide Blizzard"] = true
+                        ["Color"] = { 0.7, 0.5, 0.3, 1 }
                     },
                     ["Runes"] = {
                         ["Enabled"] = true,
@@ -243,7 +262,7 @@ local defaults =  {
                         },
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true,
@@ -271,10 +290,14 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Orientation"] = "HORIZONTAL",
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true,
@@ -302,10 +325,14 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Orientation"] = "HORIZONTAL",
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true,
@@ -333,10 +360,14 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Orientation"] = "HORIZONTAL",
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true,
@@ -364,10 +395,14 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Orientation"] = "HORIZONTAL",
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true,
@@ -395,10 +430,14 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Orientation"] = "HORIZONTAL",
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
                         ["Attached"] = true
@@ -415,7 +454,7 @@ local defaults =  {
                             },
                             ["Color By"] = "Custom",
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "FrameParent",
                             ["Point"] = "BOTTOM",
@@ -475,8 +514,12 @@ local defaults =  {
                                     ["Right"] = 1
                                 },
                                 ["Edge Size"] = 3,
+                                ["Match width"] = true,
+                                ["Width"] = 100,
+                                ["Match height"] = true,
+                                ["Height"] = 100,
                                 ["Enabled"] = true
-                            }
+                            },
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0, 1 },
@@ -487,14 +530,18 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below",
                         ["Attached"] = true,
                     },
                     ["Stagger"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
                         ["Position"] = {
@@ -519,7 +566,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Colors"] = {
                             ["High"] = { .7, 0, 0, 1 },
@@ -564,7 +615,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -596,7 +647,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -627,14 +678,19 @@ local defaults =  {
                             ["Height"] = 16
                         },
                         ["Background"] = {
-                            ["Color"] = { 0, 0, 0 },
+                            ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
                                 ["Top"] = 1,
                                 ["Bottom"] = 1,
                                 ["Left"] = 1,
                                 ["Right"] = 1
                             },
-                            ["Enabled"] = true,
+                            ["Edge Size"] = 3,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -664,14 +720,19 @@ local defaults =  {
                             ["Height"] = 16
                         },
                         ["Background"] = {
-                            ["Color"] = { 0, 0, 0 },
+                            ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
                                 ["Top"] = 1,
                                 ["Bottom"] = 1,
                                 ["Left"] = 1,
                                 ["Right"] = 1
                             },
-                            ["Enabled"] = true,
+                            ["Edge Size"] = 3,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -689,7 +750,7 @@ local defaults =  {
 					["Tags"] = {},
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -707,7 +768,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
@@ -721,7 +786,7 @@ local defaults =  {
                             },
                             ["Color By"] = "Custom",
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
@@ -781,6 +846,10 @@ local defaults =  {
                                     ["Right"] = 1
                                 },
                                 ["Edge Size"] = 3,
+                                ["Match width"] = true,
+                                ["Width"] = 100,
+                                ["Match height"] = true,
+                                ["Height"] = 100,
                                 ["Enabled"] = true
                             }
                         },
@@ -793,7 +862,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below"
                     },
@@ -819,7 +892,7 @@ local defaults =  {
                             },
                             ["Color By"] = "Custom",
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "Parent",
                             ["Point"] = "BOTTOM",
@@ -879,8 +952,12 @@ local defaults =  {
                                     ["Right"] = 1
                                 },
                                 ["Edge Size"] = 3,
+                                ["Match width"] = true,
+                                ["Width"] = 100,
+                                ["Match height"] = true,
+                                ["Height"] = 100,
                                 ["Enabled"] = true
-                            }
+                            },
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0, 1 },
@@ -891,13 +968,17 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below",
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -926,7 +1007,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -958,7 +1039,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1038,7 +1119,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Enabled"] = true
                 },
@@ -1144,7 +1229,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "VERTICAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1154,7 +1239,8 @@ local defaults =  {
                                 1, -- [4]
                             },
                             ["Color By"] = "Custom",
-                        }
+                        },
+                        ["Frequent Updates"] = true
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -1176,7 +1262,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1214,7 +1300,7 @@ local defaults =  {
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -1258,7 +1344,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Enabled"] = true
                 },
@@ -1369,7 +1459,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "VERTICAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1379,7 +1469,8 @@ local defaults =  {
                                 1, -- [4]
                             },
                             ["Color By"] = "Custom",
-                        }
+                        },
+                        ["Frequent Updates"] = true
                     },
                     ["Power"] = {
                         ["Enabled"] = true,
@@ -1401,7 +1492,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1426,7 +1517,7 @@ local defaults =  {
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -1466,7 +1557,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Enabled"] = true
                 },
@@ -1485,7 +1580,7 @@ local defaults =  {
                             ["Local Point"] = "TOP",
                             ["Offset X"] = 0,
                             ["Offset Y"] = 0,
-                            ["Relative To"] = "Parent"
+                            ["Relative To"] = "Pet"
                         },
                         ["Size"] = {
                             ["Match width"] = true,
@@ -1498,7 +1593,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1530,7 +1625,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1569,7 +1664,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -1607,7 +1706,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Blacklist"] = {
                             ["Enabled"] = true,
@@ -1625,7 +1728,7 @@ local defaults =  {
                     ["Tags"] = {},
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Max Overflow"] = 1,
                         ["Colors"] = {
                             ["My Heals"] = { 0, .827, .765, .5 },
@@ -1643,7 +1746,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Castbar"] = {
                         ["Enabled"] = true,
@@ -1657,7 +1764,7 @@ local defaults =  {
                             },
                             ["Color By"] = "Custom",
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
@@ -1717,8 +1824,12 @@ local defaults =  {
                                     ["Right"] = 1
                                 },
                                 ["Edge Size"] = 3,
+                                ["Match width"] = true,
+                                ["Width"] = 100,
+                                ["Match height"] = true,
+                                ["Height"] = 100,
                                 ["Enabled"] = true
-                            }
+                            },
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0, 1 },
@@ -1729,7 +1840,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below"
                     },
@@ -1768,7 +1883,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Health Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1800,7 +1915,7 @@ local defaults =  {
                         ["Background Multiplier"] = 0.33,
                         ["Orientation"] = "HORIZONTAL",
                         ["Reversed"] = false,
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Missing Power Bar"] = {
                             ["Enabled"] = false,
                             ["Custom Color"] = {
@@ -1840,7 +1955,7 @@ local defaults =  {
                             },
                             ["Color By"] = "Custom",
                         },
-                        ["Texture"] = "Default2",
+                        ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "Class Icons",
                             ["Point"] = "BOTTOM",
@@ -1912,7 +2027,11 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Enabled"] = true,
+                            ["Match width"] = true,
+                            ["Width"] = 100,
+                            ["Match height"] = true,
+                            ["Height"] = 100,
+                            ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below"
                     },
@@ -1999,7 +2118,7 @@ local defaults =  {
                    ["Enabled"] = true,
                    ["Show Grid"] = true,
                    ["Bars"] = {
-                        [1] = {
+                        ["Bar1"] = {
                             ["Position"] = {
                                 ["Point"] = "BOTTOM",
                                 ["Local Point"] = "BOTTOM",
@@ -2007,58 +2126,76 @@ local defaults =  {
                                 ["Offset Y"] = 0
                             },
                             ["Orientation"] = "HORIZONTAL",
-                            ["X Spacing"] = 7,
+                            ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
-                        [2] = {
+                        ["Bar2"] = {
                             ["Position"] = {
                                 ["Point"] = "BOTTOM",
                                 ["Local Point"] = "BOTTOM",
                                 ["Offset X"] = 0,
-                                ["Offset Y"] = -16
+                                ["Offset Y"] = 16
                             },
                             ["Orientation"] = "HORIZONTAL",
-                            ["X Spacing"] = 7,
+                            ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
-                        [3] = {
+                        ["Bar3"] = {
                             ["Position"] = {
                                 ["Point"] = "BOTTOM",
                                 ["Local Point"] = "BOTTOM",
                                 ["Offset X"] = 0,
-                                ["Offset Y"] = -32
+                                ["Offset Y"] = 32
                             },
                             ["Orientation"] = "HORIZONTAL",
-                            ["X Spacing"] = 7,
+                            ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
-                        [4] = {
+                        ["Bar4"] = {
                             ["Position"] = {
                                 ["Point"] = "BOTTOM",
                                 ["Local Point"] = "BOTTOM",
                                 ["Offset X"] = 0,
-                                ["Offset Y"] = -48
+                                ["Offset Y"] = 48
                             },
                             ["Orientation"] = "HORIZONTAL",
-                            ["X Spacing"] = 7,
+                            ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         },
-                        [5] = {
+                        ["Bar5"] = {
                             ["Position"] = {
                                 ["Point"] = "BOTTOM",
                                 ["Local Point"] = "BOTTOM",
                                 ["Offset X"] = 0,
-                                ["Offset Y"] = -64
+                                ["Offset Y"] = 64
                             },
                             ["Orientation"] = "HORIZONTAL",
-                            ["X Spacing"] = 7,
+                            ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
                             ["Size"] = 24,
                         }
+                    }
+                },
+                ["Micro Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Point"] = "BOTTOMRIGHT",
+                        ["Local Point"] = "BOTTOMRIGHT",
+                        ["Offset X"] = -200,
+                        ["Offset Y"] = 0,
+                    }
+                },
+                ["Bag Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Point"] = "BOTTOMRIGHT",
+                        ["Local Point"] = "BOTTOMRIGHT",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0,
                     }
                 },
                 ["Pet Bar"] = {
@@ -2072,7 +2209,22 @@ local defaults =  {
                     },
                     ["Icon Size"] = 24,
                     ["Vertical Limit"] = 12,
-                    ["Horizontal Limit"] = 1
+                    ["Horizontal Limit"] = 1,
+                    ["Background"] = {
+                        ["Color"] = { 0, 0, 0, 1 },
+                        ["Offset"] = {
+                            ["Top"] = 1,
+                            ["Bottom"] = 1,
+                            ["Left"] = 1,
+                            ["Right"] = 1
+                        },
+                        ["Edge Size"] = 3,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
+                    },
                 },
                 ["Experience Bar"] = {
                     ["Enabled"] = true,
@@ -2084,7 +2236,6 @@ local defaults =  {
                         ["Offset Y"] = -50,
                     },
                     ["Background"] = {
-                        ["Color"] = { 0, 0, 0 },
                         ["Color"] = { 0, 0, 0, 1 },
                         ["Offset"] = {
                             ["Top"] = 1,
@@ -2093,7 +2244,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Size"] = {
                         ["Width"] = 250,
@@ -2102,7 +2257,7 @@ local defaults =  {
                     ["Background Multiplier"] = 0.33,
                     ["Orientation"] = "HORIZONTAL",
                     ["Reversed"] = false,
-                    ["Texture"] = "Default2",
+                    ["Texture"] = "Default",
                     ["Color"] = { 0.8, 0, 0.4 }
                 },
                 ["Reputation Bar"] = {
@@ -2132,7 +2287,7 @@ local defaults =  {
                     ["Background Multiplier"] = 0.33,
                     ["Orientation"] = "HORIZONTAL",
                     ["Reversed"] = false,
-                    ["Texture"] = "Default2"
+                    ["Texture"] = "Default"
                 },
                 ["Artifact Power Bar"] = {
                     ["Enabled"] = true,
@@ -2152,7 +2307,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Size"] = {
                         ["Width"] = 500,
@@ -2161,7 +2320,7 @@ local defaults =  {
                     ["Background Multiplier"] = 0.33,
                     ["Orientation"] = "HORIZONTAL",
                     ["Reversed"] = false,
-                    ["Texture"] = "Default2",
+                    ["Texture"] = "Default",
                     ["Color"] = { 0.90196, 0.8, 0.50196 }
                 },
                 ["Vehicle Leave Button"] = {
@@ -2182,7 +2341,11 @@ local defaults =  {
                             ["Right"] = 1
                         },
                         ["Edge Size"] = 3,
-                        ["Enabled"] = true,
+                        ["Match width"] = true,
+                        ["Width"] = 100,
+                        ["Match height"] = true,
+                        ["Height"] = 100,
+                        ["Enabled"] = true
                     },
                     ["Size"] = 48,
                 },
@@ -2200,8 +2363,8 @@ local defaults =  {
 	    }
 	},
 	["Characters"] = {},
-    ["Global"] = {
-        scale = 1
+    global = {
+        customLayouts = {}
     }
 }
 

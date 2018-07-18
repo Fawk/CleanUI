@@ -1,6 +1,5 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local GetSpecializationInfo, GetSpecialization = GetSpecializationInfo, GetSpecialization
 local InCombatLockdown = InCombatLockdown
 
@@ -49,13 +48,11 @@ function TargetTarget:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.modules.clickcast:Setup(self, db["Clickcast"])
+                A.general.clickcast:Setup(self, db["Clickcast"])
             end
 
             --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
-
-            A.modules.clickcast:Setup(self, db["Clickcast"])
 
             --[[ Background ]]--
             U:CreateBackground(self, db)

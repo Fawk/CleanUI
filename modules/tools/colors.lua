@@ -1,5 +1,26 @@
 local A, L = unpack(select(2, ...))
 
+--[[
+{
+	[Enum.PowerType.Mana] = MANA,
+	[Enum.PowerType.Rage] = RAGE,
+	[Enum.PowerType.Focus] = FOCUS,
+	[Enum.PowerType.Energy] = ENERGY,
+	[Enum.PowerType.ComboPoints] = COMBO_POINTS,
+	[Enum.PowerType.Runes] = RUNES,
+	[Enum.PowerType.RunicPower] = RUNIC_POWER,
+	[Enum.PowerType.SoulShards] = SOUL_SHARDS,
+	[Enum.PowerType.LunarPower] = LUNAR_POWER,
+	[Enum.PowerType.HolyPower] = HOLY_POWER,
+	[Enum.PowerType.Maelstrom] = MAELSTROM_POWER,
+	[Enum.PowerType.Chi] = CHI_POWER,
+	[Enum.PowerType.Insanity] = INSANITY_POWER,
+	[Enum.PowerType.ArcaneCharges] = ARCANE_CHARGES_POWER,
+	[Enum.PowerType.Fury] = FURY,
+	[Enum.PowerType.Pain] = PAIN,
+
+]]
+
 A.colors = {
 	health = {
 		low = { .54, .16, .11 },
@@ -17,13 +38,13 @@ A.colors = {
 		["MAELSTROM"] = { 0, 128/255, 1 },
 		["ENERGY"] = { 200/255,	200/255, 33/255 },
 		["PAIN"] = { 255/255, 156/255, 0 },
-		[SPELL_POWER_COMBO_POINTS] = { 255/255, 245/255, 105/255 },
-		[SPELL_POWER_SOUL_SHARDS] = { 128/255, 82/255, 105/255 },
-		[SPELL_POWER_CHI] = { 181/255, 255/255, 235/255 },
-		[SPELL_POWER_HOLY_POWER] = { 242/255, 230/255, 153/255 },
-		[SPELL_POWER_ARCANE_CHARGES] = { 26/255, 26/255, 250/255 },
-		[SPELL_POWER_LUNAR_POWER] = { 77/255, 133/255, 230/255 },
-		[SPELL_POWER_INSANITY] = { 102/255,	0, 204/255 },
+		[Enum.PowerType.ComboPoints] = { 255/255, 245/255, 105/255 },
+		[Enum.PowerType.SoulShards] = { 128/255, 82/255, 105/255 },
+		[Enum.PowerType.Chi] = { 181/255, 255/255, 235/255 },
+		[Enum.PowerType.HolyPower] = { 242/255, 230/255, 153/255 },
+		[Enum.PowerType.ArcaneCharges] = { 26/255, 26/255, 250/255 },
+		[Enum.PowerType.LunarPower] = { 77/255, 133/255, 230/255 },
+		[Enum.PowerType.Insanity] = { 102/255,	0, 204/255 },
 		runes = {
 			[1] = { .67, .13, .13 },
 			[2] = { 0, .67, .99 },
@@ -126,11 +147,15 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	end
 
 	if (r) then
+
 		bar:SetStatusBarColor(r, g, b, a or 1)
-		if (tonumber(mult) >= 0) then
-			bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
-		else
-			bar.bg:Hide()
+
+		if (bar.bg) then
+			if (tonumber(mult) >= 0) then
+				bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
+			else
+				bar.bg:Hide()
+			end
 		end
 	end
 end
