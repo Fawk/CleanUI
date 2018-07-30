@@ -66,9 +66,9 @@ local function fetchAuraData(func, tbl, id)
         aura.isStealable = isStealable
         aura.nameplateShowPersonal = nameplateShowPersonal
         aura.spellID = spellID
-        aura.canApplyAura
-        aura.isBossDebuff
-        aura.nameplateShowAll
+        aura.canApplyAura = canApplyAura
+        aura.isBossDebuff = isBossDebuff
+        aura.nameplateShowAll = nameplateShowAll
         aura.timeMod = timeMod
 
         tbl[i] = aura

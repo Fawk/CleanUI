@@ -27,13 +27,33 @@ local function orderBuffs(auras, db, unit)
 				tremove(auras, i)
 			end
 			
-			if (db["Hide no duration"] and (not aura.duration or aura.duration <= 0) then
+			if (db["Hide no duration"] and (not aura.duration or aura.duration <= 0)) then
 				tremove(auras, i)
 			end
 		end
 	end
 
 	sort(auras, function(left, right) return left.expires < right.expires end)
+end
+
+local function CreateButton(parent, width, height)
+	local button = parent.pool:Acquire("AuraIconBarTemplate")
+	
+	button.Icon:ClearAllPoints()
+	button.Icon:SetPoint("LEFT")
+	button.Icon:SetSize(height, height)
+
+	local text = button.Cooldown:GetRegions()
+	text:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+	button.Bar:ClearAllPoints()
+	button.Bar:SetSize(parent:GetWidth() - height, height)
+	button.Bar:SetPoint("LEFT", button.Icon, "RIGHT", 0, 0)
+
+	button.Name:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	button.Time:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+	return button
 end
 
 function Buffs:Init(parent)
@@ -90,6 +110,17 @@ function Buffs:Update(...)
 		self:Show()
 	end
 
+	parent:Update(UnitEvent.UPDATE_BUFFS)
+
+	local size = db["Size"]
+	local width, height = size["Width"], size["Height"]
+	local mult = db["Background Multiplier"]
+	local texture = media:Fetch("statusbar", db["Texture"])
+	local barGrowth = db["Bar Growth"]
+	local iconGrowth = db["Icon Growth"]
+	local x, y = db["Offset X"], db["Offset Y"]
+	local iconLimit = db["Icon Limit Per Row"]
+
 	if (event == UnitEvent.UPDATE_DB) then
 
 		if (db["Attached"]) then
@@ -105,148 +136,132 @@ function Buffs:Update(...)
 		for i = 1, db["Limit"] do
 
 			local aura = parent.buffs[i]
-			local button = self.buttons[i]
 
-			local barGrowth = db["Bar Growth"]
-			local iconGrowth = db["Icon Growth"]
-			local x, y = db["Offset X"], db["Offset Y"]
-			local iconLimit = ["Icon Limit Per Row"]
+			if (aura) then
+				local button = self.buttons[i]
 
-			if (db["Style"] == "Bar") then
-				button.Cooldown:Hide()
-				button.Bar:Show()
-				button.BarBackground:Show()
-				button.Name:Show()
-				button.Time:Show()
+				if (not button) then
+					self.buttons[i] = CreateButton(self, width, height)
+					button = self.buttons[i]
+				end
 
-				button:SetSize(parent:GetWidth(), height)
+				if (db["Style"] == "Bar") then
+					button.Cooldown:Hide()
+					button.Bar:Show()
+					button.BarBackground:Show()
+					button.Name:Show()
+					button.Time:Show()
 
-				button:ClearAllPoints()
-				if (barGrowth == "Upwards") then
-					if (relative == self) then
-						button:SetPoint("BOTTOM", relative, "BOTTOM", 0, 0)
+					button.Bar:SetStatusBarTexture(texture)
+					button.BarBackground:SetTexture(texture)
+
+					button:SetSize(parent:GetWidth(), height)
+
+					button:ClearAllPoints()
+					if (barGrowth == "Upwards") then
+						if (relative == self) then
+							button:SetPoint("BOTTOM", relative, "BOTTOM", 0, 0)
+						else
+							button:SetPoint("BOTTOM", relative, "TOP", x, y)
+						end
 					else
-						button:SetPoint("BOTTOM", relative, "TOP", x, y)
+						if (relative == self) then
+							button:SetPoint("TOP", relative, "TOP", 0, 0)
+						else
+							button:SetPoint("TOP", relative, "BOTTOM", x, y)
+						end
 					end
 				else
-					if (relative == self) then
-						button:SetPoint("TOP", relative, "TOP", 0, 0)
-					else
-						button:SetPoint("TOP", relative, "BOTTOM", x, y)
+					button.Cooldown:Show()
+					button.Bar:Hide()
+					button.BarBackground:Hide()
+					button.Name:Hide()
+					button.Time:Hide()
+
+					button:SetSize(height, height)
+
+					local atLimit = iconLimit == ((i * iconRow) + 1)
+					if (iconGrowth == "Right Then Down") then
+						if (atLimit) then
+							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
+						else
+							button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
+						end
+					elseif (iconGrowth == "Right Then Up") then
+						if (atLimit) then
+							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
+						else
+							button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
+						end
+					elseif (iconGrowth == "Left Then Down") then
+						if (atLimit) then
+							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
+						else
+							button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
+						end
+					elseif (iconGrowth == "Left Then Up") then
+						if (atLimit) then
+							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
+						else
+							button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
+						end
 					end
 				end
-			else
-				button.Cooldown:Show()
-				button.Bar:Hide()
-				button.BarBackground:Hide()
-				button.Name:Hide()
-				button.Time:Hide()
 
-				button:SetSize(height, height)
-
-				local atLimit = iconLimit == ((i * iconRow) + 1)
-				if (iconGrowth == "Right Then Down") then
-					if (atLimit) then
-						button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
-					else
-						button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
-					end
-				elseif (iconGrowth == "Right Then Up") then
-					if (atLimit) then
-						button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
-					else
-						button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
-					end
-				elseif (iconGrowth == "Left Then Down") then
-					if (atLimit) then
-						button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
-					else
-						button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
-					end
-				elseif (iconGrowth == "Left Then Up") then
-					if (atLimit) then
-						button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
-					else
-						button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
-					end
-				end
+				relative = button
 			end
-
-			relative = button
 		end
 
 	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_BUFFS)) then
 		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
-
-		parent:Update(UnitEvent.UPDATE_BUFFS)
-
-		local size = db["Size"]
-		local width, height = size["Width"], size["Height"]
-		local mult = db["Background Multiplier"]
-		local texture = media:Fetch("statusbar", db["Texture"])
 
 		orderBuffs(parent.buffs, self.db, parent.unit)
 
 		for i = 1, db["Limit"] do
 
 			local aura = parent.buffs[i]
-			local button = self.buttons[i]
+			if (aura) then
+				local button = self.buttons[i]
 
-			if (not button) then
-				button = self.pool:Acquire("AuraIconBarTemplate")
-				
-				button.Icon:ClearAllPoints()
-				button.Icon:SetPoint("LEFT")
-				button.Icon:SetSize(height, height)
-
-				local text = button.Cooldown:GetRegions()
-				text:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-
-				button.Bar:ClearAllPoints()
-				button.Bar:SetSize(parent:GetWidth() - height, height)
-				button.Bar:SetPoint("LEFT", button.Icon, "RIGHT", 0, 0)
-				button.Bar:SetStatusBarTexture(texture)
-				
-				button.BarBackground:SetTexture(texture)
-
-				button.Name:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-				button.Time:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
-
-				self.buttons[i] = button
-			end
-
-			button.aura = aura
-	
-			local expires = aura.expires - GetTime()
-
-			button.Bar:SetMinMaxValues(0, expires)
-			button.Bar:SetValue(expires)
-
-			button.Icon:SetTexture(aura.icon)
-			button.Name:SetText(aura.name)
-
-			button:SetScript("OnUpdate", function(self, elapsed)
-				if (not self:IsShown()) then return end
-
-				local time = GetTime()
-				local value = self.aura.expires - time
-
-				if (value <= 0) then
-					self:Hide()
-					button:SetScript("OnUpdate", nil)
+				if (not button) then
+					self.buttons[i] = CreateButton(self, width, height)
+					button = self.buttons[i]
 				end
 
-				self.Time:SetText(T:timeShort(value))
-				self.Bar:SetValue(value)
-			end)
+				button.aura = aura
+		
+				local expires = aura.expires - GetTime()
 
-			CooldownFrame_Set(button.Cooldown, GetTime(), expires, true)
+				button.Bar:SetMinMaxValues(0, expires)
+				button.Bar:SetValue(expires)
+				button.Bar.db = self.db
 
-			-- Create background here...
+				button.Icon:SetTexture(aura.icon)
+				button.Name:SetText(aura.name)
 
-			A:ColorBar(button.Bar, parent, 0, expires, A.noop)
+				button:SetScript("OnUpdate", function(self, elapsed)
+					if (not self:IsShown()) then return end
 
-			button:Show()			
+					local time = GetTime()
+					local value = self.aura.expires - time
+
+					if (value <= 0) then
+						self:Hide()
+						button:SetScript("OnUpdate", nil)
+					end
+
+					self.Time:SetText(T:timeShort(value))
+					self.Bar:SetValue(value)
+				end)
+
+				CooldownFrame_Set(button.Cooldown, GetTime(), expires, true)
+
+				-- Create background here...
+
+				A:ColorBar(button.Bar, parent, 0, expires, A.noop)
+
+				button:Show()
+			end
 		end
 	end
 end
