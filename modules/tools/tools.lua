@@ -287,6 +287,20 @@ function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 	}
 end
 
+function T:PlaceFrame(frame, align, parent, relative, x, y)
+    if (align == "Right Of") then
+        frame:SetPoint("LEFT", relative, parent == relative and "LEFT" or "RIGHT", x, 0)
+    elseif (align == "Left Of") then
+        frame:SetPoint("RIGHT", relative, parent == relative and "RIGHT" or "LEFT", -x, 0)
+    elseif (align == "Above") then
+        frame:SetPoint("BOTTOM", relative, parent == relative and "BOTTOM" or "TOP", 0, y)
+    else
+        frame:SetPoint("TOP", relative, parent == relative and "TOP" or "BOTTOM", 0, -y)
+    end
+end
+
+function T:PlaceIcon(icon, )
+
 function T:FadeIn(frame, seconds)
 	local seconds = seconds or 1
 	frame.timer = frame.timer or 0

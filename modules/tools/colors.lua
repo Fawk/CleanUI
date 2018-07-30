@@ -119,7 +119,7 @@ local function rgbToHex(rgb)
 end
 
 local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
-function A:AddColorReplaceLogicIfNeeded(tag, class)
+function A:AddColorReplaceLogicIfNeeded(tag, class, powerType)
 	local x, y = tag.format:find("%[color:"..colorPattern.."%]")
 	if (x and y) then
 		local m = tag.format:sub(x, y)
@@ -129,6 +129,16 @@ function A:AddColorReplaceLogicIfNeeded(tag, class)
 	x, y = tag.format:find("%[color:class%]")
 	if (x and y) then
 		tag:AddReplaceLogic("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]), true)
+	end
+
+	x, y = tag.format:find("%[color:health%]")
+	if (x and y) then
+		tag:AddReplaceLogic("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard), true)
+	end
+
+	x, y = tag.format:find("%[color:power%]")
+	if (x and y) then
+		tag:AddReplaceLogic("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]), true)
 	end
 end
 

@@ -12,6 +12,7 @@ local sort = table.sort
 local E = A.enum
 local T = A.Tools
 local Units = A.Units
+local U = A.Utils
 local media = LibStub("LibSharedMedia-3.0")
 
 local elementName = "Buffs"
@@ -66,9 +67,7 @@ function Buffs:Init(parent)
 	if (not buffs) then
 		
 		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
-		buffs:SetSize(16, 16)
 		buffs.db = db
-		buffs.active = A:OrderedMap()
 
 		buffs:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 0)
 
@@ -121,7 +120,16 @@ function Buffs:Update(...)
 	local x, y = db["Offset X"], db["Offset Y"]
 	local iconLimit = db["Icon Limit Per Row"]
 
+	if (self.limit and self.limit ~= db["Limit"]) then
+		self.limit = db["Limit"]
+		self:Update(UnitEvent.UPDATE_BUFFS)
+	else
+		self.limit = db["Limit"]
+	end
+
 	if (event == UnitEvent.UPDATE_DB) then
+
+		self:SetSize(parent:GetWidth(), height)
 
 		if (db["Attached"]) then
 			Units:Attach(self, self.db)
@@ -133,7 +141,7 @@ function Buffs:Update(...)
 
 		local iconRow = 1
 		local relative = self
-		for i = 1, db["Limit"] do
+		for i = 1, self.limit do
 
 			local aura = parent.buffs[i]
 
@@ -181,29 +189,19 @@ function Buffs:Update(...)
 					button:SetSize(height, height)
 
 					local atLimit = iconLimit == ((i * iconRow) + 1)
-					if (iconGrowth == "Right Then Down") then
-						if (atLimit) then
-							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
+					local limitAnchor = self.buttons[i - iconLimit]
+
+					if (atLimit) then
+						if (iconGrowth:find("Down")) then
+							button:SetPoint("TOP", limitAnchor, "BOTTOM", 0, -y)
 						else
-							button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
+							button:SetPoint("BOTTOM", limitAnchor, "TOP", 0, y)
 						end
-					elseif (iconGrowth == "Right Then Up") then
-						if (atLimit) then
-							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
+					else
+						if (iconGrowth:find("Right")) then
+							T:PlaceFrame(button, "Right Of", self, relative, x, y)						
 						else
-							button:SetPoint("LEFT", relative, relative == self and "LEFT" or "RIGHT", x, 0)
-						end
-					elseif (iconGrowth == "Left Then Down") then
-						if (atLimit) then
-							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, -y)
-						else
-							button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
-						end
-					elseif (iconGrowth == "Left Then Up") then
-						if (atLimit) then
-							button:SetPoint("TOP", self.buttons[i - iconLimit], "BOTTOM", 0, y)
-						else
-							button:SetPoint("RIGHT", relative, relative == self and "RIGHT" or "LEFT", -x, 0)
+							T:PlaceFrame(button, "Left Of", self, relative, x, y)
 						end
 					end
 				end
@@ -217,7 +215,7 @@ function Buffs:Update(...)
 
 		orderBuffs(parent.buffs, self.db, parent.unit)
 
-		for i = 1, db["Limit"] do
+		for i = 1, self.limit do
 
 			local aura = parent.buffs[i]
 			if (aura) then
@@ -256,7 +254,7 @@ function Buffs:Update(...)
 
 				CooldownFrame_Set(button.Cooldown, GetTime(), expires, true)
 
-				-- Create background here...
+				U:CreteBackground(button, db, false)
 
 				A:ColorBar(button.Bar, parent, 0, expires, A.noop)
 
