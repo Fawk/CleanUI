@@ -50,45 +50,28 @@ function A:FormatTag(tag)
     tag.text = replaced
 end
 
--- name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
 local function fetchAuraData(func, tbl, id)
-    if (not tbl.own) then tbl.own = {} end
-    if (not tbl.others) then tbl.others = {} end
-
-    local auras = { own = {}, others = {} }
     for i = 1, 40 do
-        local aura = {func(id, i)}
-        local spellID = aura[10]
+        local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, nameplateShowAll, timeMod, value1, value2, value3 = func(id, i)
+        if (not name) then break end
 
-        if (aura[1]) then
-            if (tbl.own[spellID]) then
-                tbl.own[spellID] = aura
-                auras.own[spellID] = true
-            elseif (tbl.others[spellID]) then
-                tbl.others[spellID] = aura
-                auras.others[spellID] = true
-            else
-                if (aura[7] == id) then
-                    tbl.own[spellID] = aura
-                    auras.own[spellID] = true
-                else
-                    tbl.others[spellID] = aura
-                    auras.others[spellID] = true
-                end
-            end
-        end
-    end
+        local aura = {}
+        aura.name = name
+        aura.icon = icon
+        aura.count = count
+        aura.dispelType = dispelType
+        aura.duration = duration
+        aura.expires = expires
+        aura.caster = caster
+        aura.isStealable = isStealable
+        aura.nameplateShowPersonal = nameplateShowPersonal
+        aura.spellID = spellID
+        aura.canApplyAura
+        aura.isBossDebuff
+        aura.nameplateShowAll
+        aura.timeMod = timeMod
 
-    for spellID, a in next, tbl.own do
-        if (a[6] < GetTime() or not auras.own[spellID]) then
-            tbl.own[spellID] = nil
-        end
-    end
-
-    for spellID, a in next, tbl.others do
-        if (a[6] < GetTime() or not auras.others[spellID]) then
-            tbl.others[spellID] = nil
-        end 
+        tbl[i] = aura
     end
 end
 

@@ -8,14 +8,22 @@
 			<Layer level="OVERLAY" textureSubLevel="5">
 				<FontString parentKey="Name" justifyH="LEFT">
 					<Anchors>
-						<Anchor point="LEFT" relativeKey="$parent.Bar" relativePoint="LEFT" x="5" />
+						<Anchor point="LEFT" relativeKey="$parent.Bar" relativePoint="LEFT" x="25" />
 					</Anchors>
 				</FontString>
 				<FontString parentKey="Time" justifyH="RIGHT">
 					<Anchors>
-						<Anchor point="RIGHT" relativeKey="$parent.Bar" relativePoint="RIGHT" x="-5" />
+						<Anchor point="RIGHT" relativeKey="$parent.Bar" relativePoint="RIGHT" x="-25" />
 					</Anchors>
 				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND" textureSubLevel="1">
+				<Texture parentKey="BarBackground">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.Bar" relativePoint="TOPLEFT" />
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.Bar" relativePoint="BOTTOMRIGHT" />
+					</Anchors>
+				</Texture>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -28,8 +36,6 @@
 					<Color r="1" g="1" b="1" a="0.8"/>
 				</SwipeTexture>
 			</Cooldown>
-			<Frame parentKey="Background" setAllPoints="true">
-			</Frame>
 			<StatusBar parentKey="Bar" frameLevel="2">
 			</StatusBar>
 		</Frames>
