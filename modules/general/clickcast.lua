@@ -693,4 +693,4 @@ function CC:GetOptions(enabled, extraClick, order)
 	return config
 end
 
-A.general.clickcast = CC
+A.general:set("clickcast", CC)

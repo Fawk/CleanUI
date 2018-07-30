@@ -147,12 +147,8 @@ function Runes:Init(parent)
 
 		runes:RegisterEvent("PLAYER_TALENT_UPDATE")
 
-		--runes:SetScript("OnUpdate", function(self, elapsed)
-			--Runes:Update(self, "UPDATE")
-		--end)
-
-		A:QueueUpdate(runes:GetName(), function(elapsed)
-			Rune:Update(runes, "UPDATE")
+		runes:SetScript("OnUpdate", function(self, elapsed)
+			Runes:Update(self, "OnUpdate")
 		end)
 
 		runes:SetScript("OnEvent", function(self, ...)

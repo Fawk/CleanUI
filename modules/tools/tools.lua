@@ -382,7 +382,7 @@ function T:Scale(x)
 	end
 end
 
-function T:short(value, decimals)
+function T:short(value, decimals, hardSet)
     local decimals = decimals or 0
     if (value > 1e9) then
         return string.format("%."..decimals.."f", value/1e9).."B"
@@ -391,10 +391,23 @@ function T:short(value, decimals)
     elseif (value > 1e3) then
         return string.format("%."..decimals.."f", value/1e3).."K"
     else
+    	decimals = hardSet and decimals or 0
         return string.format("%."..decimals.."f", value)
     end
 end
 
+function T:timeShort(value)
+    local decimals = decimals or 0
+    if (value > 3600) then
+        return string.format("%.0f".."h", math.ceil(value / 3600))
+    elseif (value > 120) then
+        return string.format("%.0f".."m", math.ceil(value / 60))
+    elseif (value > 60) then
+    	return string.format("%d:%d", math.ceil(value / 60), value - 60)
+    else
+        return string.format("%.1f", value)	
+    end
+end
 
 function Table:shallowCopy(from, to)
     for k,v in pairs(from) do

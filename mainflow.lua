@@ -3,9 +3,11 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon.modules, Addon.general, Addon.options = {}, {}, {}, {}
+Addon.frames, Addon.modules, Addon.general, Addon.options = {}, Args:OrderedMap(), Args:OrderedMap(), {}
 Addon.debugging = true
 Addon.noop = function() end
+
+Addon.pools = CreatePoolCollection();
 
 Addon.OrderedTable = Args.OrderedTable
 Addon.OrderedMap = Args.OrderedMap
@@ -132,13 +134,13 @@ end
 
 function Addon:Init()
 
-	for key, module in next, self.general do
+	self.general:foreach(function(key, module)
         if (module.Init) then
             module:Init()
         end
-    end
+    end)
 
-	for modName, module in pairs(self.modules) do
+	self.modules:foreach(function(key, module)
 		if module.Init then
 	        local unit = module:Init()
             if (unit) then
@@ -149,27 +151,25 @@ function Addon:Init()
 	                	end)
             		end)
             	else
-	                unit:Update(UnitEvent.UPDATE_IDENTIFIER)
-	                Addon.Units:Add(unit, unit:GetDbName())
 	                Addon["Shared Elements"]:foreach(function(key, element)
 	                    element:Init(unit)
 	                end)
 	            end
             end
         end
-	end
+	end)
 end
 
 function Addon:UpdateDb()
     -- General
-    for key, module in next, self.general do
+	self.general:foreach(function(key, module)
         if (module.Update) then
             module:Update(UnitEvent.UPDATE_DB)
         end
-    end
+    end)
 
     -- Units
-    for key, module in next, self.modules do
+	self.modules:foreach(function(key, module)
     	if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())
         	if (unit) then
@@ -182,7 +182,7 @@ function Addon:UpdateDb()
 	        	end
 	        end
 	    end
-    end
+    end)
 end
 
 function Addon:OnDisable()

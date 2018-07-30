@@ -36,6 +36,7 @@ function Boss:Init()
         local anchor = self.container.frames[i - 1] or self.container
         local first = anchor == self.container
 
+        local lp, p
         if db["Orientation"] == "HORIZONTAL" then
             lp = "LEFT"
             p = T.reversedPoints[first and "RIGHT" or "LEFT"]
@@ -56,12 +57,12 @@ function Boss:Init()
         end
     end
 
-    self.container:UpdateUnits()
-
     RegisterStateDriver(self.container, "visibility", "[@boss1,exists] show; hide")
     Units:Position(self.container, db["Position"])
 
     Units:Add(self.container, frameName)
+
+    self.container:UpdateUnits()
 
     A:CreateMover(self.container, db, "Boss Header")
 
@@ -85,7 +86,7 @@ function Boss:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general.clickcast:Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db["Clickcast"])
             end
 
             --[[ Bindings ]]--
@@ -113,4 +114,4 @@ function Boss:Update(...)
         end
     end
 end
-A.modules["boss"] = Boss
+A.modules:set("boss", Boss)

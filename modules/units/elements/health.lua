@@ -108,7 +108,7 @@ function Health:Update(...)
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
-		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH")) then
+		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "FORCED_TAG_UPDATE")) then
 			return
 		end
 

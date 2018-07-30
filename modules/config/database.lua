@@ -440,7 +440,8 @@ local defaults =  {
                         ["Texture"] = "Default",
                         ["X Spacing"] = 1,
                         ["Y Spacing"] = 1,
-                        ["Attached"] = true
+                        ["Attached"] = true,
+                        ["Attached Position"] = "Below"
                     },              
                     ["Castbar"] = {
                         ["Enabled"] = true,
@@ -2194,6 +2195,24 @@ local defaults =  {
                     ["Position"] = {
                         ["Point"] = "BOTTOMRIGHT",
                         ["Local Point"] = "BOTTOMRIGHT",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0,
+                    }
+                },
+                ["Override Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
+                        ["Offset X"] = 0,
+                        ["Offset Y"] = 0,
+                    }
+                },
+                ["Stance Bar"] = {
+                    ["Enabled"] = true,
+                    ["Position"] = {
+                        ["Point"] = "TOPLEFT",
+                        ["Local Point"] = "TOPLEFT",
                         ["Offset X"] = 0,
                         ["Offset Y"] = 0,
                     }

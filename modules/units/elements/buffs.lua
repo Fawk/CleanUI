@@ -10,7 +10,37 @@ local elementName = "Buffs"
 local Buffs = {}
 local buildText = A.TextBuilder
 
-local buttonPool = {}
+local function orderBuffs(parent)
+
+	local db = parent.db
+	local all = {}
+
+	for caster, spells in next, parent.buttons do
+		for spellID, button in next, spells do
+			table.insert(all, button)
+		end
+	end
+
+	table.sort(all, function(left, right) return left.expires < right.expires end)
+
+	local processed = {}
+
+	local relative = parent
+	for index, button in next, all do
+		button:ClearAllPoints()
+
+		if (button.expires >= GetTime()) then
+			if (#processed == 0) then
+				button:SetPoint("LEFT", parent, "LEFT", 0, 0)
+			else
+				button:SetPoint("BOTTOMLEFT", relative, "TOPLEFT", 0, 0)
+			end
+			relative = button
+
+			table.insert(processed, button)
+		end
+	end
+end
 
 function Buffs:Init(parent)
 
@@ -26,14 +56,26 @@ function Buffs:Init(parent)
 		buffs.db = db
 		buffs.active = A:OrderedMap()
 
+		buffs:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 0)
+
+		buffs.pools = CreatePoolCollection()
+		buffs.pool = buffs.pools:CreatePool("BUTTON", buffs, "AuraIconBarTemplate")
+		buffs.buttons = {}
+
 		buffs.Update = function(self, ...)
 			Buffs:Update(self, ...)
 		end
 
-		buffs:RegisterEvent("UNIT_AURA")
+		buffs:RegisterUnitEvent("UNIT_AURA", parent.unit)
 		buffs:SetScript("OnEvent", function(self, event, ...)
 			self:Update(event, ...)
 		end)
+
+		BuffFrame:UnregisterEvent("UNIT_AURA")
+		BuffFrame:UnregisterEvent("GROUP_ROSTER_UPDATE")
+		BuffFrame:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+
+		BuffFrame:SetParent(A.hiddenFrame)
 	end
 
 	buffs:Update(UnitEvent.UPDATE_DB)
@@ -288,42 +330,131 @@ function Buffs:Update(...)
 
 	if (event == UnitEvent.UPDATE_DB) then
 
-	else
-		--[[parent:Update(UnitEvent.UPDATE_BUFFS)
+	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_BUFFS)) then
+		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
+
+		parent:Update(UnitEvent.UPDATE_BUFFS)
+
+		local size = db["Size"]
+		local width, height = size["Widht"], size["Height"]
+
+		for caster, spells in next, self.buttons do
+			for spellId, button in next, spells do
+				if (not parent.buffs.own[spellId] and not parent.buffs.others[spellId]) then
+					button:Hide()
+					button:ClearAllPoints()
+					button:SetScript("OnUpdate", nil)
+				end
+			end
+		end
 
 		local ownAppliedBuffs = parent.buffs.own
 		for spellId, aura in next, ownAppliedBuffs do
-			local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
+
+			if (aura) then
+				local name, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
 					canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
 
-			
-SetScript("OnUpdate", function(self, elapsed)
-			-- Here we want to update the values of active buffs
-			-- Text values and bar values
-			buffs.active:foreach(function(key, buff)
-				
-			end)
-		end)
+				if (duration and duration > 0) then
+					if (not self.buttons[caster]) then
+						self.buttons[caster] = {}
+					end
 
-			
+					if (not self.buttons[caster][spellID]) then
+						local button = self.pool:Acquire("AuraIconBarTemplate")
 
-			-- Take a button from pool
-			-- Here want to add OnUpdate script to the button if the duration is not 0
-			-- Then remove the OnUpdate when the button's duration reaches 0
+						button:SetSize(200 + height, height)
+						
+						button.Icon:ClearAllPoints()
+						button.Icon:SetTexture(texture)
+						button.Icon:SetPoint("LEFT")
+						button.Icon:SetSize(height, height)
+
+						local text = button.Cooldown:GetRegions()
+						text:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+						CooldownFrame_Set(button.Cooldown, GetTime(), expires - GetTime(), true)
+						
+						button.Bar:ClearAllPoints()
+						button.Bar:SetSize(200, height)
+						button.Bar:SetPoint("LEFT", button.Icon, "RIGHT", 0, 0)
+						button.Bar:SetStatusBarTexture(media:Fetch("statusbar", "Default"))
+						button.Bar:SetStatusBarColor(1, 1, 1)
+						button.Bar:SetMinMaxValues(0, expires - GetTime())
+						button.Bar:SetValue(expires)
+
+						button.Name:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+						button.Name:SetText(name)
+
+						button.Time:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+						button.duration = duration
+						button.expires = expires
+
+						button:SetScript("OnUpdate", function(b, elapsed)
+							if (not b:IsShown()) then return end
+
+							local time = GetTime()
+							local value = b.expires - time
+
+							if (value <= 0) then
+								b:Hide()
+								button:SetScript("OnUpdate", nil)
+							end
+
+							b.Time:SetText(T:timeShort(value))
+							b.Bar:SetValue(value)
+						end)
+
+						button:Show()
+
+						self.buttons[caster][spellID] = button
+					else
+						local button = self.buttons[caster][spellID]
+						if (button.expires ~= expires) then
+							button.duration = duration
+							button.expires = expires
+
+							button.Bar:SetMinMaxValues(0, expires - GetTime())
+							button.Bar:SetValue(expires)
+
+							CooldownFrame_Set(button.Cooldown, GetTime(), expires - GetTime(), true)
+
+							button:SetScript("OnUpdate", function(b, elapsed)
+								if (not b:IsShown()) then return end
+
+								local time = GetTime()
+								local value = b.expires - time
+
+								if (value <= 0) then
+									b:Hide()
+									button:SetScript("OnUpdate", nil)
+								end
+
+								b.Time:SetText(T:timeShort(value))
+								b.Bar:SetValue(value)
+							end)
+
+							button:Show()
+						end
+					end
+				end
 			end
+		end
 
 		if (not db["Own only"]) then
 			local othersAppliedBuffs = parent.buffs.others
 			for spellId, aura in next, othersAppliedBuffs do
 				local name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, 
 						canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3 = unpack(aura)
-				
-				
+
 			-- Take a button from pool
 				-- Here want to add OnUpdate script to the button if the duration is not 0
 				-- Then remove the OnUpdate when the button's duration reaches 0
 			end
-		end--]]
+		end
+
+		orderBuffs(self)
 	end
 end
 

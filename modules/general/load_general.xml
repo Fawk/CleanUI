@@ -4,6 +4,8 @@
 	<Script file="chat.lua"/>
 	<Script file="infofield.lua"/>
 	<Script file="actionbars.lua"/>
+    <Script file="overridebar.lua"/>
+    <Script file="stancebar.lua"/>
     <Script file="microbar.lua"/>
     <Script file="bagbar.lua"/>
 	<Script file="experience.lua"/>

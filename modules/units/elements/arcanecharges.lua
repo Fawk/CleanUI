@@ -7,12 +7,12 @@ local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local GetSpecialization = GetSpecialization
-local SPELL_POWER_ARCANE_CHARGES = SPELL_POWER_ARCANE_CHARGES
+local SPELL_POWER_ARCANE_CHARGES = Enum.PowerType.ArcaneCharges
 
 --[[ Locals ]]
 local elementName = "Arcane Charges"
 local ArcaneCharges = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR" }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER" }
 local MAX_ARCANE_CHARGES = 4
 
 local function notValid(frame)

@@ -33,11 +33,11 @@ function Chat:Init()
 			local tab = _G[name.."Tab"]
 			if tab then
 
-				hooksecurefunc(tab, "SetAlpha", function(self, alpha)
-					if (alpha == self.noMouseAlpha) then
-						T:FadeOut(self, 4)
-					end
-				end)
+				--hooksecurefunc(tab, "SetAlpha", function(self, alpha)
+					--if (alpha == self.noMouseAlpha) then
+						--T:FadeOut(self, 4)
+					--end
+				--end)
 
 				S:Kill(tab)
 				tab.text = _G[name.."TabText"]
@@ -80,4 +80,4 @@ function Chat:Update(...)
 
 end
 
-A.general.chat = Chat
+A.general:set("chat", Chat)

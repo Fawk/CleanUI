@@ -24,7 +24,7 @@ function MicroBar:Init()
 		local microButtonBar = CreateFrame("Frame", nil, A.frameParent)
 
 		local relative = microButtonBar
-		for _,name in next, MICRO_BUTTONS do
+		for i,name in next, MICRO_BUTTONS do
 			local button = _G[name]
 			microButtonBar:SetWidth(microButtonBar:GetWidth() + button:GetWidth())
 			microButtonBar:SetHeight(button:GetHeight())
@@ -34,6 +34,15 @@ function MicroBar:Init()
 				button:SetPoint("LEFT", relative, "LEFT", 0, 0)
 			else
 				button:SetPoint("LEFT", relative, "RIGHT", -2, 0)
+			end
+
+			if (i == 1) then
+				hooksecurefunc(button, "SetPoint", function(self, lp, r, p, x, y)
+					if (r ~= microButtonBar) then
+						self:ClearAllPoints()
+						self:SetPoint("LEFT", microButtonBar, "LEFT")
+					end
+				end)
 			end
 
 			relative = button
@@ -57,4 +66,4 @@ function MicroBar:Update(...)
 
 end
 
-A.general.microbar = MicroBar
+A.general:set("microbar", MicroBar)

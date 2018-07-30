@@ -70,6 +70,18 @@ function Tags:ToggleTagsWindow(group)
 		item = group.db[name]
 	end
 
+	if (not name) then
+		name = ""
+		item = {
+			["Format"] = "",
+			["Size"] = 10,
+			["Local Point"] = "TOPLEFT",
+			["Point"] = "TOPLEFT",
+			["Offset X"] = 0,
+			["Offset Y"] = 0
+		}
+	end
+
 	local nameTextBox, formatTextBox, size, localPointDropdown, pointDropdown, relativeToDropdown, offsetX, offsetY
 	local tagDropdown = buildDropdown(parent)
 			:atTopLeft()
@@ -350,4 +362,4 @@ function Tags:GetOptions(enabled, extraClick, order)
 	return config
 end
 
-A.general.tags = Tags
+A.general:set("tags", Tags)

@@ -1,9 +1,9 @@
 local A, L = unpack(select(2, ...))
 local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
 local CreateFrame = CreateFrame
 local LAB = LibStub("LibActionButton-1.0")
 local buildText = A.TextBuilder
+local Skins = A.Skins
 local bindingMode = false
 local capture = CreateFrame("Frame", "KeyBinder", A.frameParent)
 
@@ -18,13 +18,27 @@ local keys = {
 	["CTRL"] = "C",
 	["ALT"] = "A",
 	["MOUSEWHEELUP"] = "WU",
+	["Mouse Wheel Up"] = "WU",
 	["MOUSEWHEELDOWN"] = "WD",
+	["Mouse Wheel Down"] = "WD",
 	["BUTTON3"] = "MB",
+	["Middle Mouse"] = "MB",
 	["BUTTON4"] = "M4",
+	["Mouse Button 4"] = "M4",
 	["BUTTON5"] = "M5",
+	["Mouse Button 5"] = "M5",
 	["LeftButton"] = "LB",
-	["RightButton"] = "RB"
+	["RightButton"] = "RB",
+	["Num Pad "] = "N",
+	["-"] = ""
 }
+
+function AB:ShortKey(key)
+	for k, r in next, keys do
+		key = key:replace(k, r)
+	end
+	return key:upper()
+end
 
 local mousewheel = {
 	["-1"] = "MOUSEWHEELDOWN",
@@ -121,7 +135,15 @@ local bars = {
 	[5] = "MultiBarLeftButton"
 }
 
-local emptySlots = { 
+local backgrounds = { 
+	[1] = {},
+	[2] = {},
+	[3] = {},
+	[4] = {},
+	[5] = {}
+}
+
+local borders = { 
 	[1] = {},
 	[2] = {},
 	[3] = {},
@@ -132,6 +154,8 @@ local emptySlots = {
 local barAnchors = {}
 
 function AB:Init()
+	if (InCombatLockdown()) then return end
+
 	self:HideArt()
 
 	local db = A["Profile"]["Options"]["Actionbars"]
@@ -153,31 +177,107 @@ function AB:Init()
 			barAnchors[x] = anchor
 		end
 
-		A:CreateMover(anchor, db, "Bar"..x)
+		local width, height
+		if (orientation == "HORIZONTAL") then
+			width, height = (size * 12) + (bar["X Spacing"] * 11), size
+		else
+			width, height = size, (size * 12) + (bar["Y Spacing"] * 11)
+		end
+
+		anchor:SetSize(width, height)
+
+		anchor.getMoverSize = function(self) return width, height end
+		A:CreateMover(anchor, bar, "Bar"..x)
 
 		for i = 1, 12 do
-			_G[bars[x]..i]:SetSize(size, size)
-			_G[bars[x]..i.."Icon"]:SetTexCoord(0.133,0.867,0.133,0.867)
-			_G[bars[x]..i.."NormalTexture"]:SetTexture(nil)
+			
+			_G[bars[x]..i.."Icon"]:SetTexCoord(0.133,0.867,0.133,0.867) -- CAUSES TAINT
+			_G[bars[x]..i.."NormalTexture"]:SetTexture(nil) -- CAUSES TAINT
+			_G[bars[x]..i]:SetCheckedTexture(nil)
+
 			_G[bars[x]..i.."HotKey"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+
+			_G[bars[x]..i]:SetSize(size, size)
 			_G[bars[x]..i.."HotKey"]:ClearAllPoints()
-			_G[bars[x]..i.."HotKey"]:SetPoint("TOPRIGHT", _G[bars[x]..i], "TOPRIGHT", 0, 0)
-			_G[bars[x]..i.."Name"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
-			_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
-			_G[bars[x]..i.."Border"]:SetSize(size + size, size + size)
+			_G[bars[x]..i.."Name"]:ClearAllPoints()
+			_G[bars[x]..i.."Count"]:ClearAllPoints()
 			_G[bars[x]..i.."Cooldown"]:SetSize(size, size)
+			_G[bars[x]..i.."Border"]:SetSize(size + size, size + size)
+			
+			_G[bars[x]..i.."HotKey"]:SetPoint("TOPRIGHT", _G[bars[x]..i], "TOPRIGHT", 0, 0)
+			_G[bars[x]..i.."HotKey"]:SetJustifyH("RIGHT")
+
+			hooksecurefunc(_G[bars[x]..i.."HotKey"], "SetText", function(self, t)
+				local fixed = AB:ShortKey(t)
+				if (t ~= fixed) then
+					self:SetText(fixed)
+				end
+			end)
+
+			local text = _G[bars[x]..i.."HotKey"]:GetText()
+			_G[bars[x]..i.."HotKey"]:SetText(self:ShortKey(text))
+
+			_G[bars[x]..i.."Name"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+			_G[bars[x]..i.."Name"]:SetPoint("BOTTOMLEFT", _G[bars[x]..i], "BOTTOMLEFT", -(size/2), 2)
+			
+			_G[bars[x]..i.."Count"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
+			_G[bars[x]..i.."Count"]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 0, 2)
+			_G[bars[x]..i.."Count"]:SetJustifyH("RIGHT")
+
+			_G[bars[x]..i.."FlyoutBorder"]:SetTexture(nil)
+			_G[bars[x]..i.."FlyoutBorderShadow"]:SetTexture(nil)
 			
 			local cd = _G[bars[x]..i.."Cooldown"]:GetRegions()
 			cd:SetFont(media:Fetch("font", "NotoBold"), 14, "OUTLINE")
 			
-			if (not emptySlots[x][i]) then
-				emptySlots[x][i] = CreateFrame("Frame", nil, A.frameParent)
-				emptySlots[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", -1, 1)
-				emptySlots[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 1, -1)
-				emptySlots[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
-				emptySlots[x][i]:SetBackdropColor(0.1, 0.1, 0.1, 1)
-				emptySlots[x][i]:SetBackdropBorderColor(0, 0, 0, 1)
+			if (not backgrounds[x][i]) then
+				backgrounds[x][i] = CreateFrame("Frame", nil, A.frameParent)
+				backgrounds[x][i]:SetFrameLevel(_G[bars[x]..i]:GetFrameLevel() - 1)
+				backgrounds[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", -1, 1)
+				backgrounds[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 1, -1)
+				backgrounds[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
+				backgrounds[x][i]:SetBackdropColor(0.1, 0.1, 0.1, 1)
+				backgrounds[x][i]:SetBackdropBorderColor(0, 0, 0, 1)
 			end
+
+			if (not borders[x][i]) then
+				borders[x][i] = CreateFrame("Frame", nil, A.frameParent)
+				borders[x][i]:SetFrameStrata("HIGH")
+				borders[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", 0, 0)
+				borders[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 0, 0)
+				borders[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
+				borders[x][i]:SetBackdropColor(0, 0, 0, 0)
+				borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+			end
+
+			hooksecurefunc(_G[bars[x]..i.."Border"], "SetVertexColor", function(self, r, g, b, a)
+				if (a ~= 0) then
+					self:SetVertexColor(0, 0, 0, 0)
+				end
+
+				if (a < 0.4) then
+					borders[x][i]:SetBackdropBorderColor(r * 0.8, g * 0.8, b * 0.8, 1)				
+				end
+			end)
+
+			hooksecurefunc(_G[bars[x]..i.."Border"], "Hide", function(self)
+				borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+			end)
+
+			hooksecurefunc(_G[bars[x]..i], "SetChecked", function(self, checked)
+				if (checked) then
+					borders[x][i]:SetBackdropBorderColor(0.8, 0.8, 0, 1)
+				else
+					local r, g, b, a = borders[x][i]:GetBackdropBorderColor()
+
+					if (r > 0.78 and g > 0.78) then
+						borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+					else
+						local shouldAlpha = (r == 0 and g == 0 and b == 0)
+						borders[x][i]:SetBackdropBorderColor(r, g, b, shouldAlpha and 0 or 1)
+					end
+				end
+			end)
 
 			if(_G[bars[x]..i.."FloatingBG"]) then
 				_G[bars[x]..i.."FloatingBG"]:SetTexture(nil)
@@ -201,6 +301,7 @@ function AB:Init()
 end
 
 function AB:Update(...)
+	if (InCombatLockdown()) then return end
 
 	local db = A["Profile"]["Options"]["Actionbars"]
 
@@ -233,7 +334,9 @@ function AB:Update(...)
 		local relative = anchor
 		for i = 1, 12 do
 
-			_G[bars[x]..i]:ClearAllPoints()
+			if (not InCombatLockdown()) then
+				_G[bars[x]..i]:ClearAllPoints()
+			end
 
 			if (orientation == "HORIZONTAL") then
 				if (i == 1) then
@@ -308,17 +411,7 @@ function AB:HideArt()
 	-- Hidden parent frame
 	local UIHider = CreateFrame("Frame")
 	UIHider:Hide()
-	
-	--ArtifactWatchBar:SetParent(UIHider)
-	--HonorWatchBar:SetParent(UIHider)
 
-	--MainMenuExpBar:UnregisterAllEvents()
-	--MainMenuExpBar:Hide()
-	--MainMenuExpBar:SetParent(UIHider)
-
-	--ReputationWatchBar:UnregisterAllEvents()
-	--ReputationWatchBar:Hide()
-	--ReputationWatchBar:SetParent(UIHider)
 	IconIntroTracker:UnregisterAllEvents()
 	IconIntroTracker:Hide()
 	IconIntroTracker:SetParent(UIHider)
@@ -326,12 +419,10 @@ function AB:HideArt()
 	MainMenuBarArtFrame.LeftEndCap:Hide()
 	MainMenuBarArtFrame.RightEndCap:Hide()
 	MainMenuBarArtFrameBackground:Hide()
-	--MainMenuBarRightEndCap:Hide()
-	--MainMenuBarBackpackButtonNormalTexture:SetTexture(nil)
+	MainMenuBarArtFrame.PageNumber:Hide()
 
-	for i = 0, 3 do
-		--_G["MainMenuBarTexture"..i]:Hide()
-	end
+	MainMenuBar:SetMovable(true)
+	MainMenuBar:SetUserPlaced(true)
 
 	InterfaceOptionsActionBarsPanelAlwaysShowActionBars:EnableMouse(false)
 	InterfaceOptionsActionBarsPanelPickupActionKeyDropDownButton:SetScale(0.0001)
@@ -344,7 +435,6 @@ function AB:HideArt()
 
 	ActionBarUpButton:Hide()
 	ActionBarDownButton:Hide()
-	--MainMenuBarPageNumber:Hide()
 
 	if PlayerTalentFrame then
 		PlayerTalentFrame:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
@@ -353,4 +443,4 @@ function AB:HideArt()
 	end
 end
 
-A.general.actionbars = AB
+A.general:set("actionbars", AB)

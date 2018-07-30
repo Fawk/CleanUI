@@ -321,6 +321,12 @@ function MAP:remove(key)
   return false
 end
 
+function MAP:print()
+  for i = 1, self.c do
+    print(self.i[i], self.e[self.i[i]])
+  end
+end
+
 function Args:OrderedMap()
   local opt = {
     e = {},

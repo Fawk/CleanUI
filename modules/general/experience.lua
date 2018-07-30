@@ -140,4 +140,4 @@ function E:Update(...)
 
 end
 
-A.general.experience = E
+A.general:set("experience", E)

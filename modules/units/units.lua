@@ -1,5 +1,5 @@
 local A, L = unpack(select(2, ...))
-local Units, units = {}, {}
+local Units, units = {}, A:OrderedMap()
 local media = LibStub("LibSharedMedia-3.0")
 local T = A.Tools
 
@@ -12,18 +12,18 @@ hiddenParent:SetAllPoints()
 hiddenParent:Hide()
 
 function Units:Get(unit)
-    return units[unit]
+    return units:get(unit)
 end
- 
+
 function Units:Add(object, overrideName)
     A:Debug("Adding unit:", overrideName or object:GetName())
-    units[overrideName or object:GetName()] = object
+    units:set(overrideName or object:GetName(), object)
 end
 
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
-    if (units[relative]) then
-        return units[relative]
+    if (units:hasKey(relative)) then
+        return units:get(relative)
     elseif (A["Player Elements"]:get(relative) or A["Shared Elements"]:get(relative)) then
         if (frame.orderedElements and frame.orderedElements:get(relative)) then
             return frame.orderedElements:get(relative)
@@ -309,6 +309,10 @@ local function handleFrame(baseName)
             buffFrame:UnregisterAllEvents()
         end
     end
+end
+
+function Units:CreateBuffPool()
+    A.pools:CreatePool("BUTTON", buffs, "AuraIconBarTemplate")
 end
 
 function Units:DisableBlizzard(unit)

@@ -4,6 +4,8 @@ local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0
 --[[ Blizzard ]]
 local CreateFrame = CreateFrame
 local UnitName = UnitName
+local UnitClass = UnitClass
+local UnitIsPlayer = UnitIsPlayer
 local UnitHealth = UnitHealth
 local UnitPower = UnitPower
 local UnitPowerType = UnitPowerType
@@ -24,12 +26,16 @@ for key, color in next, A.colors.text do
 end
 
 function A:FormatTag(tag)
-    local name = UnitName(tag:GetParent().unit) or ""
+    local parent = tag:GetParent()
+
+    local name = UnitName(parent.unit) or ""
 
     replaceLogic:set("[name]", name, true)
     replaceLogic:set("[name:%d+]", name:sub(1, tag.format:match("%d+")), true)
 
-    A:AddColorReplaceLogicIfNeeded(tag)
+    local classToken = select(2, UnitClass(parent.unit))
+
+    A:AddColorReplaceLogicIfNeeded(tag, UnitIsPlayer(parent.unit) and classToken or "NPC")
     
     tag.replaceLogics:foreach(function(key, replace)
         replaceLogic:set(key, replace, true)
@@ -44,26 +50,45 @@ function A:FormatTag(tag)
     tag.text = replaced
 end
 
--- name, rank, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
+-- name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll, timeMod, value1, value2, value3
 local function fetchAuraData(func, tbl, id)
     if (not tbl.own) then tbl.own = {} end
     if (not tbl.others) then tbl.others = {} end
 
+    local auras = { own = {}, others = {} }
     for i = 1, 40 do
         local aura = {func(id, i)}
-        if (tbl.own[aura[11]]) then
-            tbl.own[aura[11]][6] = aura[6]
-        elseif (tbl.others[aura[11]]) then
-            tbl.others[aura[11]][6] = aura[6]
-        else
-            if (aura[1]) then
-                if (aura[8] == id) then
-                    tbl.own[aura[11]] = aura
+        local spellID = aura[10]
+
+        if (aura[1]) then
+            if (tbl.own[spellID]) then
+                tbl.own[spellID] = aura
+                auras.own[spellID] = true
+            elseif (tbl.others[spellID]) then
+                tbl.others[spellID] = aura
+                auras.others[spellID] = true
+            else
+                if (aura[7] == id) then
+                    tbl.own[spellID] = aura
+                    auras.own[spellID] = true
                 else
-                    tbl.others[aura[11]] = aura
+                    tbl.others[spellID] = aura
+                    auras.others[spellID] = true
                 end
             end
         end
+    end
+
+    for spellID, a in next, tbl.own do
+        if (a[6] < GetTime() or not auras.own[spellID]) then
+            tbl.own[spellID] = nil
+        end
+    end
+
+    for spellID, a in next, tbl.others do
+        if (a[6] < GetTime() or not auras.others[spellID]) then
+            tbl.others[spellID] = nil
+        end 
     end
 end
 
@@ -101,7 +126,7 @@ end
 function Unit:Init(unit)
     unit.tagEventFrame = CreateFrame("Frame")
     unit.ForceTagUpdate = function(self)
-        self.tagEventFrame:GetScript("OnEvent")(self.tagEventFrame, "IGNORED")
+        self.tagEventFrame:GetScript("OnEvent")(self.tagEventFrame, "FORCED_TAG_UPDATE")
     end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         local event = ...
@@ -219,73 +244,6 @@ function Unit:Update(...)
         self.healAbsorb = healAbsorb
         self.hasOverAbsorb = hasOverAbsorb
         self.hasOverHealAbsorb = hasOverHealAbsorb
-    elseif (event == UnitEvent.UPDATE_CASTBAR) then
-        if (arg2 ~= self.unit) then return end
-
-        local name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID
-        if (arg1 == 'UNIT_SPELLCAST_START') then
-            name, _, text, texture, startTime, endTime, _, castID, notInterruptible, spellID = UnitCastingInfo(self.unit)
-            self.castBarDelay = 0
-            if (not name) then
-                return
-            end
-        elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTIBLE') then
-            notInterruptible = false
-        elseif (arg1 == 'UNIT_SPELLCAST_NOT_INTERRUPTIBLE') then
-            notInterruptible = true
-        elseif (arg1 == 'UNIT_SPELLCAST_DELAYED') then
-            name, _, _, _, startTime, _, _, castID = UnitCastingInfo(self.unit)
-            if(not startTime or not self.casting) then return end
-        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_START') then
-            name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
-            if (not name) then
-                return
-            end
-            self.castBarDelay = 0
-        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_UPDATE') then
-            name, _, _, texture, startTime, endTime, _, notInterruptible, spellID = UnitChannelInfo(self.unit)
-        elseif (arg1 == 'UNIT_SPELLCAST_FAILED') then
-            if(self.castBarCastId ~= arg5) then
-                return
-            end
-        elseif (arg1 == 'UNIT_SPELLCAST_STOP') then
-            if(self.castBarCastId ~= arg5) then
-                return
-            end
-        elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_STOP') then
-            self.casting = false
-            return
-        elseif (arg1 == 'UNIT_SPELLCAST_INTERRUPTED') then
-            if(self.castBarCastId ~= arg5) then
-                return
-            end
-        end
-
-        if (self.castBarEnd) then
-            self.castBarDelay = self.castBarDelay + (self.castBarEnd - GetTime()) - ((endTime and endTime / 1e3 or 0) - GetTime())
-        else
-            self.castBarDelay = 0
-        end
-        self.castBarSpell = name
-        self.castBarSpellId = spellID
-        self.castBarTexture = texture
-        self.castBarStart = (startTime or 0) / 1e3
-        self.castBarEnd = (endTime or 0) / 1e3
-        self.castBarDuration = GetTime() - self.castBarStart
-
-        if (self.castBarDuration < 0) then
-            self.castBarDuration = 0
-        end
-
-        self.castBarMax = self.castBarEnd - self.castBarStart
-        self.castBarCastId = castID
-        self.castBarInterruptable = not notInterruptible
-
-        if (self.castBarSpell) then
-            self.casting = true
-        else
-            self.casting = false
-        end
     end
 
     if (self.AfterUpdate) then

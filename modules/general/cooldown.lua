@@ -255,4 +255,4 @@ function Cooldown:Init()
 	updateFrame:SetScript("OnUpdate", Update)
 end
 
-A.modules["Cooldown"] = Cooldown
+--A.modules["Cooldown"] = Cooldown

@@ -128,4 +128,4 @@ function Party:Simulate(players)
     RegisterStateDriver(container, "visibility", "show")
 end
 
-A.modules["party"] = Party
+A.modules:set("party", Party)

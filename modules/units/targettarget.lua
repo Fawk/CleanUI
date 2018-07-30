@@ -17,16 +17,20 @@ function TargetTarget:Init()
     frame.orderedElements = A:OrderedMap()
     frame.tags = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
-        self:Update(UnitEvent.UPDATE_DB, db)
+        self:Update(UnitEvent.UPDATE_DB)
     end)
-
-    A:CreateMover(frame, db, frameName)
 
     frame.Update = function(self, ...)
         TargetTarget:Update(self, ...)
     end
 
+    Units:Add(frame, frame:GetDbName())
+    Units:Position(frame, db["Position"])
+    
+    frame:Update(UnitEvent.UPDATE_IDENTIFIER)
     frame:Update(UnitEvent.UPDATE_DB, db)
+
+    A:CreateMover(frame, db, frameName)
 
     return frame
 end
@@ -48,7 +52,7 @@ function TargetTarget:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general.clickcast:Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db["Clickcast"])
             end
 
             --[[ Bindings ]]--
@@ -77,4 +81,4 @@ function TargetTarget:Update(...)
     end
 end
 
-A.modules["Target of Target"] = TargetTarget
+A.modules:set("Target of Target", TargetTarget)

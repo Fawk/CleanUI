@@ -7,12 +7,12 @@ local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local GetShapeshiftForm = GetShapeshiftForm
-local SPELL_POWER_COMBO_POINTS = SPELL_POWER_COMBO_POINTS
+local SPELL_POWER_COMBO_POINTS = Enum.PowerType.ComboPoints
 
 --[[ Locals ]]
 local elementName = "Combo Points"
 local ComboPoints = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR", "PLAYER_TALENT_UPDATE", "UPDATE_SHAPESHIFT_FORM" }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "PLAYER_TALENT_UPDATE", "UPDATE_SHAPESHIFT_FORM" }
 local MAX_COMBO_POINTS = 10
 
 local function notValid()

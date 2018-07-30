@@ -325,4 +325,4 @@ function I:Init()
 	A:CreateMover(field, db, "Info Field")
 end
 
-A["modules"]["Info Field"] = I
+--A["modules"]["Info Field"] = I

@@ -14,28 +14,31 @@ function Player:Init()
     frame.orderedElements = A:OrderedMap()
     frame.tags = A:OrderedMap()
     frame:SetScript("OnShow", function(self)
-        self:Update(UnitEvent.UPDATE_DB, db)
+        self:Update(UnitEvent.UPDATE_DB)
     end)
 
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
     frame:RegisterEvent("PLAYER_TALENT_UPDATE")
     frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     frame:SetScript("OnEvent", function(self, event, ...)
-        self:Update(UnitEvent.UPDATE_DB, db)
+        self:Update(UnitEvent.UPDATE_DB)
     end)
 
     frame.Update = function(self, ...)
         Player:Update(self, ...)
     end
 
+    Units:Add(frame, frame:GetDbName())
+    Units:Position(frame, db["Position"])
+    
+    frame:Update(UnitEvent.UPDATE_IDENTIFIER)
+    frame:Update(UnitEvent.UPDATE_DB)
+
+    A:CreateMover(frame, db, frameName)
+
     A["Player Elements"]:foreach(function(key, element)
         element:Init(frame)
     end)
-
-    frame:Update(UnitEvent.UPDATE_DB, db)
-    Units:Position(frame, db["Position"])
-
-    A:CreateMover(frame, db, frameName)
 
     return frame
 end
@@ -63,7 +66,7 @@ function Player:Update(...)
                 self:SetSize(size["Width"], size["Height"])
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general.clickcast:Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db["Clickcast"])
             end
 
             --[[ Background ]]--
@@ -96,4 +99,4 @@ end
 
 -- https://jsfiddle.net/859zu65s/
 
-A.modules["player"] = Player
+A.modules:set("player", Player)

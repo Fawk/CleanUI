@@ -25,9 +25,19 @@ function BagBar:Init()
 
 		MainMenuBarBackpackButton:ClearAllPoints()
 		MainMenuBarBackpackButton:SetPoint("RIGHT", bagBar, "RIGHT", 0, 0)
+
+		hooksecurefunc(MainMenuBarBackpackButton, "SetPoint", function(self, lp, r, p, x, y)
+			if (r ~= bagBar) then
+				self:ClearAllPoints()
+				self:SetPoint("RIGHT", microButtonBar, "RIGHT")
+			end
+		end)
+
 		MainMenuBarBackpackButton:SetSize(32, 32)
 		MainMenuBarBackpackButtonNormalTexture:SetTexture(nil)
 		MicroButtonAndBagsBar.MicroBagBar:SetTexture(nil)
+		MicroButtonAndBagsBar:SetMovable(true)
+		MicroButtonAndBagsBar:SetUserPlaced(true)
 
 		bagBar:SetHeight(MainMenuBarBackpackButton:GetHeight())
 		bagBar:SetWidth(MainMenuBarBackpackButton:GetWidth())
@@ -57,4 +67,4 @@ function BagBar:Update(...)
 
 end
 
-A.general.bagbar = BagBar
+A.general:set("bagbar", BagBar)

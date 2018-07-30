@@ -10,7 +10,7 @@ local UnitStagger = UnitStagger
 --[[ Locals ]]
 local elementName = "Stagger"
 local Stagger = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", 'UNIT_DISPLAYPOWER', 'UPDATE_VEHICLE_ACTION_BAR' }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", 'UNIT_DISPLAYPOWER' }
 
 local function notValid(frame)
 	if (select(2, UnitClass("player")) ~= "MONK" or (GetSpecialization() ~= 1)) then
@@ -59,7 +59,6 @@ function Stagger:Init(parent)
 		MonkStaggerBar:UnregisterEvent('PLAYER_ENTERING_WORLD')
 		MonkStaggerBar:UnregisterEvent('PLAYER_SPECIALIZATION_CHANGED')
 		MonkStaggerBar:UnregisterEvent('UNIT_DISPLAYPOWER')
-		MonkStaggerBar:UnregisterEvent('UPDATE_VEHICLE_ACTION_BAR')
 
 		if (notValid()) then
 			local frame = CreateFrame("Frame")

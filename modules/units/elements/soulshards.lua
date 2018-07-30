@@ -6,12 +6,12 @@ local CreateFrame = CreateFrame
 local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
-local SPELL_POWER_SOUL_SHARDS = SPELL_POWER_SOUL_SHARDS
+local SPELL_POWER_SOUL_SHARDS = Enum.PowerType.SoulShards
 
 --[[ Locals ]]
 local elementName = "Soul Shards"
 local SoulShards = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR" }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER" }
 local MAX_SOUL_SHARDS = 5
 
 function SoulShards:Init(parent)

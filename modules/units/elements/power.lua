@@ -87,7 +87,7 @@ function Power:Update(...)
 	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
-		if (not T:anyOf(arg2, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM")) then
+		if (not T:anyOf(arg2, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", "FORCED_TAG_UPDATE")) then
 			return
 		end
 

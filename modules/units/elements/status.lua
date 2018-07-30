@@ -72,6 +72,8 @@ function Status:Update(...)
     local ghost = db["Ghost"]
 
     performAction(this, self, parent, outofrange, "Out of range", function()
+        if (not parent.unit) then return false end
+
         if UnitName(parent.unit, true) == UnitName("player", true) then
             return false
         else
@@ -88,12 +90,15 @@ function Status:Update(...)
         end
     end)
     performAction(this, self, parent, dead, "Dead", function()
+        if (not parent.unit) then return false end
         return UnitIsDead(parent.unit)
     end)
     performAction(this, self, parent, offline, "Offline", function()
+         if (not parent.unit) then return false end
         return not UnitIsConnected(parent.unit)
     end)
     performAction(this, self, parent, ghost, "Ghost", function()
+         if (not parent.unit) then return false end
         if UnitIsDeadOrGhost(parent.unit) then 
             return not UnitIsDead(parent.unit)
         end

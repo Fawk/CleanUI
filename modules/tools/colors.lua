@@ -1,5 +1,8 @@
 local A, L = unpack(select(2, ...))
 
+local UnitClass = UnitClass
+local UnitIsPlayer = UnitIsPlayer
+
 --[[
 {
 	[Enum.PowerType.Mana] = MANA,
@@ -88,16 +91,48 @@ A.colors = {
 	}
 }
 
+local function rgbToHex(rgb)
+
+	rgb = { rgb[1] * 255, rgb[2] * 255, rgb[3] * 255 }
+	local hexadecimal = ''
+
+	for key, value in pairs(rgb) do
+		local hex = ''
+
+		while(value > 0)do
+			local index = math.fmod(value, 16) + 1
+			value = math.floor(value / 16)
+			hex = string.sub('0123456789ABCDEF', index, index) .. hex			
+		end
+
+		if(string.len(hex) == 0)then
+			hex = '00'
+
+		elseif(string.len(hex) == 1)then
+			hex = '0' .. hex
+		end
+
+		hexadecimal = hexadecimal .. hex
+	end
+
+	return hexadecimal
+end
+
 local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
-function A:AddColorReplaceLogicIfNeeded(tag)
+function A:AddColorReplaceLogicIfNeeded(tag, class)
 	local x, y = tag.format:find("%[color:"..colorPattern.."%]")
 	if (x and y) then
 		local m = tag.format:sub(x, y)
 		tag:AddReplaceLogic(m, "|cFF"..m:match(colorPattern))
 	end
+
+	x, y = tag.format:find("%[color:class%]")
+	if (x and y) then
+		tag:AddReplaceLogic("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]), true)
+	end
 end
 
-A.colors.class = {}
+A.colors.class = { ["NPC"] = { .8, .8, .8, 1 } }
 for classToken, color in next, RAID_CLASS_COLORS do
 	A.colors.class[classToken] = {color.r, color.g, color.b}
 end
@@ -129,7 +164,11 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	local mult = db["Background Multiplier"]
 	local colorType = db["Color By"]
 	if (colorType == "Class") then
-		r, g, b = unpack(A.colors.class[classOverride or select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
+		if (UnitIsPlayer(parent.unit)) then
+			r, g, b = unpack(A.colors.class[classOverride or select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
+		else
+			r, g, b = unpack(A.colors.backdrop.default)
+		end
 	elseif (colorType == "Power") then
 		t = A.colors.power[parent.powerToken]
 		if not t then

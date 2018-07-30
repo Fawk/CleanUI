@@ -54,6 +54,8 @@ function Tracker:Init()
     ObjectiveTrackerFrame.db = db
     ObjectiveTrackerFrame:SetAlpha(0)
     ObjectiveTrackerFrame.ignoreFramePositionManager = true
+    ObjectiveTrackerFrame:SetMovable(true)
+    ObjectiveTrackerFrame:SetUserPlaced(true)
     ObjectiveTrackerFrame:SetSize(size["Width"], size["Height"])
     ObjectiveTrackerFrame:ClearAllPoints()
     ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
@@ -138,4 +140,4 @@ function Tracker:Update(event)
 
 end
 
-A.general.objectivetracker = Tracker
+A.general:set("objectivetracker", Tracker)

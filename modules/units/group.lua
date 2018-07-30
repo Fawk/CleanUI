@@ -1,6 +1,6 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local CC = A.general.clickcast
+local CC = A.general:get("clickcast")
 local initFrame = CreateFrame("Frame")
 
 local UnitExists = UnitExists
@@ -116,6 +116,8 @@ function Group:Init(name, maxMembers, db)
 
 	container.header = header
 
+    Units:Add(container, name)
+
     self:UpdateHeader(container)
 
     initFrame:SetScript("OnUpdate", function(self, elapsed)
@@ -126,7 +128,6 @@ function Group:Init(name, maxMembers, db)
 		end
     end)
 
-    Units:Add(container, name)
     Units:Position(container, db["Position"])
 
     A:CreateMover(container, db, name)
@@ -269,7 +270,7 @@ function Group:Update(...)
      	local size = db["Size"]
         if (not InCombatLockdown()) then
             self:SetSize(size["Width"], size["Height"])
-            A.general.clickcast:Setup(self, db["Clickcast"])
+            A.general:get("clickcast"):Setup(self, db["Clickcast"])
         end
 
         if (not self.tags) then

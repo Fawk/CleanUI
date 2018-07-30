@@ -1113,7 +1113,7 @@ local function standardUnit(unit, order)
                     }
                 }
             },
-            ["Tags"] = A.general.tags:GetOptions(function(self) 
+            ["Tags"] = A.general:get("tags"):GetOptions(function(self) 
                 return self.parent:enabled() 
             end, hideParentChildrenAndShowSelf, 9)
         }
@@ -2494,7 +2494,7 @@ function A:CreatePrefs(db)
                                 }
                             }
                         },
-                        ["Tags"] = A.general.tags:GetOptions(function(self) 
+                        ["Tags"] = A.general:get("tags"):GetOptions(function(self) 
                             return self.parent:enabled() 
                         end, hideParentChildrenAndShowSelf, 13),
                     }
@@ -2522,7 +2522,7 @@ function A:CreatePrefs(db)
                         self:SetPoint("LEFT", self.parent, "RIGHT", 50, 0)
                     end,
                     children = {
-                        ["Clickcast"] = A.general.clickcast:GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 1),
+                        ["Clickcast"] = A.general:get("clickcast"):GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 1),
                     }
                 },
                 ["Raid"] = {

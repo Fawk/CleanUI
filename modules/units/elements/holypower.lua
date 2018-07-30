@@ -7,12 +7,12 @@ local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local GetSpecialization = GetSpecialization
-local SPELL_POWER_HOLY_POWER = SPELL_POWER_HOLY_POWER
+local SPELL_POWER_HOLY_POWER = Enum.PowerType.HolyPower
 
 --[[ Locals ]]
 local elementName = "Holy Power"
 local HolyPower = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR" }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER" }
 local MAX_HOLY_POWER = 5
 
 local function notValid(frame)
@@ -111,7 +111,7 @@ function HolyPower:Update(...)
             power:SetReverseFill(db["Reversed"])
             power:SetStatusBarTexture(texture)
             power:SetStatusBarColor(r, g, b)
-            power:SetMinMaxValues(0, 10)
+            power:SetMinMaxValues(0, 1)
 
             width, height = T:PositionClassPowerIcon(self, power, orientation, width, height, MAX_HOLY_POWER, i, x, y)
 

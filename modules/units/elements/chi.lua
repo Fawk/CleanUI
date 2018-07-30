@@ -7,12 +7,12 @@ local UnitClass = UnitClass
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local GetSpecialization = GetSpecialization
-local SPELL_POWER_CHI = SPELL_POWER_CHI
+local SPELL_POWER_CHI = Enum.PowerType.Chi
 
 --[[ Locals ]]
 local elementName = "Chi"
 local Chi = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "UPDATE_VEHICLE_ACTION_BAR", "PLAYER_TALENT_UPDATE" }
+local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "PLAYER_TALENT_UPDATE" }
 local MAX_CHI = 6
 
 local function notValid(frame)
@@ -78,7 +78,7 @@ function Chi:Update(...)
 		self:Show()
 	end
 
-    local realMax = UnitPowerMax("player", SPELL_POWER_CHI)
+    local realMax = UnitPowerMax("player", Enum.PowerType.Chi)
 
     if (event == UnitEvent.UPDATE_DB) then
         
@@ -98,7 +98,7 @@ function Chi:Update(...)
         self:SetSize(width, height)
         U:CreateBackground(self, db, false)
 
-        local r, g, b = unpack(A.colors.power[SPELL_POWER_CHI])
+        local r, g, b = unpack(A.colors.power[Enum.PowerType.Chi])
         local texture = media:Fetch("statusbar", db["Texture"])
 
 		if (orientation == "HORIZONTAL") then
