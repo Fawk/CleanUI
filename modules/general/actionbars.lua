@@ -193,7 +193,6 @@ function AB:Init()
 			
 			_G[bars[x]..i.."Icon"]:SetTexCoord(0.133,0.867,0.133,0.867) -- CAUSES TAINT
 			_G[bars[x]..i.."NormalTexture"]:SetTexture(nil) -- CAUSES TAINT
-			_G[bars[x]..i]:SetCheckedTexture(nil)
 
 			_G[bars[x]..i.."HotKey"]:SetFont(media:Fetch("font", "NotoBold"), 10, "OUTLINE")
 
@@ -240,44 +239,44 @@ function AB:Init()
 				backgrounds[x][i]:SetBackdropBorderColor(0, 0, 0, 1)
 			end
 
-			if (not borders[x][i]) then
-				borders[x][i] = CreateFrame("Frame", nil, A.frameParent)
-				borders[x][i]:SetFrameStrata("HIGH")
-				borders[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", 0, 0)
-				borders[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 0, 0)
-				borders[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
-				borders[x][i]:SetBackdropColor(0, 0, 0, 0)
-				borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-			end
+			-- if (not borders[x][i]) then
+			-- 	borders[x][i] = CreateFrame("Frame", nil, A.frameParent)
+			-- 	borders[x][i]:SetFrameStrata("HIGH")
+			-- 	borders[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", 0, 0)
+			-- 	borders[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 0, 0)
+			-- 	borders[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
+			-- 	borders[x][i]:SetBackdropColor(0, 0, 0, 0)
+			-- 	borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+			-- end
 
-			hooksecurefunc(_G[bars[x]..i.."Border"], "SetVertexColor", function(self, r, g, b, a)
-				if (a ~= 0) then
-					self:SetVertexColor(0, 0, 0, 0)
-				end
+			-- hooksecurefunc(_G[bars[x]..i.."Border"], "SetVertexColor", function(self, r, g, b, a)
+			-- 	if (a ~= 0) then
+			-- 		self:SetVertexColor(0, 0, 0, 0)
+			-- 	end
 
-				if (a < 0.4) then
-					borders[x][i]:SetBackdropBorderColor(r * 0.8, g * 0.8, b * 0.8, 1)				
-				end
-			end)
+			-- 	if (a < 0.4) then
+			-- 		borders[x][i]:SetBackdropBorderColor(r * 0.8, g * 0.8, b * 0.8, 1)				
+			-- 	end
+			-- end)
 
-			hooksecurefunc(_G[bars[x]..i.."Border"], "Hide", function(self)
-				borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-			end)
+			-- hooksecurefunc(_G[bars[x]..i.."Border"], "Hide", function(self)
+			-- 	borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+			-- end)
 
-			hooksecurefunc(_G[bars[x]..i], "SetChecked", function(self, checked)
-				if (checked) then
-					borders[x][i]:SetBackdropBorderColor(0.8, 0.8, 0, 1)
-				else
-					local r, g, b, a = borders[x][i]:GetBackdropBorderColor()
+			-- hooksecurefunc(_G[bars[x]..i], "SetChecked", function(self, checked)
+			-- 	if (checked) then
+			-- 		borders[x][i]:SetBackdropBorderColor(0.8, 0.8, 0, 1)
+			-- 	else
+			-- 		local r, g, b, a = borders[x][i]:GetBackdropBorderColor()
 
-					if (r > 0.78 and g > 0.78) then
-						borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-					else
-						local shouldAlpha = (r == 0 and g == 0 and b == 0)
-						borders[x][i]:SetBackdropBorderColor(r, g, b, shouldAlpha and 0 or 1)
-					end
-				end
-			end)
+			-- 		if (r > 0.78 and g > 0.78) then
+			-- 			borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
+			-- 		else
+			-- 			local shouldAlpha = (r == 0 and g == 0 and b == 0)
+			-- 			borders[x][i]:SetBackdropBorderColor(r, g, b, shouldAlpha and 0 or 1)
+			-- 		end
+			-- 	end
+			-- end)
 
 			if(_G[bars[x]..i.."FloatingBG"]) then
 				_G[bars[x]..i.."FloatingBG"]:SetTexture(nil)

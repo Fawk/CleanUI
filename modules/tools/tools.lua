@@ -299,8 +299,6 @@ function T:PlaceFrame(frame, align, parent, relative, x, y)
     end
 end
 
-function T:PlaceIcon(icon, )
-
 function T:FadeIn(frame, seconds)
 	local seconds = seconds or 1
 	frame.timer = frame.timer or 0

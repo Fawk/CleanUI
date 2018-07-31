@@ -50,29 +50,32 @@ function A:FormatTag(tag)
     tag.text = replaced
 end
 
-local function fetchAuraData(func, tbl, id)
+local function fetchAuraData(func, id)
+    local tbl = {}
     for i = 1, 40 do
         local name, icon, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, nameplateShowAll, timeMod, value1, value2, value3 = func(id, i)
-        if (not name) then break end
+        if (name) then
+            local aura = {}
+            aura.name = name
+            aura.index = i
+            aura.icon = icon
+            aura.count = count
+            aura.dispelType = dispelType
+            aura.duration = duration
+            aura.expires = expires
+            aura.caster = caster
+            aura.isStealable = isStealable
+            aura.nameplateShowPersonal = nameplateShowPersonal
+            aura.spellID = spellID
+            aura.canApplyAura = canApplyAura
+            aura.isBossDebuff = isBossDebuff
+            aura.nameplateShowAll = nameplateShowAll
+            aura.timeMod = timeMod
 
-        local aura = {}
-        aura.name = name
-        aura.icon = icon
-        aura.count = count
-        aura.dispelType = dispelType
-        aura.duration = duration
-        aura.expires = expires
-        aura.caster = caster
-        aura.isStealable = isStealable
-        aura.nameplateShowPersonal = nameplateShowPersonal
-        aura.spellID = spellID
-        aura.canApplyAura = canApplyAura
-        aura.isBossDebuff = isBossDebuff
-        aura.nameplateShowAll = nameplateShowAll
-        aura.timeMod = timeMod
-
-        tbl[i] = aura
+            tbl[i] = aura
+        end
     end
+    return tbl
 end
 
 local UnitFrame = {}
@@ -162,15 +165,13 @@ function Unit:Update(...)
             self:OnPower(...)
         end
     elseif (event == UnitEvent.UPDATE_BUFFS) then
-        if (not self.buffs) then self.buffs = {} end
-        fetchAuraData(UnitBuff, self.buffs, self.unit)
+        self.buffs = fetchAuraData(UnitBuff, self.unit)
 
         if (self.OnBuffs) then
             self:OnBuffs(...)
         end
     elseif (event == UnitEvent.UPDATE_DEBUFFS) then
-        if (not self.debuffs) then self.debuffs = {} end
-        fetchAuraData(UnitDebuff, self.debuffs, self.unit)
+        self.debuffs = fetchAuraData(UnitDebuff, self.unit)
 
         if (self.OnDebuffs) then
             self:OnDebuffs(...)
