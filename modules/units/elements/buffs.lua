@@ -33,15 +33,26 @@ local function updateButtons(parent)
 	end
 end
 
+local function filerAura(aura, unit, db)
+	local durationFilter = (aura.duration and aura.duration > 0) or (not aura.duration or aura.duration <= 0 and db["Hide no duration"])
+	local casterFilter = (db["Own only"] and aura.caster == unit) or (not db["Own only"])
+	local blackListFilter = db["Blacklist"]["Enabled"] and not db["Blacklist"]["Ids"][aura.spellID]
+	local whiteListFilter = db["Whitelist"]["Enabled"] and db["Whitelist"]["Ids"][aura.spellID]
+
+	if (not db["Blacklist"]["Enabled"] and not db["Whitelist"]["Enabled"]) then
+		whiteListFilter = true
+	end
+
+	return durationFilter and casterFilter and (blackListFilter or whiteListFilter)
+end
+
 local function orderBuffs(auras, db, unit)
 	local filteredAuras = {}
 
 	for i = 1, #auras do
 		local aura = auras[i]
-		if ((not aura.duration or aura.duration <= 0 and not db["Hide no duration"]) or aura.duration > 0) then
-			if ((db["Own only"] and aura.caster == unit) or not db["Own only"]) then
-				tinsert(filteredAuras, aura)
-			end
+		if (filterAura(aura, db, unit)) then
+			tinsert(filteredAuras, aura)
 		end
 	end
 
@@ -164,7 +175,8 @@ function Buffs:Update(...)
 	parent:Update(UnitEvent.UPDATE_BUFFS)
 
 	local size = db["Size"]
-	local width, height = size["Width"], size["Height"]
+	local width = size["Match width"] and parent:GetWidth() or size["Width"]
+	local height = size["Match height"] and parent:GetHeight() or size["Height"]
 	local mult = db["Background Multiplier"]
 	local texture = media:Fetch("statusbar", db["Texture"])
 	local barGrowth = db["Bar Growth"]
@@ -176,7 +188,7 @@ function Buffs:Update(...)
 
 	if (event == UnitEvent.UPDATE_DB) then
 
-		self:SetSize(parent:GetWidth(), height)
+		self:SetSize(width, height)
 
 		if (db["Attached"]) then
 			Units:Attach(self, self.db)

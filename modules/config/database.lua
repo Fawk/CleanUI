@@ -107,8 +107,8 @@ local defaults =  {
                         ["Size"] = {
                             ["Match width"] = true,
                             ["Match height"] = false,
-                            ["Width"] = 16,
-                            ["Height"] = 16
+                            ["Width"] = 20,
+                            ["Height"] = 20
                         },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0, 1 },
@@ -119,10 +119,10 @@ local defaults =  {
                                 ["Right"] = 1
                             },
                             ["Edge Size"] = 3,
-                            ["Match width"] = true,
-                            ["Width"] = 100,
-                            ["Match height"] = true,
-                            ["Height"] = 100,
+                            ["Match width"] = false,
+                            ["Width"] = 202,
+                            ["Match height"] = false,
+                            ["Height"] = 52,
                             ["Enabled"] = true
                         },
                         ["Blacklist"] = {
@@ -181,7 +181,7 @@ local defaults =  {
     				},
     				["Size"] = {
     					["Width"] = 200,
-    					["Height"] = 51
+    					["Height"] = 50
     				},
                     ["Tags"] = {
                         ["Name"] = {
@@ -775,7 +775,7 @@ local defaults =  {
     				},
     				["Size"] = {
     					["Width"] = 200,
-    					["Height"] = 51
+    					["Height"] = 50
     				},
 					["Tags"] = {},
                     ["Heal Prediction"] = {
