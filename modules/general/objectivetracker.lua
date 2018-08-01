@@ -106,34 +106,72 @@ function Tracker:Init()
 
     A:CreateMover(ObjectiveTrackerFrame, db, "Objective Tracker")
 
-    --[[
+    local panel = CreateFrame("Frame", T:frameName("Panel"), A.frameParent)
+    panel:SetSize(600, 50)
+    panel:SetPoint("TOP")
+    panel:SetBackdrop(A.enum.backdrops.editbox)
+    panel:SetBackdropColor(0, 0, 0, 0.3)
+
+    local map = C_Map.GetBestMapForUnit("player")
+    local playerPos = C_Map.GetPlayerMapPosition(map, "player")
+
+    local pois = {}
+    for k,v in next, C_TaskQuest.GetQuestsForPlayerByMapID(map) do
+        if (v.mapID == map) then
+            local questName, questType = C_TaskQuest.GetQuestInfoByQuestID(v.questId)
+            local distance = ((v.x - playerPos.x) ^ 2 + (v.y - playerPos.y) ^ 2) ^ 0.5
+
+            local poi = {}
+            poi.questName = questName
+            poi.questId = v.questId
+            poi.questType = questType
+            poi.distance = distance
+
+            table.insert(pois, poi)
+        end
+    end
+
+    table.sort(pois, function(left, right) return left.distance < right.distance end)
+
+    local visible = 3
+
+    local relative = panel
+    for i = 1, #pois do
         
-        SetMapToCurrentZone()
-        GetPlayerMapPosition("player")
+        local poi = pois[i]
+        
+        local button = CreateFrame("Button", nil, panel)
+        button.poi = poi
 
-        Normal Quest -- QuestPOIGetIconInfo
-        World Quest  -- x, y variable on the POI
+        button:SetScript("OnClick", function(self, b, d)
+            if (not d) then
+                if (b == "LeftButton") then
+                    QuestMapFrame_OpenToQuestDetails(self.poi.questId)
+                elseif (b == "RightButton") then
 
-        Let's iterate over the children of WorldMapPOIFrame
-    
-    ]]
+                end
+            end
+        end)
 
-    --SetMapToCurrentZone()
-    --local playerX, playerY = GetPlayerMapPosition("player")
-    --print(playerX, playerY)
+        local text = button:CreateFontString(nil, "OVERLAY")
+        text:SetPoint("CENTER")
+        S:Font(text, 10, "OUTLINE")
+        text:SetText(poi.questName)
 
-    --QuestMapFrame_UpdateAll()
+        button:SetSize(text:GetSize())
 
-    -- for _,child in next, { WorldMapPOIFrame:GetChildren() } do
-    --     if (child.questID) then
-    --         if (child.x) then -- World Quest
-    --             print(child.x, child.y)
-    --         else -- Normal Quest
-    --             local x, y = QuestPOIGetIconInfo(child.questID)
-    --             print(x, y)
-    --         end
-    --     end
-    -- end
+        if (relative == panel) then
+            button:SetPoint("TOP", relative, "TOP", 0, -5)
+        else
+            button:SetPoint("TOP", relative, "BOTTOM", 0, -2)
+        end
+        
+        relative = button
+
+        if (i > visible) then
+            button:Hide()
+        end
+    end
 end
 
 function Tracker:Update(event)

@@ -35,7 +35,13 @@ function A:FormatTag(tag)
 
     local classToken = select(2, UnitClass(parent.unit))
 
-    A:AddColorReplaceLogicIfNeeded(tag, UnitIsPlayer(parent.unit) and classToken or "NPC", parent.powerToken or parent.powerType)
+    local token = parent.powerToken or parent.powerType
+    if (not token) then
+        parent:Update(UnitEvent.UPDATE_POWER)
+        token = parent.powerToken or parent.powerType
+    end
+
+    A:AddColorReplaceLogicIfNeeded(tag, UnitIsPlayer(parent.unit) and classToken or "NPC", token)
     
     tag.replaceLogics:foreach(function(key, replace)
         replaceLogic:set(key, replace, true)
