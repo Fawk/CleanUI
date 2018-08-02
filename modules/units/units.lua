@@ -199,6 +199,8 @@ end
 
 function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, classOverride)
     if (not db) then return end
+    if (not min) then min = 0 end
+    if (not max) then max = 1 end
 
     local bar = parent[key]
     local unit = parent:GetParent()
@@ -232,7 +234,7 @@ function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, c
         
         bar:SetSize(parent:GetSize())
 
-        -- Calculate value based on missing health
+        -- Calculate value based on min and max values
         bar:SetMinMaxValues(0, max)
         bar:SetValue(max - min)
 

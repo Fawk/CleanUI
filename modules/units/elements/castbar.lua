@@ -50,7 +50,8 @@ function Castbar:Init(parent)
 		container.Icon = container:CreateTexture(nil, "OVERLAY")
 		container.Icon:SetTexCoord(0.133,0.867,0.133,0.867)
 
-		container.missingBar = CreateFrame("StatusBar", nil, container)
+		container.bar.missingBar = CreateFrame("StatusBar", nil, container.bar)
+		container.bar.missingBar:SetFrameLevel(container.bar:GetFrameLevel())
 
 		container.Update = function(self, event, ...)
 	    	Castbar:Update(self, event, ...)
@@ -186,6 +187,7 @@ function Castbar:Update(...)
 		end
 
 		Units:PlaceCastbar(self, db)
+		Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
 	elseif (event == "OnUpdate") then
 
 		if (self.casting) then
@@ -209,6 +211,7 @@ function Castbar:Update(...)
 					:replace("[target]", UnitName("target") or "")
 			)
 
+			Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
 			bar:SetValue(self.value)
 		elseif (self.channeling) then
 			
@@ -231,6 +234,7 @@ function Castbar:Update(...)
 					:replace("[target]", UnitName("target") or "")
 			)
 			
+			Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
 			bar:SetValue(self.value);
 		else
 			self.casting = nil
@@ -385,6 +389,5 @@ function Castbar:Update(...)
 		return
 	end
 
-	Units:SetupMissingBar(self, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
 	A:ColorBar(self.bar, parent, self.value, self.max, A.noop)
 end

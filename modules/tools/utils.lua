@@ -275,6 +275,7 @@ local function setPoints(o, frame)
 end
 
 local function TextBuilder(parent, sizeInPerc)
+	sizeInPerc = tonumber(sizeInPerc)
 	local o = {
 		sizeInPerc = sizeInPerc,
 		parent = parent
@@ -318,6 +319,10 @@ local function TextBuilder(parent, sizeInPerc)
 	end
 
 	function o:build()
+		if (not self.parent.CreateFontString) then 
+			for k,v in next, self.parent do print(k,v) end
+		end
+
 		local text = self.parent:CreateFontString(nil, self.layer or "ARTWORK")
 		text:SetDrawLayer(self.layer or "ARTWORK", self.flevel or 1)
 
@@ -652,6 +657,11 @@ local function NumberBuilder(parent)
 		return self
 	end
 
+	function o:fontSize(fSize)
+		self.fSize = fSize
+		return self
+	end
+
 	function o:build()
 		setPoints(self, self.textbox)
 		self.textbox:SetSize(self.w or self.parent:GetWidth(), self.h or 0)
@@ -741,7 +751,7 @@ local function NumberBuilder(parent)
 		self.textbox:SetBackdrop(A.enum.backdrops.editboxborder)
 		self.textbox:SetBackdropColor(0.3, 0.3, 0.3, 1)
 		self.textbox:SetBackdropBorderColor(0, 0, 0, 1)
-		self.textbox:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+		self.textbox:SetFont(media:Fetch("font", "Default"), o.fSize or 10, "OUTLINE")
 		self.textbox:SetTextInsets(5, 0, 0, 0)
 
 		return self.textbox

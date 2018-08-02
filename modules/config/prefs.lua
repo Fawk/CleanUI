@@ -111,6 +111,7 @@ local genericSetValue = function(self, value) self.parent.db[self.name] = value 
 local function positionSetting(order, previous, relativeTable)
     local tbl = {
         type = "group",
+        onClick = hideParentChildrenAndShowSelf,
         order = 3,
         placement = function(self)
             self.title:ClearAllPoints()
@@ -391,57 +392,6 @@ local function backgroundSetting(order)
 end
 
 local function castBarSetting(order)
---[[
-    ["Time"] = {
-        ["Enabled"] = true,
-        ["Position"] = {
-            ["Relative To"] = "Parent",
-            ["Point"] = "RIGHT",
-            ["Local Point"] = "RIGHT",
-            ["Offset X"] = -5,
-            ["Offset Y"] = 0, 
-        },
-        ["Font Size"] = 10,
-        ["Format"] = "[current]/[max]"
-    },
-    ["Name"] = {
-        ["Enabled"] = true,
-        ["Position"] = {
-            ["Relative To"] = "Parent",
-            ["Point"] = "LEFT",
-            ["Local Point"] = "LEFT",
-            ["Offset X"] = 18,
-            ["Offset Y"] = 0, 
-        },
-        ["Font Size"] = 0.7,
-        ["Format"] = "[name]"
-    },
-    ["Icon"] = {
-        ["Enabled"] = true,
-        ["Position"] = "LEFT",
-        ["Size"] = {
-            ["Match width"] = false,
-            ["Match height"] = true,
-            ["Size"] = 10
-        },
-        ["Background"] = {
-            ["Color"] = { 0, 0, 0, 1 },
-            ["Offset"] = {
-                ["Top"] = 1,
-                ["Bottom"] = 1,
-                ["Left"] = 1,
-                ["Right"] = 1
-            },
-            ["Edge Size"] = 3,
-            ["Match width"] = true,
-            ["Width"] = 100,
-            ["Match height"] = true,
-            ["Height"] = 100,
-            ["Enabled"] = true
-        },
-    },
-]]
-
     local tbl = {
         enabled = genericEnabled,
         canToggle = true,
@@ -649,12 +599,13 @@ local function castBarSetting(order)
             ["Background"] = backgroundSetting(10),
             ["Time"] = {                 
                 enabled = genericEnabled,
+                onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
                 order = 11,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
                     self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                 end,
                 children = {
@@ -664,8 +615,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                         end,
                         width = 50,
                         height = 20,
@@ -695,12 +646,13 @@ local function castBarSetting(order)
             },
             ["Name"] = {
                 enabled = genericEnabled,
+                onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
                 order = 12,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
                     self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                 end,
                 children = {
@@ -710,13 +662,13 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                         end,
                         width = 50,
                         height = 20,
                         step = 1,
-                        decimals = false,
+                        decimals = true,
                         min = 1,
                         max = 100,
                         get = genericGetValue,
@@ -741,12 +693,13 @@ local function castBarSetting(order)
             },
             ["Icon"] = {
                 enabled = genericEnabled,
+                onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
                 order = 13,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
                     self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                 end,
                 children = {
@@ -766,33 +719,75 @@ local function castBarSetting(order)
                     },
                     ["Size"] = {
                         enabled = onlyParent,
-                        type = "number",
-                        order = 1,
+                        onClick = hideParentChildrenAndShowSelf,
+                        type = "group",
+                        order = 2,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
-                        width = 50,
-                        height = 20,
-                        step = 1,
-                        decimals = false,
-                        min = 1,
-                        max = 100,
-                        get = genericGetValue,
-                        set = genericSetValue
+                        children = {
+                            ["Size"] = {
+                                enabled = function(self)
+                                    return self.parent:enabled() and not self.parent.db["Match width"] and not self.parent.db["Match height"]
+                                end,
+                                type = "number",
+                                order = 1,
+                                placement = function(self)
+                                    self.title:ClearAllPoints()
+                                    self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
+                                    self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                                end,
+                                width = 50,
+                                height = 20,
+                                step = 1,
+                                decimals = false,
+                                min = 1,
+                                max = 100,
+                                get = genericGetValue,
+                                set = genericSetValue
+                            },
+                            ["Match width"] = {
+                                type = "toggle",
+                                order = 2,
+                                placement = function(self)
+                                    self.title:ClearAllPoints()
+                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                    self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
+                                end,
+                                get = genericGetValue,
+                                set = genericSetValue,
+                                width = 50,
+                                height = 20
+                            },
+                            ["Match height"] = {
+                                type = "toggle",
+                                order = 3,
+                                placement = function(self)
+                                    self.title:ClearAllPoints()
+                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                                end,
+                                get = genericGetValue,
+                                set = genericSetValue,
+                                width = 50,
+                                height = 20                               
+                            }
+                        }
                     },
                     ["Background"] = backgroundSetting(3)
                 }
             },
             ["Missing Bar"] = {
                 enabled = genericEnabled,
+                onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
                 order = 14,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
                     self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                 end,
                 children = {
@@ -941,7 +936,7 @@ local function standardUnit(unit, order)
                         width = 200,
                         height = 20
                     },
-                    ["Position"] = positionSetting(7, false, createDropdownTable(unit, "Power"))
+                    ["Position"] = positionSetting(7, false, createDropdownTable(unit, "Power")),
                     ["Size"] = {
                         enabled = onlyParent,
                         type = "group",
@@ -1690,14 +1685,16 @@ function X:CreateChild(name, parent, setting, db)
                     :selectedButtonTextHorizontalAlign("RIGHT")
                     :rightOfButton()
         elseif (type == "text") then
-            childBuilder = buildText(parent, setting.textSize or 11)
+            childBuilder = buildEditBox(parent)
                     :size(setting.width, setting.height)
+                    :fontSize(setting.textSize or 11)
         elseif (type == "number") then
-            childBuilder = buildNumber(parent, setting.textSize or 11)
+            childBuilder = buildNumber(parent)
                     :min(setting.min)
                     :max(setting.max)
                     :stepValue(setting.step)
                     :allowDecimals(setting.decimals)
+                    :fontSize(setting.textSize or 11)
                     :size(setting.width, setting.height)
         elseif (type == "toggle") then
             childBuilder = buildToggle(parent)
@@ -1924,7 +1921,7 @@ function A:CreatePrefs(db)
                                     width = 200,
                                     height = 20
                                 },
-                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Power"))
+                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Power")),
                                 ["Size"] = {
                                     type = "group",
                                     order = 8,
@@ -2143,7 +2140,7 @@ function A:CreatePrefs(db)
                                     width = 200,
                                     height = 20
                                 },
-                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Health"))
+                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Health")),
                                 ["Size"] = {
                                     type = "group",
                                     order = 8,
@@ -2266,7 +2263,7 @@ function A:CreatePrefs(db)
                                 }
                             }
                         },
-                        ["Castbar"] = castBarSetting(9),
+                        ["Castbar"] = castBarSetting(3),
                         ["Alternative Power"] = {
                             enabled = genericEnabled,
                             canToggle = true,
