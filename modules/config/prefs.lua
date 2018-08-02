@@ -615,7 +615,7 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
                             self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                         end,
                         width = 50,
@@ -636,7 +636,7 @@ local function castBarSetting(order)
                             self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
                             self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                         end,
-                        width = 50,
+                        width = 200,
                         height = 20,
                         get = genericGetValue,
                         set = genericSetValue   
@@ -662,7 +662,7 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
                             self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                         end,
                         width = 50,
@@ -708,8 +708,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
                         end,
                         values = createDropdownTable("TOP", "BOTTOM", "LEFT", "RIGHT"),
                         get = genericGetValue,
@@ -724,7 +724,7 @@ local function castBarSetting(order)
                         order = 2,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
                             self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         children = {
