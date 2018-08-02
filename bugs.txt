@@ -1,1 +1,1 @@
-﻿clickcast funkar inte vid login, behöver reload
+﻿after copying profile and renaming, tags changes are still being copied from Default before a reload

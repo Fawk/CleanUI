@@ -1142,7 +1142,7 @@ local function barSetting(order, previous)
                 order = 1,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                    self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 30, 0)
                     self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                 end,
                 values = createDropdownTable("HORIZONTAL", "VERTICAL"),
@@ -1156,9 +1156,10 @@ local function barSetting(order, previous)
                 type = "number",
                 order = 2,
                 placement = function(self)
+                    self:ClearAllPoints()
                     self.title:ClearAllPoints()
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -4, 0)
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
                 end,
                 width = 50,
                 height = 20,
@@ -1174,9 +1175,10 @@ local function barSetting(order, previous)
                 type = "number",
                 order = 3,
                 placement = function(self)
+                    self:ClearAllPoints()
                     self.title:ClearAllPoints()
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
                 end,
                 width = 50,
                 height = 20,
@@ -1187,14 +1189,34 @@ local function barSetting(order, previous)
                 get = genericGetValue,
                 set = genericSetValue
             },
-            ["Size"] = {
+            ["Limit"] = {
                 enabled = onlyParent,
                 type = "number",
                 order = 4,
                 placement = function(self)
+                    self:ClearAllPoints()
                     self.title:ClearAllPoints()
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
+                end,
+                width = 50,
+                height = 20,
+                step = 1,
+                decimals = false,
+                min = 0,
+                max = 12,
+                get = genericGetValue,
+                set = genericSetValue
+            },
+            ["Size"] = {
+                enabled = onlyParent,
+                type = "number",
+                order = 5,
+                placement = function(self)
+                    self:ClearAllPoints()
+                    self.title:ClearAllPoints()
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
                 end,
                 width = 50,
                 height = 20,

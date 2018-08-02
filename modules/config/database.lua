@@ -2199,6 +2199,7 @@ local defaults =  {
                             ["Orientation"] = "HORIZONTAL",
                             ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
+                            ["Limit"] = 12,
                             ["Size"] = 24,
                         },
                         ["Bar2"] = {
@@ -2211,6 +2212,7 @@ local defaults =  {
                             ["Orientation"] = "HORIZONTAL",
                             ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
+                            ["Limit"] = 12,
                             ["Size"] = 24,
                         },
                         ["Bar3"] = {
@@ -2223,6 +2225,7 @@ local defaults =  {
                             ["Orientation"] = "HORIZONTAL",
                             ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
+                            ["Limit"] = 12,
                             ["Size"] = 24,
                         },
                         ["Bar4"] = {
@@ -2235,6 +2238,7 @@ local defaults =  {
                             ["Orientation"] = "HORIZONTAL",
                             ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
+                            ["Limit"] = 12,
                             ["Size"] = 24,
                         },
                         ["Bar5"] = {
@@ -2247,6 +2251,7 @@ local defaults =  {
                             ["Orientation"] = "HORIZONTAL",
                             ["X Spacing"] = 0,
                             ["Y Spacing"] = 0,
+                            ["Limit"] = 12,
                             ["Size"] = 24,
                         }
                     }

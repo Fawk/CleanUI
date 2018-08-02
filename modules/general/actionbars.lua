@@ -239,45 +239,6 @@ function AB:Init()
 				backgrounds[x][i]:SetBackdropBorderColor(0, 0, 0, 1)
 			end
 
-			-- if (not borders[x][i]) then
-			-- 	borders[x][i] = CreateFrame("Frame", nil, A.frameParent)
-			-- 	borders[x][i]:SetFrameStrata("HIGH")
-			-- 	borders[x][i]:SetPoint("TOPLEFT", _G[bars[x]..i], "TOPLEFT", 0, 0)
-			-- 	borders[x][i]:SetPoint("BOTTOMRIGHT", _G[bars[x]..i], "BOTTOMRIGHT", 0, 0)
-			-- 	borders[x][i]:SetBackdrop(A.enum.backdrops.editboxborder)
-			-- 	borders[x][i]:SetBackdropColor(0, 0, 0, 0)
-			-- 	borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-			-- end
-
-			-- hooksecurefunc(_G[bars[x]..i.."Border"], "SetVertexColor", function(self, r, g, b, a)
-			-- 	if (a ~= 0) then
-			-- 		self:SetVertexColor(0, 0, 0, 0)
-			-- 	end
-
-			-- 	if (a < 0.4) then
-			-- 		borders[x][i]:SetBackdropBorderColor(r * 0.8, g * 0.8, b * 0.8, 1)				
-			-- 	end
-			-- end)
-
-			-- hooksecurefunc(_G[bars[x]..i.."Border"], "Hide", function(self)
-			-- 	borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-			-- end)
-
-			-- hooksecurefunc(_G[bars[x]..i], "SetChecked", function(self, checked)
-			-- 	if (checked) then
-			-- 		borders[x][i]:SetBackdropBorderColor(0.8, 0.8, 0, 1)
-			-- 	else
-			-- 		local r, g, b, a = borders[x][i]:GetBackdropBorderColor()
-
-			-- 		if (r > 0.78 and g > 0.78) then
-			-- 			borders[x][i]:SetBackdropBorderColor(0, 0, 0, 0)
-			-- 		else
-			-- 			local shouldAlpha = (r == 0 and g == 0 and b == 0)
-			-- 			borders[x][i]:SetBackdropBorderColor(r, g, b, shouldAlpha and 0 or 1)
-			-- 		end
-			-- 	end
-			-- end)
-
 			if(_G[bars[x]..i.."FloatingBG"]) then
 				_G[bars[x]..i.."FloatingBG"]:SetTexture(nil)
 			end
@@ -314,6 +275,7 @@ function AB:Update(...)
 		local position = bar["Position"]
 		local orientation = bar["Orientation"]
 		local size = bar["Size"]
+		local limit = bar["Limit"]
 
 		local anchor = barAnchors[x]
 
@@ -332,26 +294,43 @@ function AB:Update(...)
 
 		local relative = anchor
 		for i = 1, 12 do
-
+			local button = _G[bars[x]..i]
+			
 			if (not InCombatLockdown()) then
-				_G[bars[x]..i]:ClearAllPoints()
-			end
-
-			if (orientation == "HORIZONTAL") then
-				if (i == 1) then
-					_G[bars[x]..i]:SetPoint("LEFT", relative, "LEFT", 0, 0)
+				button:ClearAllPoints()
+				
+				if (i > tonumber(limit)) then
+					button:Hide()
+					backgrounds[x][i]:Hide()
 				else
-					_G[bars[x]..i]:SetPoint("LEFT", relative, "RIGHT", bar["X Spacing"], 0)
-				end
-			else
-				if (i == 1) then
-					_G[bars[x]..i]:SetPoint("TOP", relative, "TOP", 0, 0)
-				else
-					_G[bars[x]..i]:SetPoint("TOP", relative, "BOTTOM", 0, bar["Y Spacing"])
-				end
-			end
+					
+					if (orientation == "HORIZONTAL") then
+						if (i == 1) then
+							button:SetPoint("LEFT", relative, "LEFT", 0, 0)
+						else
+							button:SetPoint("LEFT", relative, "RIGHT", bar["X Spacing"], 0)
+						end
+					else
+						if (i == 1) then
+							button:SetPoint("TOP", relative, "TOP", 0, 0)
+						else
+							button:SetPoint("TOP", relative, "BOTTOM", 0, bar["Y Spacing"])
+						end
+					end
 
-			relative = _G[bars[x]..i]
+					if (not button.icon or not button.icon:GetTexture()) then
+						if (db["Show Grid"]) then
+							backgrounds[x][i]:Show()
+						else
+							backgrounds[x][i]:Hide()
+						end
+					end
+
+					button:Show()
+				end
+
+				relative = button
+			end
 		end
 	end
 end

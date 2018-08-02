@@ -33,8 +33,9 @@ local function updateButtons(parent)
 	end
 end
 
-local function filerAura(aura, unit, db)
-	local durationFilter = (aura.duration and aura.duration > 0) or (not aura.duration or aura.duration <= 0 and db["Hide no duration"])
+local function filterAura(aura, db, unit)
+	local duration = aura.duration or 0
+	local durationFilter = (duration == 0 and not db["Hide no duration"]) or (duration > 0)
 	local casterFilter = (db["Own only"] and aura.caster == unit) or (not db["Own only"])
 	local blackListFilter = db["Blacklist"]["Enabled"] and not db["Blacklist"]["Ids"][aura.spellID]
 	local whiteListFilter = db["Whitelist"]["Enabled"] and db["Whitelist"]["Ids"][aura.spellID]

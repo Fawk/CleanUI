@@ -27,6 +27,9 @@ end
 
 function A:FormatTag(tag)
     local parent = tag:GetParent()
+    if (not UnitExists(parent.unit)) then
+        return
+    end
 
     local name = UnitName(parent.unit) or ""
 
@@ -123,11 +126,13 @@ function Unit:Init(unit)
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         local event = ...
         unit.tags:foreach(function(key, tag)
-            unit.orderedElements:foreach(function(k, element)
-                element:Update(UnitEvent.UPDATE_TAGS, tag, event)
-            end)
-            A:FormatTag(tag)
-            tag:SetText(tag.text)
+            if (tag) then
+                unit.orderedElements:foreach(function(k, element)
+                    element:Update(UnitEvent.UPDATE_TAGS, tag, event)
+                end)
+                A:FormatTag(tag)
+                tag:SetText(tag.text)
+            end
         end)
     end)
 end

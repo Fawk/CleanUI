@@ -70,11 +70,12 @@ function Target:Update(...)
 
             self.tags:foreach(function(key, tag)
                 if (not db["Tags"][key]) then
-                    tag:Hide()
+                    if (tag) then
+                        tag:Hide()
+                    end
                     self.tags:remove(key)
                 end
             end)
-
             for name,tag in next, db["Tags"] do
                 Units:Tag(self, name, tag)
             end
