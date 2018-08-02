@@ -82,7 +82,7 @@ function Tags:ToggleTagsWindow(group)
 		}
 	end
 
-	local nameTextBox, formatTextBox, size, localPointDropdown, pointDropdown, relativeToDropdown, offsetX, offsetY
+	local nameTextBox, formatTextBox, size, localPointDropdown, pointDropdown, relativeToDropdown, deleteButton, hideButton, offsetX, offsetY
 	local tagDropdown = buildDropdown(parent)
 			:atTopLeft()
 			:addItems(keys)
@@ -100,6 +100,21 @@ function Tags:ToggleTagsWindow(group)
 					offsetX:SetValue(0)
 					offsetY:SetValue(0)
 				else
+					local defaultNameTag = A.defaults[group.parent.name][item.name]
+					if (A.profiler:IsDefault() and defaultNameTag) then
+						deleteButton:Hide()
+						hideButton:Show()
+
+						if (defaultNameTag["Hide"]) then
+							hideButton.text:SetText("Show")
+						else
+							hideButton.text:SetText("Hide")
+						end
+					else
+						deleteButton:Show()
+						hideButton:Hide()
+					end
+
 					local db = group.db[item.name]
 
 					nameTextBox:SetValue(item.name)
@@ -266,7 +281,7 @@ function Tags:ToggleTagsWindow(group)
 	tagDropdown:SimulateClickOnActiveItem()
 	tagDropdown:Close()
 
-	local deleteButton = buildButton(parent)
+	deleteButton = buildButton(parent)
 			:below(offsetY)
 			:x(-40)
 			:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
@@ -290,6 +305,41 @@ function Tags:ToggleTagsWindow(group)
 
 	deleteButton.text:SetText("Delete")
 	deleteButton.text:SetTextColor(1, .5, .5, 1)
+
+	hideButton = buildButton(parent)
+		:below(offsetY)
+		:x(-40)
+		:backdrop(E.backdrops.editboxborder, { 0.1, 0.1, 0.1, 1 }, { .3, .3, .3, 1 })
+		:size(50, 20)
+		:onClick(function(self, b, d)
+			group.db[selected]["Hide"] = self.text:GetText() == "Hide"
+			A.dbProvider:Save()
+			GameTooltip:Hide()
+			A:UpdateDb()
+			Tags:ToggleTagsWindow(group)
+		end)
+		:build()
+
+	hideButton.text = buildText(hideButton, 10)
+			:atCenter()
+			:build()
+
+	hideButton.text:SetText("Hide")
+	hideButton.text:SetTextColor(1, .5, .5, 1)
+
+	hideButton:Hide()
+
+	local defaultNameTag = A.defaults[group.parent.name][selected]
+	if (A.profiler:IsDefault() and defaultNameTag) then
+		deleteButton:Hide()
+		hideButton:Show()
+
+		if (defaultNameTag["Hide"]) then
+			hideButton.text:SetText("Show")
+		else
+			hideButton.text:SetText("Hide")
+		end
+	end
 
 	local saveButton = buildButton(parent)
 			:rightOf(deleteButton)

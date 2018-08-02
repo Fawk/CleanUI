@@ -116,7 +116,7 @@ function Addon:OnEnable()
 
 	local E, T, Options, Units = self.enum, self.Tools, self.Options, self.Units
 
-    local profile = self.modules["Profile"]
+    local profile = self.profiler
 
 	profile:Init(self.db)
 	profile:Load()

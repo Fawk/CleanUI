@@ -191,7 +191,8 @@ local defaults =  {
                             ["Point"] = "TOPLEFT",
                             ["Relative To"] = "Player",
                             ["Offset X"] = 2,
-                            ["Offset Y"] = -2
+                            ["Offset Y"] = -2,
+                            ["Hide"] = false
                         }
                     },
                     ["Heal Prediction"] = {
@@ -1346,7 +1347,8 @@ local defaults =  {
                             ["Point"] = "BOTTOMLEFT",
                             ["Relative To"] = "Parent",
                             ["Offset X"] = 2,
-                            ["Offset Y"] = 2
+                            ["Offset Y"] = 2,
+                            ["Hide"] = false
                         }
                     },
                     ["Raid Buffs"] = {

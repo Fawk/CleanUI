@@ -143,6 +143,12 @@ function Units:Tag(frame, name, db)
     }
 
     Units:Position(tag, position)
+
+    if (db["Hide"]) then
+        tag:Hide()
+    else
+        tag:Show()
+    end
 end
 
 function Units:RegisterEvents(frame, events, force)

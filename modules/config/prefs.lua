@@ -108,6 +108,731 @@ local onlyParent = function(self) return self.parent:enabled() end
 local genericGetValue = function(self) return self.db end
 local genericSetValue = function(self, value) self.parent.db[self.name] = value end
 
+local function positionSetting(order, previous, relativeTable)
+    local tbl = {
+        type = "group",
+        order = 3,
+        placement = function(self)
+            self.title:ClearAllPoints()
+            self.title:SetPoint("TOPLEFT", previous and self.previous.last.title or self.previous.title, "BOTTOMLEFT", 0, -20)
+            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+        end,
+        children = {
+            ["Point"] = {
+                type = "dropdown",
+                order = 1,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = A.Tools.points,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Local Point"] = {
+                type = "dropdown",
+                order = 2,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = A.Tools.points,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Relative To"] = {
+                type = "dropdown",
+                order = 3,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = relativeTable,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Offset X"] = {
+                type = "number",
+                order = 4,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                step = 1,
+                decimals = false,
+                min = -GetScreenWidth(),
+                max = GetScreenWidth(),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            },
+            ["Offset Y"] = {
+                type = "number",
+                order = 5,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                step = 1,
+                decimals = false,
+                min = -GetScreenHeight(),
+                max = GetScreenHeight(),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            }
+        }
+    }
+    return tbl
+end
+
+local function backgroundSetting(order)
+    local tbl = {
+        enabled = genericEnabled,
+        canToggle = true,
+        onClick = genericOnClick,
+        type = "group",
+        order = order,
+        placement = function(self)
+            self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+        end,
+        children = {
+            ["Color"] = {
+                type = "color",
+                order = 1,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
+                    self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 20,
+                height = 20
+            },
+            ["Edge Size"] = {
+                type = "number",
+                order = 2,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
+                end,
+                step = 1,
+                decimals = false,
+                min = 1,
+                max = 100,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            },
+            ["Match width"] = {
+                type = "toggle",
+                order = 3,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            },
+            ["Match height"] = {
+                type = "toggle",
+                order = 4,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20                               
+            },
+            ["Width"] = {
+                enabled = function(self) 
+                    return not self.parent.db["Match width"]
+                end,
+                type = "number",
+                order = 5,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                width = 50,
+                height = 20,
+                step = 2,
+                decimals = false,
+                min = 1,
+                max = GetScreenWidth(),
+                get = genericGetValue,
+                set = genericSetValue
+            },
+            ["Height"] = {
+                enabled = function(self) 
+                    return not self.parent.db["Match height"]
+                end,
+                type = "number",
+                order = 6,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                width = 50,
+                height = 20,
+                step = 2,
+                decimals = false,
+                min = 1,
+                max = GetScreenHeight(),
+                get = genericGetValue,
+                set = genericSetValue   
+            },
+            ["Offset"] = {
+                canToggle = false,
+                onClick = genericOnClick,
+                type = "group",
+                order = 7,
+                placement = function(self)
+                    self:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                end,
+                children = {
+                    ["Top"] = {
+                        type = "number",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 27, 0)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 30, 0)
+                        end,
+                        step = 1,
+                        decimals = false,
+                        min = -100,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20
+                    },
+                    ["Bottom"] = {
+                        type = "number",
+                        order = 2,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        step = 1,
+                        decimals = false,
+                        min = -100,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20
+                    },
+                    ["Left"] = {
+                        type = "number",
+                        order = 3,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        step = 1,
+                        decimals = false,
+                        min = -100,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20
+                    },
+                    ["Right"] = {
+                        type = "number",
+                        order = 4,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        step = 1,
+                        decimals = false,
+                        min = -100,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20
+                    }
+                }
+            }
+        }
+    }
+    return tbl
+end
+
+local function castBarSetting(order)
+--[[
+    ["Time"] = {
+        ["Enabled"] = true,
+        ["Position"] = {
+            ["Relative To"] = "Parent",
+            ["Point"] = "RIGHT",
+            ["Local Point"] = "RIGHT",
+            ["Offset X"] = -5,
+            ["Offset Y"] = 0, 
+        },
+        ["Font Size"] = 10,
+        ["Format"] = "[current]/[max]"
+    },
+    ["Name"] = {
+        ["Enabled"] = true,
+        ["Position"] = {
+            ["Relative To"] = "Parent",
+            ["Point"] = "LEFT",
+            ["Local Point"] = "LEFT",
+            ["Offset X"] = 18,
+            ["Offset Y"] = 0, 
+        },
+        ["Font Size"] = 0.7,
+        ["Format"] = "[name]"
+    },
+    ["Icon"] = {
+        ["Enabled"] = true,
+        ["Position"] = "LEFT",
+        ["Size"] = {
+            ["Match width"] = false,
+            ["Match height"] = true,
+            ["Size"] = 10
+        },
+        ["Background"] = {
+            ["Color"] = { 0, 0, 0, 1 },
+            ["Offset"] = {
+                ["Top"] = 1,
+                ["Bottom"] = 1,
+                ["Left"] = 1,
+                ["Right"] = 1
+            },
+            ["Edge Size"] = 3,
+            ["Match width"] = true,
+            ["Width"] = 100,
+            ["Match height"] = true,
+            ["Height"] = 100,
+            ["Enabled"] = true
+        },
+    },
+]]
+
+    local tbl = {
+        enabled = genericEnabled,
+        canToggle = true,
+        onClick = hideParentChildrenAndShowSelf,
+        type = "group",
+        order = order,
+        placement = function(self)
+            self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+        end,
+        children = {
+            ["Color By"] = {
+                type = "dropdown",
+                order = 1,
+                placement = function(self)
+                    self:SetPoint("LEFT", self.parent, "RIGHT", 120, 0)
+                end,
+                values = createDropdownTable("Class", "Health", "Power", "Custom"),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Custom Color"] = {
+                enabled = function(self)
+                    return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                end,
+                type = "color",
+                order = 2,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 20,
+                height = 20
+            },
+            ["Background Multiplier"] = {
+                type = "number",
+                order = 3,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                end,
+                min = -1,
+                max = 1,
+                width = 50,
+                heigth = 20,
+                step = 0.1,
+                decimals = true,
+                get = genericGetValue,
+                set = genericSetValue
+            },
+            ["Orientation"] = {
+                type = "dropdown",
+                order = 4,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = createDropdownTable("HORIZONTAL", "VERTICAL"),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Reversed"] = {
+                type = "toggle",
+                order = 5,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            },
+            ["Texture"] = {
+                type = "dropdown",
+                order = 6,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = media:List("statusbar"),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Attached"] = {
+                type = "toggle",
+                order = 7,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                end,
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 50,
+                height = 20
+            },
+            ["Attached Position"] = {
+                enabled = function(self)
+                    return self.parent:enabled() and self.parent.db["Attached"]
+                end,
+                type = "dropdown",
+                order = 8,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                values = createDropdownTable("Below", "Above", "Left", "Right"),
+                get = genericGetValue,
+                set = genericSetValue,
+                width = 200,
+                height = 20
+            },
+            ["Size"] = {
+                enabled = onlyParent,
+                type = "group",
+                order = 9,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                children = {
+                    ["Match width"] = {
+                        type = "toggle",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
+                        end,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20
+                    },
+                    ["Match height"] = {
+                        type = "toggle",
+                        order = 2,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 50,
+                        height = 20                               
+                    },
+                    ["Width"] = {
+                        enabled = function(self) 
+                            return not self.parent.db["Match width"]
+                        end,
+                        type = "number",
+                        order = 3,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 104, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        step = 2,
+                        decimals = false,
+                        min = 1,
+                        max = GetScreenWidth(),
+                        get = genericGetValue,
+                        set = genericSetValue
+                    },
+                    ["Height"] = {
+                        enabled = function(self) 
+                            return not self.parent.db["Match height"]
+                        end,
+                        type = "number",
+                        order = 4,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        step = 2,
+                        decimals = false,
+                        min = 1,
+                        max = GetScreenHeight(),
+                        get = genericGetValue,
+                        set = genericSetValue   
+                    }
+                }
+            },
+            ["Background"] = backgroundSetting(10),
+            ["Time"] = {                 
+                enabled = genericEnabled,
+                canToggle = true,
+                type = "group",
+                order = 11,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                children = {
+                    ["Font Size"] = {
+                        enabled = onlyParent,
+                        type = "number",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        step = 1,
+                        decimals = false,
+                        min = 1,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue
+                    },
+                    ["Format"] = {
+                        enabled = onlyParent,
+                        type = "text",
+                        order = 2,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        get = genericGetValue,
+                        set = genericSetValue   
+                    },
+                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"))
+                }
+            },
+            ["Name"] = {
+                enabled = genericEnabled,
+                canToggle = true,
+                type = "group",
+                order = 12,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                children = {
+                    ["Font Size"] = {
+                        enabled = onlyParent,
+                        type = "number",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        step = 1,
+                        decimals = false,
+                        min = 1,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue
+                    },
+                    ["Format"] = {
+                        enabled = onlyParent,
+                        type = "text",
+                        order = 2,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        get = genericGetValue,
+                        set = genericSetValue   
+                    },
+                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"))
+                }
+            },
+            ["Icon"] = {
+                enabled = genericEnabled,
+                canToggle = true,
+                type = "group",
+                order = 13,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                children = {
+                    ["Position"] = {
+                        type = "dropdown",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                        end,
+                        values = createDropdownTable("TOP", "BOTTOM", "LEFT", "RIGHT"),
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 200,
+                        height = 20
+                    },
+                    ["Size"] = {
+                        enabled = onlyParent,
+                        type = "number",
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                        end,
+                        width = 50,
+                        height = 20,
+                        step = 1,
+                        decimals = false,
+                        min = 1,
+                        max = 100,
+                        get = genericGetValue,
+                        set = genericSetValue
+                    },
+                    ["Background"] = backgroundSetting(3)
+                }
+            },
+            ["Missing Bar"] = {
+                enabled = genericEnabled,
+                canToggle = true,
+                type = "group",
+                order = 14,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                end,
+                children = {
+                    ["Custom Color"] = {
+                        enabled = function(self)
+                            return self.parent:enabled() and self.parent.db["Color By"] == "Custom"
+                        end,
+                        order = 1,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+                        end,
+                        type = "color",
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 20,
+                        height = 20
+                    },
+                    ["Color By"] = {
+                        type = "dropdown",
+                        order = 2,
+                        placement = function(self)
+                            self.title:ClearAllPoints()
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                        end,
+                        values = createDropdownTable("Class", "Health", "Power", "Custom"),
+                        get = genericGetValue,
+                        set = genericSetValue,
+                        width = 200,
+                        height = 20
+                    }
+                }
+            }
+        }
+    }
+    return tbl
+end
+
 local function standardUnit(unit, order)
     
     local tbl = {
@@ -216,93 +941,7 @@ local function standardUnit(unit, order)
                         width = 200,
                         height = 20
                     },
-                    ["Position"] = {
-                        type = "group",
-                        order = 7,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                        end,
-                        children = {
-                            ["Point"] = {
-                                type = "dropdown",
-                                order = 1,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = A.Tools.points,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Local Point"] = {
-                                type = "dropdown",
-                                order = 2,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = A.Tools.points,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Relative To"] = {
-                                type = "dropdown",
-                                order = 3,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = createDropdownTable(unit, "Power"),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Offset X"] = {
-                                type = "number",
-                                order = 4,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -GetScreenWidth(),
-                                max = GetScreenWidth(),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            },
-                            ["Offset Y"] = {
-                                type = "number",
-                                order = 5,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -GetScreenHeight(),
-                                max = GetScreenHeight(),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            }
-                        }
-                    },
+                    ["Position"] = positionSetting(7, false, createDropdownTable(unit, "Power"))
                     ["Size"] = {
                         enabled = onlyParent,
                         type = "group",
@@ -522,93 +1161,7 @@ local function standardUnit(unit, order)
                         width = 200,
                         height = 20
                     },
-                    ["Position"] = {
-                        type = "group",
-                        order = 7,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                        end,
-                        children = {
-                            ["Point"] = {
-                                type = "dropdown",
-                                order = 1,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = A.Tools.points,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Local Point"] = {
-                                type = "dropdown",
-                                order = 2,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = A.Tools.points,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Relative To"] = {
-                                type = "dropdown",
-                                order = 3,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                end,
-                                values = createDropdownTable(unit, "Health"),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 200,
-                                height = 20
-                            },
-                            ["Offset X"] = {
-                                type = "number",
-                                order = 4,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -GetScreenWidth(),
-                                max = GetScreenWidth(),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            },
-                            ["Offset Y"] = {
-                                type = "number",
-                                order = 5,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -GetScreenHeight(),
-                                max = GetScreenHeight(),
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            }
-                        }
-                    },
+                    ["Position"] = positionSetting(7, false, createDropdownTable(unit, "Health")),
                     ["Size"] = {
                         enabled = function(self) return self.parent:enabled() end,
                         type = "group",
@@ -732,17 +1285,7 @@ local function standardUnit(unit, order)
                     }
                 }
             },
-            ["Castbar"] = {
-                enabled = genericEnabled,
-                canToggle = true,
-                onClick = genericOnClick,
-                type = "group",
-                order = 3,
-                placement = function(self)
-                    self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
-                end,
-                children = {}
-            },
+            ["Castbar"] = castBarSetting(3),
             ["Buffs"] = {
                 enabled = genericEnabled,
                 canToggle = true,
@@ -765,193 +1308,7 @@ local function standardUnit(unit, order)
                 end,
                 children = {}
             },
-            ["Background"] = {
-                enabled = genericEnabled,
-                canToggle = true,
-                onClick = genericOnClick,
-                type = "group",
-                order = 6,
-                placement = function(self)
-                    self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
-                end,
-                children = {
-                    ["Color"] = {
-                        type = "color",
-                        order = 1,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
-                            self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
-                        end,
-                        get = genericGetValue,
-                        set = genericSetValue,
-                        width = 20,
-                        height = 20
-                    },
-                    ["Edge Size"] = {
-                        type = "number",
-                        order = 2,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
-                        end,
-                        step = 1,
-                        decimals = false,
-                        min = 1,
-                        max = 100,
-                        get = genericGetValue,
-                        set = genericSetValue,
-                        width = 50,
-                        height = 20
-                    },
-                    ["Match width"] = {
-                        type = "toggle",
-                        order = 3,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                        end,
-                        get = genericGetValue,
-                        set = genericSetValue,
-                        width = 50,
-                        height = 20
-                    },
-                    ["Match height"] = {
-                        type = "toggle",
-                        order = 4,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                        end,
-                        get = genericGetValue,
-                        set = genericSetValue,
-                        width = 50,
-                        height = 20                               
-                    },
-                    ["Width"] = {
-                        enabled = function(self) 
-                            return not self.parent.db["Match width"]
-                        end,
-                        type = "number",
-                        order = 5,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                        end,
-                        width = 50,
-                        height = 20,
-                        step = 2,
-                        decimals = false,
-                        min = 1,
-                        max = GetScreenWidth(),
-                        get = genericGetValue,
-                        set = genericSetValue
-                    },
-                    ["Height"] = {
-                        enabled = function(self) 
-                            return not self.parent.db["Match height"]
-                        end,
-                        type = "number",
-                        order = 6,
-                        placement = function(self)
-                            self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                        end,
-                        width = 50,
-                        height = 20,
-                        step = 2,
-                        decimals = false,
-                        min = 1,
-                        max = GetScreenHeight(),
-                        get = genericGetValue,
-                        set = genericSetValue   
-                    },
-                    ["Offset"] = {
-                        canToggle = false,
-                        onClick = genericOnClick,
-                        type = "group",
-                        order = 7,
-                        placement = function(self)
-                            self:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                        end,
-                        children = {
-                            ["Top"] = {
-                                type = "number",
-                                order = 1,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 27, 0)
-                                    self:SetPoint("LEFT", self.title, "RIGHT", 30, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -100,
-                                max = 100,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            },
-                            ["Bottom"] = {
-                                type = "number",
-                                order = 2,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -100,
-                                max = 100,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            },
-                            ["Left"] = {
-                                type = "number",
-                                order = 3,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -100,
-                                max = 100,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            },
-                            ["Right"] = {
-                                type = "number",
-                                order = 4,
-                                placement = function(self)
-                                    self.title:ClearAllPoints()
-                                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                end,
-                                step = 1,
-                                decimals = false,
-                                min = -100,
-                                max = 100,
-                                get = genericGetValue,
-                                set = genericSetValue,
-                                width = 50,
-                                height = 20
-                            }
-                        }
-                    },
-                }
-            },
+            ["Background"] = backgroundSetting(6),
             ["Size"] = {
                 enabled = function(self) return self.parent:enabled() end,
                 onClick = genericOnClick,
@@ -1567,93 +1924,7 @@ function A:CreatePrefs(db)
                                     width = 200,
                                     height = 20
                                 },
-                                ["Position"] = {
-                                    type = "group",
-                                    order = 7,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                    end,
-                                    children = {
-                                        ["Point"] = {
-                                            type = "dropdown",
-                                            order = 1,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = A.Tools.points,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Local Point"] = {
-                                            type = "dropdown",
-                                            order = 2,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = A.Tools.points,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Relative To"] = {
-                                            type = "dropdown",
-                                            order = 3,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = createDropdownTable("Player", "Power"),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Offset X"] = {
-                                            type = "number",
-                                            order = 4,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -GetScreenWidth(),
-                                            max = GetScreenWidth(),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        },
-                                        ["Offset Y"] = {
-                                            type = "number",
-                                            order = 5,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -GetScreenHeight(),
-                                            max = GetScreenHeight(),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        }
-                                    }
-                                },
+                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Power"))
                                 ["Size"] = {
                                     type = "group",
                                     order = 8,
@@ -1872,93 +2143,7 @@ function A:CreatePrefs(db)
                                     width = 200,
                                     height = 20
                                 },
-                                ["Position"] = {
-                                    type = "group",
-                                    order = 7,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                                        self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                    end,
-                                    children = {
-                                        ["Point"] = {
-                                            type = "dropdown",
-                                            order = 1,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = A.Tools.points,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Local Point"] = {
-                                            type = "dropdown",
-                                            order = 2,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = A.Tools.points,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Relative To"] = {
-                                            type = "dropdown",
-                                            order = 3,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
-                                            end,
-                                            values = createDropdownTable("Player", "Health"),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 200,
-                                            height = 20
-                                        },
-                                        ["Offset X"] = {
-                                            type = "number",
-                                            order = 4,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -GetScreenWidth(),
-                                            max = GetScreenWidth(),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        },
-                                        ["Offset Y"] = {
-                                            type = "number",
-                                            order = 5,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -GetScreenHeight(),
-                                            max = GetScreenHeight(),
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        }
-                                    }
-                                },
+                                ["Position"] = positionSetting(7, false, createDropdownTable("Player", "Health"))
                                 ["Size"] = {
                                     type = "group",
                                     order = 8,
@@ -2081,17 +2266,7 @@ function A:CreatePrefs(db)
                                 }
                             }
                         },
-                        ["Castbar"] = {
-                            enabled = genericEnabled,
-                            canToggle = true,
-                            onClick = genericOnClick,
-                            type = "group",
-                            order = 3,
-                            placement = function(self)
-                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
-                            end,
-                            children = {}
-                        },
+                        ["Castbar"] = castBarSetting(9),
                         ["Alternative Power"] = {
                             enabled = genericEnabled,
                             canToggle = true,
@@ -2168,193 +2343,7 @@ function A:CreatePrefs(db)
                             end,
                             children = {}
                         },
-                        ["Background"] = {
-                            enabled = genericEnabled,
-                            canToggle = true,
-                            onClick = genericOnClick,
-                            type = "group",
-                            order = 10,
-                            placement = function(self)
-                                self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
-                            end,
-                            children = {
-                                ["Color"] = {
-                                    type = "color",
-                                    order = 1,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
-                                        self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
-                                    end,
-                                    get = genericGetValue,
-                                    set = genericSetValue,
-                                    width = 20,
-                                    height = 20
-                                },
-                                ["Edge Size"] = {
-                                    type = "number",
-                                    order = 2,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                        self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
-                                    end,
-                                    step = 1,
-                                    decimals = false,
-                                    min = 1,
-                                    max = 100,
-                                    get = genericGetValue,
-                                    set = genericSetValue,
-                                    width = 50,
-                                    height = 20
-                                },
-                                ["Match width"] = {
-                                    type = "toggle",
-                                    order = 3,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                    end,
-                                    get = genericGetValue,
-                                    set = genericSetValue,
-                                    width = 50,
-                                    height = 20
-                                },
-                                ["Match height"] = {
-                                    type = "toggle",
-                                    order = 4,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                    end,
-                                    get = genericGetValue,
-                                    set = genericSetValue,
-                                    width = 50,
-                                    height = 20                               
-                                },
-                                ["Width"] = {
-                                    enabled = function(self) 
-                                        return not self.parent.db["Match width"]
-                                    end,
-                                    type = "number",
-                                    order = 5,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                    end,
-                                    width = 50,
-                                    height = 20,
-                                    step = 2,
-                                    decimals = false,
-                                    min = 1,
-                                    max = GetScreenWidth(),
-                                    get = genericGetValue,
-                                    set = genericSetValue
-                                },
-                                ["Height"] = {
-                                    enabled = function(self) 
-                                        return not self.parent.db["Match height"]
-                                    end,
-                                    type = "number",
-                                    order = 6,
-                                    placement = function(self)
-                                        self.title:ClearAllPoints()
-                                        self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                        self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                    end,
-                                    width = 50,
-                                    height = 20,
-                                    step = 2,
-                                    decimals = false,
-                                    min = 1,
-                                    max = GetScreenHeight(),
-                                    get = genericGetValue,
-                                    set = genericSetValue   
-                                },
-                                ["Offset"] = {
-                                    canToggle = false,
-                                    onClick = genericOnClick,
-                                    type = "group",
-                                    order = 7,
-                                    placement = function(self)
-                                        self:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
-                                    end,
-                                    children = {
-                                        ["Top"] = {
-                                            type = "number",
-                                            order = 1,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 27, 0)
-                                                self:SetPoint("LEFT", self.title, "RIGHT", 30, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -100,
-                                            max = 100,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        },
-                                        ["Bottom"] = {
-                                            type = "number",
-                                            order = 2,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -100,
-                                            max = 100,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        },
-                                        ["Left"] = {
-                                            type = "number",
-                                            order = 3,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -100,
-                                            max = 100,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        },
-                                        ["Right"] = {
-                                            type = "number",
-                                            order = 4,
-                                            placement = function(self)
-                                                self.title:ClearAllPoints()
-                                                self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                                                self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
-                                            end,
-                                            step = 1,
-                                            decimals = false,
-                                            min = -100,
-                                            max = 100,
-                                            get = genericGetValue,
-                                            set = genericSetValue,
-                                            width = 50,
-                                            height = 20
-                                        }
-                                    }
-                                },
-                            }
-                        },
+                        ["Background"] = backgroundSetting(10),
                         ["Size"] = {
                             enabled = onlyParent,
                             onClick = genericOnClick,
