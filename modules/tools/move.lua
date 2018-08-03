@@ -169,7 +169,7 @@ function A:CreateMover(frame, db, overrideName)
 
 	moveFrame.Apply = function(self)
 		local lp, relative, p, x, y = self:GetPoint()
-		self.affecting:SetParent(A.frameParent)
+		--self.affecting:SetParent(A.frameParent) -- This won't work for elements seeing as they need their unit parent to get values
 
         local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db["Position"]["Anchor"])
         --A:Debug(name, position["Local Point"], position["Point"], position["Offset X"], position["Offset Y"])
@@ -189,6 +189,7 @@ function A:CreateMover(frame, db, overrideName)
 		if not down and button == "LeftButton" then
 			moveFrame.moveAble = not moveFrame.moveAble
 			moveFrame:SetMovable(moveFrame.moveAble)
+            moveFrame:EnableMouse(moveFrame.moveAble)
 			self.texture:SetTexture(moveFrame.moveAble and unLockedTexture or lockedTexture)
 		end
 	end)

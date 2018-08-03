@@ -110,8 +110,8 @@ function Units:PlaceCastbar(bar, db)
 
         self:Attach(bar, db)
     else
-        A:CreateMover(bar, db, bar:GetName())
         self:Position(bar, db["Position"])
+        A:CreateMover(bar, db, bar:GetName())
     end
 end
 
