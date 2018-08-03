@@ -29,7 +29,7 @@ function Castbar:Init(parent)
 
 	local container = parent.orderedElements:get(elementName)
 	if (not container) then
-		container = CreateFrame("Frame", T:frameName(parent:GetName(), elementName), parent)
+		container = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		container.db = db
 		
 		local bar = CreateFrame("StatusBar", nil, container)
@@ -137,6 +137,10 @@ function Castbar:Update(...)
 		local size = db["Size"]
 		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
 		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+
+		self.getMoverSize = function(self)
+			return self:GetSize()
+		end
 
 		U:CreateBackground(self, db, false)
 

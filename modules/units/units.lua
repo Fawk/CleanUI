@@ -92,11 +92,12 @@ function Units:PlaceCastbar(bar, db)
     local parent = bar:GetParent()
     local position = db["Position"]
     
-    if (parent.unit == "player") then
-        if (db["Attached"]) then
-            
-            bar:ClearAllPoints()
-            
+    if (db["Attached"]) then
+        
+        A:DeleteMover(bar:GetName())
+        bar:ClearAllPoints()
+        
+        if (parent.unit == "player") then
             local relative = getClassPowerRelative(parent)
             if (relative) then
                 local attachedPosition = relative.db["Attached Position"]
@@ -106,9 +107,12 @@ function Units:PlaceCastbar(bar, db)
                 end
             end
         end
+
+        self:Attach(bar, db)
+    else
+        A:CreateMover(bar, db, bar:GetName())
+        self:Position(bar, db["Position"])
     end
-        
-    self:Attach(bar, db)
 end
 
 function Units:SetupKeybindings(frame, db)

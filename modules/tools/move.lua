@@ -10,8 +10,10 @@ local grid
 
 local function FinalizeMove()
 	for name, moveFrame in next, moveableFrames do
-		moveFrame:Hide()
-		moveFrame:Apply()
+		if (moveFrame) then
+			moveFrame:Hide()
+			moveFrame:Apply()
+		end
 	end
 	finishFrame:Hide()
 	grid:Hide()
@@ -21,13 +23,15 @@ end
 
 function A:UpdateMoveableFrames()
 	for name, moveFrame in next, moveableFrames do
-		local db = moveFrame.affecting.db
-		if (db) then
-			local p = db["Position"]
+		if (moveFrame) then
+			local db = moveFrame.affecting.db
+			if (db) then
+				local p = db["Position"]
 
-			moveFrame:ClearAllPoints()
-			moveFrame.affecting:ClearAllPoints()
-			moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], T:Scale(p["Offset X"]), T:Scale(p["Offset Y"]))
+				moveFrame:ClearAllPoints()
+				moveFrame.affecting:ClearAllPoints()
+				moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], T:Scale(p["Offset X"]), T:Scale(p["Offset Y"]))
+			end
 		end
 	end
 end
@@ -91,16 +95,19 @@ function A:InitMove()
 	grid:Show()
 
 	for name, moveFrame in next, moveableFrames do
+
+		if (moveFrame) then
 		
-		moveFrame:Show()
-        moveFrame:ClearAllPoints()
+			moveFrame:Show()
+	        moveFrame:ClearAllPoints()
 
-        local lp, r, p, x, y = moveFrame.affecting:GetPoint()
+	        local lp, r, p, x, y = moveFrame.affecting:GetPoint()
 
-        moveFrame:SetPoint(lp, A.frameParent, p, x, y)
-		moveFrame.affecting:ClearAllPoints()
-		moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
+	        moveFrame:SetPoint(lp, A.frameParent, p, x, y)
+			moveFrame.affecting:ClearAllPoints()
+			moveFrame.affecting:SetPoint("TOPLEFT", moveFrame, "TOPLEFT", 0, 0)
 
+		end
 	end
 end
 
@@ -129,7 +136,7 @@ function A:CreateMover(frame, db, overrideName)
 		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
 	end
 
-	local moveFrame = CreateFrame("Button", A:GetName().."_"..name.."_Mover", A.frameParent)
+	local moveFrame = moveableFrames[name] or CreateFrame("Button", name.."_Mover", A.frameParent)
 	moveFrame.affecting = frame
 	moveFrame:SetBackdrop(A.enum.backdrops.editboxborder)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
@@ -170,12 +177,12 @@ function A:CreateMover(frame, db, overrideName)
 	end
 	moveFrame:Hide()
 
-	local text = moveFrame:CreateFontString(nil, "OVERLAY")
+	local text = moveFrame.text or moveFrame:CreateFontString(nil, "OVERLAY")
 	text:SetFont(media:Fetch("font", "NotoBold"), 12, "NONE")
 	text:SetPoint("CENTER")
 	text:SetText(name)
 
-	local lock = CreateFrame("Button", nil, moveFrame)
+	local lock = moveFrame.lock or CreateFrame("Button", nil, moveFrame)
 	lock:SetSize(24, 24)
 	lock:SetPoint("TOPRIGHT", moveFrame, "TOPRIGHT", -3, -3)
 	lock:SetScript("OnClick", function(self, button, down)
@@ -186,7 +193,7 @@ function A:CreateMover(frame, db, overrideName)
 		end
 	end)
 	
-	local texture = lock:CreateTexture(nil, "OVERLAY")
+	local texture = lock.texture or lock:CreateTexture(nil, "OVERLAY")
 	texture:SetTexture(lockedTexture)
 	texture:SetAllPoints()
 
@@ -199,7 +206,7 @@ end
 
 function A:DeleteMover(name)
 	if (moveableFrames[name]) then
-		table.remove(moveableFrames, name)
+		moveableFrames[name] = nil
 	end
 end
 

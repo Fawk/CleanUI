@@ -50,6 +50,7 @@ function X:HandleChildren(children, visible, once)
         end
         if (not visible) then 
             child:Hide()
+            child.open = false
         else
             child:Show()
         end

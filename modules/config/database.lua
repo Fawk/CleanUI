@@ -475,10 +475,10 @@ local defaults =  {
                         ["Texture"] = "Default",
                         ["Position"] = {
                             ["Relative To"] = "FrameParent",
-                            ["Point"] = "BOTTOM",
-                            ["Local Point"] = "TOP",
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "CENTER",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = -1, 
+                            ["Offset Y"] = 0, 
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -819,11 +819,11 @@ local defaults =  {
                         },
                         ["Texture"] = "Default",
                         ["Position"] = {
-                            ["Relative To"] = "Class Icons",
-                            ["Point"] = "BOTTOM",
-                            ["Local Point"] = "TOP",
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "CENTER",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = 0,
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -899,7 +899,8 @@ local defaults =  {
                             ["Height"] = 100,
                             ["Enabled"] = true
                         },
-                        ["Attached Position"] = "Below"
+                        ["Attached Position"] = "Below",
+                        ["Attached"] = true,
                     },
                     ["Enabled"] = true
     			},
@@ -925,11 +926,11 @@ local defaults =  {
                         },
                         ["Texture"] = "Default",
                         ["Position"] = {
-                            ["Relative To"] = "Parent",
-                            ["Point"] = "BOTTOM",
-                            ["Local Point"] = "TOP",
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "CENTER",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = 0,
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -1839,11 +1840,11 @@ local defaults =  {
                         },
                         ["Texture"] = "Default",
                         ["Position"] = {
-                            ["Relative To"] = "Class Icons",
-                            ["Point"] = "BOTTOM",
-                            ["Local Point"] = "TOP",
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "CENTER",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = -1, 
+                            ["Offset Y"] = 0,
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -1919,7 +1920,8 @@ local defaults =  {
                             ["Height"] = 100,
                             ["Enabled"] = true
                         },
-                        ["Attached Position"] = "Below"
+                        ["Attached Position"] = "Below",
+                        ["Attached"] = true,
                     },
                     ["Enabled"] = true
                 },
@@ -2030,11 +2032,11 @@ local defaults =  {
                         },
                         ["Texture"] = "Default",
                         ["Position"] = {
-                            ["Relative To"] = "Class Icons",
-                            ["Point"] = "BOTTOM",
-                            ["Local Point"] = "TOP",
+                            ["Relative To"] = "FrameParent",
+                            ["Point"] = "CENTER",
+                            ["Local Point"] = "CENTER",
                             ["Offset X"] = 0,
-                            ["Offset Y"] = 0, 
+                            ["Offset Y"] = 0,
                         },
                         ["Color By"] = "Class",
                         ["Custom Color"] = { 1, 1, 1 },
@@ -2106,7 +2108,8 @@ local defaults =  {
                             ["Height"] = 100,
                             ["Enabled"] = true
                         },
-                        ["Attached Position"] = "Below"
+                        ["Attached Position"] = "Below",
+                        ["Attached"] = true,
                     },
                     ["Enabled"] = true
                 },
