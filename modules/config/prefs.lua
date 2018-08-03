@@ -109,10 +109,11 @@ local onlyParent = function(self) return self.parent:enabled() end
 local genericGetValue = function(self) return self.db end
 local genericSetValue = function(self, value) self.parent.db[self.name] = value end
 
-local function positionSetting(order, previous, relativeTable)
+local function positionSetting(order, previous, relativeTable, onClick)
     local tbl = {
         type = "group",
         order = order,
+        onClick = onClick,
         placement = function(self)
             self.title:ClearAllPoints()
             self.title:SetPoint("TOPLEFT", previous and self.previous.last.title or self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -204,7 +205,7 @@ local function backgroundSetting(order, previous, below)
     local tbl = {
         enabled = genericEnabled,
         canToggle = true,
-        onClick = genericOnClick,
+        onClick = hideParentChildrenAndShowSelf,
         type = "group",
         order = order,
         placement = function(self)
@@ -317,7 +318,7 @@ local function backgroundSetting(order, previous, below)
             },
             ["Offset"] = {
                 canToggle = false,
-                onClick = genericOnClick,
+                onClick = hideParentChildrenAndShowSelf,
                 type = "group",
                 order = 7,
                 placement = function(self)
@@ -623,8 +624,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 200, 0)
                         end,
                         width = 50,
                         height = 20,
@@ -649,7 +650,7 @@ local function castBarSetting(order)
                         get = genericGetValue,
                         set = genericSetValue   
                     },
-                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"))
+                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"), hideParentChildrenAndShowSelf)
                 }
             },
             ["Name"] = {
@@ -670,8 +671,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 200, 0)
                         end,
                         width = 50,
                         height = 20,
@@ -691,12 +692,12 @@ local function castBarSetting(order)
                             self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
                             self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                         end,
-                        width = 50,
+                        width = 200,
                         height = 20,
                         get = genericGetValue,
                         set = genericSetValue   
                     },
-                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"))
+                    ["Position"] = positionSetting(3, false, createDropdownTable("Parent"), hideParentChildrenAndShowSelf)
                 }
             },
             ["Icon"] = {
@@ -716,8 +717,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
-                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
+                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
+                            self:SetPoint("LEFT", self.title, "RIGHT", 200, 0)
                         end,
                         values = createDropdownTable("TOP", "BOTTOM", "LEFT", "RIGHT"),
                         get = genericGetValue,
@@ -729,6 +730,7 @@ local function castBarSetting(order)
                         enabled = onlyParent,
                         type = "group",
                         order = 2,
+                        onClick = hideParentChildrenAndShowSelf,
                         placement = function(self)
                             self.title:ClearAllPoints()
                             self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
@@ -783,7 +785,7 @@ local function castBarSetting(order)
                             }
                         }
                     },
-                    ["Background"] = backgroundSetting(3, true)
+                    ["Background"] = backgroundSetting(3, false)
                 }
             },
             ["Missing Bar"] = {

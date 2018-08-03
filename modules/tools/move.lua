@@ -119,7 +119,7 @@ function A:CreateMover(frame, db, overrideName)
 
     if type(size) == "number" then
         size = {
-            ["Width"] = size, 
+            ["Width"] = size,
             ["Height"] = size
         }
     end

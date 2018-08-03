@@ -60,8 +60,8 @@ end
 function Units:Attach(frame, db, override)
     local target = override or frame:GetParent()
     local position = db["Attached Position"]
-    local x = db["Position"]["Offset X"]
-    local y = db["Position"]["Offset Y"]
+    local x = db["Attached Offset X"] or db["Position"]["Offset X"]
+    local y = db["Attached Offset Y"] or db["Position"]["Offset Y"]
 
     if (not position) then
         A:Debug("No Attached Position for frame:", frame:GetName())

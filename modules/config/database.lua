@@ -556,6 +556,8 @@ local defaults =  {
                         },
                         ["Attached Position"] = "Below",
                         ["Attached"] = true,
+                        ["Attached Offset X"] = 0,
+                        ["Attached Offset Y"] = 0
                     },
                     ["Stagger"] = {
                         ["Enabled"] = true,
@@ -901,6 +903,8 @@ local defaults =  {
                         },
                         ["Attached Position"] = "Below",
                         ["Attached"] = true,
+                        ["Attached Offset X"] = 0,
+                        ["Attached Offset Y"] = 0
                     },
                     ["Enabled"] = true
     			},
@@ -1007,6 +1011,8 @@ local defaults =  {
                             ["Enabled"] = true
                         },
                         ["Attached Position"] = "Below",
+                        ["Attached Offset X"] = 0,
+                        ["Attached Offset Y"] = 0
                     },
                     ["Heal Prediction"] = {
                         ["Enabled"] = true,
@@ -1922,6 +1928,8 @@ local defaults =  {
                         },
                         ["Attached Position"] = "Below",
                         ["Attached"] = true,
+                        ["Attached Offset X"] = 0,
+                        ["Attached Offset Y"] = 0
                     },
                     ["Enabled"] = true
                 },
@@ -2110,6 +2118,8 @@ local defaults =  {
                         },
                         ["Attached Position"] = "Below",
                         ["Attached"] = true,
+                        ["Attached Offset X"] = 0,
+                        ["Attached Offset Y"] = 0
                     },
                     ["Enabled"] = true
                 },
