@@ -111,8 +111,7 @@ local genericSetValue = function(self, value) self.parent.db[self.name] = value 
 local function positionSetting(order, previous, relativeTable)
     local tbl = {
         type = "group",
-        onClick = hideParentChildrenAndShowSelf,
-        order = 3,
+        order = order,
         placement = function(self)
             self.title:ClearAllPoints()
             self.title:SetPoint("TOPLEFT", previous and self.previous.last.title or self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -167,7 +166,7 @@ local function positionSetting(order, previous, relativeTable)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -7, 0)
                 end,
                 step = 1,
                 decimals = false,
@@ -200,7 +199,7 @@ local function positionSetting(order, previous, relativeTable)
     return tbl
 end
 
-local function backgroundSetting(order)
+local function backgroundSetting(order, previous, below)
     local tbl = {
         enabled = genericEnabled,
         canToggle = true,
@@ -208,7 +207,9 @@ local function backgroundSetting(order)
         type = "group",
         order = order,
         placement = function(self)
-            self:SetPoint("TOPLEFT", self.previous, "BOTTOMLEFT", 0, -5)
+            self.title:ClearAllPoints()
+            self.title:SetPoint("TOPLEFT", previous and self.previous.last.title or self.previous.title, "BOTTOMLEFT", 0, -20)
+            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
         end,
         children = {
             ["Color"] = {
@@ -216,8 +217,14 @@ local function backgroundSetting(order)
                 order = 1,
                 placement = function(self)
                     self.title:ClearAllPoints()
-                    self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+
+                    if (below) then
+                        self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                        self:SetPoint("LEFT", self.title, "LEFT", 173, 0)  
+                    else
+                        self.title:SetPoint("LEFT", self.parent, "RIGHT", 100, 0)
+                        self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+                    end
                 end,
                 get = genericGetValue,
                 set = genericSetValue,
@@ -230,7 +237,7 @@ local function backgroundSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 step = 1,
                 decimals = false,
@@ -519,9 +526,9 @@ local function castBarSetting(order)
                 height = 20
             },
             ["Size"] = {
-                enabled = onlyParent,
                 type = "group",
                 order = 9,
+                onClick = hideParentChildrenAndShowSelf,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -533,7 +540,7 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self.title:SetPoint("LEFT", self.parent.title, "LEFT", 100, 0)
                             self:SetPoint("LEFT", self.title, "RIGHT", 65, 0)
                         end,
                         get = genericGetValue,
@@ -596,7 +603,7 @@ local function castBarSetting(order)
                     }
                 }
             },
-            ["Background"] = backgroundSetting(10),
+            ["Background"] = backgroundSetting(10, false),
             ["Time"] = {                 
                 enabled = genericEnabled,
                 onClick = hideParentChildrenAndShowSelf,
@@ -615,8 +622,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
-                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         width = 50,
                         height = 20,
@@ -662,8 +669,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
-                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         width = 50,
                         height = 20,
@@ -708,8 +715,8 @@ local function castBarSetting(order)
                         order = 1,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("LEFT", self.parent.title, "RIGHT", 50, 0)
-                            self:SetPoint("LEFT", self.title, "RIGHT", 50, 0)
+                            self.title:SetPoint("TOPLEFT", self.parent.title, "BOTTOMLEFT", 0, -10)
+                            self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         values = createDropdownTable("TOP", "BOTTOM", "LEFT", "RIGHT"),
                         get = genericGetValue,
@@ -719,7 +726,6 @@ local function castBarSetting(order)
                     },
                     ["Size"] = {
                         enabled = onlyParent,
-                        onClick = hideParentChildrenAndShowSelf,
                         type = "group",
                         order = 2,
                         placement = function(self)
@@ -776,7 +782,7 @@ local function castBarSetting(order)
                             }
                         }
                     },
-                    ["Background"] = backgroundSetting(3)
+                    ["Background"] = backgroundSetting(3, true)
                 }
             },
             ["Missing Bar"] = {
@@ -943,7 +949,7 @@ local function standardUnit(unit, order)
                         order = 8,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
+                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
                             self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         children = {
@@ -1585,6 +1591,54 @@ local function barSetting(order, previous)
     return tbl
 end
 
+local keep = {}
+local lines = {}
+
+local function collectAllLinesToKeep(source)
+    for s, targets in next, lines do
+        for target, line in next, targets do
+            if (target == source) then
+                keep[s] = true
+                keep[target] = true
+
+                collectAllLinesToKeep(s)
+                break
+            end
+        end
+    end
+end
+
+local function clearAllLinesExceptKept()
+    for s, targets in next, lines do
+        if (not keep[s]) then
+            for target, line in next, targets do
+                if (not keep[target]) then
+                    line:Hide()
+                end
+            end
+        end
+    end
+end
+
+local function drawLine(source, target)
+    keep = {}
+    collectAllLinesToKeep(source)
+    clearAllLinesExceptKept()
+
+    local line = CreateFrame("Frame", nil, A.frameParent)
+    line:SetBackdrop(A.enum.backdrops.editbox)
+    line:SetBackdropColor(.7, .7, 1)
+    line:SetHeight(3)
+    line:SetPoint("LEFT", source, "RIGHT", 5, 0)
+    line:SetPoint("RIGHT", target, "LEFT", -7, 0)
+
+    if (not lines[source]) then
+        lines[source] = {}
+    end
+
+    lines[source][target] = line
+end
+
 local function getChildrenInOrder(children)
     local tbl = {}
     for k,v in next, children do
@@ -1622,7 +1676,7 @@ function X:CreateGroup(name, parent, setting, db)
                         if (not self:enabled()) then
                             self.title:SetTextColor(1, .2, .2, 1)
                         else
-                            self.title:SetTextColor(1, 1, 1, 1)
+                            self.title:SetTextColor(.2, .2, 1, 1)
                         end
 
                         X:UpdateWidgetStates()
@@ -1631,6 +1685,9 @@ function X:CreateGroup(name, parent, setting, db)
                     end
 
                     if (setting.onClick and button == "LeftButton") then
+                        if (self.first) then
+                            --drawLine(self.title, self.first.title)
+                        end
                         setting.onClick(self)
                     end
                 end
@@ -1661,6 +1718,7 @@ function X:CreateGroup(name, parent, setting, db)
         group:addChild(child)
     end
 
+    group.first = group.children:first()
     group.last = child
 
     group:SetActive(group:enabled())
@@ -1675,7 +1733,6 @@ function X:CreateChild(name, parent, setting, db)
     local child, childBuilder
     if (type == "group") then
         child = X:CreateGroup(name, parent, setting, db)
-        -- What needs to be done here?
     else
         if (type == "dropdown") then
             childBuilder = buildDropdown(parent)
@@ -1739,9 +1796,13 @@ function X:CreateChild(name, parent, setting, db)
     child.title:SetText(name)
 
     if (not child:enabled()) then
-        child.title:SetTextColor(1, .2, .2, 1)
+        child.title:SetTextColor(1, .7, .7, 1)
     else
-        child.title:SetTextColor(1, 1, 1, 1)
+        if (type == "group") then
+            child.title:SetTextColor(.7, .7, 1)
+        else
+            child.title:SetTextColor(1, 1, 1, 1)  
+        end
     end
 
     child:SetActive(child:enabled())
@@ -2564,9 +2625,13 @@ function A:CreatePrefs(db)
             widget:SetActive(enabled)
 
             if (not enabled) then
-                widget.title:SetTextColor(1, .2, .2, 1)
+                widget.title:SetTextColor(1, .7, .7, 1)
             else
-                widget.title:SetTextColor(1, 1, 1, 1)
+                if (widget.children) then
+                    widget.title:SetTextColor(.7, .7, 1, 1)
+                else
+                    widget.title:SetTextColor(1, 1, 1, 1)
+                end
             end
         end)
     end
@@ -2586,6 +2651,7 @@ function A:CreatePrefs(db)
                     :build()
 
             widget.title:SetText(name)
+            widget.title:SetTextColor(.7, .7, 1)
 
             widget:SetWidth(widget.title:GetWidth())
 
