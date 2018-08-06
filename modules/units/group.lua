@@ -1,8 +1,7 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
 local CC = A.general:get("clickcast")
-local initFrame = CreateFrame("Frame")
-
+local updateFrame = CreateFrame("Frame")
 local UnitExists = UnitExists
 
 local directions = {
@@ -56,32 +55,45 @@ function Group:Init(name, maxMembers, db)
     	self.initFunc = initFunc
         self:UpdateUnits()
 	end
-	container.UpdateUnits = function(self, event)
+	container.UpdateUnits = function(self, event, ...)
 		if (A.groupSimulating) then
-			self.init = true
 			A.modules[A.groupSimulating:lower()]:Simulate(self.maxMembers)
 		else
-	        for i = 1, maxMembers do
-	            local uf = self.header:GetAttribute("child"..i)
-	            if (uf) then
-	            	if (not uf.init and self.initFunc) then
-		            	uf.init = true
-		            	uf.db = db
-						uf:RegisterForClicks("AnyUp")
-	                	uf.unit = uf:GetAttribute("unit")
-		            	uf.GetDbName = function(self) 
-		            		return name 
-		            	end
+			local this = self
+			if (not updateFrame.updating) then
+				updateFrame.updating = true
+				updateFrame:SetScript("OnUpdate", function(self, elapsed)
+					if (not self.start) then
+						self.start = GetTime()
+					end
+					if (not self.success) then
+						for i = 1, this.header:GetNumChildren() do
+				            local uf = select(i, this.header:GetChildren())
+				            if (uf) then
+				            	if (not uf.init and this.initFunc) then
+					            	uf.init = true
+					            	uf.db = db
+									uf:RegisterForClicks("AnyUp")
+				                	uf.unit = uf:GetAttribute("unit")
+					            	uf.GetDbName = function(self) 
+					            		return name 
+					            	end
 
-						Group:Update(uf, UnitEvent.UPDATE_DB, self)
-		            	self:initFunc(uf)
+									Group:Update(uf, UnitEvent.UPDATE_DB, this, uf.unit)
 
-		            	self.init = true
-		            else
-		            	uf:Update(event, self)
-		            end
-	            end
-	        end
+									this:initFunc(uf)
+					            else
+					            	if (uf and uf.Update) then
+					            		uf:Update(event, this, uf.unit)
+					            	end
+					            end
+					            self.success = true
+					            self.updating = false
+				            end
+				        end
+				    end
+				end)
+			end
 	    end
     end
     container.getMoverSize = function(self)
@@ -98,16 +110,6 @@ function Group:Init(name, maxMembers, db)
 		this:RunAttribute("UpdateSize")
 	]])
 
-    container:RegisterEvent("GROUP_ROSTER_UPDATE")
-    container:RegisterEvent("UNIT_EXITED_VEHICLE")
-    container:SetScript("OnEvent", function(self, event) 
-        Units:DisableBlizzardRaid()
-        T:RunNowOrAfterCombat(function()
-            self:Execute([[ this:RunAttribute("UpdateSize") ]])
-        end)
-        self:UpdateUnits(UnitEvent.UPDATE_GROUP)
-    end)
-
     RegisterStateDriver(container, "visibility", db["Visibility"])
 
 	local header = container.header or CreateFrame("Frame", T:frameName(name.."Header"), A.frameParent, "SecureGroupHeaderTemplate")
@@ -116,17 +118,20 @@ function Group:Init(name, maxMembers, db)
 
 	container.header = header
 
+    container:RegisterEvent("GROUP_ROSTER_UPDATE")
+    container:RegisterEvent("UNIT_EXITED_VEHICLE")
+    container:SetScript("OnEvent", function(self, event) 
+        Units:DisableBlizzardRaid()
+        T:RunNowOrAfterCombat(function()
+            self:Execute([[ this:RunAttribute("UpdateSize") ]])
+        end)
+
+        self:UpdateUnits(UnitEvent.UPDATE_GROUP)
+    end)
+
     Units:Add(container, name)
 
     self:UpdateHeader(container)
-
-    initFrame:SetScript("OnUpdate", function(self, elapsed)
-    	if (not container.init) then
-			container:UpdateUnits()
-		else
-			initFrame:SetScript("OnUpdate", nil)
-		end
-    end)
 
     Units:Position(container, db["Position"])
 
@@ -243,7 +248,7 @@ function Group:Update(...)
     local self, event, arg2, arg3, arg4, arg5 = ...
     local db = self.db
     
-    local simulating = arg3 == "SIMULATE"
+    local simulating = arg4 == "SIMULATE"
     if (simulating) then
     	A.groupSimulating = arg2.name
     end
@@ -254,7 +259,9 @@ function Group:Update(...)
 	
 	self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
 
-	if (not UnitExists(self.unit)) then
+	local unit = self.unit or arg3
+
+	if (not UnitExists(unit)) then
 		return
 	end
 
@@ -302,7 +309,7 @@ function Group:Update(...)
 
     	if (not simulating) then
 	        self.orderedElements:foreach(function(key, obj)
-	            obj:Update(event, db[key])
+	            obj:Update(event, unit)
 	        end)
 
 			self:ForceTagUpdate()
@@ -311,8 +318,9 @@ function Group:Update(...)
     	U:CreateBackground(self, db)
     elseif (event == UnitEvent.UPDATE_GROUP) then
     	if (not simulating) then
+
 	        self.orderedElements:foreach(function(key, obj)
-	            obj:Update(event, arg1)
+	            obj:Update(event, unit)
 	        end)
 
 			self:ForceTagUpdate()

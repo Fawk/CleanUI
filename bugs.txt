@@ -1,1 +1,4 @@
 ﻿after copying profile and renaming, tags changes are still being copied from Default before a reload
+allow for changing options when moving, currenly resets the mover to original position when change is done
+
+party unit frames not showing on joining group

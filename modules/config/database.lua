@@ -110,6 +110,24 @@ local defaults =  {
                             ["Width"] = 20,
                             ["Height"] = 20
                         },
+                        ["Name"] = {
+                            ["Font Size"] = 10,
+                            ["Position"] = {
+                                ["Point"] = "LEFT",
+                                ["Local Point"] = "LEFT",
+                                ["Offset X"] = 25,
+                                ["Offset Y"] = 0,
+                            }
+                        },
+                        ["Time"] = {
+                            ["Font Size"] = 10,
+                            ["Position"] = {
+                                ["Point"] = "RIGHT",
+                                ["Local Point"] = "RIGHT",
+                                ["Offset X"] = -5,
+                                ["Offset Y"] = 0,
+                            }
+                        },
                         ["Background"] = {
                             ["Color"] = { 0, 0, 0, 1 },
                             ["Offset"] = {
@@ -147,7 +165,7 @@ local defaults =  {
                         ["Growth"] = "Left",
                         ["Attached"] = "LEFT",
                         ["Limit"] = 10,
-                        ["Cast by me"] = true,
+                        ["Applied by me"] = true,
                         ["Background Multiplier"] = 0.33,
                         ["Size"] = {
                             ["Match width"] = true,

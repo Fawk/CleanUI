@@ -1,5 +1,6 @@
 local A, L = unpack(select(2, ...))
 local T, media = A.Tools, LibStub("LibSharedMedia-3.0")
+local ACD = LibStub("AceConfigDialog-3.0")
 local unpack = unpack
 local select = select
 local CreateFrame = CreateFrame
@@ -271,5 +272,9 @@ function SlashCmdList.CLEANUI(msg, editbox)
 
     if command == "printScale" then
     	print("UiScale", UIParent:GetScale())
+    end
+
+    if command == "config" then
+		ACD:Open("CleanUI")
     end
 end

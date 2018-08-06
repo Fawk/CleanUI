@@ -27,8 +27,11 @@ local function updateButtons(parent)
 		local button = parent.buttons[i]
 		if (button:IsVisible()) then
 			local value = button.aura.expires - now
-			button.bar.time:SetText(T:timeShort(value))
+
+			local time = T:timeShort(value)
+			button.bar.time:SetText(time)
 			button.bar:SetValue(value)
+			button.iconText:SetText(time)
 		end
 	end
 end
@@ -92,9 +95,33 @@ local function placeIcon(button, index, iconGrowth, iconLimit, relative, parent,
 		end
 	else
 		if (iconGrowth:find("Right")) then
-			T:PlaceFrame(button, "Right Of", parent, relative, x, 0)
+			if (iconGrowth:find("Down")) then
+				if (relative == parent) then
+					button:SetPoint("TOPLEFT", relative, "TOPLEFT", 0, 0)
+				else
+					button:SetPoint("LEFT", relative, "RIGHT", x, 0)
+				end
+			else
+				if (relative == parent) then
+					button:SetPoint("BOTTOMLEFT", relative, "BOTTOMLEFT", 0, 0)
+				else
+					button:SetPoint("LEFT", relative, "RIGHT", x, 0)
+				end
+			end
 		else
-			T:PlaceFrame(button, "Left Of", parent, relative, -x, 0)
+			if (iconGrowth:find("Down")) then
+				if (relative == parent) then
+					button:SetPoint("TOPRIGHT", relative, "TOPRIGHT", 0, 0)
+				else
+					button:SetPoint("RIGHT", relative, "LEFT", -x, 0)
+				end
+			else
+				if (relative == parent) then
+					button:SetPoint("BOTTOMRIGHT", relative, "BOTTOMRIGHT", 0, 0)
+				else
+					button:SetPoint("RIGHT", relative, "LEFT", -x, 0)
+				end
+			end
 		end
 	end
 end
@@ -106,8 +133,8 @@ local function CreateButton(parent, width, height)
 	button.icon:SetPoint("LEFT")
 	button.icon:SetSize(height, height)
 
-	local text = button.cd:GetRegions()
-	text:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	button.iconText:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	button.iconText:SetPoint("CENTER")
 
 	local bar = button.bar
 	bar:ClearAllPoints()
@@ -189,12 +216,21 @@ function Buffs:Update(...)
 
 	if (event == UnitEvent.UPDATE_DB) then
 
-		self:SetSize(width, height)
+		if (db["Style"] == "Bar") then
+			self:SetSize(width, height * self.limit)
+		else
+			self:SetSize(height * iconLimit, height * 40 / iconLimit)
+		end
 
 		if (db["Attached"]) then
 			Units:Attach(self, self.db)
 		else
-			A:CreateMover(self, db["Position"], self:GetName())
+			self.getMoverSize = function(self)
+				return self:GetSize()
+			end
+
+			A:CreateMover(self, db, self:GetName())
+			Units:Position(self, db["Position"])
 		end
 
 		self:Update(UnitEvent.UPDATE_BUFFS)
@@ -208,7 +244,7 @@ function Buffs:Update(...)
 		local last = 0
 
 		for i = 1, #parent.buffs do
-			if (i > self.limit) then
+			if (i > tonumber(self.limit)) then
 				tremove(parent.buffs, i)
 			else
 				last = i
@@ -235,10 +271,8 @@ function Buffs:Update(...)
 
 			button.icon:SetTexture(aura.icon)
 
-			CooldownFrame_Set(button.cd, GetTime(), aura.expires, true)
-
 			if (db["Style"] == "Bar") then
-				button.cd:Hide()
+				button.iconText:Hide()
 				bar:Show()
 
 				bar:SetStatusBarTexture(texture)
@@ -248,10 +282,11 @@ function Buffs:Update(...)
 
 				placeBar(button, barGrowth, relative, self, x, y)
 			else
-				button.cd:Show()
+				button.iconText:Show()
 				bar:Hide()
 
 				button:SetSize(height, height)
+				button.icon:SetSize(height, height)
 
 				placeIcon(button, i, iconGrowth, iconLimit, relative, self, x, y)
 			end

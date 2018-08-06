@@ -3,7 +3,7 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local Addon = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Addon.callbacks = Addon.callbacks or LibStub("CallbackHandler-1.0")
-Addon.frames, Addon.modules, Addon.general, Addon.options = {}, Args:OrderedMap(), Args:OrderedMap(), {}
+Addon.frames, Addon.modules, Addon.general = {}, Args:OrderedMap(), Args:OrderedMap()
 Addon.debugging = true
 Addon.noop = function() end
 
@@ -126,7 +126,9 @@ function Addon:OnEnable()
 	self:Init()
 	--self:SetStyle()
 
-    Addon:CreatePrefs(Addon["Profile"]["Options"])
+    --Addon:CreatePrefs(Addon["Profile"]["Options"])
+
+    LoadAddOn("CleanUI_Config")
 
 	collectgarbage("collect");
 	collectgarbage("collect");
@@ -146,9 +148,11 @@ function Addon:Init()
             if (unit) then
             	if (unit.hasMultipleUnits) then
             		unit:InitUnits(function(self, uf)
-            			Addon["Shared Elements"]:foreach(function(key, element)
-	                    	element:Init(uf)
-	                	end)
+            			if (uf.unit and UnitExists(uf.unit)) then
+	            			Addon["Shared Elements"]:foreach(function(key, element)
+		                    	element:Init(uf)
+		                	end)
+		                end
             		end)
             	else
 	                Addon["Shared Elements"]:foreach(function(key, element)

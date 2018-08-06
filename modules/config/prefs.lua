@@ -445,7 +445,7 @@ local function buffSetting(order)
                 type = "dropdown",
                 order = 3,
                 placement = function(self)
-                    self:SetPoint("LEFT", self.parent, "RIGHT", 120, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 values = createDropdownTable("Right Then Down", "Right Then Up", "Left Then Down", "Left Then Up"),
                 get = genericGetValue,
@@ -459,7 +459,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 min = -GetScreenWidth(),
                 max = GetScreenWidth(),
@@ -476,7 +476,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 min = -GetScreenHeight(),
                 max = GetScreenHeight(),
@@ -496,7 +496,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 min = 1,
                 max = 40,
@@ -513,7 +513,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 get = genericGetValue,
                 set = genericSetValue,
@@ -547,7 +547,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 min = 1,
                 max = 40,
@@ -556,7 +556,7 @@ local function buffSetting(order)
                 step = 1,
                 decimals = false,
                 get = genericGetValue,
-                set = genericSetValue   
+                set = genericSetValue
             },
             ["Hide no duration"] = {
                 type = "toggle",
@@ -564,7 +564,7 @@ local function buffSetting(order)
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 get = genericGetValue,
                 set = genericSetValue,
@@ -573,11 +573,11 @@ local function buffSetting(order)
             },
             ["Own only"] = {
                 type = "toggle",
-                order = 10,
+                order = 11,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 get = genericGetValue,
                 set = genericSetValue,
@@ -589,8 +589,10 @@ local function buffSetting(order)
                     return self.parent:enabled() and self.parent.db["Style"] == "Bar"
                 end,
                 type = "dropdown",
-                order = 11,
+                order = 12,
                 placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
                     self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 values = createDropdownTable("Class", "Health", "Power", "Custom"),
@@ -601,13 +603,13 @@ local function buffSetting(order)
             },
             ["Custom Color"] = {
                 enabled = function(self)
-                    return self.parent:enabled() and self.previous:enabled() and self.parent.db["Color By"] == "Custom"
+                    return self.parent:enabled() and self.parent.db["Style"] == "Bar" and self.parent.db["Color By"] == "Custom"
                 end,
-                order = 12,
+                order = 13,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 88, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 type = "color",
                 get = genericGetValue,
@@ -620,11 +622,11 @@ local function buffSetting(order)
                     return self.parent:enabled() and self.parent.db["Style"] == "Bar"
                 end,
                 type = "number",
-                order = 13,
+                order = 14,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("LEFT", self.title, "RIGHT", 5, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 min = -1,
                 max = 1,
@@ -640,11 +642,11 @@ local function buffSetting(order)
                     return self.parent:enabled() and self.parent.db["Style"] == "Bar"
                 end,
                 type = "toggle",
-                order = 14,
+                order = 15,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
-                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", -8, 0)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
                 end,
                 get = genericGetValue,
                 set = genericSetValue,
@@ -652,8 +654,11 @@ local function buffSetting(order)
                 height = 20
             },
             ["Texture"] = {
+                enabled = function(self)
+                    return self.parent:enabled() and self.parent.db["Style"] == "Bar"
+                end,
                 type = "dropdown",
-                order = 15,
+                order = 16,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
@@ -667,7 +672,7 @@ local function buffSetting(order)
             },
             ["Size"] = {
                 type = "group",
-                order = 16,
+                order = 17,
                 onClick = hideParentChildrenAndShowSelf,
                 placement = function(self)
                     self.title:ClearAllPoints()
@@ -743,9 +748,9 @@ local function buffSetting(order)
                     }
                 }
             },
-            ["Background"] = backgroundSetting(17, false),
-            ["Blacklist"] = A.general:get("blacklist"):GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 18),
-            ["Whitelist"] = A.general:get("whitelist"):GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 19)
+            ["Background"] = backgroundSetting(18, false),
+            ["Blacklist"] = A.general:get("blacklist"):GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 19),
+            ["Whitelist"] = A.general:get("whitelist"):GetOptions(genericEnabled, hideParentChildrenAndShowSelf, 20)
         }
     }
     return tbl
@@ -878,9 +883,49 @@ local function castBarSetting(order)
                 width = 200,
                 height = 20
             },
+            ["Attached Offset X"] = {
+                enabled = function(self) 
+                    return self.parent:enabled() and self.parent.db["Attached"]
+                end,
+                type = "number",
+                order = 9,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                width = 50,
+                height = 20,
+                step = 1,
+                decimals = false,
+                min = -GetScreenWidth(),
+                max = GetScreenWidth(),
+                get = genericGetValue,
+                set = genericSetValue
+            },
+            ["Attached Offset Y"] = {
+                enabled = function(self) 
+                    return self.parent:enabled() and self.parent.db["Attached"]
+                end,
+                type = "number",
+                order = 10,
+                placement = function(self)
+                    self.title:ClearAllPoints()
+                    self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -10)
+                    self:SetPoint("TOPRIGHT", self.previous, "BOTTOMRIGHT", 0, 0)
+                end,
+                width = 50,
+                height = 20,
+                step = 1,
+                decimals = false,
+                min = -GetScreenHeight(),
+                max = GetScreenHeight(),
+                get = genericGetValue,
+                set = genericSetValue
+            },        
             ["Size"] = {
                 type = "group",
-                order = 9,
+                order = 11,
                 onClick = hideParentChildrenAndShowSelf,
                 placement = function(self)
                     self.title:ClearAllPoints()
@@ -956,13 +1001,13 @@ local function castBarSetting(order)
                     }
                 }
             },
-            ["Background"] = backgroundSetting(10, false),
+            ["Background"] = backgroundSetting(12, false),
             ["Time"] = {                 
                 enabled = genericEnabled,
                 onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
-                order = 11,
+                order = 13,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -1009,7 +1054,7 @@ local function castBarSetting(order)
                 onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
-                order = 12,
+                order = 14,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -1056,7 +1101,7 @@ local function castBarSetting(order)
                 onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
-                order = 13,
+                order = 15,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -1144,7 +1189,7 @@ local function castBarSetting(order)
                 onClick = hideParentChildrenAndShowSelf,
                 canToggle = true,
                 type = "group",
-                order = 14,
+                order = 16,
                 placement = function(self)
                     self.title:ClearAllPoints()
                     self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
@@ -1303,7 +1348,7 @@ local function standardUnit(unit, order)
                         order = 8,
                         placement = function(self)
                             self.title:ClearAllPoints()
-                            self.title:SetPoint("TOPLEFT", self.previous.title, "BOTTOMLEFT", 0, -20)
+                            self.title:SetPoint("TOPLEFT", self.previous.last.title, "BOTTOMLEFT", 0, -20)
                             self:SetPoint("LEFT", self.title, "LEFT", 0, 0)
                         end,
                         children = {
@@ -2114,6 +2159,7 @@ function X:CreateChild(name, parent, setting, db)
                 X:UpdateWidgetStates()
                 A.dbProvider:Save()
                 A:UpdateDb()
+                A:UpdateMoveableFrames()
             end)
             :build()
 

@@ -415,8 +415,8 @@ local function setStyle()
 						return lp, r, p, x, y
 					end
 
-					for i,slot in next, slots do
-						local button = CreateFrame("Button", slot, items, "PaperDollItemSlotButtonTemplate")
+					for i, slot in next, slots do
+						local button = items.buttons[i] or CreateFrame("Button", slot, items, "PaperDollItemSlotButtonTemplate")
 						button:SetSize(slotSize - 2, slotSize - 2)
 						button:SetBackdrop({
 							bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],

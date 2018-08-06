@@ -90,7 +90,7 @@ function Party:Simulate(players)
         uf.db = db
         uf.orderedElements = A:OrderedMap()
         uf.Update = function(self, ...)
-            Group:Update(self, UnitEvent.UPDATE_DB, container, "SIMULATE")
+            Group:Update(self, UnitEvent.UPDATE_DB, container, self.unit, "SIMULATE")
         end
         uf.unit = "player"
         uf:SetAttribute("unit", uf.unit)

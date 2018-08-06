@@ -2,19 +2,16 @@
 	<Button name="AuraIconBarTemplate" virtual="true">
 		<Layers>
 			<Layer level="ARTWORK" textureSubLevel="1">
-				<Texture parentKey="icon"></Texture>
+				<Texture parentKey="icon" >
+					<TexCoords left="0.133" right="0.867" top="0.133" bottom="0.867" />
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
+				<FontString parentKey="iconText" justifyH="CENTER">
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
-			<Cooldown parentKey="cd" inherits="CooldownFrameTemplate">
-				<Anchors>
-					<Anchor relativeKey="$parent.icon" point="TOPLEFT" />
-					<Anchor relativeKey="$parent.icon" point="BOTTOMRIGHT" />
-				</Anchors>
-				<SwipeTexture>
-					<Color r="1" g="1" b="1" a="0.4"/>
-				</SwipeTexture>
-			</Cooldown>
 			<StatusBar parentKey="bar" frameLevel="2">
 				<Layers>
 					<Layer level="OVERLAY">

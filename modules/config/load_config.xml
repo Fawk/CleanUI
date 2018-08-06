@@ -2,5 +2,6 @@
     <Script file="profile.lua"/>
     <Script file="database.lua"/>
 	<Script file="db.lua"/>
+	<Script file="options.lua"/>
     <Script file="prefs.lua"/>
 </Ui>

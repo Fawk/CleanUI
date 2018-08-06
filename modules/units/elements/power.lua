@@ -79,6 +79,11 @@ function Power:Update(...)
 			self:SetMinMaxValues(0, parent.currentMaxPower)
 		  	self:SetValue(parent.currentPower)
 
+		  	if (parent.currentPower == 0 and parent.currentMaxPower == 0) then
+		  		self:SetMinMaxValues(0, 1)
+		  		self:SetValue(1)
+		  	end
+
 		  	if (db["Missing Power Bar"]["Enabled"]) then
 		  		Units:UpdateMissingBar(self, "missingPowerBar", parent.currentPower, parent.currentMaxPower)
 		  	end
@@ -95,10 +100,16 @@ function Power:Update(...)
 		local tag = arg1
 		tag:AddReplaceLogic("[pp]", parent.currentPower)
 		tag:AddReplaceLogic("[maxpp]", parent.currentMaxPower)
-		tag:AddReplaceLogic("[perpp]", math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5))
+
+		local perpp = 0
+		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
+			perpp = math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
+		end
+
+		tag:AddReplaceLogic("[perpp]", perpp)
 		tag:AddReplaceLogic("[pp:round]", T:short(parent.currentPower, 1))
 		tag:AddReplaceLogic("[maxpp:round]", T:short(parent.currentMaxPower, 1))
-		tag:AddReplaceLogic("[pp:deficit]", parent.deficitPower > 0 and string.format("-%d", T:short(parent.deficitPower, 0)) or "")
+		tag:AddReplaceLogic("[pp:deficit]", parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 
 		self:Update("UNIT_POWER_FREQUENT", parent.unit)

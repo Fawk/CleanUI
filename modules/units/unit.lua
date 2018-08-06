@@ -34,7 +34,7 @@ function A:FormatTag(tag)
     local name = UnitName(parent.unit) or ""
 
     replaceLogic:set("[name]", name, true)
-    replaceLogic:set("[name:%d+]", name:sub(1, tag.format:match("%d+")), true)
+    replaceLogic:set("[name:%d+]", name:utf8sub(1, tonumber(tag.format:match("%d+"))), true)
 
     local classToken = select(2, UnitClass(parent.unit))
 
