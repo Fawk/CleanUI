@@ -1,33 +1,78 @@
 local A, L = unpack(select(2, ...))
+
+local function standardUnit(name, unit, order)
+	return {
+		type = "group",
+		order = order,
+		name = name,
+		args = {
+
+		}
+	}
+end
+
 A.options = {
-	name = "Options",
+	name = "CleanUI Options",
 	type = "group",
 	inline = true,
 	order = 1,
-	childGroups = "tree",
-	get = function(info) end,
-	set = function(info, val) end,
 	args = {
-		enable = {
-			name = "Enable",
-			desc = "Enables / disables the addon",
-			type = "toggle",
+		general = {
+			name = "General",
+			type = "group",
 			order = 1,
-			set = function(info,val)  end,
-			get = function(info) end
+			args = {
+				minimap = {
+					type = "group",
+					order = 1,
+					name = "Minimap",
+					args = {
+
+					}
+				}
+			}
 		},
-		moreoptions = {
-			name = "More Options",
+		units = {
+			name = "Units",
 			type = "group",
 			order = 2,
 			args = {
-				-- more options go here
-				something = {
-					type = "select",
-					name = "Something",
-					set = function(info, val) end,
-					get = function(info) end,
-					values = { "ABC", "ADG", "ASD" }
+				player = {
+					type = "group",
+					order = 1,
+					name = "Player",
+					args = {}
+				},
+				target = standardUnit("Target", 2),
+				targettarget = standardUnit("Target of Target", 3),
+				pet = standardUnit("Pet", 4),
+				focus = standardUnit("Focus", 5),
+				boss = {
+					type = "group",
+					order = 6,
+					name = "Boss",
+					args = {
+
+					}
+				}
+			}
+		},
+		group = {
+			name = "Group",
+			type = "group",
+			order = 3,
+			args = {
+				party = {
+					type = "group",
+					order = 1,
+					name = "Party",
+					args = {}
+				},
+				raid = {
+					type = "group",
+					order = 2,
+					name = "Raid",
+					args = {}
 				}
 			}
 		}
