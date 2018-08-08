@@ -141,6 +141,10 @@ function string.fupper(self)
     return self:sub(1, 1):upper()..self:sub(2)
 end
 
+function T:unpackColor(color)
+	return color.r, color.g, color.b, color.a
+end
+
 function T:tcount(tbl)
 	local i = 0
 	for k,v in pairs(tbl) do i=i+1 end

@@ -66,7 +66,7 @@ function AlternativePower:Update(...)
 	local db = self.db
 
 	local mult = db.mult
-	local r, g, b, a = unpack(db.color)
+	local r, g, b, a = T:unpackColor(db.color)
 
 	if (not db.enabled) then
 		Units:RegisterEvents(PlayerPowerBarAlt, events)
@@ -80,7 +80,7 @@ function AlternativePower:Update(...)
 
 		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetSize(db.size.matchWidth and parent:GetWidth() or db.size.width, db,size.matchHeight and parent:GetHeight() or db.size.height)
+		self:SetSize(db.size.matchWidth and parent:GetWidth() or db.size.width, db.size.matchHeight and parent:GetHeight() or db.size.height)
 		self:SetStatusBarTexture(texture)
 		self.bg:SetTexture(texture)
 		self.bg:SetAllPoints()

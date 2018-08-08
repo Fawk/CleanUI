@@ -172,10 +172,10 @@ function HealPrediction:Update(...)
 		self.absorbBar:SetStatusBarTexture(texture)
 		self.healAbsorbBar:SetStatusBarTexture(texture)
 
-		self.myBar:SetStatusBarColor(unpack(db.colors.my))
-		self.otherBar:SetStatusBarColor(unpack(db.colors.all))
-		self.absorbBar:SetStatusBarColor(unpack(db.colors.absorb))
-		self.healAbsorbBar:SetStatusBarColor(unpack(db.colors.healAbsorb))
+		self.myBar:SetStatusBarColor(T:unpackColor(db.colors.my))
+		self.otherBar:SetStatusBarColor(T:unpackColor(db.colors.all))
+		self.absorbBar:SetStatusBarColor(T:unpackColor(db.colors.absorb))
+		self.healAbsorbBar:SetStatusBarColor(T:unpackColor(db.colors.healAbsorb))
 
 		parent.maxOverflow = self.maxOverflow
 

@@ -80,7 +80,7 @@ function Player:Update(...)
                 end
             end)
 
-            for name,tag in next, db.tags do
+            for name,tag in next, db.tags.list do
                 Units:Tag(self, name, tag)
             end
 

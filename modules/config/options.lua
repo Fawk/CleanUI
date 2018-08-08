@@ -29,21 +29,17 @@ end
 local function createElementTable(isPlayer)
 	local tbl = { ["Parent"] = "Parent" }
 	
-	A["Shared Elements"]:foreach(funtion(key, element)
+	A["Shared Elements"]:foreach(function(key, element)
 		tbl[key] = key
 	end)
 
 	if (isPlayer) then
-		A["Player Elements"]:foreach(funtion(key, element)
+		A["Player Elements"]:foreach(function(key, element)
 			tbl[key] = key
 		end)
 	end
 
 	return tbl
-end
-
-local function parentDisabled(info)
-	return not getParent(info).enabled
 end
 
 local function getParent(info)
@@ -55,6 +51,26 @@ local function getParent(info)
 		end
 	end
 	return db	
+end
+
+local function goBack(info)
+	local i = {}
+	for x = 1, #info - 1 do
+		i[x] = info[x]
+	end
+	return i
+end
+
+local function parentDisabled(info)
+	local db = getParent(info)
+
+	local i = goBack(info)
+	while (db.enabled == nil) do
+		db = getParent(i)
+		i = goBack(i)
+	end
+
+	return not db.enabled
 end
 
 local function positionSetting(order, relativeTable)
@@ -202,7 +218,7 @@ local function backgroundSetting(order)
 				softMax = 500,
 				get = "Get",
 				set = "Set",
-			}
+			},
             offset = {
             	disabled = parentDisabled,
             	type = "group",
@@ -258,7 +274,7 @@ end
 local function constructTags(order, db, isPlayer)
 	local row = {
 		format = {
-			type = "text",
+			type = "input",
 			order = 1,
 			name = "Format",
 			get = "Get",
@@ -336,7 +352,7 @@ local function constructTags(order, db, isPlayer)
 			new = {
 				type = "group",
 				order = 1,
-				name = "Create New"
+				name = "Create New",
 				args = row
 			},
 			list = {
@@ -357,7 +373,7 @@ local function constructTags(order, db, isPlayer)
 	
 	local o = 2
 	for key, tag in next, db.tags.list do
-		options.args.list[key] = {
+		options.args.list.args[key] = {
 			type = "group",
 			order = o,
 			name = key,
@@ -385,51 +401,57 @@ local function classPowerSetting(name, order, hidden)
 				set = "Set"
 			},
 		    size = {
-				matchWidth = {
-					type = "toggle",
-					order = 1,
-					name = "Match Width",
-					get = "Get",
-					set = "Set"
-				},
-				matchHeight = {
-					type = "toggle",
-					order = 2,
-					name = "Match Height",
-					get = "Get",
-					set = "Set"
-				},
-				width = {
-					disabled = function(info)
-		        		local parent = getParent(info)
-		        		return parent.matchWidth
-		        	end,
-					type = "range",
-					order = 3,
-					name = "Width",
-					min = 1,
-					max = floor(GetScreenWidth()),
-					step = 1,
-					softMin = 1,
-					softMax = 500,
-					get = "Get",
-					set = "Set",
-				},
-				height = {
-					disabled = function(info)
-		        		local parent = getParent(info)
-		        		return parent.matchHeight
-		        	end,
-					type = "range",
-					order = 4,
-					name = "Height",
-					min = 1,
-					max = floor(GetScreenHeight()),
-					step = 1,
-					softMin = 1,
-					softMax = 500,
-					get = "Get",
-					set = "Set",
+		    	disabled = parentDisabled,
+		    	type = "group",
+		    	order = 2,
+		    	name = "Size",
+		    	args = {
+					matchWidth = {
+						type = "toggle",
+						order = 1,
+						name = "Match Width",
+						get = "Get",
+						set = "Set"
+					},
+					matchHeight = {
+						type = "toggle",
+						order = 2,
+						name = "Match Height",
+						get = "Get",
+						set = "Set"
+					},
+					width = {
+						disabled = function(info)
+			        		local parent = getParent(info)
+			        		return parent.matchWidth
+			        	end,
+						type = "range",
+						order = 3,
+						name = "Width",
+						min = 1,
+						max = floor(GetScreenWidth()),
+						step = 1,
+						softMin = 1,
+						softMax = 500,
+						get = "Get",
+						set = "Set",
+					},
+					height = {
+						disabled = function(info)
+			        		local parent = getParent(info)
+			        		return parent.matchHeight
+			        	end,
+						type = "range",
+						order = 4,
+						name = "Height",
+						min = 1,
+						max = floor(GetScreenHeight()),
+						step = 1,
+						softMin = 1,
+						softMax = 500,
+						get = "Get",
+						set = "Set",
+					}
 				}
 		    },
 		    background = backgroundSetting(3),
@@ -1318,13 +1340,53 @@ function A:RegisterOptions()
 						            },
 						            background = backgroundSetting(21),
 						            blacklist = {
-						                enabled = true,
-						                ids = {}
+						            	disabled = parentDisabled,
+						            	type = "group",
+						            	order = 22,
+						            	name = "Blacklist",
+						            	args = {
+						            		enabled = {
+												type = "toggle",
+												order = 1,
+												name = "Enabled",
+												get = "Get",
+												set = "Set"
+						            		},
+						            		ids = {
+						            			disabled = parentDisabled,
+						            			type = "group",
+						            			order = 2,
+						            			name = "Ids",
+						            			args = {
+
+						            			}
+						            		}
+						            	}
 						            },
-						            whitelist = {
-						                enabled = false,
-						                ids = {}
-						            }
+						            whitelist = { -- Contruct this properly
+						            	disabled = parentDisabled,
+						            	type = "group",
+						            	order = 23,
+						            	name = "WhiteList",
+						            	args = {
+						            		enabled = {
+												type = "toggle",
+												order = 1,
+												name = "Enabled",
+												get = "Get",
+												set = "Set"
+						            		},
+						            		ids = {
+						            			disabled = parentDisabled,
+						            			type = "group",
+						            			order = 2,
+						            			name = "Ids",
+						            			args = {
+						            				
+						            			}
+						            		}
+						            	}
+						            },
 						        }
 							},
 							debuffs = {
@@ -1622,13 +1684,53 @@ function A:RegisterOptions()
 						            },
 						            background = backgroundSetting(21),
 						            blacklist = {
-						                enabled = true,
-						                ids = {}
+						            	disabled = parentDisabled,
+						            	type = "group",
+						            	order = 22,
+						            	name = "Blacklist",
+						            	args = {
+						            		enabled = {
+												type = "toggle",
+												order = 1,
+												name = "Enabled",
+												get = "Get",
+												set = "Set"
+						            		},
+						            		ids = {
+						            			disabled = parentDisabled,
+						            			type = "group",
+						            			order = 2,
+						            			name = "Ids",
+						            			args = {
+
+						            			}
+						            		}
+						            	}
 						            },
-						            whitelist = {
-						                enabled = false,
-						                ids = {}
-						            }
+						            whitelist = { -- Contruct this properly
+						            	disabled = parentDisabled,
+						            	type = "group",
+						            	order = 23,
+						            	name = "WhiteList",
+						            	args = {
+						            		enabled = {
+												type = "toggle",
+												order = 1,
+												name = "Enabled",
+												get = "Get",
+												set = "Set"
+						            		},
+						            		ids = {
+						            			disabled = parentDisabled,
+						            			type = "group",
+						            			order = 2,
+						            			name = "Ids",
+						            			args = {
+						            				
+						            			}
+						            		}
+						            	}
+						            },
 						        }
 							},
 							size = {
@@ -1659,13 +1761,7 @@ function A:RegisterOptions()
 									}
 								}
 							},
-					        tags = {
-					        	disabled = parentDisabled,
-					        	type = "group",
-					        	order = 7,
-					        	name = "Tags",
-					        	args = constructTags(db.units.player, true)
-					        },
+					        tags = constructTags(7, db.units.player, true),
 					        healPrediction = {
 					        	disabled = parentDisabled,
 					        	type = "group",
@@ -1695,8 +1791,8 @@ function A:RegisterOptions()
 						            	order = 3,
 						            	name = "Max Overflow",
 						            	min = 1,
-						            	max = 10,
-						            	step = 1,
+						            	max = 2,
+						            	step = 0.1,
 						            	isPercent = true
 						            },
 						            colors = {
@@ -1809,7 +1905,7 @@ function A:RegisterOptions()
 												set = "Set",
 											}
 							            }
-							        }
+							        },
 						            texture = {
 										disabled = parentDisabled,
 										type = "select",

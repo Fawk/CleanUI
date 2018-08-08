@@ -27,7 +27,7 @@ local defaults = {
         				height = 35
         			},
                     colorBy = "Gradient",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = -1,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -35,7 +35,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = { 0.5, 0.5, 0.5, 1 },
+                        customColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 },
                         colorBy = "Custom",
                     }
         		},
@@ -55,19 +55,14 @@ local defaults = {
         				height = 15
         			},
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = -1,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 },
                         colorBy = "Custom",
                     }
         		},
@@ -93,7 +88,7 @@ local defaults = {
                     hideNoDuration = true,
                     own = true,
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     reversed = false,
                     texture = "Default",
@@ -122,7 +117,7 @@ local defaults = {
                         }
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -167,7 +162,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -213,14 +208,14 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -237,7 +232,7 @@ local defaults = {
                 altpower = {
                     enabled = true,
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -266,7 +261,7 @@ local defaults = {
                     },
                     texture = "Default",
                     mult = 0.3,
-                    color = { 0.7, 0.5, 0.3, 1 }
+                    color = { r = 0.7, g = 0.5, b = 0.3, a = 1 }
                 },
                 runes = {
                     enabled = true,
@@ -284,7 +279,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -322,7 +317,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -359,7 +354,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -396,7 +391,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -433,7 +428,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -470,7 +465,7 @@ local defaults = {
                         matchHeight = false,
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -495,12 +490,7 @@ local defaults = {
                     enabled = true,
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     texture = "Default",
@@ -512,7 +502,7 @@ local defaults = {
                         y = 0, 
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -555,7 +545,7 @@ local defaults = {
                             size = 10
                         },
                         background = {
-                            color = { 0, 0, 0, 1 },
+                            color = { r = 0, g = 0, b = 0, a = 1 },
                             offset = {
                                 top = 1,
                                 bottom = 1,
@@ -571,7 +561,7 @@ local defaults = {
                         },
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -609,7 +599,7 @@ local defaults = {
                         height = 15
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -624,9 +614,9 @@ local defaults = {
                         enabled = true
                     },
                     colors = {
-                        high = { .7, 0, 0, 1 },
-                        medium = { .5, .5, 0, 1 },
-                        low = { 0, .7, 0, 1}
+                        high = { r = .7, g = 0, b = 0, a = 1 },
+                        medium = { r = .5, g = .5, b = 0, a = 1 },
+                        low = { r = 0, g = .7, b = 0, a = 1}
                     },
                     mult = 0.33,
                     attachedPosition = "Below",
@@ -638,7 +628,7 @@ local defaults = {
                     style = "Letter",
                     fontSize = 10,
                     size = 24,
-                    color = { 1, 0.8, 0, 1 },
+                    color = { r = 1, g = 0.8, b = 0, a = 1 },
                     position = {
                         relative = "Parent",
                         point = "TOPLEFT",
@@ -673,7 +663,7 @@ local defaults = {
         				height = 35
         			},
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -706,19 +696,14 @@ local defaults = {
         				height = 15
         			},
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
         		},
@@ -743,7 +728,7 @@ local defaults = {
                     hideNoDuration = true,
                     own = true,
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     reversed = false,
                     texture = "Default",
@@ -754,7 +739,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -799,7 +784,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -845,14 +830,14 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -870,12 +855,7 @@ local defaults = {
                     enabled = true,
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     texture = "Default",
@@ -887,7 +867,7 @@ local defaults = {
                         y = 0,
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -930,7 +910,7 @@ local defaults = {
                             size = 10
                         },
                         background = {
-                            color = { 0, 0, 0, 1 },
+                            color = { r = 0, g = 0, b = 0, a = 1 },
                             offset = {
                                 top = 1,
                                 bottom = 1,
@@ -946,7 +926,7 @@ local defaults = {
                         }
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -979,12 +959,7 @@ local defaults = {
                     enabled = true,
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     texture = "Default",
@@ -996,7 +971,7 @@ local defaults = {
                         y = 0,
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1039,7 +1014,7 @@ local defaults = {
                             size = 10
                         },
                         background = {
-                            color = { 0, 0, 0, 1 },
+                            color = { r = 0, g = 0, b = 0, a = 1 },
                             offset = {
                                 top = 1,
                                 bottom = 1,
@@ -1055,7 +1030,7 @@ local defaults = {
                         },
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1078,10 +1053,10 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 health = {
@@ -1100,7 +1075,7 @@ local defaults = {
                         height = 20
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1108,12 +1083,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1133,7 +1103,7 @@ local defaults = {
                         height = 5
                     },
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1170,7 +1140,7 @@ local defaults = {
                     hideNoDuration = true,
                     own = true,
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     reversed = false,
                     texture = "Default",
@@ -1181,7 +1151,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1226,7 +1196,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1268,7 +1238,7 @@ local defaults = {
                     }
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -1308,7 +1278,7 @@ local defaults = {
                         height = 15
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1316,12 +1286,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1341,19 +1306,14 @@ local defaults = {
                         height = 5
                     },
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1378,7 +1338,7 @@ local defaults = {
                     hideNoDuration = true,
                     own = true,
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     reversed = false,
                     texture = "Default",
@@ -1389,7 +1349,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1434,7 +1394,7 @@ local defaults = {
                         height = 16
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1480,14 +1440,14 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -1505,12 +1465,7 @@ local defaults = {
                     enabled = true,
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     texture = "Default",
@@ -1522,7 +1477,7 @@ local defaults = {
                         y = 0,
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1565,7 +1520,7 @@ local defaults = {
                             size = 10
                         },
                         background = {
-                            color = { 0, 0, 0, 1 },
+                            color = { r = 0, g = 0, b = 0, a = 1 },
                             offset = {
                                 top = 1,
                                 bottom = 1,
@@ -1581,7 +1536,7 @@ local defaults = {
                         },
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1631,7 +1586,7 @@ local defaults = {
                         height = 35
                     },
                     colorBy = "Gradient",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1639,12 +1594,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1664,19 +1614,14 @@ local defaults = {
                         height = 15
                     },
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1699,7 +1644,7 @@ local defaults = {
                 y = 0,
                 highlight = true,
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -1713,12 +1658,7 @@ local defaults = {
                     enabled = true,
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     texture = "Default",
@@ -1730,7 +1670,7 @@ local defaults = {
                         y = 0,
                     },
                     colorBy = "Class",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
@@ -1773,7 +1713,7 @@ local defaults = {
                             size = 10
                         },
                         background = {
-                            color = { 0, 0, 0, 1 },
+                            color = { r = 0, g = 0, b = 0, a = 1 },
                             offset = {
                                 top = 1,
                                 bottom = 1,
@@ -1789,7 +1729,7 @@ local defaults = {
                         }
                     },
                     background = {
-                        color = { 0, 0, 0, 1 },
+                        color = { r = 0, g = 0, b = 0, a = 1 },
                         offset = {
                             top = 1,
                             bottom = 1,
@@ -1824,7 +1764,7 @@ local defaults = {
                             present = "None",
                             modify = "Alpha",
                             alpha = 50,
-                            color = { 1, 1, 1, 1 },
+                            color = { r = 1, g = 1, b = 1, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -1842,7 +1782,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 0.7, 0, 0, 1 },
+                            color = { r = 0.7, g = 0, b = 0, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -1860,7 +1800,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 0.7, 0, 0, 1 },
+                            color = { r = 0.7, g = 0, b = 0, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -1878,7 +1818,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 1, 0.8, 0, 1 },
+                            color = { r = 1, g = 0.8, b = 0, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -1914,7 +1854,7 @@ local defaults = {
                         height = 41
                     },
                     colorBy = "Gradient",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "VERTICAL",
                     reversed = false,
@@ -1922,12 +1862,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     frequentUpdates = true
@@ -1948,19 +1883,14 @@ local defaults = {
                         height = 5
                     },
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1995,10 +1925,10 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 x = 2,
@@ -2019,13 +1949,13 @@ local defaults = {
                     size = 20,
                     style = "Letter",
                     textSize = 10,
-                    color = { 1, 1, 1, 1 },
+                    color = { r = 1, g = 1, b = 1, a = 1 },
                     textStyle = "Outline",
                     texture = nil,
                     enabled = true
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2063,7 +1993,7 @@ local defaults = {
                             present = "None",
                             modify = "Alpha",
                             alpha = 50,
-                            color = { 1, 1, 1, 1 },
+                            color = { r = 1, g = 1, b = 1, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -2081,7 +2011,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 0.7, 0, 0, 1 },
+                            color = { r = 0.7, g = 0, b = 0, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -2099,7 +2029,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 0.7, 0, 0, 1 },
+                            color = { r = 0.7, g = 0, b = 0, a = 1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -2117,7 +2047,7 @@ local defaults = {
                             present = "Text",
                             modify = "None",
                             alpha = 100,
-                            color = { 1, 0.8, 0, 1 },
+                            color = { r = 1, g = 0.8, b = 0, a =1 },
                             iconSize = 16,
                             icon = nil,
                             size = 10,
@@ -2153,7 +2083,7 @@ local defaults = {
                         height = 41
                     },
                     colorBy = "Gradient",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "VERTICAL",
                     reversed = false,
@@ -2161,12 +2091,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     },
                     frequentUpdates = true
@@ -2187,19 +2112,14 @@ local defaults = {
                         height = 5
                     },
                     colorBy = "Power",
-                    customColor = { 1, 1, 1 },
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
                     reversed = false,
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -2229,10 +2149,10 @@ local defaults = {
                     texture = "Default",
                     overflow = 1,
                     colors = {
-                        my = { 0, .827, .765, .5 },
-                        all = { 0, .631, .557, .5 },
-                        absorb = { .7, .7, 1, .5 },
-                        healAbsorb = { .7, .7, 1, .5 }
+                        my = { r = 0, g = .827, b = .765, a = .5 },
+                        all = { r = 0, g = .631, b = .557, a = .5 },
+                        absorb = { r = .7, g = .7, b = 1, a = .5 },
+                        healAbsorb = { r = .7, g = .7, b = 1, a = .5 }
                     }
                 },
                 x = 2,
@@ -2252,13 +2172,13 @@ local defaults = {
                     size = 20,
                     style = "Letter",
                     textSize = 10,
-                    color = { 1, 1, 1, 1 },
+                    color = { r = 1, g = 1, b = 1, a = 1 },
                     textStyle = "Outline",
                     texture = nil,
                     enabled = true
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2461,7 +2381,7 @@ local defaults = {
                 verticalLimit = 1,
                 horizontalLimit = 12,
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2486,7 +2406,7 @@ local defaults = {
                     y = -50,
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2508,7 +2428,7 @@ local defaults = {
                 orientation = "HORIZONTAL",
                 reversed = false,
                 texture = "Default",
-                color = { 0.8, 0, 0.4 }
+                color = { r = 0.8, g = 0, b = 0.4, a = 1 }
             },
             reputation = {
                 enabled = true,
@@ -2520,7 +2440,7 @@ local defaults = {
                     y = -250,
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2553,7 +2473,7 @@ local defaults = {
                     y = -50,
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,
@@ -2575,7 +2495,7 @@ local defaults = {
                 orientation = "HORIZONTAL",
                 reversed = false,
                 texture = "Default",
-                color = { 0.90196, 0.8, 0.50196 }
+                color = { r = 0.90196, g = 0.8, b = 0.50196, a = 1 }
             },
             vehicleLeaveButton = {
                 enabled = true,
@@ -2587,7 +2507,7 @@ local defaults = {
                     y = -500,
                 },
                 background = {
-                    color = { 0, 0, 0, 1 },
+                    color = { r = 0, g = 0, b = 0, a = 1 },
                     offset = {
                         top = 1,
                         bottom = 1,

@@ -149,7 +149,7 @@ function Status:Modify(frame, parent, db, key, shouldAct)
                 parent.oldBackdropColor = parent:GetBackdropColor()
             end
 
-            parent:SetBackdropColor(unpack(settings.color))
+            parent:SetBackdropColor(T:unpackColor(settings.color))
         else
             if (parent.oldBackdropColor) then
                 parent:SetBackdropColor(unpack(parent.oldBackdropColor))
@@ -177,7 +177,7 @@ function Status:Present(frame, parent, db, key, shouldAct)
         local fs = frame.tags[key] or parent:CreateFontString(nil, "OVERLAY")
         fs:SetFont(media:Fetch("font", "Default"), settings.size, "OUTLINE")
         fs:SetPoint(position.localPoint, parent, position.point, position.x, position.y)
-        fs:SetTextColor(unpack(settings.color))
+        fs:SetTextColor(T:unpackColor(settings.color))
         fs:SetText(key)
 
         frame.tags[key] = fs

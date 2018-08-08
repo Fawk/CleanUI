@@ -2,6 +2,7 @@ local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 local Units = A.Units
+local T = A.Tools
 
 local elementName = "combat"
 local CombatIndicator = {}
@@ -68,7 +69,7 @@ function CombatIndicator:Update(...)
 		end
 		self.text:SetFont(media:Fetch("font", "Default"), db.fontSize, "OUTLINE")
 		self.text:SetText(value)
-		self.text:SetTextColor(unpack(db.color))
+		self.text:SetTextColor(T:unpackColor(db.color))
 	elseif (db.style == "texture") then
 		self.texture:Show()
 		self.text:Hide()
@@ -79,7 +80,7 @@ function CombatIndicator:Update(...)
 		self.texture:Show()
 		self.text:Hide()
 
-		self.texture:SetTexture(unpack(db.color))
+		self.texture:SetTexture(T:unpackColor(db.color))
 		self.texture:SetTexCoord(0, 1, 0, 1)
 	end
 end

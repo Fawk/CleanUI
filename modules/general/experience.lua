@@ -99,7 +99,7 @@ function E:Init()
     local position = db.position
     local size = db.size
     local texture = media:Fetch("statusbar", db.texture)
-    local r, g, b = unpack(db.color)
+    local r, g, b = T:unpackColor(db.color)
 
     experience:ClearAllPoints()
     

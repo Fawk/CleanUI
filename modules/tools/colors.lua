@@ -192,7 +192,10 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	elseif (colorType == "gradient") then
 		r, g, b = A:ColorGradient(min, max, gradient(parent.unit))
 	elseif (colorType == "custom") then
-		t = db.customColor
+		r = db.customColor.r
+		g = db.customColor.g
+		b = db.customColor.b
+		a = db.customColor.a
 	end
 	if t then
 		r, g, b, a = unpack(t)

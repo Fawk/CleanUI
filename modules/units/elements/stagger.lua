@@ -41,7 +41,7 @@ function Stagger:Init(parent)
 	   	end
 
 	   	local mult = db.mult
-		local r, g, b, a = unpack(db.colors.low)
+		local r, g, b, a = T:unpackColor(db.colors.low)
 		
 		stagger:SetStatusBarColor(r, g, b, a)
 		stagger.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
@@ -133,11 +133,11 @@ function Stagger:Update(...)
 
 		local perc = (staggerValue / parent.currentMaxHealth) * 100
 		if (perc > 60) then
-			r, g, b, a = unpack(high)
+			r, g, b, a = T:unpackColor(high)
 		elseif (perc > 30) then
-			r, g, b, a = unpack(medium)
+			r, g, b, a = T:unpackColor(medium)
 		else
-			r, g, b, a = unpack(low)
+			r, g, b, a = T:unpackColor(low)
 		end
 
 		self:SetStatusBarColor(r, g, b, a)

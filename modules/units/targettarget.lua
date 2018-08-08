@@ -61,7 +61,7 @@ function TargetTarget:Update(...)
             U:CreateBackground(self, db, false)
 
             self.tags:foreach(function(key, tag)
-                if (not db.tags[key]) then
+                if (not db.tags.list[key]) then
                     if (tag) then
                         tag:Hide()
                     end
@@ -69,7 +69,7 @@ function TargetTarget:Update(...)
                 end
             end)
 
-            for name,tag in next, db.tags do
+            for name,tag in next, db.tags.list do
                 Units:Tag(self, name, tag)
             end
 

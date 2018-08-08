@@ -79,7 +79,7 @@ function Role:Update(...)
             end
             self.text:SetFont(media:Fetch("font", "Default"), db.textSize, textExtra)
             self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
-            self.text:SetTextColor(unpack(db.color))
+            self.text:SetTextColor(T:unpackColor(db.color))
             self.text:SetAllPoints()
             self.text:Show()
         elseif (db.style == "Custom Texture") then
