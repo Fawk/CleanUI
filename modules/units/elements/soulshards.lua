@@ -57,8 +57,8 @@ function SoulShards:Update(...)
 	if (event == UnitEvent.UPDATE_DB) then
 		
 		local orientation = db.orientation
-		local width = db.size.width
-		local height = db.size.height
+		local width = db.size.matchWidth and parent:GetWidth() or db.size.width
+		local height = db.size.matchHeight and parent:GetHeight() or db.size.height
 		local x = db.x
 		local y = db.y
 

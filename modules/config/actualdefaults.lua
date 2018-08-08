@@ -195,15 +195,17 @@ local defaults = {
         			height = 50
         		},
                 tags = {
-                    name = {
-                        format = "[name]",
-                        size = 10,
-                        localPoint = "TOPLEFT",
-                        point = "TOPLEFT",
-                        relative = "Player",
-                        x = 2,
-                        y = -2,
-                        hide = false
+                    list = {
+                        name = {
+                            format = "[name]",
+                            size = 10,
+                            localPoint = "TOPLEFT",
+                            point = "TOPLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = -2,
+                            hide = false
+                        }
                     }
                 },
                 healPrediction = {
@@ -258,7 +260,9 @@ local defaults = {
                     },
                     size = {
                         width = 200,
-                        height = 20
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     texture = "Default",
                     mult = 0.3,
@@ -267,15 +271,17 @@ local defaults = {
                 runes = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
                         width = 200,
-                        height = 15
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -303,15 +309,17 @@ local defaults = {
                 comboPoints = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
-                        width = 191,
-                        height = 15
+                        width = 200,
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -338,15 +346,17 @@ local defaults = {
                 soulShards = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
-                        width = 196,
-                        height = 15
+                        width = 200,
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -373,15 +383,17 @@ local defaults = {
                 chi = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
-                        width = 196,
-                        height = 15
+                        width = 200,
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -408,15 +420,17 @@ local defaults = {
                 arcaneCharges = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
                         y = 0, 
                     },
                     size = {
-                        width = 150,
-                        height = 15
+                        width = 200,
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -443,15 +457,17 @@ local defaults = {
                 holyPower = {
                     enabled = true,
                     position = {
-                        relative = "Parent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        relative = "FrameParent",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
                         width = 200,
-                        height = 15
+                        height = 20,
+                        matchWidth = true,
+                        matchHeight = false,
                     },
                     background = {
                         color = { 0, 0, 0, 1 },
@@ -581,10 +597,10 @@ local defaults = {
                     reversed = false,
                     position = {
                         relative = "FrameParent",
-                        point = "BOTTOM",
-                        localPoint = "TOP",
+                        point = "CENTER",
+                        localPoint = "CENTER",
                         x = 0,
-                        y = -1, 
+                        y = 0, 
                     },
                     size = {
                         matchWidth = true,
@@ -810,7 +826,20 @@ local defaults = {
         			width = 200,
         			height = 50
         		},
-        		tags = {},
+        		tags = {
+                    list = {
+                        name = {
+                            format = "[name]",
+                            size = 10,
+                            localPoint = "TOPLEFT",
+                            point = "TOPLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = -2,
+                            hide = false
+                        }
+                    }
+                },
                 healPrediction = {
                     enabled = true,
                     texture = "Default",
@@ -1224,7 +1253,20 @@ local defaults = {
                     width = 100,
                     height = 26
                 },
-                tags = {},
+                tags = {
+                    list = {
+                        name = {
+                            format = "[name]",
+                            size = 10,
+                            localPoint = "TOPLEFT",
+                            point = "TOPLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = -2,
+                            hide = false
+                        }
+                    }
+                },
                 background = {
                     color = { 0, 0, 0, 1 },
                     offset = {
@@ -1419,7 +1461,20 @@ local defaults = {
                     width = 200,
                     height = 21
                 },
-                tags = {},
+                tags = {
+                    list = {
+                        name = {
+                            format = "[name]",
+                            size = 10,
+                            localPoint = "TOPLEFT",
+                            point = "TOPLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = -2,
+                            hide = false
+                        }
+                    }
+                },
                 healPrediction = {
                     enabled = true,
                     texture = "Default",
@@ -1626,7 +1681,20 @@ local defaults = {
                     }
                 },
                 orientation = "VERTICAL",
-                tags = {},
+                tags = {
+                    list = {
+                        name = {
+                            format = "[name]",
+                            size = 10,
+                            localPoint = "TOPLEFT",
+                            point = "TOPLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = -2,
+                            hide = false
+                        }
+                    }
+                },
                 x = 2,
                 y = 0,
                 highlight = true,
@@ -1903,15 +1971,17 @@ local defaults = {
                 orientation = "HORIZONTAL",
                 growth = "Right",
                 tags = {
-                    name = {
-                        format = "[name:4]",
-                        size = 10,
-                        localPoint = "BOTTOMLEFT",
-                        point = "BOTTOMLEFT",
-                        relative = "Parent",
-                        x = 2,
-                        y = 2,
-                        hide = false
+                    list = {
+                        name = {
+                            format = "[name:4]",
+                            size = 10,
+                            localPoint = "BOTTOMLEFT",
+                            point = "BOTTOMLEFT",
+                            relative = "Parent",
+                            x = 2,
+                            y = 2,
+                            hide = false
+                        }
                     }
                 },
                 raidBuffs = {
@@ -2138,7 +2208,18 @@ local defaults = {
                     height = 47
                 },
                 growth = "Right Then Down",
-                tags = {},
+                tags = {
+                    name = {
+                        format = "[name]",
+                        size = 10,
+                        localPoint = "TOPLEFT",
+                        point = "TOPLEFT",
+                        relative = "Parent",
+                        x = 2,
+                        y = -2,
+                        hide = false
+                    }
+                },
                 raidBuffs = {
                     tracked = {},
                     enabled = true

@@ -80,7 +80,7 @@ function AlternativePower:Update(...)
 
 		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetSize(db.size.width, db.size.height)
+		self:SetSize(db.size.matchWidth and parent:GetWidth() or db.size.width, db,size.matchHeight and parent:GetHeight() or db.size.height)
 		self:SetStatusBarTexture(texture)
 		self.bg:SetTexture(texture)
 		self.bg:SetAllPoints()
