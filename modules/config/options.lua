@@ -49,7 +49,6 @@ function A:RegisterOptions()
 		db[info[#info]] = val
 	end
 
-
 	A.options = {
 		name = "CleanUI Options",
 		type = "group",
@@ -177,6 +176,7 @@ function A:RegisterOptions()
 												name = "Offset X",
 												min = -floor(GetScreenWidth()),
 												max = floor(GetScreenWidth()),
+												step = 1,
 												get = "Get",
 												set = "Set",
 											},
@@ -186,6 +186,7 @@ function A:RegisterOptions()
 												name = "Offset Y",
 												min = -floor(GetScreenHeight()),
 												max = floor(GetScreenHeight()),
+												step = 1,
 												get = "Get",
 												set = "Set",
 											},
@@ -228,6 +229,7 @@ function A:RegisterOptions()
 												name = "Width",
 												min = 1,
 												max = floor(GetScreenWidth()),
+												step = 1,
 												get = "Get",
 												set = "Set",
 											},
@@ -241,6 +243,7 @@ function A:RegisterOptions()
 												name = "Height",
 												min = 1,
 												max = floor(GetScreenHeight()),
+												step = 1,
 												get = "Get",
 												set = "Set",
 											}
