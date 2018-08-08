@@ -652,11 +652,22 @@ function A:RegisterOptions()
 	local O = {}
 	function O:Get(info)
 		local db = getParent(info)
-		return db[info[#info]]
+
+		local value = db[info[#info]]
+		if (type(value) == "table" and value.r) then
+			return value.r, value.g, value.b, value.a
+		end
+
+		return value
 	end
-	function O:Set(info, val)
+	function O:Set(info, arg1, arg2, arg3, arg4)
 		local db = getParent(info)
-		db[info[#info]] = val
+
+		if (arg2) then
+			db[info[#info]] = { r = arg1, g = arg2, b = arg3, a = arg4 }
+		else
+			db[info[#info]] = arg1
+		end
 	end
 
 	local db = A.db.profile

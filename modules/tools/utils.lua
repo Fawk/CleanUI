@@ -2305,7 +2305,6 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 	        bgFile = media:Fetch("background", "bg"), 
 	        tile = true, 
 	        tileSize = 1,
-	        --edgeFile = media:Fetch("border", "test-border3"), 
 	        edgeFile = media:Fetch("background", "bg"), 
 	        edgeSize = bg.size, 
 	        insets = { 
