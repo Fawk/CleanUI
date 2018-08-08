@@ -15,11 +15,10 @@ local Group = {}
 
 function Group:GetMoverSize(container, maxMembers, db)
 	local ox, oy = 0, 0
-	local size = db["Size"]
-	local background = db["Background"]
-	if (background and background["Enabled"]) then
-		local offset = background["Offset"]
-		local top, bottom, left, right = offset["Top"], offset["Bottom"], offset["Left"], offset["Right"]
+	local background = db.background
+	if (background and background.enabled) then
+		local offset = background.offset
+		local top, bottom, left, right = offset.top, offset.bottom, offset.left, offset.right
 		local x, y = 0, 0
 		if (top < 0) then y = y + top end
 		if (bottom < 0) then y = y + bottom end
@@ -29,15 +28,15 @@ function Group:GetMoverSize(container, maxMembers, db)
 		oy = y < 0 and y * -1 or 0
 	end
 
-	local width, height, maxColumns = size["Width"], size["Height"], db["Max Columns"]
+	local width, height, maxColumns = db.size.width, db.size.height, db.maxColumns
 	if (maxColumns) then
 		width = maxColumns * width
 		height = (maxMembers / maxColumns) * height
 	else
-		if (db["Orientation"] == "VERTICAL") then
-			height = ((height * maxMembers) + (db["Offset Y"] * (maxMembers - 1)) + oy)
+		if (db.orientation == "VERTICAL") then
+			height = ((height * maxMembers) + (db.y * (maxMembers - 1)) + oy)
 		else
-			width = ((size["Width"] * maxMembers) + (db["Offset X"] * (maxMembers - 1))) + ox
+			width = ((db.size.width * maxMembers) + (db.x * (maxMembers - 1))) + ox
 		end
 	end
 
@@ -97,20 +96,21 @@ function Group:Init(name, maxMembers, db)
 	    end
     end
     container.getMoverSize = function(self)
+    	if (not self.db) then error("wtf") end
         return Group:GetMoverSize(self, self.maxMembers, self.db)
     end
 
     container:SetAttribute("UpdateSize", ([[
         self:SetWidth(%d)
         self:SetHeight(%d)
-    ]]):format(Group:GetMoverSize(container, maxMembers, db)))
+    ]]):format(container:getMoverSize()))
 
 	container:Execute([[ 
 		if (not this) then this = self end
 		this:RunAttribute("UpdateSize")
 	]])
 
-    RegisterStateDriver(container, "visibility", db["Visibility"])
+    RegisterStateDriver(container, "visibility", db.visibility)
 
 	local header = container.header or CreateFrame("Frame", T:frameName(name.."Header"), A.frameParent, "SecureGroupHeaderTemplate")
     header:SetParent(container)
@@ -133,7 +133,7 @@ function Group:Init(name, maxMembers, db)
 
     self:UpdateHeader(container)
 
-    Units:Position(container, db["Position"])
+    Units:Position(container, db.position)
 
     A:CreateMover(container, db, name)
 
@@ -157,25 +157,24 @@ function Group:UpdateHeader(container)
 	local db, header, maxMembers = container.db, container.header, container.maxMembers
 
  	local groupBy, groupingOrder, sortingMethod, maxColumns, unitsPerColumn
-	if (db["Group By"] == "Role") then
+	if (db.groupBy == "Role") then
 		groupBy, groupingOrder = "ASSIGNEDROLE", "TANK,HEALER,DAMAGER"
-	elseif (db["Group By"] == "Class") then
+	elseif (db.groupBy == "Class") then
 		groupBy, groupingOrder = "CLASS", "DEATHKNIGHT,DEMONHUNTER,DRUID,HUNTER,MAGE,MONK,PALADIN,PRIEST,ROGUE,SHAMAN,WARLOCK,WARRIOR"
 	else
 		groupBy, groupingOrder = "GROUP", "1,2,3,4,5,6,7,8"
 	end
 
-	if (db["Sort Alphabetically"]) then
+	if (db.sortAlphabetically) then
 		sortingMethod = "NAME"
 	else
 		sortingMethod = "INDEX"
 	end
 
-	local limit = db["Max Columns"]
-	local orientation = db["Orientation"]
-	local growth = db["Growth Direction"]
-	local sortingDir = db["Sorting Direction"]
-	local size = db["Size"]
+	local limit = db.maxColumns
+	local orientation = db.orientation
+	local growth = db.growth
+	local sortingDir = db.sortDirection
 
 	local point, columnAnchorPoint, columnSpacing = nil, nil, 0
 	if (limit) then
@@ -188,17 +187,17 @@ function Group:UpdateHeader(container)
 			columnAnchorPoint = directions[growth]
 			maxColumns = maxMembers
 			unitsPerColumn = 1
-			columnSpacing = db["Offset X"]
+			columnSpacing = db.x
 		else
 			point = directions[growth]
 			columnAnchorPoint = "LEFT"
 			maxColumns = 1
 			unitsPerColumn = maxMembers
-			columnSpacing = db["Offset Y"]
+			columnSpacing = db.y
 		end
 	end
 
-	local clickCastString = CC:GetInitString("", db["Clickcast"])
+	local clickCastString = CC:GetInitString("", db.clickcast)
 	local initialConfigFunction = ([[
 		local header = self:GetParent()
 		local frames = table.new()
@@ -211,13 +210,13 @@ function Group:UpdateHeader(container)
 			RegisterUnitWatch(frame)
 			%s
 		end
-	]]):format(size["Width"], size["Height"], clickCastString)
+	]]):format(db.size.width, db.size.height, clickCastString)
 
-    header:SetAttribute("showPlayer", db["Show Player"])
+    header:SetAttribute("showPlayer", db.showPlayer)
     header:SetAttribute("showSolo", false)
     header:SetAttribute("show"..container.name, true)
-    header:SetAttribute("yOffset", db["Offset Y"])
-    header:SetAttribute("xOffset", db["Offset X"])
+    header:SetAttribute("yOffset", db.y)
+    header:SetAttribute("xOffset", db.x)
     header:SetAttribute("maxColumns", maxColumns)
     header:SetAttribute("unitsPerColumn", unitsPerColumn)
     header:SetAttribute("point", point)
@@ -230,7 +229,7 @@ function Group:UpdateHeader(container)
     header:SetAttribute("template", "SecureUnitButtonTemplate")
     header:SetAttribute("initialConfigFunction", initialConfigFunction)
 
-	RegisterAttributeDriver(header, 'state-visibility', db["Visibility"])
+	RegisterAttributeDriver(header, 'state-visibility', db.visibility)
 end
 
 function Group:SimulateTags(frame)
@@ -274,10 +273,9 @@ function Group:Update(...)
         	Group:UpdateHeader(arg2)
         end
 
-     	local size = db["Size"]
         if (not InCombatLockdown()) then
-            self:SetSize(size["Width"], size["Height"])
-            A.general:get("clickcast"):Setup(self, db["Clickcast"])
+            self:SetSize(db.size.width, db.size.height)
+            A.general:get("clickcast"):Setup(self, db.clickcast)
         end
 
         if (not self.tags) then
@@ -285,7 +283,7 @@ function Group:Update(...)
         end
 
         self.tags:foreach(function(key, tag)
-            if (not db["Tags"][key]) then
+            if (not db.tags[key]) then
                 if (tag) then
                     tag:Hide()
                 end
@@ -293,7 +291,7 @@ function Group:Update(...)
             end
         end)
 
-        for name,tag in next, db["Tags"] do
+        for name,tag in next, db.tags do
             Units:Tag(self, name, tag)
         end
 

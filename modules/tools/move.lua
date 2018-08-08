@@ -27,11 +27,9 @@ function A:UpdateMoveableFrames()
 		if (moveFrame) then
 			local db = moveFrame.affecting.db
 			if (db) then
-				local p = db["Position"]
-
 				moveFrame:ClearAllPoints()
 				moveFrame.affecting:ClearAllPoints()
-				moveFrame.affecting:SetPoint(p["Local Point"], A.frameParent, p["Point"], T:Scale(p["Offset X"]), T:Scale(p["Offset Y"]))
+				moveFrame.affecting:SetPoint(db.position.localPoint, A.frameParent, db.position.point, T:Scale(db.position.x), T:Scale(db.position.y))
 			end
 		end
 	end
@@ -114,27 +112,27 @@ end
 
 function A:CreateMover(frame, db, overrideName)
 	local name = overrideName or frame:GetName()
-	local position, size = db["Position"], db["Size"]
+	local size = db.size
 	local lockedTexture = media:Fetch("texture", "locked")
 	local unLockedTexture = media:Fetch("texture", "unlocked")
 
     if type(size) == "number" then
         size = {
-            ["Width"] = size,
-            ["Height"] = size
+            width = size,
+            height = size
         }
     end
 
 	if frame.getMoverSize then
 		local w, h = frame:getMoverSize()
 		size = {
-			["Width"] = w,
-			["Height"] = h
+			width = w,
+			height = h
 		}
 	end
 
 	if not size then
-		size = { Width = frame:GetWidth(), Height = frame:GetHeight() }
+		size = { width = frame:GetWidth(), height = frame:GetHeight() }
 	end
 
 	local moveFrame = moveableFrames[name] or CreateFrame("Button", name.."_Mover", A.frameParent)
@@ -142,7 +140,7 @@ function A:CreateMover(frame, db, overrideName)
 	moveFrame:SetBackdrop(A.enum.backdrops.editboxborder)
 	moveFrame:SetBackdropColor(unpack(A.colors.moving.backdrop))
 	moveFrame:SetBackdropBorderColor(unpack(A.colors.moving.border))
-	moveFrame:SetSize(size["Width"], size["Height"])
+	moveFrame:SetSize(size.width, size.height)
 	moveFrame:SetFrameStrata("HIGH")
 	moveFrame:SetFrameLevel(8)
 
@@ -170,11 +168,9 @@ function A:CreateMover(frame, db, overrideName)
 
 	moveFrame.Apply = function(self)
 		local lp, relative, p, x, y = self:GetPoint()
-		--self.affecting:SetParent(A.frameParent) -- This won't work for elements seeing as they need their unit parent to get values
-
-        local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db["Position"]["Anchor"])
-        --A:Debug(name, position["Local Point"], position["Point"], position["Offset X"], position["Offset Y"])
-        db["Position"] = position
+        local position = T:TranslatePosition(self.affecting, lp, A.frameParent, p, x, y, db.position.anchor)
+        --A:Debug(name, position.localPoint, position.point, position.x, position.y)
+        db.position = position
 	end
 	moveFrame:Hide()
 

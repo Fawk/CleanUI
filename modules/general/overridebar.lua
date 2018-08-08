@@ -16,23 +16,23 @@ local OverrideBar = {}
 
 function OverrideBar:Init()
 
-	local db = A["Profile"]["Options"][moduleName]
+	local db = A.db.profile.general.overrideBar
 
 	if not db then return end
 
-	if (db["Enabled"]) then
+	if (db.enabled) then
 
-		local position = db["Position"]
+		local position = db.position
 		local overrideBar = CreateFrame("Frame", nil, A.frameParent)
 
 		overrideBar:SetHeight(MainMenuBarBackpackButton:GetHeight())
 		overrideBar:SetWidth(MainMenuBarBackpackButton:GetWidth())
 
 		
-		overrideBar:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		overrideBar:SetPoint(position.localPoint, A.frameParent, position.point, position.x, position.y)
 		A:CreateMover(overrideBar, db, moduleName)
 
-		if (db["Hide"]) then
+		if (db.hide) then
 
 			overrideBar:Hide()
 		end

@@ -1,7 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-    <Script file="profile.lua"/>
-    <Script file="database.lua"/>
-	<Script file="db.lua"/>
+	<Script file="actualdefaults.lua"/>
 	<Script file="options.lua"/>
-    <Script file="prefs.lua"/>
 </Ui>

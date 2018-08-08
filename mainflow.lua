@@ -93,7 +93,7 @@ end
 
 function Addon:OnInitialize()
 
-	self.db = self.dbProvider:New(AddonName.."_DB", self.defaults)
+	self.db = LibStub("AceDB-3.0"):New("CleanUI_DB", self.actualDefaults, true)
 
 	local uiscale = GetCVar("uiscale") or 0.71
 	local h, w = GetScreenHeight() or 1080, GetScreenWidth() or 1920
@@ -116,10 +116,10 @@ function Addon:OnEnable()
 
 	local E, T, Options, Units = self.enum, self.Tools, self.Options, self.Units
 
-    local profile = self.profiler
+    --local profile = self.profiler
 
-	profile:Init(self.db)
-	profile:Load()
+	--profile:Init(self.db)
+	--profile:Load()
 
 	self:SetScale()
 

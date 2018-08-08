@@ -18,19 +18,19 @@ local M = {}
 
 function M:Init()
 
-	local minimapConfig = A["Profile"]["Options"][moduleName]
+	local minimapConfig = A.db.profile.general.minimap
 
 	Minimap.Update = function(self, db)
 		self:SetSize(db.Size - 3, db.Size - 3)
 		MinimapBackdrop:SetSize(db.Size, db.Size)
 	end
 
-	local position = minimapConfig["Position"]
-	local x, y = position["Offset X"], position["Offset Y"]
+	local position = minimapConfig.position
+	local x, y = position.x, position.y
 
 	MinimapCluster:ClearAllPoints()
-	MinimapCluster:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
-	MinimapCluster:SetSize(minimapConfig.Size - 3, minimapConfig.Size - 3)
+	MinimapCluster:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
+	MinimapCluster:SetSize(minimapConfig.size - 3, minimapConfig.size - 3)
 	Minimap:SetSize(MinimapCluster:GetSize())
 
 	Minimap:ClearAllPoints()
@@ -56,7 +56,7 @@ function M:Init()
 	Minimap:SetArchBlobRingAlpha(0)
 	Minimap:SetQuestBlobRingScalar(0)
 	Minimap:SetQuestBlobRingAlpha(0)
-	MinimapBackdrop:SetSize(minimapConfig.Size, minimapConfig.Size)
+	MinimapBackdrop:SetSize(minimapConfig.size, minimapConfig.size)
 	--MinimapBackdrop:SetBackdrop(backdrop(0, 1, 0, 0, 0, 0))
 	MinimapBackdrop:SetBackdropColor(unpack(A.colors.backdrop.default))
 	MinimapBackdrop:SetParent(Minimap)

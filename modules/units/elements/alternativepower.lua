@@ -18,14 +18,14 @@ local Units = A.Units
 local media = LibStub("LibSharedMedia-3.0")
 local buildText = A.TextBuilder
 local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER", "PLAYER_ENTERING_WORLD", "UNIT_DISPLAYPOWER", "UPDATE_VEHICLE_ACTIONBAR" }
-local elementName = "Alternative Power"
+local elementName = "altpower"
 
 local AlternativePower = {}
 
 function AlternativePower:Init(parent)
 	local db = parent.db[elementName]
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		return
 	end
 
@@ -50,7 +50,7 @@ function AlternativePower:Init(parent)
 		end)
 
 		A:CreateMover(altpower, db, elementName)
-		Units:Position(altpower, db["Position"])
+		Units:Position(altpower, db.position)
 
 		altpower:Hide()
 	end
@@ -65,10 +65,10 @@ function AlternativePower:Update(...)
 	local parent = self:GetParent()
 	local db = self.db
 
-	local mult = db["Background Multiplier"]
-	local r, g, b, a = unpack(db["Color"])
+	local mult = db.mult
+	local r, g, b, a = unpack(db.color)
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		Units:RegisterEvents(PlayerPowerBarAlt, events)
 		PlayerPowerBarAlt:SetAlpha(100)
 
@@ -78,10 +78,9 @@ function AlternativePower:Update(...)
 
 	if (event == UnitEvent.UPDATE_DB) then
 
-		local texture = media:Fetch("statusbar", db["Texture"])
-		local size = db["Size"]
+		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetSize(size["Width"], size["Height"])
+		self:SetSize(db.size.width, db.size.height)
 		self:SetStatusBarTexture(texture)
 		self.bg:SetTexture(texture)
 		self.bg:SetAllPoints()

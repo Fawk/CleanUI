@@ -2274,11 +2274,12 @@ local Utils = {}
 
 function Utils:CreateBackground(frame, db, useBackdrop)
 	local ref = frame
-	if db["Background"] and db["Background"]["Enabled"] then 
-		if not useBackdrop then
+	local bg = db.background
+	if (bg and bg.enabled) then 
+		if (not useBackdrop) then
 
-			local width = db["Background"]["Match width"] and frame:GetWidth() or db["Background"]["Width"]
-			local height = db["Background"]["Match height"] and frame:GetHeight() or db["Background"]["Height"]
+			local width = bg.matchWidth and frame:GetWidth() or bg.width
+			local height = bg.matchHeight and frame:GetHeight() or bg.height
 
 			local x = math.max(frame:GetWidth(), width) - math.min(frame:GetWidth(), width)
 			local y = math.max(frame:GetHeight(), height) - math.min(frame:GetHeight(), height)
@@ -2299,26 +2300,28 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 			ref:Show()
 			frame.Background = ref
 		end
-		local offset = db["Background"]["Offset"]
+		local offset = bg.offset
 		ref:SetBackdrop({
 	        bgFile = media:Fetch("background", "bg"), 
 	        tile = true, 
 	        tileSize = 1,
 	        --edgeFile = media:Fetch("border", "test-border3"), 
 	        edgeFile = media:Fetch("background", "bg"), 
-	        edgeSize = db["Background"]["Edge Size"] or 3, 
+	        edgeSize = bg.size, 
 	        insets = { 
-	        	top = offset["Top"], 
-	        	bottom = offset["Bottom"], 
-	        	left = offset["Left"], 
-	        	right = offset["Right"] 
+	        	top = offset.top, 
+	        	bottom = offset.bottom, 
+	        	left = offset.left, 
+	        	right = offset.right
 	        } 
 		})
-		local r, g, b, a = unpack(db["Background"]["Color"])
+		local r, g, b, a = unpack(bg.color)
 		ref:SetBackdropColor(r, g, b, a or 1)
         ref:SetBackdropBorderColor(r, g, b, a or 1)
 	else
-		ref:SetBackdrop(nil)
+		if (useBackdrop) then
+			ref:SetBackdrop(nil)
+		end
 	end
 end
 

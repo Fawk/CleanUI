@@ -10,7 +10,7 @@ local GetSpecialization = GetSpecialization
 local SPELL_POWER_HOLY_POWER = Enum.PowerType.HolyPower
 
 --[[ Locals ]]
-local elementName = "Holy Power"
+local elementName = "holyPower"
 local HolyPower = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER" }
 local MAX_HOLY_POWER = 5
@@ -80,14 +80,12 @@ function HolyPower:Update(...)
 
     if (event == UnitEvent.UPDATE_DB) then
         
-        local size = db["Size"]
-        local orientation = db["Orientation"]
-        local width = size["Width"]
-        local height = size["Height"]
-        local x = db["X Spacing"]
-        local y = db["Y Spacing"] 
+        local width = db.size.width
+        local height = db.size.height
+        local x = db.x
+        local y = db.y
 
-        if (orientation == "HORIZONTAL") then
+        if (db.orientation == "HORIZONTAL") then
             width = width + (x * (MAX_HOLY_POWER - 1))
         else
             height = height + (y * (MAX_HOLY_POWER - 1))
@@ -97,9 +95,9 @@ function HolyPower:Update(...)
         U:CreateBackground(self, db, false)
 
         local r, g, b = unpack(A.colors.power[SPELL_POWER_HOLY_POWER])
-        local texture = media:Fetch("statusbar", db["Texture"])
+        local texture = media:Fetch("statusbar", db.texture)
 
-        if (orientation == "HORIZONTAL") then
+        if (db.orientation == "HORIZONTAL") then
             width = math.floor((width - x) / MAX_HOLY_POWER)
         else
             height = math.floor((height - y) / MAX_HOLY_POWER)
@@ -107,13 +105,13 @@ function HolyPower:Update(...)
 
         for i = 1, MAX_HOLY_POWER do
             local power = self.buttons[i]
-            power:SetOrientation(orientation)
-            power:SetReverseFill(db["Reversed"])
+            power:SetOrientation(db.orientation)
+            power:SetReverseFill(db.reversed)
             power:SetStatusBarTexture(texture)
             power:SetStatusBarColor(r, g, b)
             power:SetMinMaxValues(0, 1)
 
-            width, height = T:PositionClassPowerIcon(self, power, orientation, width, height, MAX_HOLY_POWER, i, x, y)
+            width, height = T:PositionClassPowerIcon(self, power, db.orientation, width, height, MAX_HOLY_POWER, i, x, y)
 
             power.bg:SetTexture(texture)
             power.bg:SetVertexColor(r * .33, g * .33, b * .33)
@@ -125,9 +123,8 @@ function HolyPower:Update(...)
             A:CreateMover(self, db, elementName)
         else
             A:DeleteMover(elementName)
+            Units:Attach(self, db)
         end
-
-        Units:Attach(self, db)
     else
         local current = UnitPower("player", SPELL_POWER_HOLY_POWER)
 

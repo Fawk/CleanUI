@@ -8,7 +8,7 @@ local frameName = "Raid"
 local Raid = {}
 
 function Raid:Init()
-    local db = A["Profile"]["Options"][frameName]
+    local db = A.db.profile.group[frameName:lower()]
     Units:DisableBlizzardRaid()
     return Group:Init(frameName, 40, db)
 end

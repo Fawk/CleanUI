@@ -10,7 +10,7 @@ local GetSpecialization = GetSpecialization
 local SPELL_POWER_CHI = Enum.PowerType.Chi
 
 --[[ Locals ]]
-local elementName = "Chi"
+local elementName = "chi"
 local Chi = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "PLAYER_TALENT_UPDATE" }
 local MAX_CHI = 6
@@ -82,14 +82,12 @@ function Chi:Update(...)
 
     if (event == UnitEvent.UPDATE_DB) then
         
-        local size = db["Size"]
-        local orientation = db["Orientation"]
-        local width = size["Width"]
-        local height = size["Height"]
-        local x = db["X Spacing"]
-        local y = db["Y Spacing"] 
+        local width = db.size.width
+        local height = db.size.height
+        local x = db.x
+        local y = db.y
 
-        if (orientation == "HORIZONTAL") then
+        if (db.orientation == "HORIZONTAL") then
             width = width + (x * (realMax - 1))
         else
             height = height + (y * (realMax - 1))
@@ -99,9 +97,9 @@ function Chi:Update(...)
         U:CreateBackground(self, db, false)
 
         local r, g, b = unpack(A.colors.power[Enum.PowerType.Chi])
-        local texture = media:Fetch("statusbar", db["Texture"])
+        local texture = media:Fetch("statusbar", db.texture)
 
-		if (orientation == "HORIZONTAL") then
+		if (db.orientation == "HORIZONTAL") then
 			width = math.floor((width - x) / realMax)
 		else
 	        height = math.floor((height - y) / realMax)
@@ -109,13 +107,13 @@ function Chi:Update(...)
 
         for i = 1, MAX_CHI do
             local chi = self.buttons[i]
-            chi:SetOrientation(orientation)
-            chi:SetReverseFill(db["Reversed"])
+            chi:SetOrientation(db.orientation)
+            chi:SetReverseFill(db.reversed)
             chi:SetStatusBarTexture(texture)
             chi:SetStatusBarColor(r, g, b)
             chi:SetMinMaxValues(0, 1)
 
-			width, height = T:PositionClassPowerIcon(self, chi, orientation, width, height, realMax, i, x, y)
+			width, height = T:PositionClassPowerIcon(self, chi, db.orientation, width, height, realMax, i, x, y)
 
             chi.bg:SetTexture(texture)
             chi.bg:SetVertexColor(r * .33, g * .33, b * .33)
@@ -129,13 +127,12 @@ function Chi:Update(...)
             end
         end
 
-        if (not db["Attached"]) then
+        if (not db.attached) then
             A:CreateMover(self, db, elementName)
         else
             A:DeleteMover(elementName)
+            Units:Attach(self, db)
         end
-
-        Units:Attach(self, db)
     else
         local current = UnitPower("player", SPELL_POWER_CHI)
 

@@ -15,7 +15,7 @@ local Chat = {}
 
 function Chat:Init()
 	
-	local db = A["Profile"]["Options"]["Chat"]
+	local db = A.db.profile.general.chat
 
 	for _,name in pairs(CHAT_FRAMES) do
 		local frame = _G[name]

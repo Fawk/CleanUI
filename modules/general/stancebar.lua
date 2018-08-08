@@ -19,11 +19,13 @@ local emptySlots = {}
 
 function StanceBar:Init()
 
-	local db = A["Profile"]["Options"][moduleName]
+	local db = A.db.profile.stanceBar
 
-	if (db["Enabled"]) then
+	if (not db) then return end
 
-		local position = db["Position"]
+	if (db.enabled) then
+
+		local position = db.position
 		local stanceBar = CreateFrame("Frame", nil, A.frameParent)
 
 		local relative = stanceBar
@@ -78,11 +80,10 @@ function StanceBar:Init()
 			relative = button
 		end
 		
-		stanceBar:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		stanceBar:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 		A:CreateMover(stanceBar, db, moduleName)
 
-		if (db["Hide"]) then
-
+		if (db.hide) then
 			stanceBar:Hide()
 		end
 	end

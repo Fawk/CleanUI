@@ -43,7 +43,7 @@ end
 
 function E:Init()
 	
-	local db = A["Profile"]["Options"][self.name]
+	local db = A.db.profile.general.experience
     local xp, xpMax = UnitXP("player"), UnitXPMax("player")
 	
 	local experience = A.frames.experienceBar or (function()
@@ -59,10 +59,10 @@ function E:Init()
                     self:SetValue(xp)
                     self:SetMinMaxValues(0, xpMax)
                     self.text:SetText(text(xp, xpMax))
-                    sizeRestedBar(self, db["Size"]["Width"])
+                    sizeRestedBar(self, db.size.width)
                 end,
                 "UPDATE_EXHAUSTION", function()
-                    sizeRestedBar(self, db["Size"]["Width"])
+                    sizeRestedBar(self, db.size.width)
                 end)
 
             if (UnitLevel("player") == GetMaxPlayerLevel()) or IsXPUserDisabled() then
@@ -84,7 +84,7 @@ function E:Init()
             end
         end)
         local textFrame = CreateFrame("Frame", nil, experience)
-        textFrame:SetSize(db["Size"]["Width"], db["Size"]["Height"])
+        textFrame:SetSize(db.size.width, db.size.height)
         textFrame:SetPoint("CENTER")
         textFrame:SetFrameLevel(2)
         
@@ -96,17 +96,17 @@ function E:Init()
 		return experience
 	end)()
 
-    local position = db["Position"]
-    local size = db["Size"]
-    local texture = media:Fetch("statusbar", db["Texture"])
-    local r, g, b = unpack(db["Color"])
+    local position = db.position
+    local size = db.size
+    local texture = media:Fetch("statusbar", db.texture)
+    local r, g, b = unpack(db.color)
 
     experience:ClearAllPoints()
     
-    local x, y = position["Offset X"], position["Offset Y"]
+    local x, y = position.x, position.y
 
-    experience:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
-	experience:SetSize(size["Width"], size["Height"])
+    experience:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
+	experience:SetSize(size.width, size.height)
 	experience:SetStatusBarTexture(texture)
     experience:SetStatusBarColor(r, g, b)
     experience:SetMinMaxValues(0, xpMax)
@@ -117,9 +117,9 @@ function E:Init()
     experience.restedBar:SetStatusBarColor(0, 0.2, 0.8)
     experience.restedBar:SetPoint("TOPLEFT", experience:GetStatusBarTexture(), "TOPRIGHT")
     experience.restedBar:SetPoint("BOTTOMLEFT", experience:GetStatusBarTexture(), "BOTTOMLEFT")
-    sizeRestedBar(experience, size["Width"])
+    sizeRestedBar(experience, size.width)
 
-    local mult = db["Background Multiplier"]
+    local mult = db.mult
 	experience.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
 	U:CreateBackground(experience, db, true)

@@ -6,7 +6,7 @@ local frameName = "Player"
 
 function Player:Init()
 
-    local db = A["Profile"]["Options"][frameName]
+    local db = A.db.profile.units[frameName:lower()]
 
     local frame = Units:Get(frameName) or A:CreateUnit(frameName)
     frame.GetDbName = function(self) return frameName end
@@ -29,7 +29,7 @@ function Player:Init()
     end
 
     Units:Add(frame, frame:GetDbName())
-    Units:Position(frame, db["Position"])
+    Units:Position(frame, db.position)
     
     frame:Update(UnitEvent.UPDATE_IDENTIFIER)
     frame:Update(UnitEvent.UPDATE_DB)
@@ -56,24 +56,23 @@ function Player:Update(...)
         if (event == UnitEvent.UPDATE_DB) then
             
             local db = self.db or arg2
-            local position, size = db["Position"], db["Size"]
 
             --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
 
             if (not InCombatLockdown()) then
-                Units:Position(self, position)
-                self:SetSize(size["Width"], size["Height"])
+                Units:Position(self, db.position)
+                self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general:get("clickcast"):Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db.clickcast)
             end
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
             self.tags:foreach(function(key, tag)
-                if (not db["Tags"][key]) then
+                if (not db.tags[key]) then
                     if (tag) then
                         tag:Hide()
                     end
@@ -81,7 +80,7 @@ function Player:Update(...)
                 end
             end)
 
-            for name,tag in next, db["Tags"] do
+            for name,tag in next, db.tags do
                 Units:Tag(self, name, tag)
             end
 

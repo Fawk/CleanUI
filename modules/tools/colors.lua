@@ -173,25 +173,26 @@ end
 function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	local db = bar.db
 	local r, g, b, a, t
-	local mult = db["Background Multiplier"]
-	local colorType = db["Color By"]
-	if (colorType == "Class") then
+	local mult = db.mult
+	local colorType = db.colorBy:lower()
+
+	if (colorType == "class") then
 		if (UnitIsPlayer(parent.unit)) then
 			r, g, b = unpack(A.colors.class[classOverride or select(2, UnitClass(parent.unit))] or A.colors.backdrop.default)
 		else
 			r, g, b = unpack(A.colors.backdrop.default)
 		end
-	elseif (colorType == "Power") then
+	elseif (colorType == "power") then
 		t = A.colors.power[parent.powerToken]
 		if not t then
 			t = A.colors.power[parent.powerType]
 		end
-	elseif (colorType == "Health") then
+	elseif (colorType == "health") then
 		r, g, b = unpack(A.colors.health.standard)
-	elseif (colorType == "Gradient") then
+	elseif (colorType == "gradient") then
 		r, g, b = A:ColorGradient(min, max, gradient(parent.unit))
-	elseif (colorType == "Custom") then
-		t = db["Custom Color"]
+	elseif (colorType == "custom") then
+		t = db.customColor
 	end
 	if t then
 		r, g, b, a = unpack(t)

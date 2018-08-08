@@ -1,246 +1,308 @@
 local A, L = unpack(select(2, ...))
-local E, T, Units, media = A.enum, A.Tools, A.Units, LibStub("LibSharedMedia-3.0")
-local oUF = oUF or A.oUF
+
+--[[ Blizzard ]]
+local CreateFrame = CreateFrame
+local CreatePoolCollection = CreatePoolCollection
+
+--[[ Lua ]]
+local tremove = table.remove
+local tinster = table.insert
+local sort = table.sort
+
+--[[ Locals ]]
+local E = A.enum
+local T = A.Tools
+local Units = A.Units
+local U = A.Utils
+local media = LibStub("LibSharedMedia-3.0")
+
+local elementName = "debuffs"
+local Debuffs = {}
 local buildText = A.TextBuilder
 
-local Debuffs = function(frame, db)
+local function updateButtons(parent)
+	local now = GetTime()
+	
+	for i = 1, #parent.buttons do
+		local button = parent.buttons[i]
+		if (button:IsVisible()) then
+			local value = button.aura.expires - now
 
-	local growth, attached, style, size = db["Growth"], db["Attached"], db["Style"], db["Size"]
-	local debuffs = frame.Debuffs or (function()
-		local debuffs = CreateFrame("Frame", T:frameName(frame.unit, "Debuffs"), frame)
-		debuffs:SetSize(frame:GetWidth(), 300)
-		return debuffs
-	end)()
-
-	if attached ~= false then
-		debuffs:SetPoint(T.reversedPoints[attached], frame, attached, 0, style == "Bar" and 1 or 0)
-	else
-		A:CreateMover(debuffs, db, "Debuffs")
-		Units:Position(debuffs, db["Position"])
+			local time = T:timeShort(value)
+			button.bar.time:SetText(time)
+			button.bar:SetValue(value)
+			button.iconText:SetText(time)
+		end
 	end
-
-	T:Switch(style, 
-		"Icon", function()
-			local width = size["Width"]
-			local height = size["Height"]
-
-			if growth == "Left" then
-				debuffs['growth-x'] = "LEFT"
-				debuffs.initialAnchor = "BOTTOMRIGHT"
-			elseif growth == "Right" then
-				debuffs['growth-x'] = "RIGHT"
-				debuffs.initialAnchor = "BOTTOMLEFT"
-			end
-
-			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
-				if db["Blacklist"]["Enabled"] then
-					return not db["Blacklist"]["Ids"][spellID]
-				elseif db["Whitelist"]["Enabled"] then
-					return db["Whitelist"]["Ids"][spellID]
-				end
-			end
-
-			debuffs:SetSize(width * (db["Limit X"] or 5), height * (db["Limit Y"] or 2))
-
-			debuffs.PostUpdateIcon = function(element, unit, button, index)
-				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
-
-				if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
-					button:Hide()
-					return
-				elseif db["Whitelist"]["Enabled"] and not db["Whitelist"]["Ids"][spellID] then
-					button:Hide()
-					return
-				end
-
-				button.spellID = spellID
-
-				local background = button.background or CreateFrame("Frame", nil, button)
-				background:SetPoint("CENTER")
-				background:SetSize(button:GetSize())
-				background:SetFrameLevel(button:GetFrameLevel() - 1)
-
-				button.background = background
-
-				T:Background(background, db, nil, true)
-
-				button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
-
-				if not button.initCount then
-					button.initCount = true
-					button.count:Hide()
-					button.count = buildText(button, 10):outline():atCenter():build()
-					button.count:Show()
-					button.count:SetJustifyH("CENTER")
-				end
-
-				if not button.fixcd then
-					button.fixcd = true
-					for _,region in pairs({ button.cd:GetRegions() }) do
-						if region.GetObjectType and region:GetObjectType() == "FontString" then
-							region:SetFont(media:Fetch("font", "Default"), 8, "OUTLINE")
-							region:SetJustifyH("CENTER")
-						end
-					end
-				end
-
-				button.count:SetText(count > 1 and count or "")
-				button:Show()
-				
-			end
-
-		end,
-		"Bar", function()
-			local width = size["Match width"] and frame:GetWidth() or size["Width"]
-			local height = size["Match height"] and frame:GetHeight() or size["Height"]
-
-			debuffs.disableCooldown = true
-			debuffs.CustomFilter = function(element, unit, button, name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID)
-				if db["Blacklist"]["Enabled"] then
-					return not db["Blacklist"]["Ids"][spellID] and caster == "player"
-				elseif db["Whitelist"]["Enabled"] then
-					return db["Whitelist"]["Ids"][spellID]
-				end
-			end
-
-			debuffs.SetPosition = function(element, from, to)
-				local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
-				local sizey = (element.size or 16) + (element['spacing-y'] or element.spacing or 0)
-				local anchor = element.initialAnchor or 'BOTTOMLEFT'
-				local x, y = 0, 0
-
-				for i = from, to do
-
-					local button = element[i]
-					if(not button) then break end
-
-					if not button.bar then
-						button.bar = CreateFrame("StatusBar", nil, button)
-						button.bar:SetStatusBarTexture(media:Fetch("statusbar", "Default2"))
-						button.bar:SetStatusBarColor(0.3, 0.6, 0.8)
-						button.bar.bg = button.bar.bg or button.bar:CreateTexture(nil, "BACKGROUND")
-						button.bar.bg:SetTexture(media:Fetch("statusbar", "Default2"))
-						button.bar.bg:SetVertexColor(0.3 * .3, 0.6 * .3, 0.8 * .3)
-						button.bar.bg:SetAllPoints()
-
-						button:SetScript("OnClick", function(self, button, down)
-							if not down and IsShiftKeyDown() and IsAltKeyDown() and IsControlKeyDown() and button == "RightButton" then
-								if db["Blacklist"]["Enabled"] then
-									db["Blacklist"]["Ids"][self.spellID] = true
-								elseif db["Whitelist"]["Enabled"] then
-									table.remove(db["Whitelist"]["Ids"], self.spellID)
-								end
-								A.dbProvider:Save()
-								buffs:ForceUpdate()
-							end
-						end)
-
-						local name = buildText(button.bar, 0.7):enforceHeight():shadow():atLeft():x(3):build()
-						name:SetJustifyH("LEFT")
-
-						local time = buildText(button.bar, 9):shadow():atRight():x(-5):build()
-						time:SetJustifyH("RIGHT")
-
-						button.bar.name = name
-						button.bar.time = time
-					end
-
-					button.bar:ClearAllPoints()
-					button.icon:SetTexCoord(0.133,0.867,0.133,0.867)
-					
-					local background = button.background or CreateFrame("Frame", nil, button)
-					background:SetPoint("LEFT")
-					background:SetSize(width, sizey)
-					background:SetFrameLevel(button:GetFrameLevel() - 1)
-
-					button.background = background
-
-					T:Background(background, db, nil, true)
-
-					T:Switch(growth,
-						"Upwards", function() 
-							x = 0
-							y = sizey * (i - 1)
-							button.bar:SetPoint("LEFT", button, "RIGHT", 0, 0)
-							button.bar:SetSize(width - sizex, sizey)
-						end,
-						"Downwards", function() 
-							x = 0
-							y = sizey * (i - 1) * -1
-							button.bar:SetPoint("LEFT", button, "RIGHT", 0, 0)
-							button.bar:SetSize(width - sizex, sizey)
-						end,
-						"Left", function()
-							x = sizex * (i - 1) * -1
-							y = 0
-							button.bar:SetPoint("BOTTOM", button, "TOP", 0, 0)
-							button.bar:SetSize(sizex, height - sizey)
-						end,
-						"Right", function()
-							x = sizex * (i - 1)
-							y = 0
-							button.bar:SetPoint("BOTTOM", button, "TOP", 0, 0)
-							button.bar:SetSize(sizex, height - sizey)
-						end)
-
-					button:ClearAllPoints()
-					if i ~= 1 then
-						y = y + i - 1
-					end
-					button:SetPoint(anchor, element, anchor, x, y)
-				end
-			end
-
-			debuffs.PostUpdateIcon = function(element, unit, button, index)
-				local name, rank, texture, count, dispelType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID = UnitAura(unit, index, "HARMFUL")
-				if button.bar then
-
-					if db["Blacklist"]["Enabled"] and db["Blacklist"]["Ids"][spellID] then
-						button:Hide()
-						return
-					elseif db["Whitelist"]["Enabled"] and not db["Whitelist"]["Ids"][spellID] then
-						button:Hide()
-						return
-					end
-
-					if caster ~= "player" then
-						button:Hide()
-						return
-					end
-
-					button.spellID = spellID
-
-					button.bar.name:SetText(name)
-					if duration == 0 then
-						button.bar:SetMinMaxValues(0, 1)
-						button.bar:SetValue(1)
-						button.bar.time:SetText("")
-						if db["Hide zero duration"] then
-							button:Hide()
-							return
-						end
-					else
-						local timeLeft = (expiration or 0) - GetTime()
-						button.bar:SetMinMaxValues(0, duration or 1)
-						button.bar:SetValue(timeLeft < 0 and 1 or timeLeft)
-						button.bar.time:SetText(timeLeft < 0 and "" or T:timeString(timeLeft))
-					end
-
-					if not button.initCount then
-						button.initCount = true
-						button.count:Hide()
-						button.count = buildText(button, 11):outline():atCenter():build()
-						button.count:Show()
-						button.count:SetJustifyH("CENTER")
-					end
-
-					button.count:SetText((count or 0) > 1 and count or "")
-					button:Show()
-				end
-			end
-		end)
-
-	frame.Debuffs = debuffs
 end
 
---A["Elements"]:add({ name = "Debuffs", func = Debuffs })
+local function filterAura(aura, db, unit)
+	local casterFilter = (db.own and aura.caster == unit) or (not db.own)
+	local blackListFilter = db.blacklist.enabled and not db.blacklist.ids[aura.spellID]
+	local whiteListFilter = db.whitelist.enabled and db.whitelist.ids[aura.spellID]
+
+	if (not db.blacklist.enabled and not db.whitelist.enabled) then
+		whiteListFilter = true
+	end
+
+	return casterFilter and (blackListFilter or whiteListFilter)
+end
+
+local function orderDebuffs(auras, db, unit)
+	local filteredAuras = {}
+
+	for i = 1, #auras do
+		local aura = auras[i]
+		if (filterAura(aura, db, unit)) then
+			tinsert(filteredAuras, aura)
+		end
+	end
+
+	sort(filteredAuras, function(left, right) return left.expires < right.expires end)
+
+	return filteredAuras
+end
+
+local function placeBar(button, barGrowth, relative, parent, x, y)
+	button:ClearAllPoints()
+	if (barGrowth == "Upwards") then
+		if (relative == parent) then
+			button:SetPoint("BOTTOM", relative, "BOTTOM", 0, 0)
+		else
+			button:SetPoint("BOTTOM", relative, "TOP", 0, y)
+		end
+	else
+		if (relative == parent) then
+			button:SetPoint("TOP", relative, "TOP", 0, 0)
+		else
+			button:SetPoint("TOP", relative, "BOTTOM", 0, -y)
+		end
+	end
+end
+
+local function placeIcon(button, index, iconGrowth, iconLimit, relative, parent, x, y)
+	local atLimit = index % (iconLimit + 1) == 0
+	local limitAnchor = parent.buttons[index - iconLimit]
+
+	button:ClearAllPoints()
+	if (atLimit) then
+		if (iconGrowth:find("Down")) then
+			button:SetPoint("TOP", limitAnchor, "BOTTOM", 0, -y)
+		else
+			button:SetPoint("BOTTOM", limitAnchor, "TOP", 0, y)
+		end
+	else
+		if (iconGrowth:find("Right")) then
+			if (iconGrowth:find("Down")) then
+				if (relative == parent) then
+					button:SetPoint("TOPLEFT", relative, "TOPLEFT", 0, 0)
+				else
+					button:SetPoint("LEFT", relative, "RIGHT", x, 0)
+				end
+			else
+				if (relative == parent) then
+					button:SetPoint("BOTTOMLEFT", relative, "BOTTOMLEFT", 0, 0)
+				else
+					button:SetPoint("LEFT", relative, "RIGHT", x, 0)
+				end
+			end
+		else
+			if (iconGrowth:find("Down")) then
+				if (relative == parent) then
+					button:SetPoint("TOPRIGHT", relative, "TOPRIGHT", 0, 0)
+				else
+					button:SetPoint("RIGHT", relative, "LEFT", -x, 0)
+				end
+			else
+				if (relative == parent) then
+					button:SetPoint("BOTTOMRIGHT", relative, "BOTTOMRIGHT", 0, 0)
+				else
+					button:SetPoint("RIGHT", relative, "LEFT", -x, 0)
+				end
+			end
+		end
+	end
+end
+
+local function CreateButton(parent, width, height)
+	local button = parent.pool:Acquire("AuraIconBarTemplate")
+	
+	button.icon:ClearAllPoints()
+	button.icon:SetPoint("LEFT")
+	button.icon:SetSize(height, height)
+
+	button.iconText:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	button.iconText:SetPoint("CENTER")
+
+	local bar = button.bar
+	bar:ClearAllPoints()
+	bar:SetSize(parent:GetWidth() - height, height)
+	bar:SetPoint("LEFT", button.icon, "RIGHT", 0, 0)
+	bar.name:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+	bar.time:SetFont(media:Fetch("font", "Default"), 10, "OUTLINE")
+
+	return button
+end
+
+function Debuffs:Init(parent)
+
+	local db = parent.db[elementName]
+
+	if (not db) then return end
+
+	local debuffs = parent.orderedElements:get(elementName)
+	if (not debuffs) then
+		
+		debuffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
+		debuffs.db = db
+
+		debuffs.pools = CreatePoolCollection()
+		debuffs.pool = debuffs.pools:CreatePool("BUTTON", debuffs, "AuraIconBarTemplate")
+		debuffs.buttons = {}
+
+		debuffs.Update = function(self, ...)
+			Debuffs:Update(self, ...)
+		end
+
+		debuffs:RegisterUnitEvent("UNIT_AURA", parent.unit)
+		debuffs:SetScript("OnEvent", function(self, event, ...)
+			self:Update(event, ...)
+		end)
+
+		debuffs:SetScript("OnUpdate", updateButtons)
+
+		--DebuffFrame:UnregisterEvent("UNIT_AURA")
+		--DebuffFrame:UnregisterEvent("GROUP_ROSTER_UPDATE")
+		--DebuffFrame:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+
+		--DebuffFrame:SetParent(A.hiddenFrame)
+	end
+
+	debuffs:Update(UnitEvent.UPDATE_DB)
+	debuffs:Update(UnitEvent.UPDATE_DEBUFFS)
+
+	parent.orderedElements:set(elementName, debuffs)
+end
+
+function Debuffs:Update(...)
+	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+	local parent = self:GetParent()
+	local db = self.db
+
+	if (not db.enabled) then
+		self.pools:ReleaseAll()
+		return self:Hide()
+	else
+		self:Show()
+	end
+
+	parent:Update(UnitEvent.UPDATE_DEBUFFS)
+
+	local width = db.size.matchWidth and parent:GetWidth() or db.size.width
+	local height = db.size.matchHeight and parent:GetHeight() or db.size.height
+	local texture = media:Fetch("statusbar", db.texture)
+	local font = media:Fetch("font", "Default")
+
+	self.limit = db.limit
+
+	if (event == UnitEvent.UPDATE_DB) then
+
+		if (db.style == "Bar") then
+			self:SetSize(width, height * self.limit)
+		else
+			self:SetSize(height * iconLimit, height * 40 / iconLimit)
+		end
+
+		if (db.attached) then
+			Units:Attach(self, self.db)
+		else
+			self.getMoverSize = function(self)
+				return self:GetSize()
+			end
+
+			A:CreateMover(self, db, self:GetName())
+			Units:Position(self, db.position)
+		end
+
+		self:Update(UnitEvent.UPDATE_DEBUFFS)
+
+	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_DEBUFFS)) then
+		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
+
+		parent.debuffs = orderDebuffs(parent.buffs, self.db, parent.unit)
+
+		local relative = self
+		local last = 0
+
+		for i = 1, #parent.buffs do
+			if (i > tonumber(self.limit)) then
+				tremove(parent.buffs, i)
+			else
+				last = i
+			end
+		end
+
+		for i = 1, last do
+
+			local aura = parent.buffs[i]
+			local button = self.buttons[i]
+
+			if (not button) then
+				self.buttons[i] = CreateButton(self, width, height)
+				button = self.buttons[i]
+			end
+
+			local hasCount = aura.count and aura.count > 1
+
+			button.aura = aura
+			local bar = button.bar
+
+			bar:SetMinMaxValues(0, aura.duration)
+			bar:SetValue(aura.expires - GetTime())
+			bar.db = self.db
+			bar.name:SetText(aura.name..(hasCount and " ["..aura.count.."]" or ""))
+
+			button.icon:SetTexture(aura.icon)
+
+			if (db.style == "Bar") then
+				button.iconText:Hide()
+				button.iconCount:Hide()
+				bar:Show()
+
+				bar:SetStatusBarTexture(texture)
+				bar.bg:SetTexture(texture)
+				bar.name:SetFont(font, db.name.size, "OUTLINE")
+				bar.time:SetFont(font, db.time.size, "OUTLINE")
+
+				button:SetSize(parent:GetWidth(), height)
+
+				placeBar(button, db.barGrowth, relative, self, db.x, db.y)
+			else
+				button.iconText:Show()
+				button.iconCount:Show()
+				bar:Hide()
+
+				button:SetSize(height, height)
+				button.icon:SetSize(height, height)
+				button.iconText:SetFont(font, db.iconTextSize, "OUTLINE")
+				button.iconCount:SetFont(font, 10, "OUTLINE")
+				button.iconCount:SetText(hasCount and aura.count or "")
+
+				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.x, db.y)
+			end
+
+			U:CreateBackground(button, db, false)
+
+			A:ColorBar(bar, parent, 0, duration, A.noop)
+			button:Show()
+
+			relative = button
+		end
+
+		for i = last + 1, #self.buttons do
+			self.buttons[i]:Hide()
+		end
+	end
+end
+
+A["Shared Elements"]:set(elementName, Debuffs)

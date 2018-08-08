@@ -43,29 +43,29 @@ end
  
 function Units:Position(frame, db, overrideRelative)
     frame:ClearAllPoints()
-    if (db["Local Point"] == "ALL") then
+    if (db.localPoint == "ALL") then
         frame:SetAllPoints()
     else
-        local x, y = db["Offset X"], db["Offset Y"]
+        local x, y = db.x, db.y
 
-        if (db["Relative To"] == "FrameParent" or (db["Relative To"] == "Parent" and frame:GetParent() == A.frameParent)) then
+        if (db.relative == "FrameParent" or (db.relative == "Parent" and frame:GetParent() == A.frameParent)) then
             x = T:Scale(x)
             y = T:Scale(y)
         end
 
-        frame:SetPoint(db["Local Point"], self:Translate(frame, overrideRelative or db["Relative To"]), db["Point"], x, y)
+        frame:SetPoint(db.localPoint, self:Translate(frame, overrideRelative or db.relative), db.point, x, y)
     end
 end
 
 function Units:Attach(frame, db, override)
     local target = override or frame:GetParent()
-    local position = db["Attached Position"]
-    local x = db["Attached Offset X"] or db["Position"]["Offset X"]
-    local y = db["Attached Offset Y"] or db["Position"]["Offset Y"]
+    local position = db.attachedPosition
+    local x = db.x or db.position.x
+    local y = db.y or db.position.y
 
     if (not position) then
         A:Debug("No Attached Position for frame:", frame:GetName())
-        return Units:Position(frame, db["Position"])
+        return Units:Position(frame, db.position)
     end
 
     if (position == "Below") then
@@ -90,9 +90,9 @@ end
 
 function Units:PlaceCastbar(bar, db)
     local parent = bar:GetParent()
-    local position = db["Position"]
+    local position = db.position
     
-    if (db["Attached"]) then
+    if (db.attached) then
         
         A:DeleteMover(bar:GetName())
         bar:ClearAllPoints()
@@ -100,8 +100,8 @@ function Units:PlaceCastbar(bar, db)
         if (parent.unit == "player") then
             local relative = getClassPowerRelative(parent)
             if (relative) then
-                local attachedPosition = relative.db["Attached Position"]
-                if (attachedPosition == db["Attached Position"]) then
+                local attachedPosition = relative.db.attachedPosition
+                if (attachedPosition == db.attachedPosition) then
                     self:Attach(bar, db, relative)
                     return
                 end
@@ -110,15 +110,8 @@ function Units:PlaceCastbar(bar, db)
 
         self:Attach(bar, db)
     else
-        self:Position(bar, db["Position"])
+        self:Position(bar, db.position)
         A:CreateMover(bar, db, bar:GetName())
-    end
-end
-
-function Units:SetupKeybindings(frame, db)
-    if InCombatLockdown() then return end
-    if db then
-        A.modules["Actionbars"]:SetupBindings(db)
     end
 end
 
@@ -135,20 +128,20 @@ function Units:Tag(frame, name, db)
         frame.tags:set(name, tag)
     end
 
-    tag:SetFont(media:Fetch("font", "Default"), db["Size"], "OUTLINE")
-    tag.format = db["Format"]
+    tag:SetFont(media:Fetch("font", "Default"), db.size, "OUTLINE")
+    tag.format = db.format
 
     local position = {
-        ["Local Point"] = db["Local Point"],
-        ["Point"] = db["Point"],
-        ["Relative To"] = db["Relative To"],
-        ["Offset X"] = db["Offset X"],
-        ["Offset Y"] = db["Offset Y"]
+        localPoint = db.localPoint,
+        point = db.point,
+        relative = db.relative,
+        x = db.x,
+        y = db.y
     }
 
     Units:Position(tag, position)
 
-    if (db["Hide"]) then
+    if (db.hide) then
         tag:Hide()
     else
         tag:Show()
@@ -161,36 +154,6 @@ function Units:RegisterEvents(frame, events, force)
         if (registered and force or not registered) then
             frame:RegisterEvent(event)
         end
-    end
-end
-
-function Units:CreateStatusBorder(frame, name, db)
-    if not frame["StatusBorder"] then
-        frame["StatusBorder"] = {}
-    end
-
-    local border = frame["StatusBorder"][name]
-    if not border then
-        border = CreateFrame("Frame", frame:GetName().."_"..name, frame)
-        border:SetBackdrop(A.enum.backdrops.editboxborder2)
-        border:SetBackdropColor(0, 0, 0, 0)
-        border:SetBackdropBorderColor(0, 0, 0, 0)
-        border.timer = 0
-        frame["StatusBorder"][name] = border
-    end
-
-    if not db["Enabled"] then
-        border:SetScript("OnUpdate", nil)
-        border:Hide()
-    else
-        border.unit = frame.unit or frame:GetAttribute("unit")
-        border:SetScript("OnUpdate", db["Condition"])
-        border:SetBackdropBorderColor(unpack(db["Color"] or { 0, 0, 0, 0 }))
-        border:SetFrameStrata(db["Framestrata"] or "LOW")
-        border:SetFrameLevel(db["FrameLevel"])
-        border:SetAllPoints()
-        border:SetAlpha(0)
-        border:Show()
     end
 end
 
@@ -209,7 +172,7 @@ function Units:SetupMissingBar(parent, db, key, min, max, gradient, colorFunc, c
     local bar = parent[key]
     local unit = parent:GetParent()
 
-    if (db["Enabled"]) then
+    if (db.enabled) then
         local tex = parent:GetStatusBarTexture()
         local orientation = parent:GetOrientation()
         local reversed = parent:GetReverseFill()

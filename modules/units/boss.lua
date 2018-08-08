@@ -8,11 +8,10 @@ local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES
 
 function Boss:Init()
 
-    local db = A["Profile"]["Options"][frameName]
-    local size = db["Size"]
+    local db = A.db.profile.units[frameName:lower()]
 
     self.container = self.container or Units:Get(frameName) or CreateFrame("Frame", T:frameName("Boss Container"), A.frameParent, "SecureHandlerBaseTemplate, SecureHandlerShowHideTemplate, SecureHandlerStateTemplate, SecureHandlerAttributeTemplate")
-    self.container:SetSize(size["Width"], size["Height"])
+    self.container:SetSize(db.size.width, db.size.height)
     self.container.db = db
     self.container.frames = self.container.frames or {}
     
@@ -37,7 +36,7 @@ function Boss:Init()
         local first = anchor == self.container
 
         local lp, p
-        if db["Orientation"] == "HORIZONTAL" then
+        if db.orientation == "HORIZONTAL" then
             lp = "LEFT"
             p = T.reversedPoints[first and "RIGHT" or "LEFT"]
         else
@@ -45,7 +44,7 @@ function Boss:Init()
             p = T.reversedPoints[first and "BOTTOM" or "TOP"]
         end
 
-        frame:SetPoint(lp, anchor, p, db["Offset X"], db["Offset Y"])
+        frame:SetPoint(lp, anchor, p, db.x, db.y)
         
         self.container.frames[i] = frame
         self:Update(frame, db)
@@ -58,7 +57,7 @@ function Boss:Init()
     end
 
     RegisterStateDriver(self.container, "visibility", "[@boss1,exists] show; hide")
-    Units:Position(self.container, db["Position"])
+    Units:Position(self.container, db.position)
 
     Units:Add(self.container, frameName)
 
@@ -79,14 +78,13 @@ function Boss:Update(...)
         if (event == UnitEvent.UPDATE_DB) then
 
             local db = self.db or arg2
-            local position, size = db["Position"], db["Size"]
 
             if (not InCombatLockdown()) then
                 Units:Position(self, position)
-                self:SetSize(size["Width"], size["Height"])
+                self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general:get("clickcast"):Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db.clickcast)
             end
 
             --[[ Bindings ]]--
@@ -96,7 +94,7 @@ function Boss:Update(...)
             U:CreateBackground(self, db)
 
             self.tags:foreach(function(key, tag)
-                if (not db["Tags"][key]) then
+                if (not db.tags[key]) then
                     if (tag) then
                         tag:Hide()
                     end
@@ -104,7 +102,7 @@ function Boss:Update(...)
                 end
             end)
 
-            for name,tag in next, db["Tags"] do
+            for name,tag in next, db.tags do
                 Units:Tag(self, name, tag)
             end
 

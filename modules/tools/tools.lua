@@ -279,11 +279,11 @@ function T:TranslatePosition(frame, lp, relative, p, x, y, anchor)
 	frame:SetPoint(anchor, relative, anchor, newX, newY)
 
 	return {
-		["Local Point"] = anchor,
-		["Point"] = anchor,
-		["Relative To"] = "FrameParent",
-		["Offset X"] = newX,
-		["Offset Y"] = newY
+		localPoint = anchor,
+		point = anchor,
+		relative = "FrameParent",
+		x = newX,
+		y = newY
 	}
 end
 

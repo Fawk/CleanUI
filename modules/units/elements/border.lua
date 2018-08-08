@@ -9,7 +9,7 @@ local Unit
 
 
 --[[ Locals ]]
-local elementName = "Border"
+local elementName = "border"
 local Border = {}
 
 function Border:Init(parent)
@@ -39,7 +39,7 @@ function Border:Update(...)
 	local parent = self:GetParent()
 	local db = self.db
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		self:Hide()
 		return
 	else
@@ -47,11 +47,11 @@ function Border:Update(...)
 	end
 
 	if (event == UnitEvent.UPDATE_DB) then
-		if (db["Highlight Target"]) then
-			parent:SetBackdropBorderColor(unpack(db["Target Color"]))
+		if (db.highlight) then
+			parent:SetBackdropBorderColor(unpack(db.targetColor))
 		end
 
-		if (db["Show Debuff Border"]) then
+		if (db.debuff) then
 			local debuffTypes = {}
 			for i = 1, 40 do
 				local debuffType = select(5, UnitDebuff(parent.unit, i))
@@ -59,25 +59,18 @@ function Border:Update(...)
 					debuffTypes[debuffType] = true
 				end
 			end
-				
+
 			local color
-			if (debuffTypes["Poison"]) then
-				color = A.colors.debuff["Poison"]
-			end
-
-			if (debuffTypes["Disease"]) then
-				color = A.colors.debuff["Disease"]
-			end
-
-			if (debuffTypes["Curse"]) then
-				color = A.colors.debuff["Curse"]
-			end
-
-			if (debuffTypes["Magic"]) then
-				color = A.colors.debuff["Magic"]
+			for i = #db.debuffOrder, 1 do
+				local debuff = db.debuffOrder[i]
+				if (debuffTypes[debuff]) then
+					color = A.colors.debuff[debuff]
+				end
 			end
 			
-			parent:SetBackdropBorderColor(unpack(color))
+			if (color) then
+				parent:SetBackdropBorderColor(unpack(color))
+			end
 		end
 	else
 

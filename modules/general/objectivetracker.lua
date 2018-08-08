@@ -46,25 +46,25 @@ function Tracker:Init()
         LoadAddOn("Blizzard_ObjectiveTracker")
     end
 
-    local db = A["Profile"]["Options"]["Objective Tracker"]
-    local size = db["Size"]
-    local position = db["Position"]
-    local x, y = position["Offset X"], position["Offset Y"]
+    local db = A.db.profile.general.objectiveTracker
+    local size = db.size
+    local position = db.position
+    local x, y = position.x, position.y
 
     ObjectiveTrackerFrame.db = db
     ObjectiveTrackerFrame:SetAlpha(0)
     ObjectiveTrackerFrame.ignoreFramePositionManager = true
     ObjectiveTrackerFrame:SetMovable(true)
     ObjectiveTrackerFrame:SetUserPlaced(true)
-    ObjectiveTrackerFrame:SetSize(size["Width"], size["Height"])
+    ObjectiveTrackerFrame:SetSize(size.width, size.height)
     ObjectiveTrackerFrame:ClearAllPoints()
-    ObjectiveTrackerFrame:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
+    ObjectiveTrackerFrame:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 
     hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(self, lp, r, p, x1, y2)
 		if (r ~= A.frameParent) then
 			if (r.GetName and r:GetName():find("Mover")) then return end;
 		    self:ClearAllPoints()
-    		self:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
+    		self:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
     	end
     end)
 

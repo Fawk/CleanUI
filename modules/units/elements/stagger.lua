@@ -8,7 +8,7 @@ local UnitClass = UnitClass
 local UnitStagger = UnitStagger
 
 --[[ Locals ]]
-local elementName = "Stagger"
+local elementName = "stagger"
 local Stagger = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", 'UNIT_DISPLAYPOWER' }
 
@@ -24,7 +24,7 @@ function Stagger:Init(parent)
 	end
 
 	local db = parent.db[elementName]
-	local texture = media:Fetch("statusbar", db["Texture"])
+	local texture = media:Fetch("statusbar", db.texture)
 
 	local stagger = parent.orderedElements:get(elementName)
 	if (not stagger) then
@@ -40,8 +40,8 @@ function Stagger:Init(parent)
 	   		Stagger:Update(self, ...)
 	   	end
 
-	   	local mult = db["Background Multiplier"]
-		local r, g, b, a = unpack(db["Colors"]["Low"])
+	   	local mult = db.mult
+		local r, g, b, a = unpack(db.colors.low)
 		
 		stagger:SetStatusBarColor(r, g, b, a)
 		stagger.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
@@ -98,20 +98,19 @@ function Stagger:Update(...)
 		local tag = arg1
 		tag:AddReplaceLogic("[stagger]", staggerValue)
 	elseif (event == UnitEvent.UPDATE_DB) then
-		local texture = media:Fetch("statusbar", db["Texture"])
-		local size = db["Size"]
+		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetOrientation(db["Orientation"])
-		self:SetReverseFill(db["Reversed"])
+		self:SetOrientation(db.orientation)
+		self:SetReverseFill(db.reversed)
 		self:SetStatusBarTexture(texture)
-		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
-		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		self:SetWidth(db.size.matchWidth and parent:GetWidth() or db.size.width)
+		self:SetHeight(db.size.matchHeight and parent:GetHeight() or db.size.height)
 		
 		self.bg:ClearAllPoints()
 		self.bg:SetAllPoints()
 		self.bg:SetTexture(texture)
 
-		if (db["Background Multiplier"] == -1) then
+		if (db.mult == -1) then
 			self.bg:Hide()
 		else
 			self.bg:Show()
@@ -127,10 +126,10 @@ function Stagger:Update(...)
 		self:SetValue(staggerValue)
 
 		local r, g, b, a
-		local low = db["Colors"]["Low"]
-		local medium = db["Colors"]["Medium"]
-		local high = db["Colors"]["High"]
-		local mult = db["Background Multiplier"]
+		local low = db.colors.low
+		local medium = db.colors.medium
+		local high = db.colors.high
+		local mult = db.mult
 
 		local perc = (staggerValue / parent.currentMaxHealth) * 100
 		if (perc > 60) then

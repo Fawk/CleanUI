@@ -1,37 +1,88 @@
 local A, L = unpack(select(2, ...))
 local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
+local Units = A.Units
 
+local elementName = "combat"
 local CombatIndicator = {}
--- function CombatIndicator(frame, db)
 
--- 	local combat = frame.CombatIndicator or (function()
--- 		local combat = CreateFrame("Frame", "Combat", frame)
--- 		combat:SetBackdrop({
--- 			bgFile = media:Fetch("statusbar", "Default"),
--- 			tile = true,
--- 			tileSize = 16,
--- 			insets = {
--- 				top = -1,
--- 				bottom = -1,
--- 				left = -1,
--- 				right = -1,
--- 			}
--- 		})
--- 		combat:SetFrameStrata("LOW")
--- 		combat:SetFrameLevel(2)
--- 		return combat
--- 	end)()
+function CombatIndicator:Init(parent)
+	local db = parent.db[elementName]
 
--- 	combat:SetBackdropColor(unpack(A.colors.border.combat))
--- 	combat:ClearAllPoints()
--- 	combat:SetPoint("CENTER", frame, "CENTER", 0, 0)
--- 	combat:SetSize(frame:GetSize())
+	local combat = parent.orderedElements:get(elementName)
+	if (not combat) then
+		combat = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
+		combat.db = db
+		combat.text = combat:CreateFontString(nil, "OVERLAY")
+		combat.text:SetPoint("CENTER")
+		combat.texture = combat:CreateTexture(nil, "OVERLAY")
+		combat.texture:SetAllPoints()
 
--- 	combat:Hide()
+		combat.Update = function(self, ...)
+			CombatIndicator:Update(self, ...)
+		end
 
--- 	frame.CombatIndicator = combat
--- end
+		combat:RegisterEvent("PLAYER_REGEN_ENABLED")
+		combat:RegisterEvent("PLAYER_REGEN_DISABLED")
+		combat:SetScript("OnEvent", function(self, ...)
+			self:Update(UnitEvent.UPDATE_DB)
+		end)
+	end
 
---A["Elements"]:add({ name = "CombatIndicator", func = CombatIndicator })
+	combat:Update(UnitEvent.UPDATE_DB)
+
+	parent.orderedElements:set(elementName, combat)
+end
+
+function CombatIndicator:Update(...)
+    local self, event, arg1, arg2, arg3, arg4, arg5 = ...
+    local db = self.db
+
+	local inCombat = UnitAffectingCombat("player")
+	if (inCombat) then
+		self:Show()
+	else
+		self:Hide()
+	end
+
+	if (not self.style) then
+    	self.style = db.style
+    else
+    	if (self.style == db.style) then
+    		return -- Let's not update if we don't have to
+    	else
+    		self.style = db.style
+    	end
+    end
+
+    self:SetSize(db.size, db.size)
+    Units:Position(self, db.position)
+
+	if (db.style == "Text" or db.style == "Letter") then
+		self.texture:Hide()
+		self.text:Show()
+
+		local value = "Combat"
+		if (db.style == "Letter") then
+			value = value:sub(1, 1)
+		end
+		self.text:SetFont(media:Fetch("font", "Default"), db.fontSize, "OUTLINE")
+		self.text:SetText(value)
+		self.text:SetTextColor(unpack(db.color))
+	elseif (db.style == "texture") then
+		self.texture:Show()
+		self.text:Hide()
+
+		self.texture:SetTexture([[Interface\CharacterFrame\UI-StateIcon]])
+		self.texture:SetTexCoord(.5, 1, 0, .49)
+	elseif (db.style == "color") then
+		self.texture:Show()
+		self.text:Hide()
+
+		self.texture:SetTexture(unpack(db.color))
+		self.texture:SetTexCoord(0, 1, 0, 1)
+	end
+end
+
+A["Player Elements"]:set(elementName, CombatIndicator)
 

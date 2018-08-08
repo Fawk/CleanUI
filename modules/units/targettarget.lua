@@ -9,7 +9,7 @@ local unitName = "TargetTarget"
 
 function TargetTarget:Init()
 
-    local db = A["Profile"]["Options"][frameName]
+    local db = A.db.profile.units[unitName:lower()]
 
     local frame = Units:Get(frameName) or A:CreateUnit(unitName)
     frame.GetDbName = function(self) return frameName end
@@ -25,10 +25,10 @@ function TargetTarget:Init()
     end
 
     Units:Add(frame, frame:GetDbName())
-    Units:Position(frame, db["Position"])
+    Units:Position(frame, db.position)
     
     frame:Update(UnitEvent.UPDATE_IDENTIFIER)
-    frame:Update(UnitEvent.UPDATE_DB, db)
+    frame:Update(UnitEvent.UPDATE_DB)
 
     A:CreateMover(frame, db, frameName)
 
@@ -44,25 +44,24 @@ function TargetTarget:Update(...)
         -- Update player specific things based on the event
         if (event == UnitEvent.UPDATE_DB) then
 
-            local db = self.db or arg2
-            local position, size = db["Position"], db["Size"]
+            local db = self.db
 
             if (not InCombatLockdown()) then
-                Units:Position(self, position)
-                self:SetSize(size["Width"], size["Height"])
+                Units:Position(self, db.position)
+                self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general:get("clickcast"):Setup(self, db["Clickcast"])
+                A.general:get("clickcast"):Setup(self, db.clickcast)
             end
 
             --[[ Bindings ]]--
             self:RegisterForClicks("AnyUp")
 
             --[[ Background ]]--
-            U:CreateBackground(self, db)
+            U:CreateBackground(self, db, false)
 
             self.tags:foreach(function(key, tag)
-                if (not db["Tags"][key]) then
+                if (not db.tags[key]) then
                     if (tag) then
                         tag:Hide()
                     end
@@ -70,7 +69,7 @@ function TargetTarget:Update(...)
                 end
             end)
 
-            for name,tag in next, db["Tags"] do
+            for name,tag in next, db.tags do
                 Units:Tag(self, name, tag)
             end
 

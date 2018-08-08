@@ -73,7 +73,7 @@ end
 local CC = {}
 
 function CC:Setup(frame, db)
-	if (not db or not db["Enabled"]) then return end
+	if (not db or not db.enabled) then return end
 
 	for key, attribute in next, keyMap do
 		if (frame:GetAttribute(attribute)) then
@@ -90,7 +90,7 @@ function CC:Setup(frame, db)
 		end
 	end
 
-	for key, action in next, db["Actions"] do
+	for key, action in next, db.actions do
 
 		local mapped = keyMap[key]
 
@@ -110,10 +110,10 @@ function CC:Setup(frame, db)
 end
 
 function CC:GetInitString(initString, db)
-	if (not db["Enabled"]) then return initString end
+	if (not db.enabled) then return initString end
 
 	local initiated = {}
-	for key, action in next, db["Actions"] do
+	for key, action in next, db.actions do
 
 		local mapped = keyMap[key]
 
@@ -292,7 +292,7 @@ function CC:ToggleClickCastWindow(group)
 
 	parent.rows = createRows(parent)
 
-	local actions = splitActionsByConditions(group.db["Actions"])
+	local actions = splitActionsByConditions(group.db.actions)
 	local mappedActions = mapActionsByKey(actions)
 
 	parent:SetSize(350, 20 + (20 * T:tcount(mappedActions["LMB"] or {})))
@@ -325,7 +325,7 @@ function CC:ToggleClickCastWindow(group)
 				local button, dropdown, mouseButton = ...
 
 				local relative = parent.rows
-				actions = splitActionsByConditions(group.db["Actions"])
+				actions = splitActionsByConditions(group.db.actions)
 				mappedActions = mapActionsByKey(actions)
 				local mapped = mappedActions[button.name]
 				if (mapped) then
@@ -412,19 +412,19 @@ function CC:ToggleClickCastWindow(group)
 									-- Delete this clickcast from the db
 									local command = action.spell:anyMatch("target", "togglemenu")
 									if (command) then
-										group.db["Actions"][action.key] = nil
+										group.db.actions[action.key] = nil
 									else
 										local con = concat(action)
-										if (T:tcount(group.db["Actions"]) > 1) then 
-											group.db["Actions"][action.key] = group.db["Actions"][action.key]:gsub(con:escape().."[;%s]?[%s]?", "")
+										if (T:tcount(group.db.actions) > 1) then 
+											group.db.actions[action.key] = group.db.actions[action.key]:gsub(con:escape().."[;%s]?[%s]?", "")
 										else
-											group.db["Actions"][action.key] = nil
+											group.db.actions[action.key] = nil
 										end
 									end
 
 									local rowCount = 0
-									if (group.db["Actions"][action.key]) then
-										rowCount =  T:tcount(group.db["Actions"][action.key]:explode(";"))
+									if (group.db.actions[action.key]) then
+										rowCount =  T:tcount(group.db.actions[action.key]:explode(";"))
 									end
 
 									parent:SetHeight(20 + (20 * rowCount))
@@ -605,13 +605,13 @@ function CC:ToggleClickCastWindow(group)
 				local spell = textbox:GetText()
 
 				local key = keyDropdown:GetValue()
-				local actionTbl = group.db["Actions"][key]
+				local actionTbl = group.db.actions[key]
 
 				local command = spell:anyMatch("target", "togglemenu")
 				if (command) then
 					-- Present notification here that conditions does not work for blizzard commands and this will
 					-- also override any other settings for this key combination
-					group.db["Actions"][key] = command
+					group.db.actions[key] = command
 				else
 					if (actionTbl and (actionTbl:find("target") or actionTbl:find("togglemenu"))) then
 						-- Present notification here stating that the previous setting has a blizzard command and that
@@ -630,7 +630,7 @@ function CC:ToggleClickCastWindow(group)
 						local toSave
 						if (not actionTbl) then
 							toSave = string.format("/cast [%s] %s", concatted, spell)
-							group.db["Actions"][key] = toSave
+							group.db.actions[key] = toSave
 						else
 							if (actionTbl:find(concatted)) then
 								-- Already exists, add a notification of some kind
@@ -638,16 +638,16 @@ function CC:ToggleClickCastWindow(group)
 								toSave = string.format("[%s] %s;", concatted, spell)
 								if (actionTbl:sub(-1) ~= ";") then
 									toSave = "; "..toSave
-									group.db["Actions"][key] = actionTbl..toSave
+									group.db.actions[key] = actionTbl..toSave
 								else
-									group.db["Actions"][key] = actionTbl.." "..toSave
+									group.db.actions[key] = actionTbl.." "..toSave
 								end
 							end
 						end
 					end
 				end
 
-				parent:SetHeight(20 + (20 * T:tcount(group.db["Actions"][key]:explode(";"))))
+				parent:SetHeight(20 + (20 * T:tcount(group.db.actions[key]:explode(";"))))
 
 				-- Save to db here and reload the rows
 				textbox:SetText("")

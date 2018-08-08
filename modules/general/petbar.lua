@@ -34,10 +34,10 @@ function PetBar:Init()
 
     local bar = CreateFrame("Frame", T:frameName("PetBar"), A.frameParent, "SecureHandlerStateTemplate")
 
-    local db = A["Profile"]["Options"]["Pet Bar"]
-    local size = db["Icon Size"]
-    local verticalLimit = db["Vertical Limit"]
-    local horizontalLimit = db["Horizontal Limit"]
+    local db = A.db.profile.general.petBar
+    local size = db.iconSize
+    local verticalLimit = db.verticalLimit
+    local horizontalLimit = db.horizontalLimit
     local rows = 1
 
     for i=1, NUM_PET_ACTION_SLOTS, 1 do
@@ -170,10 +170,10 @@ function PetBar:Init()
 
     RegisterStateDriver(bar, "visibility", "[@pet,exists] show; hide")
     
-    local position = db["Position"]
-    local x, y = position["Offset X"], position["Offset Y"]
+    local position = db.position
+    local x, y = position.x, position.y
 
-    bar:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
+    bar:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 
     bar.db = db
 

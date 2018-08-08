@@ -9,13 +9,13 @@ local UnitClass = UnitClass
 local UnitName = UnitName
 
 --[[ Locals ]]
-local elementName = "Castbar"
+local elementName = "castbar"
 local Castbar = { name = elementName }
 
 A["Shared Elements"]:set(elementName, Castbar)
 
 local function CheckEnabled(e, db)
-	if not db["Enabled"] then
+	if not db.enabled then
 		e:Hide()
 	else
 		e:Show()
@@ -38,10 +38,10 @@ function Castbar:Init(parent)
 		bar.bg = container:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
-		local name = buildText(container, db["Name"]["Font Size"]):shadow():enforceHeight():build()
+		local name = buildText(container, db.name.size):shadow():enforceHeight():build()
 		name:SetText("")
 
-		local time = buildText(container, db["Time"]["Font Size"]):shadow():build()
+		local time = buildText(container, db.time.size):shadow():build()
 		time:SetText("")
 
 		container.bar = bar
@@ -72,8 +72,8 @@ function Castbar:Init(parent)
 	    end)
 
 		container:HookScript("OnShow", function(self)
-			self.bar:SetStatusBarTexture(media:Fetch("statusbar", db["Texture"]))
-			self.bar.bg:SetTexture(media:Fetch("statusbar", db["Texture"]))
+			self.bar:SetStatusBarTexture(media:Fetch("statusbar", db.texture))
+			self.bar.bg:SetTexture(media:Fetch("statusbar", db.texture))
 
 			if ( parent.unit ) then
 				if ( self.casting ) then
@@ -122,21 +122,20 @@ function Castbar:Update(...)
 	local bar = self.bar
 
 	if (event == UnitEvent.UPDATE_DB) then
-		Units:Position(self.Text, db["Name"]["Position"])
-		Units:Position(self.Time, db["Time"]["Position"])
+		Units:Position(self.Text, db.name.position)
+		Units:Position(self.Time, db.time.position)
 
-		local texture = media:Fetch("statusbar", db["Texture"])
+		local texture = media:Fetch("statusbar", db.texture)
 
 		bar:SetStatusBarTexture(texture)
 		bar.bg:SetTexture(texture)
 
-		CheckEnabled(self.Text, db["Name"])
-		CheckEnabled(self.Time, db["Time"])
-		CheckEnabled(self.Icon, db["Icon"])
+		CheckEnabled(self.Text, db.name)
+		CheckEnabled(self.Time, db.time)
+		CheckEnabled(self.Icon, db.icon)
 
-		local size = db["Size"]
-		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
-		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		self:SetWidth(db.size.matchWidth and parent:GetWidth() or db.size.width)
+		self:SetHeight(db.size.matchHeight and parent:GetHeight() or db.size.height)
 
 		self.getMoverSize = function(self)
 			return self:GetSize()
@@ -145,38 +144,36 @@ function Castbar:Update(...)
 		U:CreateBackground(self, db, false)
 
 		local iconW, iconH
-		local iconDb = db["Icon"]
 
-		if (iconDb["Enabled"]) then
+		if (db.icon.enabled) then
 
-			size = iconDb["Size"]
+			size = db.icon.size
 			local width, height = self:GetSize()
 
-			if (size["Match width"]) then
+			if (size.matchWidth) then
 				iconW = width
 				iconH = width
-			elseif (size["Match height"]) then
+			elseif (size.matchHeight) then
 				iconH = height
 				iconW = height
 			else
-				iconW = size["Size"]
-				iconH = size["Size"]
+				iconW = size.size
+				iconH = size.size
 			end
 
 			self.Icon:SetSize(iconW, iconH)
-			U:CreateBackground(self.Icon, iconDb, false)
+			U:CreateBackground(self.Icon, db.icon, false)
 			self.Icon.Background:SetBackdropBorderColor(0, 0, 0, 0)
 
-			local iconPosition = iconDb["Position"]
-			if (iconPosition == "LEFT") then
+			if (db.icon.position == "LEFT") then
 				self.Icon:SetPoint("LEFT", self, "LEFT", 0, 0)
 				bar:SetPoint("TOPLEFT", self.Icon, "TOPRIGHT", 1, 0)
 				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
-			elseif (iconPosition == "RIGHT") then
+			elseif (db.icon.position == "RIGHT") then
 				self.Icon:SetPoint("RIGHT", self, "RIGHT", 0, 0)
 				bar:SetPoint("TOPRIGHT", self.Icon, "TOPLEFT", -1, 0)
 				bar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-			elseif (iconPosition == "TOP") then
+			elseif (db.icon.position == "TOP") then
 				self.Icon:SetPoint("TOP", self, "TOP", 0, -1)
 				bar:SetPoint("TOPLEFT", self.Icon, "BOTTOMLEFT", 0, 1)
 				bar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
@@ -191,7 +188,7 @@ function Castbar:Update(...)
 		end
 
 		Units:PlaceCastbar(self, db)
-		Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
+		Units:SetupMissingBar(self.bar, self.db.missingBar, "missingBar", self.value, self.max, A.noop, A.ColorBar)
 	elseif (event == "OnUpdate") then
 
 		if (self.casting) then
@@ -204,18 +201,18 @@ function Castbar:Update(...)
 				return self:Hide()
 			end
 
-			self.Time:SetText(db["Time"]["Format"]
+			self.Time:SetText(db.time.format
 					:replace("[current]", T:timeShort(self.value, 1, true))
 					:replace("[max]", T:timeShort(self.max, 1, true))
 					:replace("[delay]", "-"..self.delay)
 			)
 
-			self.Text:SetText(db["Name"]["Format"]
+			self.Text:SetText(db.name.format
 					:replace("[name]", self.spell)
 					:replace("[target]", UnitName("target") or "")
 			)
 
-			Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
+			Units:UpdateMissingBar(self.bar, "missingBar", self.value, self.max)
 			bar:SetValue(self.value)
 		elseif (self.channeling) then
 			
@@ -227,18 +224,18 @@ function Castbar:Update(...)
 				return self:Hide()
 			end
 
-			self.Time:SetText(db["Time"]["Format"]
+			self.Time:SetText(db.time.format
 					:replace("[current]", T:timeShort(self.value, 1, true))
 					:replace("[max]", T:timeShort(self.max, 1, true))
 					:replace("[delay]", "-"..self.delay)
 			)
 
-			self.Text:SetText(db["Name"]["Format"]
+			self.Text:SetText(db.name.format
 					:replace("[name]", self.spell)
 					:replace("[target]", UnitName("target") or "")
 			)
 			
-			Units:SetupMissingBar(self.bar, self.db["Missing Bar"], "missingBar", self.value, self.max, A.noop, A.ColorBar)
+			Units:SetupMissingBar(self.bar, self.db.missingBar, "missingBar", self.value, self.max, A.noop, A.ColorBar)
 			bar:SetValue(self.value);
 		else
 			self.casting = nil

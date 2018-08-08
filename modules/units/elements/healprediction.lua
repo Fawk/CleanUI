@@ -12,7 +12,7 @@ local floor = math.floor
 local unpack = unpack
 
 --[[ Locals ]]
-local elementName = "Heal Prediction"
+local elementName = "healPrediction"
 local HealPrediction = {}
 local events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH", "UNIT_HEAL_PREDICTION", "UNIT_ABSORB_AMOUNT_CHANGED", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" }
 
@@ -57,7 +57,7 @@ end
 
 local function HealPredictionPostUpdate(self, my, all, absorb, healAbsorb)
 	local frame = self:GetParent()
-	local health = frame.orderedElements:get("Health")
+	local health = frame.orderedElements:get("health")
 	local previous = health:GetStatusBarTexture()
 
 	previous = Update(health, previous, self.myBar, my)
@@ -70,7 +70,7 @@ function HealPrediction:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local texture = media:Fetch("statusbar", db["Texture"] or "Default")
+	local texture = media:Fetch("statusbar", db.texture)
 
 	local healPrediction = parent.orderedElements:get(elementName)
 	if (not healPrediction) then
@@ -89,7 +89,7 @@ function HealPrediction:Init(parent)
 		absorb:Hide()
 		healAbsorb:Hide()
 		
-		local health = parent.orderedElements:get("Health")
+		local health = parent.orderedElements:get("health")
 		if health then
 			my:SetParent(health)
 			all:SetParent(health)
@@ -152,7 +152,7 @@ function HealPrediction:Update(...)
 	local parent = self:GetParent()
 	local db = self.db
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		self.myBar:Hide()
 		self.otherBar:Hide()
 		self.absorbBar:Hide()
@@ -163,21 +163,19 @@ function HealPrediction:Update(...)
 	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
 
 	if (event == UnitEvent.UPDATE_DB) then
-		local texture = media:Fetch("statusbar", db["Texture"] or "Default2")
+		local texture = media:Fetch("statusbar", db.texture)
 
-		self.maxOverflow = db["Max Overflow"]
-		self.frequentUpdates = db["Frequent Updates"]
+		self.maxOverflow = db.overflow
 		
 		self.myBar:SetStatusBarTexture(texture)
 		self.otherBar:SetStatusBarTexture(texture)
 		self.absorbBar:SetStatusBarTexture(texture)
 		self.healAbsorbBar:SetStatusBarTexture(texture)
 
-		local colors = db["Colors"]
-		self.myBar:SetStatusBarColor(unpack(colors["My Heals"]))
-		self.otherBar:SetStatusBarColor(unpack(colors["All Heals"]))
-		self.absorbBar:SetStatusBarColor(unpack(colors["Absorb"]))
-		self.healAbsorbBar:SetStatusBarColor(unpack(colors["Heal Absorb"]))
+		self.myBar:SetStatusBarColor(unpack(db.colors.my))
+		self.otherBar:SetStatusBarColor(unpack(db.colors.all))
+		self.absorbBar:SetStatusBarColor(unpack(db.colors.absorb))
+		self.healAbsorbBar:SetStatusBarColor(unpack(db.colors.healAbsorb))
 
 		parent.maxOverflow = self.maxOverflow
 

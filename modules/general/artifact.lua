@@ -52,10 +52,10 @@ end
 
 local function setup(name, artifact, db)
     
-    local position = db["Position"]
-    local size = db["Size"]
+    local position = db.position
+    local size = db.size
     local texture = media:Fetch("statusbar", db["Texture"])
-    local r, g, b = unpack(db["Color"])
+    local r, g, b = unpack(db.color)
     local current = select(5, C_ArtifactUI.GetEquippedArtifactInfo())
     local numTraits = select(6, C_ArtifactUI.GetEquippedArtifactInfo())
     local tier = select(13, C_ArtifactUI.GetEquippedArtifactInfo())
@@ -68,10 +68,10 @@ local function setup(name, artifact, db)
 
     artifact:ClearAllPoints()
 
-    local x, y = position["Offset X"], position["Offset Y"]
+    local x, y = position.x, position.y
 
-    artifact:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
-    artifact:SetSize(size["Width"], size["Height"])
+    artifact:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
+    artifact:SetSize(size.width, size.height)
     artifact:SetStatusBarTexture(texture)
     artifact:SetStatusBarColor(r, g, b)
     artifact:SetMinMaxValues(0, nextCost)
@@ -79,7 +79,7 @@ local function setup(name, artifact, db)
     artifact.bg:SetTexture(texture)
     artifact.text:SetText(text(current, nextCost))
 
-    local mult = db["Background Multiplier"]
+    local mult = db.mult
     artifact.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
     U:CreateBackground(artifact, db, false)
@@ -96,7 +96,7 @@ end
 
 function Artifact:Init()
     
-    local db = A["Profile"]["Options"][self.name]
+    local db = A.db.profile.general.artifact
     
     local artifact = A.frames.artifactPowerBar or (function()
         local artifact = CreateFrame("StatusBar", T:frameName(self.name), A.frameParent)
@@ -134,7 +134,7 @@ function Artifact:Init()
         end)
 
         local textFrame = CreateFrame("Frame", nil, artifact)
-        textFrame:SetSize(db["Size"]["Width"], db["Size"]["Height"])
+        textFrame:SetSize(db.size.width, db.size.height)
         textFrame:SetPoint("CENTER")
         textFrame:SetFrameLevel(2)
         

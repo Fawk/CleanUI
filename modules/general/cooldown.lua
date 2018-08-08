@@ -216,7 +216,10 @@ end
 
 function Cooldown:Init()
 
-	local db = A["Profile"]["Options"]["Cooldown bar"]
+	local db = A.db.profile.general.cooldown
+
+	if (not db) then return end
+
 	local position = db["Position"]
 
 	if not bar then

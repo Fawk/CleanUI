@@ -16,11 +16,11 @@ local BagBar = {}
 
 function BagBar:Init()
 
-	local db = A["Profile"]["Options"][moduleName]
+	local db = A.db.profile.general.bagBar
 
-	if (db["Enabled"]) then
+	if (db.enabled) then
 
-		local position = db["Position"]
+		local position = db.position
 		local bagBar = CreateFrame("Frame", nil, A.frameParent)
 
 		MainMenuBarBackpackButton:ClearAllPoints()
@@ -50,10 +50,10 @@ function BagBar:Init()
 		_G["CharacterBag0Slot"]:ClearAllPoints()
 		_G["CharacterBag0Slot"]:SetPoint("RIGHT", MainMenuBarBackpackButton, "LEFT", -2, 0)
 
-		bagBar:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		bagBar:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 		A:CreateMover(bagBar, db, moduleName)
 
-		if (db["Hide"]) then
+		if (db.hide) then
 			MainMenuBarBackpackButton:Hide()
 			for i = 0, 3 do
 				_G["CharacterBag"..i.."Slot"]:Hide()

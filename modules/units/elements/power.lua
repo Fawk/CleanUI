@@ -8,7 +8,7 @@ local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
 
 --[[ Locals ]]
-local elementName = "Power"
+local elementName = "power"
 local Power = { name = elementName }
 local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM" }
 
@@ -44,7 +44,7 @@ function Power:Init(parent)
 	    end)
 	end
 
-	power:Update(UnitEvent.UPDATE_DB, db)
+	power:Update(UnitEvent.UPDATE_DB)
 
 	parent.orderedElements:set(elementName, power)
 end
@@ -59,9 +59,9 @@ function Power:Update(...)
 	
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
-	local db = self.db or arg1
+	local db = self.db
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		self:Hide()
 		return
 	else
@@ -84,7 +84,7 @@ function Power:Update(...)
 		  		self:SetValue(1)
 		  	end
 
-		  	if (db["Missing Power Bar"]["Enabled"]) then
+		  	if (db.missingBar.enabled) then
 		  		Units:UpdateMissingBar(self, "missingPowerBar", parent.currentPower, parent.currentMaxPower)
 		  	end
 
@@ -114,27 +114,27 @@ function Power:Update(...)
 
 		self:Update("UNIT_POWER_FREQUENT", parent.unit)
 
-		Units:Position(self, db["Position"])
+		Units:Position(self, db.position)
 
-		local texture = media:Fetch("statusbar", db["Texture"])
-		local size = db["Size"]
+		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetOrientation(db["Orientation"])
-		self:SetReverseFill(db["Reversed"])
+		self:SetOrientation(db.orientation)
+		self:SetReverseFill(db.reversed)
 		self:SetStatusBarTexture(texture)
-		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
-		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		self:SetWidth(db.size.matchWidth and parent:GetWidth() or db.size.width)
+		self:SetHeight(db.size.matchHeight and parent:GetHeight() or db.size.height)
+		
 		self.bg:ClearAllPoints()
 		self.bg:SetAllPoints()
 		self.bg:SetTexture(texture)
 
-		if (db["Background Multiplier"] == -1) then
+		if (db.mult == -1) then
 			self.bg:Hide()
 		else
 			self.bg:Show()
 		end
 
-		Units:SetupMissingBar(self, self.db["Missing Power Bar"], "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
+		Units:SetupMissingBar(self, self.db.missingBar, "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	end
 end

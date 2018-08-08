@@ -241,7 +241,7 @@ end
 
 local function Update(field, db)
 
-	if not db["Enabled"] then
+	if (not db.enabled) then
 		field:Hide()
 		field:SetScript("OnUpdate", nil)
 		collectgarbage(field)
@@ -250,21 +250,21 @@ local function Update(field, db)
 	end
 
 	local w, h = nil, nil
-	if db["Orientation"] == "HORIZONTAL" then
-		w = db["Size"] * db["Limit"]
-		h = db["Size"]
+	if db.orientation == "HORIZONTAL" then
+		w = db.size * db.limit
+		h = db.size
 	else
-		w = db["Size"]
-		h = db["Size"] * db["Limit"]
+		w = db.size
+		h = db.size * db.limit
 	end
 	field:SetSize(w, h)
 
-	local position = db["Position"]
-    local x, y = position["Offset X"], position["Offset Y"]
+	local position = db.position
+    local x, y = position.x, position.y
 
-    field:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
+    field:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 
-	for id,preset in next, db["Presets"] do
+	for id,preset in next, db.presets do
 		if not alreadyCreated(field.groups, id) then
 			local icon = createIcon(field, id, preset.spellId, preset.timer or 0, preset.size, preset.priority, preset.condition, preset.options)
 			field.groups[preset.priority]:add(icon)
@@ -276,14 +276,14 @@ local function Update(field, db)
 		for i = 1, group:count() do
 			local icon = group:get(i)
 			if icon and icon:GetAlpha() > 0 then
-				if db["Orientation"] == "HORIZONTAL" then
-					if db["Direction"] == "Right" then
+				if db.orientation == "HORIZONTAL" then
+					if db.growth == "Right" then
 						icon:SetPoint("LEFT", anchor, anchor == field and "LEFT" or "RIGHT", anchor == field and 0 or 3, 0)
 					else
 						icon:SetPoint("RIGHT", anchor, anchor == field and "RIGHT" or "LEFT",  anchor == field and 0 or -3, 0)
 					end
 				else
-					if db["Direction"] == "Upwards" then
+					if db.growth == "Upwards" then
 						icon:SetPoint("BOTTOM", anchor, anchor == field and "BOTTOM" or "TOP", 0, anchor == field and 0 or 3)
 					else
 						icon:SetPoint("TOP", anchor, anchor == field and "TOP" or "BOTTOM", 0, 0, anchor == field and 0 or -3)
@@ -298,15 +298,15 @@ end
 
 function I:Init()
 
-	local db = A["Profile"]["Options"]["Info Field"]
-	if not db["Enabled"] then return end
+	local db = A.db.profile.general.infoField
+	if (not db.enabled) then return end
 
 	local field = A["Info Field"]
 	if not field then
 		field = CreateFrame("Frame", A:GetName().."_InfoField", A.frameParent)
 
 		field.groups = {}
-		for i = 1, tonumber(db["Limit"]) do
+		for i = 1, tonumber(db.limit) do
 			field.groups[i] = A:OrderedTable()
 		end
 

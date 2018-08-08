@@ -9,6 +9,11 @@
 			<Layer level="OVERLAY" textureSubLevel="2">
 				<FontString parentKey="iconText" justifyH="CENTER">
 				</FontString>
+				<FontString parentKey="iconCount" justifyH="RIGHT">
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" />
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>

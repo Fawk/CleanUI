@@ -54,9 +54,9 @@ end
 
 function R:Init()
     
-    local db = A["Profile"]["Options"][self.name]
-    local texture = media:Fetch("statusbar", db["Texture"])
-    local size = db["Size"]
+    local db = A.db.profile.general.reputation
+    local texture = media:Fetch("statusbar", db.texture)
+    local size = db.size
 
     local reputation = A.frames.reputationBar or (function()
         local reputation = CreateFrame("Frame", T:frameName(self.name), A.frameParent)
@@ -91,7 +91,7 @@ function R:Init()
         for i = 1, 8 do
             local bar = CreateFrame("StatusBar", T:frameName(self.name, standings[i].name), reputation)
             bar:SetPoint("LEFT", i == 1 and reputation or reputation.bars[i-1], i == 1 and "LEFT" or "RIGHT", 0, 0)
-            bar:SetSize((standings[i].value / total) * size["Width"], size["Height"])
+            bar:SetSize((standings[i].value / total) * size.width, size.height)
             bar:SetMinMaxValues(0, standings[i].value)
             bar:SetStatusBarTexture(texture)
            
@@ -108,7 +108,7 @@ function R:Init()
             bar.bg:SetAllPoints()
             bar.bg:SetTexture(texture)
 
-            local mult = db["Background Multiplier"]
+            local mult = db.mult
             bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
 
             local textFrame = CreateFrame("Frame", nil, bar)
@@ -132,13 +132,13 @@ function R:Init()
         return reputation
     end)()
 
-    local position = db["Position"]
+    local position = db.position
 
     reputation:ClearAllPoints()
-    local x, y = position["Offset X"], position["Offset Y"]
+    local x, y = position.x, position.y
 
-    reputation:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
-    reputation:SetSize(size["Width"], size["Height"])
+    reputation:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
+    reputation:SetSize(size.width, size.height)
 
     setupBarValues(reputation)
 

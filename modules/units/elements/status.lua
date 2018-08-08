@@ -13,7 +13,7 @@ local CreateFrame = CreateFrame
 local rand = math.random
 
 --[[ Locals ]]
-local elementName = "Status"
+local elementName = "status"
 local Status = {}
 A["Shared Elements"]:set(elementName, Status)
 
@@ -55,7 +55,7 @@ function Status:Init(parent)
 end
 
 local function performAction(status, frame, parent, db, key, shouldAct)
-    status[db["Action"]](status, frame, parent, db, key, shouldAct)
+    status[db.action](status, frame, parent, db, key, shouldAct)
 end
 
 function Status:Update(...)
@@ -66,10 +66,10 @@ function Status:Update(...)
     local parent = self:GetParent()
     local db = self.db or arg2
 
-    local outofrange = db["Out of range"]
-    local dead = db["Dead"]
-    local offline = db["Offline"]
-    local ghost = db["Ghost"]
+    local outofrange = db.range
+    local dead = db.dead
+    local offline = db.offline
+    local ghost = db.ghost
 
     performAction(this, self, parent, outofrange, "Out of range", function()
         if (not parent.unit) then return false end
@@ -123,10 +123,10 @@ function Status:Simulate(parent)
                 return rand(1, 2) == 1 and true or false
             end
 
-            performAction(this, status, parent, db["Out of range"], "Out of range", randomBool)
-            performAction(this, status, parent, db["Dead"], "Dead", randomBool)
-            performAction(this, status, parent, db["Offline"], "Offline", randomBool)
-            performAction(this, status, parent, db["Ghost"], "Ghost", randomBool)
+            performAction(this, status, parent, db.range, "Out of range", randomBool)
+            performAction(this, status, parent, db.dead, "Dead", randomBool)
+            performAction(this, status, parent, db.offline, "Offline", randomBool)
+            performAction(this, status, parent, db.ghost, "Ghost", randomBool)
 
             waitFrame:SetScript("OnUpdate", nil)
         end
@@ -134,12 +134,12 @@ function Status:Simulate(parent)
 end
 
 function Status:Modify(frame, parent, db, key, shouldAct)
-    local settings = db["Settings"]
-    local type = settings["Modify Type"]
+    local settings = db.settings
+    local type = settings.modify
 
     if (type == "Alpha") then
         if (shouldAct()) then
-            parent:SetAlpha(tonumber(settings["Alpha Value"]) / 100)
+            parent:SetAlpha(tonumber(settings.alpha) / 100)
         else
             parent:SetAlpha(1)
         end
@@ -149,7 +149,7 @@ function Status:Modify(frame, parent, db, key, shouldAct)
                 parent.oldBackdropColor = parent:GetBackdropColor()
             end
 
-            parent:SetBackdropColor(unpack(settings["Color"]))
+            parent:SetBackdropColor(unpack(settings.color))
         else
             if (parent.oldBackdropColor) then
                 parent:SetBackdropColor(unpack(parent.oldBackdropColor))
@@ -159,9 +159,9 @@ function Status:Modify(frame, parent, db, key, shouldAct)
 end
 
 function Status:Present(frame, parent, db, key, shouldAct)
-    local settings = db["Settings"]
-    local type = settings["Present Type"]
-    local position = settings["Position"]
+    local settings = db.settings
+    local type = settings.present
+    local position = settings.position
     
     if (frame.tags[key]) then
         frame.tags[key]:Hide()
@@ -174,22 +174,19 @@ function Status:Present(frame, parent, db, key, shouldAct)
     if (not shouldAct()) then return end
 
     if (type == "Text") then
-
         local fs = frame.tags[key] or parent:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(media:Fetch("font", "Default"), settings["Font Size"], "OUTLINE")
-        fs:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
-        fs:SetTextColor(unpack(settings["Color"]))
+        fs:SetFont(media:Fetch("font", "Default"), settings.size, "OUTLINE")
+        fs:SetPoint(position.localPoint, parent, position.point, position.x, position.y)
+        fs:SetTextColor(unpack(settings.color))
         fs:SetText(key)
 
         frame.tags[key] = fs
         frame.tags[key]:Show()
     elseif (type == "Icon") then
-        local size = settings["Icon Size"]
-
         local icon = frame.icons[key] or parent:CreateTexture(nil, "OVERLAY")
-        icon:SetTexture(media:Fetch("icon", settings["Icon"]))
-        icon:SetSize(size, size)
-        icon:SetPoint(position["Local Point"], parent, position["Point"], position["Offset X"], position["Offset Y"])
+        icon:SetTexture(media:Fetch("icon", settings.icon))
+        icon:SetSize(settings.iconSize, settings.iconSize)
+        icon:SetPoint(position.localPoint, parent, position.point, position.x, position.y)
 
         frame.icons[key] = icon
         frame.icons[key]:Show()

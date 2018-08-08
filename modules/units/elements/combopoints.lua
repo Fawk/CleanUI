@@ -10,7 +10,7 @@ local GetShapeshiftForm = GetShapeshiftForm
 local SPELL_POWER_COMBO_POINTS = Enum.PowerType.ComboPoints
 
 --[[ Locals ]]
-local elementName = "Combo Points"
+local elementName = "comboPoints"
 local ComboPoints = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER", "PLAYER_TALENT_UPDATE", "UPDATE_SHAPESHIFT_FORM" }
 local MAX_COMBO_POINTS = 10
@@ -29,12 +29,12 @@ function ComboPoints:Init(parent)
 
     local points = parent.orderedElements:get(elementName)
     if (not points) then
-        points = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
+        points = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
         points.buttons = {}
         points.db = db
 
         for i = 1, MAX_COMBO_POINTS do
-            local point = CreateFrame("StatusBar", T:frameName(parentName, "Combo Point"..i), points)
+            local point = CreateFrame("StatusBar", parent:GetName().."_Combo Point"..i, points)
             point.bg = point:CreateTexture(nil, "BORDER")
             point.bg:SetAllPoints()
             points.buttons[i] = point
@@ -81,14 +81,12 @@ function ComboPoints:Update(...)
 
     if (event == UnitEvent.UPDATE_DB) then
         
-        local size = db["Size"]
-        local orientation = db["Orientation"]
-        local width = size["Width"]
-        local height = size["Height"]
-        local x = db["X Spacing"]
-        local y = db["Y Spacing"] 
+        local width = db.size.width
+        local height = db.size.height
+        local x = db.x
+        local y = db.y
 
-        if (orientation == "HORIZONTAL") then
+        if (db.orientation == "HORIZONTAL") then
             width = width + (x * (realMax - 1))
         else
             height = height + (y * (realMax - 1))
@@ -98,9 +96,9 @@ function ComboPoints:Update(...)
         U:CreateBackground(self, db, false)
 
         local r, g, b = unpack(A.colors.power[SPELL_POWER_COMBO_POINTS])
-        local texture = media:Fetch("statusbar", db["Texture"])
+        local texture = media:Fetch("statusbar", db.texture)
 
-        if (orientation == "HORIZONTAL") then
+        if (db.orientation == "HORIZONTAL") then
             width = math.floor((width - x) / realMax)
         else
             height = math.floor((height - y) / realMax)
@@ -114,7 +112,7 @@ function ComboPoints:Update(...)
             point:SetStatusBarColor(r, g, b)
             point:SetMinMaxValues(0, 1)
 
-            width, height = T:PositionClassPowerIcon(self, point, orientation, width, height, realMax, i, x, y)
+            width, height = T:PositionClassPowerIcon(self, point, db.orientation, width, height, realMax, i, x, y)
 
             point.bg:SetTexture(texture)
             point.bg:SetVertexColor(r * .33, g * .33, b * .33)
@@ -128,13 +126,12 @@ function ComboPoints:Update(...)
             end
         end
 
-        if (not db["Attached"]) then
+        if (not db.attached) then
             A:CreateMover(self, db, elementName)
         else
             A:DeleteMover(elementName)
+            Units:Attach(self, db)
         end
-
-        Units:Attach(self, db)
     else
         local current = UnitPower("player", SPELL_POWER_COMBO_POINTS)
 

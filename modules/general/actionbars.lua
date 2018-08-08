@@ -158,18 +158,18 @@ function AB:Init()
 
 	self:HideArt()
 
-	local db = A["Profile"]["Options"]["Actionbars"]
+	local db = A.db.profile.general.actionbars
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		return
 	end
 
 	for x = 1, 5 do
 
-		local bar = db["Bars"]["Bar"..x]
-		local position = bar["Position"]
-		local orientation = bar["Orientation"]
-		local size = bar["Size"]
+		local bar = db.bars["bar"..x]
+		local position = bar.position
+		local orientation = bar.orientation
+		local size = bar.size
 
 		local anchor = barAnchors[x]
 		if (not anchor) then
@@ -179,9 +179,9 @@ function AB:Init()
 
 		local width, height
 		if (orientation == "HORIZONTAL") then
-			width, height = (size * 12) + (bar["X Spacing"] * 11), size
+			width, height = (size * 12) + (bar.x * 11), size
 		else
-			width, height = size, (size * 12) + (bar["Y Spacing"] * 11)
+			width, height = size, (size * 12) + (bar.y * 11)
 		end
 
 		anchor:SetSize(width, height)
@@ -263,27 +263,27 @@ end
 function AB:Update(...)
 	if (InCombatLockdown()) then return end
 
-	local db = A["Profile"]["Options"]["Actionbars"]
+	local db = A.db.profile.general.actionbars
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		return
 	end
 
 	for x = 1, 5 do
 
-		local bar = db["Bars"]["Bar"..x]
-		local position = bar["Position"]
-		local orientation = bar["Orientation"]
-		local size = bar["Size"]
-		local limit = bar["Limit"]
+		local bar = db.bars["bar"..x]
+		local position = bar.position
+		local orientation = bar.orientation
+		local size = bar.size
+		local limit = bar.horizontalLimit
 
 		local anchor = barAnchors[x]
 
 		local width, height
 		if (orientation == "HORIZONTAL") then
-			width, height = (size * 12) + (bar["X Spacing"] * 11), size
+			width, height = (size * 12) + (bar.x * 11), size
 		else
-			width, height = size, (size * 12) + (bar["Y Spacing"] * 11)
+			width, height = size, (size * 12) + (bar.y * 11)
 		end
 
 		anchor:SetSize(width, height)
@@ -308,18 +308,18 @@ function AB:Update(...)
 						if (i == 1) then
 							button:SetPoint("LEFT", relative, "LEFT", 0, 0)
 						else
-							button:SetPoint("LEFT", relative, "RIGHT", bar["X Spacing"], 0)
+							button:SetPoint("LEFT", relative, "RIGHT", bar.x, 0)
 						end
 					else
 						if (i == 1) then
 							button:SetPoint("TOP", relative, "TOP", 0, 0)
 						else
-							button:SetPoint("TOP", relative, "BOTTOM", 0, bar["Y Spacing"])
+							button:SetPoint("TOP", relative, "BOTTOM", 0, bar.y)
 						end
 					end
 
 					if (not button.icon or not button.icon:GetTexture()) then
-						if (db["Show Grid"]) then
+						if (db.grid) then
 							backgrounds[x][i]:Show()
 						else
 							backgrounds[x][i]:Hide()

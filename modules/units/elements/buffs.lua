@@ -16,7 +16,7 @@ local Units = A.Units
 local U = A.Utils
 local media = LibStub("LibSharedMedia-3.0")
 
-local elementName = "Buffs"
+local elementName = "buffs"
 local Buffs = {}
 local buildText = A.TextBuilder
 
@@ -38,12 +38,12 @@ end
 
 local function filterAura(aura, db, unit)
 	local duration = aura.duration or 0
-	local durationFilter = (duration == 0 and not db["Hide no duration"]) or (duration > 0)
-	local casterFilter = (db["Own only"] and aura.caster == unit) or (not db["Own only"])
-	local blackListFilter = db["Blacklist"]["Enabled"] and not db["Blacklist"]["Ids"][aura.spellID]
-	local whiteListFilter = db["Whitelist"]["Enabled"] and db["Whitelist"]["Ids"][aura.spellID]
+	local durationFilter = (duration == 0 and not db.hideNoDuration) or (duration > 0)
+	local casterFilter = (db.own and aura.caster == unit) or (not db.own)
+	local blackListFilter = db.blacklist.enabled and not db.blacklist.ids[aura.spellID]
+	local whiteListFilter = db.whitelist.enabled and db.whitelist.ids[aura.spellID]
 
-	if (not db["Blacklist"]["Enabled"] and not db["Whitelist"]["Enabled"]) then
+	if (not db.blacklist.enabled and not db.whitelist.enabled) then
 		whiteListFilter = true
 	end
 
@@ -158,8 +158,6 @@ function Buffs:Init(parent)
 		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		buffs.db = db
 
-		buffs:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 0, 0)
-
 		buffs.pools = CreatePoolCollection()
 		buffs.pool = buffs.pools:CreatePool("BUTTON", buffs, "AuraIconBarTemplate")
 		buffs.buttons = {}
@@ -193,7 +191,7 @@ function Buffs:Update(...)
 	local parent = self:GetParent()
 	local db = self.db
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		self.pools:ReleaseAll()
 		return self:Hide()
 	else
@@ -202,27 +200,22 @@ function Buffs:Update(...)
 
 	parent:Update(UnitEvent.UPDATE_BUFFS)
 
-	local size = db["Size"]
-	local width = size["Match width"] and parent:GetWidth() or size["Width"]
-	local height = size["Match height"] and parent:GetHeight() or size["Height"]
-	local mult = db["Background Multiplier"]
-	local texture = media:Fetch("statusbar", db["Texture"])
-	local barGrowth = db["Bar Growth"]
-	local iconGrowth = db["Icon Growth"]
-	local x, y = db["Offset X"], db["Offset Y"]
-	local iconLimit = db["Icon Limit Per Row"]
+	local width = db.size.matchWidth and parent:GetWidth() or db.size.width
+	local height = db.size.matchHeight and parent:GetHeight() or db.size.height
+	local texture = media:Fetch("statusbar", db.texture)
+	local font = media:Fetch("font", "Default")
 
-	self.limit = db["Limit"]
+	self.limit = db.limit
 
 	if (event == UnitEvent.UPDATE_DB) then
 
-		if (db["Style"] == "Bar") then
+		if (db.style == "Bar") then
 			self:SetSize(width, height * self.limit)
 		else
 			self:SetSize(height * iconLimit, height * 40 / iconLimit)
 		end
 
-		if (db["Attached"]) then
+		if (db.attached) then
 			Units:Attach(self, self.db)
 		else
 			self.getMoverSize = function(self)
@@ -230,7 +223,7 @@ function Buffs:Update(...)
 			end
 
 			A:CreateMover(self, db, self:GetName())
-			Units:Position(self, db["Position"])
+			Units:Position(self, db.position)
 		end
 
 		self:Update(UnitEvent.UPDATE_BUFFS)
@@ -261,34 +254,43 @@ function Buffs:Update(...)
 				button = self.buttons[i]
 			end
 
+			local hasCount = aura.count and aura.count > 1
+
 			button.aura = aura
 			local bar = button.bar
 
 			bar:SetMinMaxValues(0, aura.duration)
 			bar:SetValue(aura.expires - GetTime())
 			bar.db = self.db
-			bar.name:SetText(aura.name..((aura.count and aura.count > 1) and " ["..aura.count.."]" or ""))
+			bar.name:SetText(aura.name..(hasCount and " ["..aura.count.."]" or ""))
 
 			button.icon:SetTexture(aura.icon)
 
-			if (db["Style"] == "Bar") then
+			if (db.style == "Bar") then
 				button.iconText:Hide()
+				button.iconCount:Hide()
 				bar:Show()
 
 				bar:SetStatusBarTexture(texture)
 				bar.bg:SetTexture(texture)
+				bar.name:SetFont(font, db.name.size, "OUTLINE")
+				bar.time:SetFont(font, db.time.size, "OUTLINE")
 
 				button:SetSize(parent:GetWidth(), height)
 
-				placeBar(button, barGrowth, relative, self, x, y)
+				placeBar(button, db.barGrowth, relative, self, db.x, db.y)
 			else
 				button.iconText:Show()
+				button.iconCount:Show()
 				bar:Hide()
 
 				button:SetSize(height, height)
 				button.icon:SetSize(height, height)
+				button.iconText:SetFont(font, db.iconTextSize, "OUTLINE")
+				button.iconCount:SetFont(font, 10, "OUTLINE")
+				button.iconCount:SetText(hasCount and aura.count or "")
 
-				placeIcon(button, i, iconGrowth, iconLimit, relative, self, x, y)
+				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.x, db.y)
 			end
 
 			U:CreateBackground(button, db, false)

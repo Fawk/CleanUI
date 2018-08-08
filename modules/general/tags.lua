@@ -100,12 +100,12 @@ function Tags:ToggleTagsWindow(group)
 					offsetX:SetValue(0)
 					offsetY:SetValue(0)
 				else
-					local defaultNameTag = A.defaults["Profiles"]["Default"]["Options"][group.parent.name]["Tags"]["Name"]
+					local defaultNameTag = A.actualDefaults.profile[group.parent.name].tags["Name"]
 					if (A.profiler:IsDefault() and item.name == "Name" and defaultNameTag) then
 						deleteButton:Hide()
 						hideButton:Show()
 
-						if (defaultNameTag["Hide"]) then
+						if (defaultNameTag.hide) then
 							hideButton.text:SetText("Show")
 						else
 							hideButton.text:SetText("Hide")

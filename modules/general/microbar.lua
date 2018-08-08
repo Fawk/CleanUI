@@ -16,11 +16,11 @@ local MicroBar = {}
 
 function MicroBar:Init()
 
-	local db = A["Profile"]["Options"][moduleName]
+	local db = A.db.profile.general.microBar
 
-	if (db["Enabled"]) then
+	if (db.enabled) then
 
-		local position = db["Position"]
+		local position = db.position
 		local microButtonBar = CreateFrame("Frame", nil, A.frameParent)
 
 		local relative = microButtonBar
@@ -48,10 +48,10 @@ function MicroBar:Init()
 			relative = button
 		end
 
-		microButtonBar:SetPoint(position["Local Point"], A.frameParent, position["Point"], position["Offset X"], position["Offset Y"])
+		microButtonBar:SetPoint(position.localPoint, A.frameParent, position.point, position.x, position.y)
 		A:CreateMover(microButtonBar, db, moduleName)
 
-		if (db["Hide"]) then
+		if (db.hide) then
 			for _,name in next, MICRO_BUTTONS do
 				local button = _G[name]
 				button:Hide()

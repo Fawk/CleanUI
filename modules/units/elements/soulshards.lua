@@ -9,7 +9,7 @@ local UnitPowerMax = UnitPowerMax
 local SPELL_POWER_SOUL_SHARDS = Enum.PowerType.SoulShards
 
 --[[ Locals ]]
-local elementName = "Soul Shards"
+local elementName = "soulShards"
 local SoulShards = { isClassPower = true }
 local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", "UNIT_MAXPOWER" }
 local MAX_SOUL_SHARDS = 5
@@ -23,12 +23,12 @@ function SoulShards:Init(parent)
 
 	local shards = parent.orderedElements:get(elementName)
 	if (not shards) then
-		shards = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
+		shards = CreateFrame("Frame", parentName.."_"..elementName, parent)
 		shards.buttons = {}
 		shards.db = db
 
 		for i = 1, MAX_SOUL_SHARDS do
-			local shard = CreateFrame("StatusBar", T:frameName(parentName, "Soul Shard"..i), shards)
+			local shard = CreateFrame("StatusBar", parent:GetName().."_Soul Shard"..i, shards)
 			shard.bg = shard:CreateTexture(nil, "BORDER")
 			shard.bg:SetAllPoints()
 			shards.buttons[i] = shard
@@ -56,12 +56,11 @@ function SoulShards:Update(...)
 
 	if (event == UnitEvent.UPDATE_DB) then
 		
-		local size = db["Size"]
-		local orientation = db["Orientation"]
-		local width = size["Width"]
-		local height = size["Height"]
-		local x = db["X Spacing"]
-		local y = db["Y Spacing"] 
+		local orientation = db.orientation
+		local width = db.size.width
+		local height = db.size.height
+		local x = db.x
+		local y = db.y
 
 		if (orientation == "HORIZONTAL") then
 			width = width + (x * (MAX_SOUL_SHARDS - 1))
@@ -73,7 +72,7 @@ function SoulShards:Update(...)
 		U:CreateBackground(self, db, false)
 
 		local r, g, b = unpack(A.colors.power[SPELL_POWER_SOUL_SHARDS])
-		local texture = media:Fetch("statusbar", db["Texture"])
+		local texture = media:Fetch("statusbar", db.texture)
 
 		if (orientation == "HORIZONTAL") then
 			width = math.floor((width - x) / MAX_SOUL_SHARDS)
@@ -84,7 +83,7 @@ function SoulShards:Update(...)
 		for i = 1, MAX_SOUL_SHARDS do
 			local shard = self.buttons[i]
 			shard:SetOrientation(orientation)
-			shard:SetReverseFill(db["Reversed"])
+			shard:SetReverseFill(db.reversed)
 			shard:SetStatusBarTexture(texture)
 			shard:SetStatusBarColor(r, g, b)
 			shard:SetMinMaxValues(0, 10)
@@ -97,13 +96,12 @@ function SoulShards:Update(...)
 			shard:SetSize(width, height)
 		end
 
-		if (not db["Attached"]) then
+		if (not db.attached) then
 			A:CreateMover(self, db, elementName)
 		else
 			A:DeleteMover(elementName)
+			Units:Attach(self, db)
 		end
-
-		Units:Attach(self, db)
 	else
 		local mod = UnitPowerDisplayMod(SPELL_POWER_SOUL_SHARDS)
 		local current = UnitPower("player", SPELL_POWER_SOUL_SHARDS)

@@ -4,8 +4,8 @@ local buildText = A.TextBuilder
 local media = LibStub("LibSharedMedia-3.0")
 
 function V:Init()
-    local db = A["Profile"]["Options"][self.name]
-    local size = db["Size"]
+    local db = A.db.profile.general.vehicleLeaveButton
+    local size = db.size
     
     local vehicle = A.frames.vehicleLeaveButton or (function()
         local vehicle = CreateFrame("Button", T:frameName(self.name), A.frameParent, "SecureActionButtonTemplate")
@@ -48,11 +48,11 @@ function V:Init()
         return vehicle
     end)()
 
-    local position = db["Position"]
+    local position = db.position
     vehicle:SetSize(size, size)
-    local x, y = position["Offset X"], position["Offset Y"]
+    local x, y = position.x, position.y
 
-    vehicle:SetPoint(position["Local Point"], A.frameParent, position["Point"], x, y)
+    vehicle:SetPoint(position.localPoint, A.frameParent, position.point, x, y)
 
     U:CreateBackground(vehicle, db, false)
 

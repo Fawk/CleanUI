@@ -15,7 +15,7 @@ local rand = math.random
 local select = select
 
 --[[ Locals ]]
-local elementName = "Health"
+local elementName = "health"
 local Health = {}
 
 A["Shared Elements"]:set(elementName, Health)
@@ -50,7 +50,7 @@ function Health:Init(parent)
 
 	   	local tagEventFrame = parent.tagEventFrame
 	   	if (tagEventFrame) then
-	   		if (db["Frequent Updates"]) then
+	   		if (db.frequentUpdates) then
 	   			tagEventFrame:UnregisterEvent("UNIT_HEALTH")
 	   			tagEventFrame:RegisterEvent("UNIT_HEALTH_FREQUENT")
 	   		else
@@ -59,7 +59,7 @@ function Health:Init(parent)
 	   		end
 	   	end
 
-	   	if (db["Frequent Updates"]) then
+	   	if (db.frequentUpdates) then
    			health:UnregisterEvent("UNIT_HEALTH")
    			health:RegisterEvent("UNIT_HEALTH_FREQUENT")
    		else
@@ -85,7 +85,7 @@ function Health:Update(...)
 	local parent = self:GetParent()
 	local db = self.db
 
-	if (not db["Enabled"]) then
+	if (not db.enabled) then
 		self:Hide()
 		return
 	else
@@ -101,7 +101,7 @@ function Health:Update(...)
 		self:SetMinMaxValues(0, parent.currentMaxHealth)
 	  	self:SetValue(parent.currentHealth)
 	  	
-	  	if (db["Missing Health Bar"]["Enabled"]) then
+	  	if (db.missingBar.enabled) then
 	  		Units:UpdateMissingBar(self, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth)
 	  	end
 
@@ -125,28 +125,27 @@ function Health:Update(...)
 		
 		self:Update("UNIT_HEALTH_FREQUENT", parent.unit)
 
-		Units:Position(self, db["Position"])
+		Units:Position(self, db.position)
 
-		local texture = media:Fetch("statusbar", db["Texture"])
-		local size = db["Size"]
+		local texture = media:Fetch("statusbar", db.texture)
 
-		self:SetOrientation(db["Orientation"])
-		self:SetReverseFill(db["Reversed"])
+		self:SetOrientation(db.orientation)
+		self:SetReverseFill(db.reversed)
 		self:SetStatusBarTexture(texture)
-		self:SetWidth(size["Match width"] and parent:GetWidth() or size["Width"])
-		self:SetHeight(size["Match height"] and parent:GetHeight() or size["Height"])
+		self:SetWidth(db.size.matchWidth and parent:GetWidth() or db.size.width)
+		self:SetHeight(db.size.matchHeight and parent:GetHeight() or db.size.height)
 		
 		self.bg:ClearAllPoints()
 		self.bg:SetAllPoints()
 		self.bg:SetTexture(texture)
 
-		if (db["Background Multiplier"] == -1) then
+		if (db.mult == -1) then
 			self.bg:Hide()
 		else
 			self.bg:Show()
 		end
 
-		Units:SetupMissingBar(self, db["Missing Health Bar"], "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 	end
 end

@@ -8,7 +8,7 @@ local GetSpecialization = GetSpecialization
 local GetRuneCooldown = GetRuneCooldown
 
 -- [[ Locals ]]
-local elementName = "Runes"
+local elementName = "runes"
 local Runes = { isClassPower = true }
 local MAX_RUNES = 6
 
@@ -39,9 +39,8 @@ end
 local function orderRunes(parent, orientation)
 	local readyRunes, notReadyRunes = {}, {}
 	local db = parent.db
-	local orientation = db["Orientation"]
-	local x = db["X Spacing"]
-	local y = db["Y Spacing"]
+	local x = db.x
+	local y = db.y
 
 	for i = 1, MAX_RUNES do
 		local rune = parent.buttons[i]
@@ -60,7 +59,7 @@ local function orderRunes(parent, orientation)
 
 	for i, realIndex in pairs(readyRunes) do
 		local rune = parent.buttons[realIndex]
-		if (orientation == "HORIZONTAL") then
+		if (db.orientation == "HORIZONTAL") then
 			if (i == 1) then
 				rune:SetPoint("LEFT", parent, "LEFT", 0, 0)
 			else
@@ -85,7 +84,7 @@ local function orderRunes(parent, orientation)
 			parent.realIndex = realIndex
 		end
 		if (#readyRunes > 0) then
-			if (orientation == "HORIZONTAL") then
+			if (db.orientation == "HORIZONTAL") then
 				if (i == first) then
 					rune:SetPoint("LEFT", parent.buttons[readyRunes[#readyRunes]], "RIGHT", x, 0)
 				else
@@ -99,7 +98,7 @@ local function orderRunes(parent, orientation)
 				end
 			end
 		else
-			if (orientation == "HORIZONTAL") then
+			if (db.orientation == "HORIZONTAL") then
 				if (i == first) then
 					rune:SetPoint("LEFT", parent, "LEFT", 0, 0)
 				else
@@ -166,13 +165,12 @@ function Runes:Update(...)
 	local db = self.db
 
 	if (event == UnitEvent.UPDATE_DB) then
-		
-		local size = db["Size"]
-		local orientation = db["Orientation"]
-		local width = size["Width"]
-		local height = size["Height"]
-		local x = db["X Spacing"]
-		local y = db["Y Spacing"] 
+
+		local orientation = db.orientation
+		local width = db.size.width
+		local height = db.size.height
+		local x = db.x
+		local y = db.y
 
 		if (orientation == "HORIZONTAL") then
 			width = math.floor((width - x) / MAX_RUNES)
@@ -184,7 +182,7 @@ function Runes:Update(...)
 		U:CreateBackground(self, db, false)
 
 		local r, g, b = unpack(A.colors.power.runes[GetSpecialization()])
-		local texture = media:Fetch("statusbar", db["Texture"])
+		local texture = media:Fetch("statusbar", db.texture)
 
 		if (orientation == "HORIZONTAL") then
 			width = width / MAX_RUNES
@@ -195,7 +193,7 @@ function Runes:Update(...)
 		for i = 1, MAX_RUNES do
 			local rune = self.buttons[i]
 			rune:SetOrientation(orientation)
-			rune:SetReverseFill(db["Reversed"])
+			rune:SetReverseFill(db.reversed)
 			rune:SetStatusBarTexture(texture)
 			rune:SetStatusBarColor(r, g, b)
 
@@ -207,13 +205,12 @@ function Runes:Update(...)
 			rune:SetSize(width, height)
 		end
 
-		if (not db["Attached"]) then
+		if (not db.attached) then
 			A:CreateMover(self, db, elementName)
 		else
 			A:DeleteMover(elementName)
+			Units:Attach(self, db)
 		end
-
-		Units:Attach(self, db)
 	else
 		for i = 1, MAX_RUNES do
 			local rune = self.buttons[i]

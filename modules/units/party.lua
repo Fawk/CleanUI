@@ -13,7 +13,7 @@ local frameName = "Party"
 local fakeUnits = A:OrderedTable()
 
 function Party:Init()
-    local db = A["Profile"]["Options"][frameName]
+    local db = A.db.profile.group[frameName:lower()]
     return Group:Init(frameName, 5, db)
 end
 
@@ -44,7 +44,6 @@ function Party:Simulate(players)
 
     fakeUnits = A:OrderedTable()
     local db = container.db
-    local size = db["Size"]
 
     -- The player
     local player = CreateFrame("Button", T:frameName(frameName, "FakeUnitButton1"), container, 'SecureUnitButtonTemplate')
@@ -55,18 +54,18 @@ function Party:Simulate(players)
         Group:Update(self, UnitEvent.UPDATE_DB, container, "SIMULATE")
     end
     player:SetAttribute("unit", player.unit)
-    player:SetSize(size["Width"], size["Height"])
+    player:SetSize(db.size.width, db.size.height)
 
-    if (db["Orientation"] == "HORIZONTAL") then
-        if (db["Growth Direction"] == "Right") then
+    if (db.orientation == "HORIZONTAL") then
+        if (db.growth == "Right") then
             player:SetPoint("LEFT", container, "LEFT", 0, 0)
-        elseif (db["Growth Direction"] == "Left") then
+        elseif (db.growth == "Left") then
             player:SetPoint("RIGHT", container, "RIGHT", 0, 0)
         end
     else
-        if (db["Growth Direction"] == "Upwards") then
+        if (db.growth == "Upwards") then
             player:SetPoint("BOTTOM", container, "BOTTOM", 0, 0)
-        elseif (db["Growth Direction"] == "Downwards") then
+        elseif (db.growth == "Downwards") then
             player:SetPoint("TOP", container, "TOP", 0, 0)
         end
     end
@@ -94,19 +93,19 @@ function Party:Simulate(players)
         end
         uf.unit = "player"
         uf:SetAttribute("unit", uf.unit)
-        uf:SetSize(size["Width"], size["Height"])
+        uf:SetSize(size.width, size.height)
 
-        if (db["Orientation"] == "HORIZONTAL") then
-            if (db["Growth Direction"] == "Right") then
-                uf:SetPoint("LEFT", relative, "RIGHT", db["Offset X"], db["Offset Y"])
-            elseif (db["Growth Direction"] == "Left") then
-                uf:SetPoint("RIGHT", relative, "LEFT", db["Offset X"], db["Offset Y"])
+        if (db.orientation == "HORIZONTAL") then
+            if (db.growth == "Right") then
+                uf:SetPoint("LEFT", relative, "RIGHT", db.x, db.y)
+            elseif (db.growth == "Left") then
+                uf:SetPoint("RIGHT", relative, "LEFT", db.x, db.y)
             end
         else
-            if (db["Growth Direction"] == "Upwards") then
-                uf:SetPoint("BOTTOM", relative, "TOP", db["Offset X"], db["Offset Y"])
-            elseif (db["Growth Direction"] == "Downwards") then
-                uf:SetPoint("TOP", relative, "BOTTOM", db["Offset X"], db["Offset Y"])
+            if (db.growth == "Upwards") then
+                uf:SetPoint("BOTTOM", relative, "TOP", db.x, db.y)
+            elseif (db.growth == "Downwards") then
+                uf:SetPoint("TOP", relative, "BOTTOM", db.x, db.y)
             end
         end
 
