@@ -116,17 +116,8 @@ function Addon:OnEnable()
 
 	local E, T, Options, Units = self.enum, self.Tools, self.Options, self.Units
 
-    --local profile = self.profiler
-
-	--profile:Init(self.db)
-	--profile:Load()
-
 	self:SetScale()
-
 	self:Init()
-	--self:SetStyle()
-
-    --Addon:CreatePrefs(Addon["Profile"]["Options"])
 
     LoadAddOn("CleanUI_Config")
 

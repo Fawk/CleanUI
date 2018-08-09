@@ -232,8 +232,90 @@ function Args:OrderedTable(s)
 	return opt
 end
 
-local MAP = {}
-MAP.__index = MAP
+--[[
+
+  Assigning -> table[key] = value
+  Iterate Keys -> table()
+  Specific Key -> table(index)
+  Iterate values -> for i = 1, #table do local value = table[i] end
+  Specific value -> table[key] or table[index]
+  Remove value -> table[key] = nil or table[index] = nil
+
+]]
+local MAP = {
+  __len = function(t) return t.c end,
+  __index = function(self, k) 
+    if (type(k) == "number") then
+      return self.e[self.i[k]]
+    end
+    if (self.e[k]) then
+      return self.e[k]
+    else
+      local v = rawget(self, k)
+      if (v) then
+        return v
+      else
+        return rawget(getmetatable(self), k)
+      end
+    end
+  end,
+  __newindex = function(self, k, v)
+    if (v == nil) then
+      if (type(k) == "string") then
+        if (rawget(self.e, k)) then
+          local i, e, f = {}, {}, nil
+          for x = 1, self.c do
+            if (self.i[x] == k) then
+              f = x
+            else
+              if (f) then 
+                i[x - 1] = self.i[x]
+              else
+                i[x] = self.i[x]
+              end
+              e[self.i[x]] = self.e[self.i[x]]
+            end
+          end
+          self.i = i
+          self.e = e
+          self.c = self.c - 1
+        end
+      elseif (type(k) == "number") then
+        if (rawget(self.i, k)) then
+          local i, e, f = {}, {}, nil
+          for x = 1, self.c do
+            if (x == k) then 
+              f = x 
+            else
+              if (f) then 
+                i[x - 1] = self.i[x]
+              else
+                i[x] = self.i[x]
+              end
+              e[self.i[x]] = self.e[self.i[x]]
+            end
+          end
+          self.i = i
+          self.e = e
+          self.c = self.c - 1
+        end
+      end
+    else
+      if (not rawget(self.e, k)) then
+        self.c = self.c + 1
+        self.i[self.c] = k
+      end
+      self.e[k] = v
+    end
+  end,
+  __call = function(self, i)
+    if (i) then
+      return self.i[i]
+    else
+      return next, self.i, nil
+    end
+  end
+}
 
 function MAP:set(k, v, overwrite)
   if (not k) then 
