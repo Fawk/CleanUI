@@ -129,12 +129,10 @@ function Power:Update(...)
 
 		for key, func in next, tags do
 			local k = "%["..key.."%]"
-			if (tag.replaced:find(k)) then
-				local func, err = loadstring("return " .. func)
-				if(func) then
-					func = func()
-					tag.replaced = replaced:replace(k, func(parent))
-				end
+			local func, err = loadstring("return " .. func)
+			if(func) then
+				func = func()
+				tag.replaced = replaced:replace(k, func(parent))
 			end
 		end
 
