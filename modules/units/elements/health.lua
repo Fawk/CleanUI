@@ -92,8 +92,6 @@ function Health:Update(...)
 		self:Show()
 	end
 
-	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
-
 	if (T:anyOf(event, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "UNIT_MAXHEALTH", UnitEvent.GROUP_UPDATE)) then
 		if (parent.unit ~= arg1) then return end
 
@@ -105,22 +103,26 @@ function Health:Update(...)
 	  		Units:UpdateMissingBar(self, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth)
 	  	end
 
-		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+	  	if (db.colorBy == "gradient") then
+			A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+		end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
 		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "FORCED_TAG_UPDATE")) then
 			return
 		end
 
+		if (parent.unit ~= arg3) then return end
+
 		self:Update("UNIT_HEALTH_FREQUENT", parent.unit)
 
 		local tag = arg1
-		tag:AddReplaceLogic("[hp]", parent.currentHealth)
-		tag:AddReplaceLogic("[maxhp]", parent.currentMaxHealth)
-		tag:AddReplaceLogic("[perhp]", floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
-		tag:AddReplaceLogic("[hp:round]", T:short(parent.currentHealth, 1))
-		tag:AddReplaceLogic("[maxhp:round]", T:short(parent.currentMaxHealth, 1))
-		tag:AddReplaceLogic("[hp:deficit]", parent.deficitHealth > 0 and format("-%s", T:short(parent.deficitHealth, 0)) or "")
+		tag.replaced = tag.replaced:replace("[hp]", parent.currentHealth)
+		tag.replaced = tag.replaced:replace("[maxhp]", parent.currentMaxHealth)
+		tag.replaced = tag.replaced:replace("[perhp]", floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
+		tag.replaced = tag.replaced:replace("[hp:round]", T:short(parent.currentHealth, 1))
+		tag.replaced = tag.replaced:replace("[maxhp:round]", T:short(parent.currentMaxHealth, 1))
+		tag.replaced = tag.replaced:replace("[hp:deficit]", parent.deficitHealth > 0 and format("-%s", T:short(parent.deficitHealth, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 		
 		self:Update("UNIT_HEALTH_FREQUENT", parent.unit)

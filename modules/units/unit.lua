@@ -19,12 +19,6 @@ local UnitGetTotalHealAbsorbs = UnitGetTotalHealAbsorbs
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 
-local replaceLogic = A:OrderedMap()
-
-for key, color in next, A.colors.text do
-    replaceLogic:set("[color:"..key.."]", color)
-end
-
 function A:FormatTag(tag)
     local parent = tag:GetParent()
     if (not UnitExists(parent.unit)) then
@@ -33,8 +27,8 @@ function A:FormatTag(tag)
 
     local name = UnitName(parent.unit) or ""
 
-    replaceLogic:set("[name]", name, true)
-    replaceLogic:set("[name:%d+]", name:utf8sub(1, tonumber(tag.format:match("%d+"))), true)
+    tag.replaced = tag.replaced:replace("[name]", name)
+    tag.replaced = tag.replaced:replace("[name:%d+]", name:utf8sub(1, tonumber(tag.replaced:match("%d+"))))
 
     local classToken = select(2, UnitClass(parent.unit))
 
@@ -44,19 +38,11 @@ function A:FormatTag(tag)
         token = parent.powerToken or parent.powerType
     end
 
-    A:AddColorReplaceLogicIfNeeded(tag, UnitIsPlayer(parent.unit) and classToken or "NPC", token)
-    
-    tag.replaceLogics:foreach(function(key, replace)
-        replaceLogic:set(key, replace, true)
-    end)
+    for key, color in next, A.colors.text do
+        tag.replaced = tag.replaced:replace("[color:"..key.."]", color)
+    end
 
-    local replaced = tag.format
-    
-    replaceLogic:foreach(function(key, replaceString)
-        replaced = replaced:replace(key, replaceString)
-    end)
-    
-    tag.text = replaced
+    A:AddColorReplaceLogicIfNeeded(tag, UnitIsPlayer(parent.unit) and classToken or "NPC", token)
 end
 
 local function fetchAuraData(func, id)
@@ -107,6 +93,7 @@ function A:CreateUnit(id)
     unit.super = Unit
 
     Unit:Init(unit)
+    Unit:Update(unit, UnitEvent.UPDATE_IDENTIFIER)
 
     RegisterUnitWatch(unit)
 
@@ -119,21 +106,24 @@ function A:SetUnitMeta(frame)
 end
 
 function Unit:Init(unit)
-    unit.tagEventFrame = CreateFrame("Frame")
+    unit.tagEventFrame = CreateFrame("Frame", nil, unit)
     unit.ForceTagUpdate = function(self)
         self.tagEventFrame:GetScript("OnEvent")(self.tagEventFrame, "FORCED_TAG_UPDATE")
     end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         local event = ...
-        unit.tags:foreach(function(key, tag)
+        for _,tag in next, unit.tags.e do
             if (tag) then
-                unit.orderedElements:foreach(function(k, element)
-                    element:Update(UnitEvent.UPDATE_TAGS, tag, event)
-                end)
+                tag.replaced = tag.format
+                for _,element in next, unit.orderedElements.e do
+                    if (not element.noTags) then
+                        element:Update(UnitEvent.UPDATE_TAGS, tag, event, self:GetParent().unit)
+                    end
+                end
                 A:FormatTag(tag)
-                tag:SetText(tag.text)
+                tag:SetText(tag.replaced)
             end
-        end)
+        end
     end)
 end
 
@@ -143,6 +133,9 @@ function Unit:Update(...)
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 
     if (event == UnitEvent.UPDATE_IDENTIFIER) then
+
+        print("UPDATE_IDENTIFIER", GetTime())
+
         local previous = self.unit
         local realUnit, modUnit = SecureButton_GetUnit(self), SecureButton_GetModifiedUnit(self)
         self.unit = realUnit
@@ -151,6 +144,9 @@ function Unit:Update(...)
             self:OnIdentifier(previous)
         end
     elseif (event == UnitEvent.UPDATE_HEALTH) then
+
+        print("UPDATE_HEALTH", GetTime())
+
         self.previousHealth = self.currentHealth
         self.previousMaxHealth = self.currentMaxHealth
         self.currentHealth = UnitHealth(self.unit)
@@ -161,8 +157,10 @@ function Unit:Update(...)
             self:OnHealth(...)
         end
     elseif (event == UnitEvent.UPDATE_POWER) then
-        self.previousPower = self.currentPower
-        self.previousMaxPower = self.currentMaxPower
+
+        if true then return end
+
+        print("UPDATE_POWER", GetTime())
 
         local powerType, powerToken, altR, altG, altB = UnitPowerType(self.unit)
         self.currentPower = UnitPower(self.unit, powerType)
@@ -176,12 +174,18 @@ function Unit:Update(...)
             self:OnPower(...)
         end
     elseif (event == UnitEvent.UPDATE_BUFFS) then
+
+        print("UPDATE_BUFFS", GetTime(), self.unit)
+
         self.buffs = fetchAuraData(UnitBuff, self.unit)
 
         if (self.OnBuffs) then
             self:OnBuffs(...)
         end
     elseif (event == UnitEvent.UPDATE_DEBUFFS) then
+
+        print("UPDATE_DEBUFF", GetTime(), self.unit)
+
         self.debuffs = fetchAuraData(UnitDebuff, self.unit)
 
         if (self.OnDebuffs) then
@@ -189,6 +193,8 @@ function Unit:Update(...)
         end
     elseif (event == UnitEvent.UPDATE_HEAL_PREDICTION) then
         
+        print("UPDATE_HEAL_PREDICTION", GetTime())
+
         local myIncomingHeal = UnitGetIncomingHeals(self.unit, 'player') or 0
         local allIncomingHeal = UnitGetIncomingHeals(self.unit) or 0
         local absorb = UnitGetTotalAbsorbs(self.unit) or 0

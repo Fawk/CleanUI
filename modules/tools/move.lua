@@ -18,7 +18,6 @@ local function FinalizeMove()
 	end
 	finishFrame:Hide()
 	grid:Hide()
-    A.dbProvider:Save()
 	A.isMovingFrames = false
 end
 

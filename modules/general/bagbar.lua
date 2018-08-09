@@ -16,6 +16,8 @@ local BagBar = {}
 
 function BagBar:Init()
 
+	if true then return end
+
 	local db = A.db.profile.general.bagBar
 
 	if (db.enabled) then

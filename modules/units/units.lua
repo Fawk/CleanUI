@@ -60,14 +60,15 @@ end
 function Units:Attach(frame, db, override)
     local target = override or frame:GetParent()
     local position = db.attachedPosition
-    local x = db.x or db.position.x
-    local y = db.y or db.position.y
+    local x = db.x
+    local y = db.y
 
     if (not position) then
         A:Debug("No Attached Position for frame:", frame:GetName())
         return Units:Position(frame, db.position)
     end
 
+    frame:ClearAllPoints()
     if (position == "Below") then
         frame:SetPoint("TOP", target, "BOTTOM", x, y)
     elseif (position == "Above") then
@@ -122,7 +123,9 @@ function Units:Tag(frame, name, db)
         tag.text = ""
         tag.replaceLogics = A:OrderedMap()
         tag.AddReplaceLogic = function(self, key, replace)
-            self.replaceLogics:set(key, replace, true)
+            if (replace ~= self.replaceLogics:get(key)) then
+                self.replaceLogics:set(key, replace, true)
+            end
         end
 
         frame.tags:set(name, tag)

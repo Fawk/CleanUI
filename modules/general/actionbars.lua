@@ -154,6 +154,10 @@ local borders = {
 local barAnchors = {}
 
 function AB:Init()
+	if true then return end
+
+	print("actionbars")
+
 	if (InCombatLockdown()) then return end
 
 	self:HideArt()
@@ -261,6 +265,8 @@ function AB:Init()
 end
 
 function AB:Update(...)
+	if true then return end
+
 	if (InCombatLockdown()) then return end
 
 	local db = A.db.profile.general.actionbars

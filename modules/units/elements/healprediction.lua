@@ -160,8 +160,6 @@ function HealPrediction:Update(...)
 		return
 	end
 
-	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
-
 	if (event == UnitEvent.UPDATE_DB) then
 		local texture = media:Fetch("statusbar", db.texture)
 
@@ -186,16 +184,18 @@ function HealPrediction:Update(...)
 			return
 		end
 
+		if (parent.unit ~= arg3) then return end
+
 		local tag = arg1
-		tag:AddReplaceLogic("[heal]", parent.myIncomingHeal)
-		tag:AddReplaceLogic("[heal:round]", T:short(parent.myIncomingHeal, 2))
-		tag:AddReplaceLogic("[allheal]", parent.otherIncomingHeal)
-		tag:AddReplaceLogic("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
-		tag:AddReplaceLogic("[absorb]", parent.absorb)
-		tag:AddReplaceLogic("[absorb:round]", T:short(parent.absorb, 2))
-		tag:AddReplaceLogic("[healabsorb]", parent.healAbsorb)
-		tag:AddReplaceLogic("[healabsorb:round]", T:short(parent.healAbsorb, 2))
-		tag:AddReplaceLogic("[perabsorb]", floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
+		tag.replaced = tag.replaced:replace("[heal]", parent.myIncomingHeal)
+		tag.replaced = tag.replaced:replace("[heal:round]", T:short(parent.myIncomingHeal, 2))
+		tag.replaced = tag.replaced:replace("[allheal]", parent.otherIncomingHeal)
+		tag.replaced = tag.replaced:replace("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
+		tag.replaced = tag.replaced:replace("[absorb]", parent.absorb)
+		tag.replaced = tag.replaced:replace("[absorb:round]", T:short(parent.absorb, 2))
+		tag.replaced = tag.replaced:replace("[healabsorb]", parent.healAbsorb)
+		tag.replaced = tag.replaced:replace("[healabsorb:round]", T:short(parent.healAbsorb, 2))
+		tag.replaced = tag.replaced:replace("[perabsorb]", floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
 	else
 		if (parent.unit ~= arg1) then return end
 		

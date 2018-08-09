@@ -7,10 +7,38 @@ local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
 
+--[[ Lua ]]
+local floor = math.floor
+
 --[[ Locals ]]
 local elementName = "power"
 local Power = { name = elementName }
-local events = { "UNIT_POWER_FREQUENT", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM" }
+local events = { "UNIT_POWER_UPDATE", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM" }
+
+local tags = {
+	["pp"] = [[function(parent)
+		return parent.currentPower
+	end]],
+	["maxpp"] = [[function(parent)
+		return parent.currentMaxPower
+	end]],
+	["perpp"] = [[function(parent)
+		local perpp = 0
+		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
+			perpp = floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
+		end
+		return perpp
+	end]],
+	["pp:round"] = [[function(parent)
+		return T:short(parent.currentPower, 1)
+	end]],
+	["maxpp:round"] = [[function(parent)
+		return T:short(parent.currentMaxPower, 1)
+	end]],
+	["pp:deficit"] = [[function(parent)
+		return parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or ""
+	end]]
+}
 
 A["Shared Elements"]:set(elementName, Power)
 
@@ -56,7 +84,7 @@ function Power:Disable(parent)
 end
 
 function Power:Update(...)
-	
+
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
 	local db = self.db
@@ -68,16 +96,15 @@ function Power:Update(...)
 		self:Show()
 	end
 
-	parent:Update(UnitEvent.UPDATE_IDENTIFIER)
+	if (T:anyOf(event, "UNIT_POWER_UPDATE", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", UnitEvent.UPDATE_GROUP)) then
 
-	if (T:anyOf(event, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", UnitEvent.UPDATE_GROUP)) then
 		if (parent.unit ~= arg1) then return end
-		
+
 		parent:Update(UnitEvent.UPDATE_POWER)
 
 		if (parent.powerToken or parent.powerType) then
-			self:SetMinMaxValues(0, parent.currentMaxPower)
-		  	self:SetValue(parent.currentPower)
+			self:SetMinMaxValues(0, parent.currentMaxPower or 1)
+		  	self:SetValue(parent.currentPower or 1)
 
 		  	if (parent.currentPower == 0 and parent.currentMaxPower == 0) then
 		  		self:SetMinMaxValues(0, 1)
@@ -87,32 +114,33 @@ function Power:Update(...)
 		  	if (db.missingBar.enabled) then
 		  		Units:UpdateMissingBar(self, "missingPowerBar", parent.currentPower, parent.currentMaxPower)
 		  	end
-
-			A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
-		if (not T:anyOf(arg2, "UNIT_POWER_FREQUENT", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", "FORCED_TAG_UPDATE")) then
+		if (not T:anyOf(arg2, "UNIT_POWER_UPDATE", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", "FORCED_TAG_UPDATE")) then
 			return
 		end
 
-		parent:Update(UnitEvent.UPDATE_POWER)
-		local tag = arg1
-		tag:AddReplaceLogic("[pp]", parent.currentPower)
-		tag:AddReplaceLogic("[maxpp]", parent.currentMaxPower)
+		if (parent.unit ~= arg3) then return end
 
-		local perpp = 0
-		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
-			perpp = math.floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
+		local tag = arg1
+
+		parent:Update(UnitEvent.UPDATE_POWER)
+
+		for key, func in next, tags do
+			local k = "%["..key.."%]"
+			if (tag.replaced:find(k)) then
+				local func, err = loadstring("return " .. func)
+				if(func) then
+					func = func()
+					tag.replaced = replaced:replace(k, func(parent))
+				end
+			end
 		end
 
-		tag:AddReplaceLogic("[perpp]", perpp)
-		tag:AddReplaceLogic("[pp:round]", T:short(parent.currentPower, 1))
-		tag:AddReplaceLogic("[maxpp:round]", T:short(parent.currentMaxPower, 1))
-		tag:AddReplaceLogic("[pp:deficit]", parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 
-		self:Update("UNIT_POWER_FREQUENT", parent.unit)
+		self:Update("UNIT_POWER_UPDATE", parent.unit)
 
 		Units:Position(self, db.position)
 

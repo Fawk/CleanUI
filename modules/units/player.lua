@@ -13,9 +13,6 @@ function Player:Init()
     frame.db = db
     frame.orderedElements = A:OrderedMap()
     frame.tags = A:OrderedMap()
-    frame:SetScript("OnShow", function(self)
-        self:Update(UnitEvent.UPDATE_DB)
-    end)
 
     frame:RegisterEvent("PLAYER_ENTERING_WORLD")
     frame:RegisterEvent("PLAYER_TALENT_UPDATE")
@@ -47,8 +44,6 @@ function Player:Update(...)
     local self, event, arg2, arg3, arg4, arg5 = ...
 
     if (self.super) then
-        
-        self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
 
         self.super:Update(...)
 
@@ -87,7 +82,7 @@ function Player:Update(...)
             self:ForceTagUpdate()
 
             self.orderedElements:foreach(function(key, obj)
-                obj:Update(event, db[key])
+                obj:Update(event)
             end)
 
             -- Player specific elements

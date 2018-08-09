@@ -157,6 +157,7 @@ function Buffs:Init(parent)
 		
 		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		buffs.db = db
+		buffs.noTags = true
 
 		buffs.pools = CreatePoolCollection()
 		buffs.pool = buffs.pools:CreatePool("BUTTON", buffs, "AuraIconBarTemplate")
@@ -198,8 +199,6 @@ function Buffs:Update(...)
 		self:Show()
 	end
 
-	parent:Update(UnitEvent.UPDATE_BUFFS)
-
 	local width = db.size.matchWidth and parent:GetWidth() or db.size.width
 	local height = db.size.matchHeight and parent:GetHeight() or db.size.height
 	local texture = media:Fetch("statusbar", db.texture)
@@ -230,6 +229,8 @@ function Buffs:Update(...)
 
 	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_BUFFS)) then
 		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
+
+		parent:Update(UnitEvent.UPDATE_BUFFS)
 
 		parent.buffs = orderBuffs(parent.buffs, self.db, parent.unit)
 
@@ -278,7 +279,7 @@ function Buffs:Update(...)
 
 				button:SetSize(parent:GetWidth(), height)
 
-				placeBar(button, db.barGrowth, relative, self, db.x, db.y)
+				placeBar(button, db.barGrowth, relative, self, db.spacingX, db.spacingY)
 			else
 				button.iconText:Show()
 				button.iconCount:Show()
@@ -290,7 +291,7 @@ function Buffs:Update(...)
 				button.iconCount:SetFont(font, 10, "OUTLINE")
 				button.iconCount:SetText(hasCount and aura.count or "")
 
-				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.x, db.y)
+				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.spacingX, db.spacingY)
 			end
 
 			U:CreateBackground(button, db, false)

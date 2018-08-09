@@ -54,7 +54,7 @@ local defaults = {
         				width = 150,
         				height = 15
         			},
-                    colorBy = "Power",
+                    colorBy = "power",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = -1,
                     orientation = "HORIZONTAL",
@@ -78,8 +78,10 @@ local defaults = {
                     style = "Bar",
                     barGrowth = "Upwards",
                     iconGrowth = "Right Then Down",
-                    x = 1,
-                    y = 1,
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
                     iconLimit = 5,
                     iconTextSize = 10,
         			attached = true,
@@ -141,7 +143,7 @@ local defaults = {
                     }
         		},
                 debuffs = {
-                    enabled = false,
+                    enabled = true,
                     position = {
                         point = "TOPLEFT",
                         localPoint = "TOPLEFT",
@@ -149,17 +151,47 @@ local defaults = {
                         y = 0,
                         relative = "FrameParent"
                     },
-                    style = "Icon",
-                    growth = "Left",
-                    attached = "LEFT",
+                    style = "Bar",
+                    barGrowth = "Upwards",
+                    iconGrowth = "Right Then Down",
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
+                    iconLimit = 5,
+                    iconTextSize = 10,
+                    attached = true,
+                    attachedPosition = "Above",
                     limit = 10,
                     own = true,
+                    colorBy = "Class",
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
+                    reversed = false,
+                    texture = "Default",
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -170,10 +202,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -695,7 +727,7 @@ local defaults = {
         				width = 250,
         				height = 15
         			},
-                    colorBy = "Power",
+                    colorBy = "power",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
@@ -763,7 +795,7 @@ local defaults = {
                     }
                 },
                 debuffs = {
-                    enabled = false,
+                    enabled = true,
                     position = {
                         point = "TOPLEFT",
                         localPoint = "TOPLEFT",
@@ -771,17 +803,47 @@ local defaults = {
                         y = 0,
                         relative = "FrameParent"
                     },
-                    style = "Icon",
-                    growth = "Left",
-                    attached = "LEFT",
+                    style = "Bar",
+                    barGrowth = "Upwards",
+                    iconGrowth = "Right Then Down",
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
+                    iconLimit = 5,
+                    iconTextSize = 10,
+                    attached = true,
+                    attachedPosition = "Above",
                     limit = 10,
                     own = true,
+                    colorBy = "Class",
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
+                    reversed = false,
+                    texture = "Default",
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -792,10 +854,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -1110,12 +1172,7 @@ local defaults = {
                     texture = "Default",
                     missingBar = {
                         enabled = false,
-                        customColor = {
-                            0.5, -- [1]
-                            0.5, -- [2]
-                            0.5, -- [3]
-                            1, -- [4]
-                        },
+                        customColor = { r = .5, g = .5, b = .5, a = 1 },
                         colorBy = "Custom",
                     }
                 },
@@ -1175,7 +1232,7 @@ local defaults = {
                     }
                 },
                 debuffs = {
-                    enabled = false,
+                    enabled = true,
                     position = {
                         point = "TOPLEFT",
                         localPoint = "TOPLEFT",
@@ -1183,17 +1240,47 @@ local defaults = {
                         y = 0,
                         relative = "FrameParent"
                     },
-                    style = "Icon",
-                    growth = "Left",
-                    attached = "LEFT",
+                    style = "Bar",
+                    barGrowth = "Upwards",
+                    iconGrowth = "Right Then Down",
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
+                    iconLimit = 5,
+                    iconTextSize = 10,
+                    attached = true,
+                    attachedPosition = "Above",
                     limit = 10,
                     own = true,
+                    colorBy = "Class",
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
+                    reversed = false,
+                    texture = "Default",
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -1204,10 +1291,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -1373,7 +1460,7 @@ local defaults = {
                     }
                 },
                 debuffs = {
-                    enabled = false,
+                    enabled = true,
                     position = {
                         point = "TOPLEFT",
                         localPoint = "TOPLEFT",
@@ -1381,17 +1468,47 @@ local defaults = {
                         y = 0,
                         relative = "FrameParent"
                     },
-                    style = "Icon",
-                    growth = "Left",
-                    attached = "LEFT",
+                    style = "Bar",
+                    barGrowth = "Upwards",
+                    iconGrowth = "Right Then Down",
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
+                    iconLimit = 5,
+                    iconTextSize = 10,
+                    attached = true,
+                    attachedPosition = "Above",
                     limit = 10,
                     own = true,
+                    colorBy = "Class",
+                    customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
+                    reversed = false,
+                    texture = "Default",
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -1402,10 +1519,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -1613,7 +1730,7 @@ local defaults = {
                         width = 150,
                         height = 15
                     },
-                    colorBy = "Power",
+                    colorBy = "power",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",
@@ -1882,7 +1999,7 @@ local defaults = {
                         width = 64,
                         height = 5
                     },
-                    colorBy = "Power",
+                    colorBy = "power",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
                     orientation = "HORIZONTAL",

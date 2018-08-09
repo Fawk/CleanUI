@@ -109,7 +109,7 @@ function Boss:Update(...)
             self:ForceTagUpdate()
 
             self.orderedElements:foreach(function(key, obj)
-                obj:Update(event, db[key])
+                obj:Update(event)
             end)
         end
     end

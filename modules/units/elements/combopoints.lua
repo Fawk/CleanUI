@@ -32,6 +32,7 @@ function ComboPoints:Init(parent)
         points = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
         points.buttons = {}
         points.db = db
+        points.noTags = true
 
         for i = 1, MAX_COMBO_POINTS do
             local point = CreateFrame("StatusBar", parent:GetName().."_Combo Point"..i, points)

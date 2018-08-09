@@ -96,7 +96,7 @@ function Stagger:Update(...)
 
 	if (event == UnitEvent.UPDATE_TAGS) then
 		local tag = arg1
-		tag:AddReplaceLogic("[stagger]", staggerValue)
+		tag.replaced = tag.replaced:replace("[stagger]", staggerValue)
 	elseif (event == UnitEvent.UPDATE_DB) then
 		local texture = media:Fetch("statusbar", db.texture)
 

@@ -15,7 +15,7 @@ local moduleName = "Micro Bar"
 local MicroBar = {}
 
 function MicroBar:Init()
-
+	if true then return end
 	local db = A.db.profile.general.microBar
 
 	if (db.enabled) then

@@ -33,6 +33,7 @@ function HolyPower:Init(parent)
         holypower = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         holypower.buttons = {}
         holypower.db = db
+        holypower.noTags = true
 
         for i = 1, MAX_HOLY_POWER do
             local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), holypower)

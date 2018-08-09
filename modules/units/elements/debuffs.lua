@@ -155,6 +155,7 @@ function Debuffs:Init(parent)
 		
 		debuffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		debuffs.db = db
+		debuffs.noTags = true
 
 		debuffs.pools = CreatePoolCollection()
 		debuffs.pool = debuffs.pools:CreatePool("BUTTON", debuffs, "AuraIconBarTemplate")
@@ -170,12 +171,6 @@ function Debuffs:Init(parent)
 		end)
 
 		debuffs:SetScript("OnUpdate", updateButtons)
-
-		--DebuffFrame:UnregisterEvent("UNIT_AURA")
-		--DebuffFrame:UnregisterEvent("GROUP_ROSTER_UPDATE")
-		--DebuffFrame:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-
-		--DebuffFrame:SetParent(A.hiddenFrame)
 	end
 
 	debuffs:Update(UnitEvent.UPDATE_DB)
@@ -195,8 +190,6 @@ function Debuffs:Update(...)
 	else
 		self:Show()
 	end
-
-	parent:Update(UnitEvent.UPDATE_DEBUFFS)
 
 	local width = db.size.matchWidth and parent:GetWidth() or db.size.width
 	local height = db.size.matchHeight and parent:GetHeight() or db.size.height
@@ -229,14 +222,16 @@ function Debuffs:Update(...)
 	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_DEBUFFS)) then
 		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
 
-		parent.debuffs = orderDebuffs(parent.buffs, self.db, parent.unit)
+		parent:Update(UnitEvent.UPDATE_DEBUFFS)
+
+		parent.debuffs = orderDebuffs(parent.debuffs, self.db, parent.unit)
 
 		local relative = self
 		local last = 0
 
-		for i = 1, #parent.buffs do
+		for i = 1, #parent.debuffs do
 			if (i > tonumber(self.limit)) then
-				tremove(parent.buffs, i)
+				tremove(parent.debuffs, i)
 			else
 				last = i
 			end
@@ -244,7 +239,7 @@ function Debuffs:Update(...)
 
 		for i = 1, last do
 
-			local aura = parent.buffs[i]
+			local aura = parent.debuffs[i]
 			local button = self.buttons[i]
 
 			if (not button) then
@@ -276,7 +271,7 @@ function Debuffs:Update(...)
 
 				button:SetSize(parent:GetWidth(), height)
 
-				placeBar(button, db.barGrowth, relative, self, db.x, db.y)
+				placeBar(button, db.barGrowth, relative, self, db.spacingX, db.spacingY)
 			else
 				button.iconText:Show()
 				button.iconCount:Show()
@@ -288,7 +283,7 @@ function Debuffs:Update(...)
 				button.iconCount:SetFont(font, 10, "OUTLINE")
 				button.iconCount:SetText(hasCount and aura.count or "")
 
-				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.x, db.y)
+				placeIcon(button, i, db.iconGrowth, db.iconLimit, relative, self, db.spacingX, db.spacingY)
 			end
 
 			U:CreateBackground(button, db, false)

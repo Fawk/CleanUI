@@ -23,6 +23,8 @@ local function CheckEnabled(e, db)
 end
 
 function Castbar:Init(parent)
+	if true then return end
+	
 	local db = parent.db[elementName]
 
 	if (not db) then return end
@@ -31,6 +33,7 @@ function Castbar:Init(parent)
 	if (not container) then
 		container = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		container.db = db
+		container.noTags = true
 		
 		local bar = CreateFrame("StatusBar", nil, container)
 		bar:SetFrameLevel(2)
@@ -115,6 +118,8 @@ function Castbar:Init(parent)
 end
 
 function Castbar:Update(...)
+
+	if true then return end
 
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()

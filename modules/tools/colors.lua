@@ -122,25 +122,25 @@ end
 
 local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
 function A:AddColorReplaceLogicIfNeeded(tag, class, powerType)
-	local x, y = tag.format:find("%[color:"..colorPattern.."%]")
+	local x, y = tag.replaced:find("%[color:"..colorPattern.."%]")
 	if (x and y) then
-		local m = tag.format:sub(x, y)
-		tag:AddReplaceLogic(m, "|cFF"..m:match(colorPattern))
+		local m = tag.replaced:sub(x, y)
+		tag.replaced = tag.replaced:replace(m, "|cFF"..m:match(colorPattern))
 	end
 
-	x, y = tag.format:find("%[color:class%]")
+	x, y = tag.replaced:find("%[color:class%]")
 	if (x and y) then
-		tag:AddReplaceLogic("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]), true)
+		tag.replaced = tag.replaced:replace("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]))
 	end
 
-	x, y = tag.format:find("%[color:health%]")
+	x, y = tag.replaced:find("%[color:health%]")
 	if (x and y) then
-		tag:AddReplaceLogic("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard), true)
+		tag.replaced = tag.replaced:replace("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard))
 	end
 
-	x, y = tag.format:find("%[color:power%]")
+	x, y = tag.replaced:find("%[color:power%]")
 	if (x and y) then
-		tag:AddReplaceLogic("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]), true)
+		tag.replaced = tag.replaced:replace("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]))
 	end
 end
 

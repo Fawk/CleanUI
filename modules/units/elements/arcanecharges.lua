@@ -33,6 +33,7 @@ function ArcaneCharges:Init(parent)
         charges = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         charges.buttons = {}
         charges.db = db
+        charges.noTags = true
 
         for i = 1, MAX_ARCANE_CHARGES do
             local power = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), charges)

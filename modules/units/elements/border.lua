@@ -22,6 +22,7 @@ function Border:Init(parent)
 	if (not border) then
 		border = CreateFrame("Frame")
 		border.db = db
+		border.noTags = true
 		border.Update = function(self, ...)
 			Border:Update(self, ...)
 		end

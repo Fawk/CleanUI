@@ -520,7 +520,7 @@ local function classPowerSetting(name, order, hidden)
     			type = "select",
 				order = 10,
 				name = "Attached Position",
-				values = createDropdownTable("Top", "Bottom", "Left", "Right"),
+				values = createDropdownTable("Above", "Below", "Left", "Right"),
 				get = "Get",
 				set = "Set"
             }
@@ -668,6 +668,8 @@ function A:RegisterOptions()
 		else
 			db[info[#info]] = arg1
 		end
+
+		A:UpdateDb()
 	end
 
 	local db = A.db.profile
@@ -732,7 +734,7 @@ function A:RegisterOptions()
 										type = "select",
 										order = 2,
 										name = "Color By",
-										values = createDropdownTable("Class", "Power", "Gradient", "Custom"),
+										values = createDropdownTable("Class", "power", "Gradient", "Custom"),
 										get = "Get",
 										set = "Set"
 						            },
@@ -786,7 +788,7 @@ function A:RegisterOptions()
 										get = "Get",
 										set = "Set"
 						            },
-									position = positionSetting(8, createDropdownTable("Player", "Power")),
+									position = positionSetting(8, createDropdownTable("Player", "power")),
 									size = {
 										disabled = parentDisabled,
 										type = "group",
@@ -872,7 +874,7 @@ function A:RegisterOptions()
 												type = "select",
 												order = 3,
 												name = "Color By",
-												values = createDropdownTable("Class", "Health", "Power", "Gradient", "Custom"),
+												values = createDropdownTable("Class", "health", "power", "Gradient", "Custom"),
 												get = "Get",
 												set = "Set"
 							                },
@@ -899,7 +901,7 @@ function A:RegisterOptions()
 										type = "select",
 										order = 2,
 										name = "Color By",
-										values = createDropdownTable("Class", "Power", "Custom"),
+										values = createDropdownTable("Class", "power", "Custom"),
 										get = "Get",
 										set = "Set"
 						            },
@@ -953,7 +955,7 @@ function A:RegisterOptions()
 										get = "Get",
 										set = "Set"
 						            },
-									position = positionSetting(8, createDropdownTable("Player", "Health")),
+									position = positionSetting(8, createDropdownTable("Player", "health")),
 									size = {
 										disabled = parentDisabled,
 										type = "group",
@@ -1039,7 +1041,7 @@ function A:RegisterOptions()
 												type = "select",
 												order = 3,
 												name = "Color By",
-												values = createDropdownTable("Class", "Health", "Power", "Gradient", "Custom"),
+												values = createDropdownTable("Class", "health", "power", "Gradient", "Custom"),
 												get = "Get",
 												set = "Set"
 							                },
@@ -1094,7 +1096,7 @@ function A:RegisterOptions()
 										get = "Get",
 										set = "Set"
 						        	},
-						            x = {
+						            spacingX = {
 						            	disabled = parentDisabled,
 						            	type = "range",
 						            	order = 5,
@@ -1105,7 +1107,7 @@ function A:RegisterOptions()
 						            	get = "Get",
 						            	set = "Set"
 						            },
-						            y = {
+						            spacingY = {
 						            	disabled = parentDisabled,
 						            	type = "range",
 						            	order = 6,
@@ -1146,17 +1148,45 @@ function A:RegisterOptions()
 				            			type = "select",
 										order = 9,
 										name = "Attached Position",
-										values = createDropdownTable("Top", "Bottom", "Left", "Right"),
+										values = createDropdownTable("Above", "Below", "Left", "Right"),
 										get = "Get",
 										set = "Set"
 						            },
+						            x = {
+						            	disabled = function(info)
+						            		local parent = getParent(info)
+						            		return not (parent.enabled and parent.attached)
+						            	end,
+						            	type = "range",
+						            	order = 10,
+						            	name = "Attached Offset X",
+						            	min = -500,
+						            	max = 500,
+						            	step = 1,
+						            	get = "Get",
+						            	set = "Set"
+						        	},
+						        	y = {
+						            	disabled = function(info)
+						            		local parent = getParent(info)
+						            		return not (parent.enabled and parent.attached)
+						            	end,
+						            	type = "range",
+						            	order = 11,
+						            	name = "Attached Offset Y",
+						            	min = -500,
+						            	max = 500,
+						            	step = 1,
+						            	get = "Get",
+						            	set = "Set"
+						        	},
 						            limit = {
 						            	disabled = function(info)
 						            		local parent = getParent(info)
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 						            	type = "range",
-						            	order = 10,
+						            	order = 12,
 						            	name = "Bar Limit",
 						            	min = 1,
 						            	max = 40,
@@ -1167,7 +1197,7 @@ function A:RegisterOptions()
 						            hideNoDuration = {
 						            	disabled = parentDisabled,
 										type = "toggle",
-										order = 11,
+										order = 13,
 										name = "Hide No Duration",
 										desc = "Hide auras that never expire, e.g. mounts, weekly event buffs, etc.",
 										get = "Get",
@@ -1176,7 +1206,7 @@ function A:RegisterOptions()
 						            own = {
 						            	disabled = parentDisabled,
 										type = "toggle",
-										order = 12,
+										order = 14,
 										name = "Own Only",
 										desc = "Only show auras cast by yourself",
 										get = "Get",
@@ -1188,9 +1218,9 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "select",
-										order = 13,
+										order = 15,
 										name = "Color By",
-										values = createDropdownTable("Class", "Health", "Power", "Gradient", "Custom"),
+										values = createDropdownTable("Class", "health", "power", "Gradient", "Custom"),
 										get = "Get",
 										set = "Set"
 						        	},
@@ -1200,7 +1230,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar" and parent.colorBy == "Custom")
 						            	end,
 					                	type = "color",
-					                	order = 14,
+					                	order = 16,
 					                	name = "Custom Color",
 					                	hasAlpha = true,
 					                	get = "Get",
@@ -1212,7 +1242,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "range",
-										order = 15,
+										order = 17,
 										name = "Background Multiplier",
 										min = -1,
 										max = 1,
@@ -1226,7 +1256,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "toggle",
-										order = 16,
+										order = 18,
 										name = "Reversed",
 										get = "Get",
 										set = "Set"
@@ -1234,7 +1264,7 @@ function A:RegisterOptions()
 						            texture = {
 						            	disabled = parentDisabled,
 										type = "select",
-										order = 17,
+										order = 19,
 										name = "Texture",
 								      	values = media:HashTable("statusbar"),
 								      	dialogControl = "LSM30_Statusbar",
@@ -1244,7 +1274,7 @@ function A:RegisterOptions()
 						            size = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 18,
+						            	order = 20,
 						            	name = "Size",
 						            	args = {
 											matchWidth = {
@@ -1298,7 +1328,7 @@ function A:RegisterOptions()
 						            name = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 19,
+						            	order = 21,
 						            	name = "Name",
 						            	args = {
 						            		enabled = {
@@ -1325,7 +1355,7 @@ function A:RegisterOptions()
 						            time = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 20,
+						            	order = 22,
 						            	name = "Time",
 						            	args = {
 						            		enabled = {
@@ -1349,11 +1379,11 @@ function A:RegisterOptions()
 							                position = positionSetting(3)
 							            }
 						            },
-						            background = backgroundSetting(21),
+						            background = backgroundSetting(23),
 						            blacklist = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 22,
+						            	order = 24,
 						            	name = "Blacklist",
 						            	args = {
 						            		enabled = {
@@ -1377,7 +1407,7 @@ function A:RegisterOptions()
 						            whitelist = { -- Contruct this properly
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 23,
+						            	order = 25,
 						            	name = "WhiteList",
 						            	args = {
 						            		enabled = {
@@ -1447,7 +1477,7 @@ function A:RegisterOptions()
 										get = "Get",
 										set = "Set"
 						        	},
-						            x = {
+						            spacingX = {
 						            	disabled = parentDisabled,
 						            	type = "range",
 						            	order = 5,
@@ -1458,7 +1488,7 @@ function A:RegisterOptions()
 						            	get = "Get",
 						            	set = "Set"
 						            },
-						            y = {
+						            spacingY = {
 						            	disabled = parentDisabled,
 						            	type = "range",
 						            	order = 6,
@@ -1499,17 +1529,45 @@ function A:RegisterOptions()
 				            			type = "select",
 										order = 9,
 										name = "Attached Position",
-										values = createDropdownTable("Top", "Bottom", "Left", "Right"),
+										values = createDropdownTable("Above", "Below", "Left", "Right"),
 										get = "Get",
 										set = "Set"
 						            },
+						            x = {
+						            	disabled = function(info)
+						            		local parent = getParent(info)
+						            		return not (parent.enabled and parent.attached)
+						            	end,
+						            	type = "range",
+						            	order = 10,
+						            	name = "Attached Offset X",
+						            	min = -500,
+						            	max = 500,
+						            	step = 1,
+						            	get = "Get",
+						            	set = "Set"
+						        	},
+						        	y = {
+						            	disabled = function(info)
+						            		local parent = getParent(info)
+						            		return not (parent.enabled and parent.attached)
+						            	end,
+						            	type = "range",
+						            	order = 11,
+						            	name = "Attached Offset Y",
+						            	min = -500,
+						            	max = 500,
+						            	step = 1,
+						            	get = "Get",
+						            	set = "Set"
+						        	},
 						            limit = {
 						            	disabled = function(info)
 						            		local parent = getParent(info)
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 						            	type = "range",
-						            	order = 10,
+						            	order = 12,
 						            	name = "Bar Limit",
 						            	min = 1,
 						            	max = 40,
@@ -1520,9 +1578,9 @@ function A:RegisterOptions()
 						            own = {
 						            	disabled = parentDisabled,
 										type = "toggle",
-										order = 12,
+										order = 14,
 										name = "Own Only",
-										desc = "Only show debuffs cast by yourself",
+										desc = "Only show auras cast by yourself",
 										get = "Get",
 										set = "Set"
 						            },
@@ -1532,9 +1590,9 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "select",
-										order = 13,
+										order = 15,
 										name = "Color By",
-										values = createDropdownTable("Class", "Health", "Power", "Gradient", "Custom"),
+										values = createDropdownTable("Class", "health", "power", "Gradient", "Custom"),
 										get = "Get",
 										set = "Set"
 						        	},
@@ -1544,7 +1602,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar" and parent.colorBy == "Custom")
 						            	end,
 					                	type = "color",
-					                	order = 14,
+					                	order = 16,
 					                	name = "Custom Color",
 					                	hasAlpha = true,
 					                	get = "Get",
@@ -1556,7 +1614,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "range",
-										order = 15,
+										order = 17,
 										name = "Background Multiplier",
 										min = -1,
 										max = 1,
@@ -1570,7 +1628,7 @@ function A:RegisterOptions()
 						            		return not (parent.enabled and parent.style == "Bar")
 						            	end,
 										type = "toggle",
-										order = 16,
+										order = 18,
 										name = "Reversed",
 										get = "Get",
 										set = "Set"
@@ -1578,7 +1636,7 @@ function A:RegisterOptions()
 						            texture = {
 						            	disabled = parentDisabled,
 										type = "select",
-										order = 17,
+										order = 19,
 										name = "Texture",
 								      	values = media:HashTable("statusbar"),
 								      	dialogControl = "LSM30_Statusbar",
@@ -1588,7 +1646,7 @@ function A:RegisterOptions()
 						            size = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 18,
+						            	order = 20,
 						            	name = "Size",
 						            	args = {
 											matchWidth = {
@@ -1642,7 +1700,7 @@ function A:RegisterOptions()
 						            name = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 19,
+						            	order = 21,
 						            	name = "Name",
 						            	args = {
 						            		enabled = {
@@ -1669,7 +1727,7 @@ function A:RegisterOptions()
 						            time = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 20,
+						            	order = 22,
 						            	name = "Time",
 						            	args = {
 						            		enabled = {
@@ -1693,11 +1751,11 @@ function A:RegisterOptions()
 							                position = positionSetting(3)
 							            }
 						            },
-						            background = backgroundSetting(21),
+						            background = backgroundSetting(23),
 						            blacklist = {
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 22,
+						            	order = 24,
 						            	name = "Blacklist",
 						            	args = {
 						            		enabled = {
@@ -1721,7 +1779,7 @@ function A:RegisterOptions()
 						            whitelist = { -- Contruct this properly
 						            	disabled = parentDisabled,
 						            	type = "group",
-						            	order = 23,
+						            	order = 25,
 						            	name = "WhiteList",
 						            	args = {
 						            		enabled = {
@@ -1741,7 +1799,7 @@ function A:RegisterOptions()
 						            			}
 						            		}
 						            	}
-						            },
+						            }
 						        }
 							},
 							size = {

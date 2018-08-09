@@ -132,6 +132,7 @@ function Runes:Init(parent)
 		runes = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
 		runes.buttons = {}
 		runes.db = db
+		runes.noTags = true
 
 		for i = 1, MAX_RUNES do
 			local rune = CreateFrame("StatusBar", T:frameName(parentName, "Rune"..i), runes)

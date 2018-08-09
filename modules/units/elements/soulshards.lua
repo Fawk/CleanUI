@@ -26,6 +26,7 @@ function SoulShards:Init(parent)
 		shards = CreateFrame("Frame", parentName.."_"..elementName, parent)
 		shards.buttons = {}
 		shards.db = db
+		shards.noTags = true
 
 		for i = 1, MAX_SOUL_SHARDS do
 			local shard = CreateFrame("StatusBar", parent:GetName().."_Soul Shard"..i, shards)

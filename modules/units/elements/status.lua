@@ -34,6 +34,7 @@ function Status:Init(parent)
         status.tags = A:OrderedTable()
         status.icons = A:OrderedTable()
         status.db = db
+        status.noTags = true
 
         status.Update = function(self, event, ...)
             Status:Update(self, event, ...)

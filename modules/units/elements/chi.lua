@@ -33,6 +33,7 @@ function Chi:Init(parent)
         chis = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         chis.buttons = {}
         chis.db = db
+        chis.noTags = true
 
         for i = 1, MAX_CHI do
             local chi = CreateFrame("StatusBar", T:frameName(parentName, elementName..i), chis)

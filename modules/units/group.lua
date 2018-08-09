@@ -235,7 +235,7 @@ end
 function Group:SimulateTags(frame)
     frame.tags:foreach(function(key, tag)
         frame.orderedElements:foreach(function(k, element)
-            element:Update(UnitEvent.UPDATE_TAGS, tag)
+            element:Update(UnitEvent.UPDATE_TAGS, tag, "UNIT_HEALTH", "player")
         end)
         A:FormatTag(tag)
         tag:SetText(tag.text)

@@ -29,7 +29,7 @@ function Target:Init()
 
     frame:RegisterEvent("PLAYER_TARGET_CHANGED")
     frame:SetScript("OnEvent", function(self, ...)
-        self:Update(UnitEvent.UPDATE_DB)
+        self:Update("OnEvent")
     end)
 
     Units:Add(frame, frame:GetDbName())
@@ -48,8 +48,6 @@ function Target:Update(...)
 
     if (self.super) then
         self.super:Update(...)
-
-        self.super:Update(self, UnitEvent.UPDATE_IDENTIFIER)
 
         if (event == UnitEvent.UPDATE_DB) then
 
@@ -83,6 +81,12 @@ function Target:Update(...)
 
             self.orderedElements:foreach(function(key, obj)
                 obj:Update(event, db[key])
+            end)
+        elseif (event == "OnEvent") then
+            self:ForceTagUpdate()
+
+            self.orderedElements:foreach(function(key, obj)
+                obj:Update(event)
             end)
         end
     end

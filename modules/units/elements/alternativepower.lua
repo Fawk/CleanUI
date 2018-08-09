@@ -36,6 +36,7 @@ function AlternativePower:Init(parent)
 		altpower.value = buildText(altpower, 10):shadow():atCenter():build()
 		altpower.value:SetText("")
 		altpower.bg = altpower:CreateTexture(nil, "BACKGROUND")
+		altpower.noTags = true
 
 		PlayerPowerBarAlt:UnregisterAllEvents()
 		PlayerPowerBarAlt:SetAlpha(0)

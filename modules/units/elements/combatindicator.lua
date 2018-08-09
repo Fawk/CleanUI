@@ -14,6 +14,7 @@ function CombatIndicator:Init(parent)
 	if (not combat) then
 		combat = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		combat.db = db
+		combat.noTags = true
 		combat.text = combat:CreateFontString(nil, "OVERLAY")
 		combat.text:SetPoint("CENTER")
 		combat.texture = combat:CreateTexture(nil, "OVERLAY")
