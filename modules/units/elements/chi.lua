@@ -28,7 +28,7 @@ function Chi:Init(parent)
 
     local db = parent.db[elementName]
 
-    local chis = parent.orderedElements:get(elementName)
+    local chis = parent.orderedElements[elementName]
     if (not chis) then
         chis = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         chis.buttons = {}
@@ -65,7 +65,7 @@ function Chi:Init(parent)
     self:Update(chis, UnitEvent.UPDATE_DB)
     self:Update(chis, "UNIT_POWER_FREQUENT")
 
-    parent.orderedElements:set(elementName, chis)
+    parent.orderedElements[elementName] = chis
 end
 
 function Chi:Update(...)
@@ -154,4 +154,4 @@ function Chi:Update(...)
     end
 end
 
-A["Player Elements"]:set(elementName, Chi)
+A.elements.player[elementName] = Chi

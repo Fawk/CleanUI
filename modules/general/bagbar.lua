@@ -69,4 +69,4 @@ function BagBar:Update(...)
 
 end
 
-A.general:set("bagbar", BagBar)
+A.general.bagbar = BagBar

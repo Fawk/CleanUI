@@ -36,4 +36,4 @@ function Blacklist:GetOptions(enabled, extraClick, order)
     return config
 end
 
-A.general:set("blacklist", Blacklist)
+A.general.blacklist = Blacklist

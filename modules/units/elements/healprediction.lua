@@ -16,7 +16,7 @@ local elementName = "healPrediction"
 local HealPrediction = {}
 local events = { "UNIT_HEALTH_FREQUENT", "UNIT_MAXHEALTH", "UNIT_HEAL_PREDICTION", "UNIT_ABSORB_AMOUNT_CHANGED", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED" }
 
-A["Shared Elements"]:set(elementName, HealPrediction)
+A.elements.shared[elementName] = HealPrediction
 
 local function Update(health, previous, current, amount)
 
@@ -72,7 +72,7 @@ function HealPrediction:Init(parent)
 
 	local texture = media:Fetch("statusbar", db.texture)
 
-	local healPrediction = parent.orderedElements:get(elementName)
+	local healPrediction = parent.orderedElements[elementName]
 	if (not healPrediction) then
 
 		healPrediction = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
@@ -143,7 +143,7 @@ function HealPrediction:Init(parent)
 	healPrediction:Update(UnitEvent.UPDATE_DB)
 	healPrediction:Update("UNIT_HEALTH_FREQUENT")
 
-	parent.orderedElements:set(elementName, healPrediction)
+	parent.orderedElements[elementName] = healPrediction
 end
 
 function HealPrediction:Update(...)

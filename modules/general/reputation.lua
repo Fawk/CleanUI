@@ -158,4 +158,4 @@ function R:Init()
     A.frames.reputationBar = reputation
 end
 
-A.general:set("reputation", R)
+A.general.reputation = R

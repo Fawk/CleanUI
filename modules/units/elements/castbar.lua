@@ -12,7 +12,7 @@ local UnitName = UnitName
 local elementName = "castbar"
 local Castbar = { name = elementName }
 
-A["Shared Elements"]:set(elementName, Castbar)
+A.elements.shared[elementName] = Castbar
 
 local function CheckEnabled(e, db)
 	if not db.enabled then
@@ -29,7 +29,7 @@ function Castbar:Init(parent)
 
 	if (not db) then return end
 
-	local container = parent.orderedElements:get(elementName)
+	local container = parent.orderedElements[elementName]
 	if (not container) then
 		container = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		container.db = db
@@ -114,7 +114,7 @@ function Castbar:Init(parent)
 	container:Update(UnitEvent.UPDATE_DB)
 	container:Update(UnitEvent.UPDATE_CASTBAR)
 
-	parent.orderedElements:set(elementName, container)
+	parent.orderedElements[elementName] = container
 end
 
 function Castbar:Update(...)
@@ -240,7 +240,7 @@ function Castbar:Update(...)
 					:replace("[target]", UnitName("target") or "")
 			)
 			
-			Units:SetupMissingBar(self.bar, self.db.missingBar, "missingBar", self.value, self.max, A.noop, A.ColorBar)
+			Units:UpdateMissingBar(self.bar, "missingBar", self.value, self.max)
 			bar:SetValue(self.value);
 		else
 			self.casting = nil

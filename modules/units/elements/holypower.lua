@@ -28,7 +28,7 @@ function HolyPower:Init(parent)
 
     local db = parent.db[elementName]
 
-    local holypower = parent.orderedElements:get(elementName)
+    local holypower = parent.orderedElements[elementName]
     if (not holypower) then
         holypower = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         holypower.buttons = {}
@@ -65,7 +65,7 @@ function HolyPower:Init(parent)
     self:Update(holypower, UnitEvent.UPDATE_DB)
     self:Update(holypower, "UNIT_POWER_FREQUENT")
 
-    parent.orderedElements:set(elementName, holypower)
+    parent.orderedElements[elementName] = holypower
 end
 
 function HolyPower:Update(...)
@@ -140,4 +140,4 @@ function HolyPower:Update(...)
     end
 end
 
-A["Player Elements"]:set(elementName, HolyPower)
+A.elements.player[elementName] = HolyPower

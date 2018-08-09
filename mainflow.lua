@@ -12,8 +12,10 @@ Addon.pools = CreatePoolCollection();
 Addon.OrderedTable = Args.OrderedTable
 Addon.OrderedMap = Args.OrderedMap
 
-Addon["Shared Elements"] = Args:OrderedMap()
-Addon["Player Elements"] = Args:OrderedMap()
+Addon.elements = {
+    player = Args:OrderedMap(),
+    shared = Args:OrderedMap()
+}
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName, false)
 
@@ -127,44 +129,46 @@ end
 
 function Addon:Init()
 
-	self.general:foreach(function(key, module)
-        if (module.Init) then
-            module:Init()
+	for i = 1, #self.general do
+        if (self.general[i].Init) then
+            self.general[i]:Init()
         end
-    end)
+    end
 
-	self.modules:foreach(function(key, module)
-		if module.Init then
+	for i = 1, #self.modules
+        local module = self.modules[i]
+		if (module.Init) then
 	        local unit = module:Init()
             if (unit) then
             	if (unit.hasMultipleUnits) then
             		unit:InitUnits(function(self, uf)
             			if (uf.unit and UnitExists(uf.unit)) then
-	            			Addon["Shared Elements"]:foreach(function(key, element)
-		                    	element:Init(uf)
-		                	end)
+	            			for x = 1, #Addon.elements.shared do
+		                    	Addon.elements.shared[x]:Init(uf)
+		                	end
 		                end
             		end)
             	else
-	                Addon["Shared Elements"]:foreach(function(key, element)
-	                    element:Init(unit)
-	                end)
+	                for x = 1, #Addon.elements.shared do
+	                    Addon.elements.shared[x]:Init(unit)
+	                end
 	            end
             end
         end
-	end)
+	end
 end
 
 function Addon:UpdateDb()
     -- General
-	self.general:foreach(function(key, module)
-        if (module.Update) then
-            module:Update(UnitEvent.UPDATE_DB)
+    for i = 1, #self.general do
+        if (self.general[i].Update) then
+            self.general[i]:Update(UnitEvent.UPDATE_DB)
         end
-    end)
+    end
 
     -- Units
-	self.modules:foreach(function(key, module)
+    for i = 1, #self.modules do
+        local module = self.modules[i]
     	if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())
         	if (unit) then
@@ -177,7 +181,7 @@ function Addon:UpdateDb()
 	        	end
 	        end
 	    end
-    end)
+    end
 end
 
 function Addon:OnDisable()

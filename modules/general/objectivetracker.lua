@@ -178,4 +178,4 @@ function Tracker:Update(event)
 
 end
 
-A.general:set("objectivetracker", Tracker)
+A.general.objectivetracker = Tracker

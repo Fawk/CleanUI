@@ -127,7 +127,7 @@ function Runes:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local runes = parent.orderedElements:get(elementName)
+	local runes = parent.orderedElements[elementName]
 	if (not runes) then
 		runes = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
 		runes.buttons = {}
@@ -158,7 +158,7 @@ function Runes:Init(parent)
 
 	self:Update(runes, UnitEvent.UPDATE_DB)
 
-	parent.orderedElements:set(elementName, runes)
+	parent.orderedElements[elementName] = runes
 end
 
 function Runes:Update(...)
@@ -233,4 +233,4 @@ function Runes:Update(...)
 	end
 end
 
-A["Player Elements"]:set(elementName, Runes)
+A.elements.player[elementName] = Runes

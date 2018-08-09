@@ -67,4 +67,4 @@ function V:Init()
     A.frames.vehicleLeaveButton = vehicle
 end
 
-A.general:set("vehicle", V)
+A.general.vehicle = V

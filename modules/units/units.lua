@@ -1,6 +1,6 @@
 local A, L = unpack(select(2, ...))
 local Units, units = {}, A:OrderedMap()
-local media = LibStub("LibSharedMedia-3.0")
+local media = LibStub("LibA.elements.sharedMedia-3.0")
 local T = A.Tools
 
 local MAX_ARENA_ENEMIES = MAX_ARENA_ENEMIES or 5
@@ -12,7 +12,7 @@ hiddenParent:SetAllPoints()
 hiddenParent:Hide()
 
 function Units:Get(unit)
-    return units:get(unit)
+    return units[unit]
 end
 
 function Units:Add(object, overrideName)
@@ -22,13 +22,14 @@ end
 
 function Units:Translate(frame, relative)
     local parent, name = frame:GetParent(), frame:GetName()
-    if (units:hasKey(relative)) then
-        return units:get(relative)
-    elseif (A["Player Elements"]:get(relative) or A["Shared Elements"]:get(relative)) then
-        if (frame.orderedElements and frame.orderedElements:get(relative)) then
-            return frame.orderedElements:get(relative)
-        elseif (parent.orderedElements and parent.orderedElements:get(relative)) then
-            return parent.orderedElements:get(relative)
+
+    if (units[relative]) then
+        return units[relative]
+    elseif (A.elements.player[relative] or A.elements.shared[relative]) then
+        if (frame.orderedElements and frame.orderedElements[relative]) then
+            return frame.orderedElements[relative]
+        elseif (parent.orderedElements and parent.orderedElements[relative]) then
+            return parent.orderedElements[relative]
         end
         return parent
     elseif (relative:equals(parent:GetName(), "Parent")) then
@@ -81,12 +82,12 @@ function Units:Attach(frame, db, override)
 end
 
 local function getClassPowerRelative(frame)
-    return A["Player Elements"]:foreach(function(key, element)
-        local target = frame.orderedElements:get(key)
-        if (element.isClassPower and target and target:IsShown()) then
+    for i = 1, #A.elements.player do
+        local target = frame.orderedElements[A.elements.player(i)]
+        if (A.elements.player[i].isClassPower and target and target:IsShown()) then
             return target
         end
-    end)
+    end
 end
 
 function Units:PlaceCastbar(bar, db)
@@ -120,15 +121,9 @@ function Units:Tag(frame, name, db)
     local tag = frame.tags:get(name)
     if (not tag) then
         tag = frame:CreateFontString(nil, "OVERLAY")
-        tag.text = ""
-        tag.replaceLogics = A:OrderedMap()
-        tag.AddReplaceLogic = function(self, key, replace)
-            if (replace ~= self.replaceLogics:get(key)) then
-                self.replaceLogics:set(key, replace, true)
-            end
-        end
+        tag.replaced = ""
 
-        frame.tags:set(name, tag)
+        frame.tags[name] = tag
     end
 
     tag:SetFont(media:Fetch("font", "Default"), db.size, "OUTLINE")

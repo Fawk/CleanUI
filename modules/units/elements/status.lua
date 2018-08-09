@@ -15,7 +15,7 @@ local rand = math.random
 --[[ Locals ]]
 local elementName = "status"
 local Status = {}
-A["Shared Elements"]:set(elementName, Status)
+A.elements.shared[elementName] = Status
 
 function Status:Init(parent)
 
@@ -23,7 +23,7 @@ function Status:Init(parent)
 
     if (not db) then return end
 
-    local status = parent.orderedElements:get(elementName)
+    local status = parent.orderedElements[elementName]
     if (not status) then
 
         status = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
@@ -52,7 +52,7 @@ function Status:Init(parent)
 
     status:Update("OnUpdate", status.db)
 
-    parent.orderedElements:set(elementName, status)
+    parent.orderedElements[elementName] = status
 end
 
 local function performAction(status, frame, parent, db, key, shouldAct)
@@ -108,7 +108,7 @@ end
 
 function Status:Simulate(parent)
     self:Init(parent)
-    local status = parent.orderedElements:get(elementName)
+    local status = parent.orderedElements[elementName]
     status:SetScript("OnUpdate", nil)
 
     local this = self

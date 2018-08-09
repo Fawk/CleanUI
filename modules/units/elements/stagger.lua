@@ -26,7 +26,7 @@ function Stagger:Init(parent)
 	local db = parent.db[elementName]
 	local texture = media:Fetch("statusbar", db.texture)
 
-	local stagger = parent.orderedElements:get(elementName)
+	local stagger = parent.orderedElements[elementName]
 	if (not stagger) then
 		stagger = CreateFrame("StatusBar", T:frameName(parent:GetName(), elementName), parent)
 		stagger.db = db
@@ -76,7 +76,7 @@ function Stagger:Init(parent)
 
 	self:Update(stagger, UnitEvent.UPDATE_DB)
 
-	parent.orderedElements:set(elementName, stagger)
+	parent.orderedElements[elementName] = stagger
 end
 
 function Stagger:Update(...)
@@ -145,4 +145,4 @@ function Stagger:Update(...)
 	end
 end
 
-A["Player Elements"]:set(elementName, Stagger)
+A.elements.player[elementName] = Stagger

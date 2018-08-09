@@ -412,4 +412,4 @@ function Tags:GetOptions(enabled, extraClick, order)
 	return config
 end
 
-A.general:set("tags", Tags)
+A.general.tags = Tags

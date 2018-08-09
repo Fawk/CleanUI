@@ -18,7 +18,7 @@ function Border:Init(parent)
 
 	if (not db) then return end
 
-	local border = parent.orderedElements:get(elementName)
+	local border = parent.orderedElements[elementName]
 	if (not border) then
 		border = CreateFrame("Frame")
 		border.db = db
@@ -32,7 +32,7 @@ function Border:Init(parent)
 		end)
 	end
 
-	parent.orderedElements:set(elementName, border)
+	parent.orderedElements[elementName] = border
 end
 
 function Border:Update(...)	
@@ -81,3 +81,5 @@ end
 function Border:Simulate(parent)
 
 end
+
+A.elements.shared[elementName] = Border

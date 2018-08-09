@@ -71,11 +71,11 @@ function Party:Simulate(players)
     end
 
     local randomClass = CLASS_SORT_ORDER[math.random(1, 12)]
-    A["Shared Elements"]:foreach(function(key, element)
-        if (element.Simulate and db[key]) then
-            element:Simulate(player, randomClass)
+    for i = 1, #A.elements.shared do
+        if (A.elements.shared[i].Simulate and db[A.elements.shared(i)]) then
+            A.elements.shared[i]:Simulate(player, randomClass)
         end
-    end)
+    end
 
     player:Update()
     Group:SimulateTags(player)
@@ -110,11 +110,11 @@ function Party:Simulate(players)
         end
 
         randomClass = CLASS_SORT_ORDER[math.random(1, 12)]
-        A["Shared Elements"]:foreach(function(key, element)
-            if (element.Simulate and db[key]) then
-                element:Simulate(uf, randomClass)
+        for i = 1, #A.elements.shared do
+            if (A.elements.shared[i].Simulate and db[A.elements.shared(i)]) then
+                A.elements.shared[i]:Simulate(player, randomClass)
             end
-        end)
+        end
 
         uf:Update()
         Group:SimulateTags(uf)
@@ -127,4 +127,4 @@ function Party:Simulate(players)
     RegisterStateDriver(container, "visibility", "show")
 end
 
-A.modules:set("party", Party)
+A.modules.party = Party

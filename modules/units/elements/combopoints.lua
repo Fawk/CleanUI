@@ -27,7 +27,7 @@ function ComboPoints:Init(parent)
 
     local db = parent.db[elementName]
 
-    local points = parent.orderedElements:get(elementName)
+    local points = parent.orderedElements[elementName]
     if (not points) then
         points = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
         points.buttons = {}
@@ -64,7 +64,7 @@ function ComboPoints:Init(parent)
     self:Update(points, UnitEvent.UPDATE_DB)
     self:Update(points, "UNIT_POWER_FREQUENT")
 
-    parent.orderedElements:set(elementName, points)
+    parent.orderedElements[elementName] = points
 end
 
 function ComboPoints:Update(...)
@@ -153,4 +153,4 @@ function ComboPoints:Update(...)
     end
 end
 
-A["Player Elements"]:set(elementName, ComboPoints)
+A.elements.player[elementName] = ComboPoints

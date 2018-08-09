@@ -21,7 +21,7 @@ function SoulShards:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local shards = parent.orderedElements:get(elementName)
+	local shards = parent.orderedElements[elementName]
 	if (not shards) then
 		shards = CreateFrame("Frame", parentName.."_"..elementName, parent)
 		shards.buttons = {}
@@ -48,7 +48,7 @@ function SoulShards:Init(parent)
 	self:Update(shards, UnitEvent.UPDATE_DB)
 	self:Update(shards, "UNIT_POWER_FREQUENT")
 
-	parent.orderedElements:set(elementName, shards)
+	parent.orderedElements[elementName] = shards
 end
 
 function SoulShards:Update(...)
@@ -132,4 +132,4 @@ function SoulShards:Update(...)
 	end
 end
 
-A["Player Elements"]:set(elementName, SoulShards)
+A.elements.player[elementName] = SoulShards

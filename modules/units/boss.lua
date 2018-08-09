@@ -84,7 +84,7 @@ function Boss:Update(...)
                 self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general:get("clickcast"):Setup(self, db.clickcast)
+                A.general.clickcast:Setup(self, db.clickcast)
             end
 
             --[[ Bindings ]]--
@@ -93,14 +93,14 @@ function Boss:Update(...)
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
-            self.tags:foreach(function(key, tag)
-                if (not db.tags.list[key]) then
-                    if (tag) then
-                        tag:Hide()
+            for i = 1, #self.tags do
+                if (not db.tags.list[self.tags(i)) then
+                    if (self.tags[i]) then
+                        self.tags[i]:Hide()
                     end
-                    self.tags:remove(key)
+                    self.tags[i] = nil
                 end
-            end)
+            end
 
             for name,tag in next, db.tags.list do
                 Units:Tag(self, name, tag)
@@ -108,10 +108,10 @@ function Boss:Update(...)
 
             self:ForceTagUpdate()
 
-            self.orderedElements:foreach(function(key, obj)
-                obj:Update(event)
-            end)
+            for i = 1, #self.orderedElements do
+                self.orderedElements[i]:Update(event)
+            end
         end
     end
 end
-A.modules:set("boss", Boss)
+A.modules.boss = Boss

@@ -33,9 +33,9 @@ function Player:Init()
 
     A:CreateMover(frame, db, frameName)
 
-    A["Player Elements"]:foreach(function(key, element)
-        element:Init(frame)
-    end)
+    for i = 1, #A.elements.player do
+        A.elements.player[i]:Init(frame)
+    end
 
     return frame
 end
@@ -60,20 +60,20 @@ function Player:Update(...)
                 self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")
-                A.general:get("clickcast"):Setup(self, db.clickcast)
+                A.general.clickcast:Setup(self, db.clickcast)
             end
 
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
-            self.tags:foreach(function(key, tag)
-                if (not db.tags[key]) then
-                    if (tag) then
-                        tag:Hide()
+            for i = 1, #self.tags do
+                if (not db.tags.list[self.tags(i)) then
+                    if (self.tags[i]) then
+                        self.tags[i]:Hide()
                     end
-                    self.tags:remove(key)
+                    self.tags[i] = nil
                 end
-            end)
+            end
 
             for name,tag in next, db.tags.list do
                 Units:Tag(self, name, tag)
@@ -81,18 +81,18 @@ function Player:Update(...)
 
             self:ForceTagUpdate()
 
-            self.orderedElements:foreach(function(key, obj)
-                obj:Update(event)
-            end)
+            for i = 1, #self.orderedElements do
+                self.orderedElements[i]:Update(event)
+            end
 
             -- Player specific elements
-            A["Player Elements"]:foreach(function(key, element)
-                element:Init(self)
-            end)
+            for i = 1, #A.elements.player do
+                A.elements.player[i]:Init(self)
+            end
         end
     end
 end
 
 -- https://jsfiddle.net/859zu65s/
 
-A.modules:set("player", Player)
+A.modules.player = Player

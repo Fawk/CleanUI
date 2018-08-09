@@ -29,7 +29,7 @@ function AlternativePower:Init(parent)
 		return
 	end
 
-	local altpower = parent.orderedElements:get(elementName)
+	local altpower = parent.orderedElements[elementName]
 	if (not altpower) then
 		altpower = CreateFrame("StatusBar", A:GetName().."_AltPowerBar", parent)
 		altpower.db = db
@@ -58,7 +58,7 @@ function AlternativePower:Init(parent)
 
 	altpower:Update(UnitEvent.UPDATE_DB)
 
-	parent.orderedElements:set(elementName, altpower)
+	parent.orderedElements[elementName] = altpower
 end
 
 function AlternativePower:Update(...)
@@ -105,4 +105,4 @@ function AlternativePower:Update(...)
 	self:SetStatusBarColor(r, g, b, a)
 end
 
-A["Player Elements"]:set(elementName, AlternativePower)
+A.elements.player[elementName] = AlternativePower

@@ -66,4 +66,4 @@ function MicroBar:Update(...)
 
 end
 
-A.general:set("microbar", MicroBar)
+A.general.microbar = MicroBar

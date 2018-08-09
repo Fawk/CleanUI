@@ -150,7 +150,7 @@ function Debuffs:Init(parent)
 
 	if (not db) then return end
 
-	local debuffs = parent.orderedElements:get(elementName)
+	local debuffs = parent.orderedElements[elementName]
 	if (not debuffs) then
 		
 		debuffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
@@ -176,7 +176,7 @@ function Debuffs:Init(parent)
 	debuffs:Update(UnitEvent.UPDATE_DB)
 	debuffs:Update(UnitEvent.UPDATE_DEBUFFS)
 
-	parent.orderedElements:set(elementName, debuffs)
+	parent.orderedElements[elementName] = debuffs
 end
 
 function Debuffs:Update(...)
@@ -300,4 +300,4 @@ function Debuffs:Update(...)
 	end
 end
 
-A["Shared Elements"]:set(elementName, Debuffs)
+A.elements.shared[elementName] = Debuffs

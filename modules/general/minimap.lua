@@ -217,4 +217,4 @@ function M:Update(...)
 
 end
 
-A.general:set("minimap", M)
+A.general.minimap = M

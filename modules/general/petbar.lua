@@ -180,4 +180,4 @@ function PetBar:Init()
     A:CreateMover(bar, db, "PetBar")
 end
 
-A.general:set("petbar", PetBar)
+A.general.petbar = PetBar

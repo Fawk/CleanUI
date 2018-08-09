@@ -233,7 +233,7 @@ function Group:UpdateHeader(container)
 end
 
 function Group:SimulateTags(frame)
-    frame.tags:foreach(function(key, tag)
+    for = 1, #frame.tags do 
         frame.orderedElements:foreach(function(k, element)
             element:Update(UnitEvent.UPDATE_TAGS, tag, "UNIT_HEALTH", "player")
         end)
@@ -282,14 +282,14 @@ function Group:Update(...)
             self.tags = A:OrderedMap()
         end
 
-        self.tags:foreach(function(key, tag)
-            if (not db.tags.list[key]) then
-                if (tag) then
-                    tag:Hide()
+        for i = 1, #self.tags do
+            if (not db.tags.list[self.tags(i)) then
+                if (self.tags[i]) then
+                    self.tags[i]:Hide()
                 end
-                self.tags:remove(key)
+                self.tags[i] = nil
             end
-        end)
+        end
 
         for name,tag in next, db.tags.list do
             Units:Tag(self, name, tag)
@@ -306,9 +306,9 @@ function Group:Update(...)
     	end
 
     	if (not simulating) then
-	        self.orderedElements:foreach(function(key, obj)
-	            obj:Update(event, unit)
-	        end)
+            for i = 1, #self.orderedElements do
+                self.orderedElements[i]:Update(event, unit)
+            end
 
 			self:ForceTagUpdate()
 	    end
@@ -317,9 +317,9 @@ function Group:Update(...)
     elseif (event == UnitEvent.UPDATE_GROUP) then
     	if (not simulating) then
 
-	        self.orderedElements:foreach(function(key, obj)
-	            obj:Update(event, unit)
-	        end)
+            for i = 1, #self.orderedElements do
+                self.orderedElements[i]:Update(event, unit)
+            end
 
 			self:ForceTagUpdate()
 	    end

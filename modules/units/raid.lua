@@ -22,4 +22,4 @@ function Raid:Simulate(players)
 
 end
 
-A.modules:set("raid", Raid)
+A.modules.raid = Raid

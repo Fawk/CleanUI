@@ -18,7 +18,7 @@ local select = select
 local elementName = "health"
 local Health = {}
 
-A["Shared Elements"]:set(elementName, Health)
+A.elements.shared[elementName] = Health
 
 local function Gradient(unit, class)
 	local r1, g1, b1 = unpack(A.colors.health.low)
@@ -31,7 +31,7 @@ function Health:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local health = parent.orderedElements:get(elementName)
+	local health = parent.orderedElements[elementName]
 	if (not health) then
 
 		health = CreateFrame("StatusBar", parent:GetName().."_"..elementName, A.frameParent)
@@ -76,7 +76,7 @@ function Health:Init(parent)
 	health:Update(UnitEvent.UPDATE_DB, self.db)
 	health:Update("UNIT_HEALTH")
 
-	parent.orderedElements:set(elementName, health)
+	parent.orderedElements[elementName] = health
 end
 
 function Health:Update(...)

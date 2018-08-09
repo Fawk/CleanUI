@@ -28,7 +28,7 @@ function ArcaneCharges:Init(parent)
 
     local db = parent.db[elementName]
 
-    local charges = parent.orderedElements:get(elementName)
+    local charges = parent.orderedElements[elementName]
     if (not charges) then
         charges = CreateFrame("Frame", T:frameName(parentName, elementName), parent)
         charges.buttons = {}
@@ -65,7 +65,7 @@ function ArcaneCharges:Init(parent)
     self:Update(charges, UnitEvent.UPDATE_DB)
     self:Update(charges, "UNIT_POWER_FREQUENT")
 
-    parent.orderedElements:set(elementName, charges)
+    parent.orderedElements[elementName] = charges
 end
 
 function ArcaneCharges:Update(...)
@@ -141,4 +141,4 @@ function ArcaneCharges:Update(...)
     end
 end
 
-A["Player Elements"]:set(elementName, ArcaneCharges)
+A.elements.player[elementName] = ArcaneCharges

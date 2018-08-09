@@ -152,7 +152,7 @@ function Buffs:Init(parent)
 
 	if (not db) then return end
 
-	local buffs = parent.orderedElements:get(elementName)
+	local buffs = parent.orderedElements[elementName]
 	if (not buffs) then
 		
 		buffs = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
@@ -184,7 +184,7 @@ function Buffs:Init(parent)
 	buffs:Update(UnitEvent.UPDATE_DB)
 	buffs:Update(UnitEvent.UPDATE_BUFFS)
 
-	parent.orderedElements:set(elementName, buffs)
+	parent.orderedElements[elementName] = buffs
 end
 
 function Buffs:Update(...)
@@ -308,4 +308,4 @@ function Buffs:Update(...)
 	end
 end
 
-A["Shared Elements"]:set(elementName, Buffs)
+A.elements.shared[elementName] = Buffs

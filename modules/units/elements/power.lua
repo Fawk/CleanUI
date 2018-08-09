@@ -40,13 +40,13 @@ local tags = {
 	end]]
 }
 
-A["Shared Elements"]:set(elementName, Power)
+A.elements.shared[elementName] = Power
 
 function Power:Init(parent)
 
 	local db = parent.db[elementName]
 
-	local power = parent.orderedElements:get(elementName)
+	local power = parent.orderedElements[elementName]
 	if (not power) then
 
 		power = CreateFrame("StatusBar", parent:GetName().."_"..elementName, A.frameParent)
@@ -74,7 +74,7 @@ function Power:Init(parent)
 
 	power:Update(UnitEvent.UPDATE_DB)
 
-	parent.orderedElements:set(elementName, power)
+	parent.orderedElements[elementName] = power
 end
 
 function Power:Disable(parent)

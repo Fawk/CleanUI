@@ -93,4 +93,4 @@ function StanceBar:Update(...)
 
 end
 
-A.general:set("stanceBar", StanceBar)
+A.general.stanceBar = StanceBar

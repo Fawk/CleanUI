@@ -10,7 +10,7 @@ local CombatIndicator = {}
 function CombatIndicator:Init(parent)
 	local db = parent.db[elementName]
 
-	local combat = parent.orderedElements:get(elementName)
+	local combat = parent.orderedElements[elementName]
 	if (not combat) then
 		combat = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		combat.db = db
@@ -33,7 +33,7 @@ function CombatIndicator:Init(parent)
 
 	combat:Update(UnitEvent.UPDATE_DB)
 
-	parent.orderedElements:set(elementName, combat)
+	parent.orderedElements[elementName] = combat
 end
 
 function CombatIndicator:Update(...)
@@ -86,5 +86,5 @@ function CombatIndicator:Update(...)
 	end
 end
 
-A["Player Elements"]:set(elementName, CombatIndicator)
+A.elements.player[elementName] = CombatIndicator
 

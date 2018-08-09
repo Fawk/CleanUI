@@ -10,7 +10,6 @@ local capture = CreateFrame("Frame", "KeyBinder", A.frameParent)
 local _G = _G
 
 local AB = {
-	bars = A:OrderedTable()
 }
 
 local keys = {
@@ -427,4 +426,4 @@ function AB:HideArt()
 	end
 end
 
-A.general:set("actionbars", AB)
+A.general["actionbars"] = AB

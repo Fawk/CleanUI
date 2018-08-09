@@ -43,4 +43,4 @@ function OverrideBar:Update(...)
 
 end
 
-A.general:set("overrideBar", OverrideBar)
+A.general.overrideBar = OverrideBar

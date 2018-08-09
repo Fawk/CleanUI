@@ -36,4 +36,4 @@ function Whitelist:GetOptions(enabled, extraClick, order)
     return config
 end
 
-A.general:set("whitelist", Whitelist)
+A.general.whitelist = Whitelist

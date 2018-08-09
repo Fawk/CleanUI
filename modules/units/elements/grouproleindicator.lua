@@ -9,7 +9,7 @@ local T = A.Tools
 
 local elementName = "role"
 local Role = {}
-A["Shared Elements"]:set(elementName, Role)
+A.elements.shared[elementName] = Role
 
 function Role:Init(parent)
 
@@ -17,7 +17,7 @@ function Role:Init(parent)
 
     if (not db) then return end
 
-    local role = parent.orderedElements:get(elementName)
+    local role = parent.orderedElements[elementName]
     if (not role) then
 
         role = CreateFrame("Frame", parent:GetName().."_"..elementName, A.frameParent)
@@ -41,7 +41,7 @@ function Role:Init(parent)
     role:Update(UnitEvent.UPDATE_DB, db)
     role:Update("GROUP_ROSTER_UPDATE")
 
-    parent.orderedElements:set(elementName, role)
+    parent.orderedElements[elementName] = role
 end
 
 function Role:Update(...)

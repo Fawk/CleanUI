@@ -80,4 +80,4 @@ function Chat:Update(...)
 
 end
 
-A.general:set("chat", Chat)
+A.general.chat = Chat

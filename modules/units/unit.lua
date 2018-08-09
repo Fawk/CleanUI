@@ -112,16 +112,16 @@ function Unit:Init(unit)
     end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         local event = ...
-        for _,tag in next, unit.tags.e do
-            if (tag) then
-                tag.replaced = tag.format
-                for _,element in next, unit.orderedElements.e do
-                    if (not element.noTags) then
-                        element:Update(UnitEvent.UPDATE_TAGS, tag, event, self:GetParent().unit)
+        for i = 1, #unit.tags do
+            if (unit.tags[i]) then
+                unit.tags[i].replaced = unit.tags[i].format
+                for x = 1, #unit.orderedElements do
+                    if (not unit.orderedElements[x].noTags) then
+                        unit.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, unit.tags[i], event, self:GetParent().unit)
                     end
                 end
-                A:FormatTag(tag)
-                tag:SetText(tag.replaced)
+                A:FormatTag(unit.tags[i])
+                unit.tags[i]:SetText(unit.tags[i].replaced)
             end
         end
     end)
