@@ -129,13 +129,13 @@ end
 
 function Addon:Init()
 
-	for i = 1, #self.general do
+	for i = 1, self.general:len() do
         if (self.general[i].Init) then
             self.general[i]:Init()
         end
     end
 
-	for i = 1, #self.modules
+	for i = 1, self.modules:len() do
         local module = self.modules[i]
 		if (module.Init) then
 	        local unit = module:Init()
@@ -143,13 +143,13 @@ function Addon:Init()
             	if (unit.hasMultipleUnits) then
             		unit:InitUnits(function(self, uf)
             			if (uf.unit and UnitExists(uf.unit)) then
-	            			for x = 1, #Addon.elements.shared do
+	            			for x = 1, Addon.elements.shared:len() do
 		                    	Addon.elements.shared[x]:Init(uf)
 		                	end
 		                end
             		end)
             	else
-	                for x = 1, #Addon.elements.shared do
+	                for x = 1, Addon.elements.shared:len() do
 	                    Addon.elements.shared[x]:Init(unit)
 	                end
 	            end
@@ -160,14 +160,14 @@ end
 
 function Addon:UpdateDb()
     -- General
-    for i = 1, #self.general do
+    for i = 1, self.general:len() do
         if (self.general[i].Update) then
             self.general[i]:Update(UnitEvent.UPDATE_DB)
         end
     end
 
     -- Units
-    for i = 1, #self.modules do
+    for i = 1, self.modules:len() do
         local module = self.modules[i]
     	if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())

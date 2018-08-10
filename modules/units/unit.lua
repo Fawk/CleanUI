@@ -112,10 +112,10 @@ function Unit:Init(unit)
     end
     unit.tagEventFrame:SetScript("OnEvent", function(self, ...)
         local event = ...
-        for i = 1, #unit.tags do
+        for i = 1, unit.tags:len() do
             if (unit.tags[i]) then
                 unit.tags[i].replaced = unit.tags[i].format
-                for x = 1, #unit.orderedElements do
+                for x = 1, unit.orderedElements:len() do
                     if (not unit.orderedElements[x].noTags) then
                         unit.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, unit.tags[i], event, self:GetParent().unit)
                     end
@@ -157,8 +157,6 @@ function Unit:Update(...)
             self:OnHealth(...)
         end
     elseif (event == UnitEvent.UPDATE_POWER) then
-
-        if true then return end
 
         print("UPDATE_POWER", GetTime())
 

@@ -233,12 +233,12 @@ function Group:UpdateHeader(container)
 end
 
 function Group:SimulateTags(frame)
-    for = 1, #frame.tags do 
-        frame.orderedElements:foreach(function(k, element)
-            element:Update(UnitEvent.UPDATE_TAGS, tag, "UNIT_HEALTH", "player")
+    for i = 1, frame.tags:len() do 
+        for x = 1, frame.orderedElements:len() do
+            frame.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, frame.tags[i], "UNIT_HEALTH", "player")
         end)
         A:FormatTag(tag)
-        tag:SetText(tag.text)
+        tag:SetText(tag.replaced)
     end)
 end
 
@@ -275,15 +275,15 @@ function Group:Update(...)
 
         if (not InCombatLockdown()) then
             self:SetSize(db.size.width, db.size.height)
-            A.general:get("clickcast"):Setup(self, db.clickcast)
+            A.general.clickcast:Setup(self, db.clickcast)
         end
 
         if (not self.tags) then
             self.tags = A:OrderedMap()
         end
 
-        for i = 1, #self.tags do
-            if (not db.tags.list[self.tags(i)) then
+        for i = 1, self.tags:len() do
+            if (not db.tags.list[self.tags(i)]) then
                 if (self.tags[i]) then
                     self.tags[i]:Hide()
                 end
@@ -306,7 +306,7 @@ function Group:Update(...)
     	end
 
     	if (not simulating) then
-            for i = 1, #self.orderedElements do
+            for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event, unit)
             end
 
@@ -317,7 +317,7 @@ function Group:Update(...)
     elseif (event == UnitEvent.UPDATE_GROUP) then
     	if (not simulating) then
 
-            for i = 1, #self.orderedElements do
+            for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event, unit)
             end
 

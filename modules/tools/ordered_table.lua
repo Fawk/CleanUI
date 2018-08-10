@@ -243,13 +243,12 @@ end
 
 ]]
 local MAP = {
-  __len = function(t) return t.c end,
   __index = function(self, k) 
     if (type(k) == "number") then
-      return self.e[self.i[k]]
+      return rawget(self, "e")[rawget(self, "i")[k]]
     end
-    if (self.e[k]) then
-      return self.e[k]
+    if (rawget(self, "e")[k]) then
+      return rawget(self, "e")[k]
     else
       local v = rawget(self, k)
       if (v) then
@@ -262,67 +261,68 @@ local MAP = {
   __newindex = function(self, k, v)
     if (v == nil) then
       if (type(k) == "string") then
-        if (rawget(self.e, k)) then
+        if (rawget(self, "e")[k]) then
           local i, e, f = {}, {}, nil
-          for x = 1, self.c do
-            if (self.i[x] == k) then
+          for x = 1, rawget(self, "c") do
+            if (rawget(self, "i")[x] == k) then
               f = x
             else
               if (f) then 
-                i[x - 1] = self.i[x]
+                i[x - 1] = rawget(self, "i")[x]
               else
-                i[x] = self.i[x]
+                i[x] = rawget(self, "i")[x]
               end
-              e[self.i[x]] = self.e[self.i[x]]
+              e[self.i[x]] = rawget(self, "e")[rawget(self, "i")[x]]
             end
           end
-          self.i = i
-          self.e = e
-          self.c = self.c - 1
+          rawset(self, "i", i)
+          rawset(self, "e", e)
+          rawset(self, "c", rawget(self, "c") - 1)
         end
       elseif (type(k) == "number") then
-        if (rawget(self.i, k)) then
+        if (rawget(self, "i")[k]) then
           local i, e, f = {}, {}, nil
-          for x = 1, self.c do
+          for x = 1, rawget(self, "c") do
             if (x == k) then 
               f = x 
             else
               if (f) then 
-                i[x - 1] = self.i[x]
+                i[x - 1] = rawget(self, "i")[x]
               else
-                i[x] = self.i[x]
+                i[x] = rawget(self, "i")[x]
               end
-              e[self.i[x]] = self.e[self.i[x]]
+              e[rawget(self, "i")[x]] = rawget(self, "e")[rawget(self, "i")[x]]
             end
           end
-          self.i = i
-          self.e = e
-          self.c = self.c - 1
+          rawset(self, "i", i)
+          rawset(self, "e", e)
+          rawset(self, "c", rawget(self, "c") - 1)
         end
       end
     else
-      if (not rawget(self.e, k)) then
-        self.c = self.c + 1
-        self.i[self.c] = k
+      if (not self.e[k]) then
+        rawset(self, "c", rawget(self, "c") + 1)
+        rawget(self, "i")[rawget(self, "c")] = k
       end
-      self.e[k] = v
+      rawget(self, "e")[k] = v
     end
   end,
   __call = function(self, i)
     if (i) then
-      return self.i[i]
+      return rawget(self, "i")[i]
     else
-      return next, self.i, nil
+      return next, rawget(self, "i"), nil
     end
-  end
+  end,
+  len = function(self) return rawget(self, "c") end
 }
 
 function MAP:isEmpty()
- return #self == 0
+ return self:len()
 end
 
 function MAP:print()
-  for i = 1, self.c do
+  for i = 1, rawget(self, "c") do
     print(self.i[i], self.e[self.i[i]])
   end
 end
@@ -331,7 +331,7 @@ function Args:OrderedMap()
   local opt = {
     e = {},
     i = {},
-    c = 0
+    c = 0,
   }
   setmetatable(opt, MAP)
   return opt

@@ -29,14 +29,14 @@ end
 local function createElementTable(isPlayer)
 	local tbl = { ["Parent"] = "Parent" }
 	
-	A["Shared Elements"]:foreach(function(key, element)
+	for _,key in A.elements.shared() do
 		tbl[key] = key
-	end)
+	end
 
 	if (isPlayer) then
-		A["Player Elements"]:foreach(function(key, element)
+		for _,key in A.elements.player() do
 			tbl[key] = key
-		end)
+		end
 	end
 
 	return tbl

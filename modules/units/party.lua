@@ -71,7 +71,7 @@ function Party:Simulate(players)
     end
 
     local randomClass = CLASS_SORT_ORDER[math.random(1, 12)]
-    for i = 1, #A.elements.shared do
+    for i = 1, A.elements.shared:len() do
         if (A.elements.shared[i].Simulate and db[A.elements.shared(i)]) then
             A.elements.shared[i]:Simulate(player, randomClass)
         end
@@ -110,7 +110,7 @@ function Party:Simulate(players)
         end
 
         randomClass = CLASS_SORT_ORDER[math.random(1, 12)]
-        for i = 1, #A.elements.shared do
+        for i = 1, A.elements.shared:len() do
             if (A.elements.shared[i].Simulate and db[A.elements.shared(i)]) then
                 A.elements.shared[i]:Simulate(player, randomClass)
             end

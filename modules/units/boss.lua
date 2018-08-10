@@ -93,8 +93,8 @@ function Boss:Update(...)
             --[[ Background ]]--
             U:CreateBackground(self, db)
 
-            for i = 1, #self.tags do
-                if (not db.tags.list[self.tags(i)) then
+            for i = 1, self.tags:len() do
+                if (not db.tags.list[self.tags(i)]) then
                     if (self.tags[i]) then
                         self.tags[i]:Hide()
                     end
@@ -108,7 +108,7 @@ function Boss:Update(...)
 
             self:ForceTagUpdate()
 
-            for i = 1, #self.orderedElements do
+            for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event)
             end
         end

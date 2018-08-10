@@ -1,6 +1,6 @@
 local A, L = unpack(select(2, ...))
 local Units, units = {}, A:OrderedMap()
-local media = LibStub("LibA.elements.sharedMedia-3.0")
+local media = LibStub("LibSharedMedia-3.0")
 local T = A.Tools
 
 local MAX_ARENA_ENEMIES = MAX_ARENA_ENEMIES or 5
@@ -17,7 +17,7 @@ end
 
 function Units:Add(object, overrideName)
     A:Debug("Adding unit:", overrideName or object:GetName())
-    units:set(overrideName or object:GetName(), object)
+    units[overrideName or object:GetName()] = object
 end
 
 function Units:Translate(frame, relative)
@@ -82,7 +82,7 @@ function Units:Attach(frame, db, override)
 end
 
 local function getClassPowerRelative(frame)
-    for i = 1, #A.elements.player do
+    for i = 1, A.elements.player:len() do
         local target = frame.orderedElements[A.elements.player(i)]
         if (A.elements.player[i].isClassPower and target and target:IsShown()) then
             return target
@@ -118,7 +118,7 @@ function Units:PlaceCastbar(bar, db)
 end
 
 function Units:Tag(frame, name, db)
-    local tag = frame.tags:get(name)
+    local tag = frame.tags[name]
     if (not tag) then
         tag = frame:CreateFontString(nil, "OVERLAY")
         tag.replaced = ""

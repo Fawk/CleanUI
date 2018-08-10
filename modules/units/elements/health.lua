@@ -114,7 +114,9 @@ function Health:Update(...)
 
 		if (parent.unit ~= arg3) then return end
 
-		self:Update("UNIT_HEALTH_FREQUENT", parent.unit)
+		if (not parent.currentHealth) then
+			parent:Update(UnitEvent.UPDATE_HEALTH)
+		end
 
 		local tag = arg1
 		tag.replaced = tag.replaced:replace("[hp]", parent.currentHealth)
@@ -147,6 +149,9 @@ function Health:Update(...)
 			self.bg:Show()
 		end
 
+		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+	elseif (event == "UpdateColors") then
 		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
 	end

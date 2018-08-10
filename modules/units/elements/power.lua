@@ -15,31 +15,6 @@ local elementName = "power"
 local Power = { name = elementName }
 local events = { "UNIT_POWER_UPDATE", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM" }
 
-local tags = {
-	["pp"] = [[function(parent)
-		return parent.currentPower
-	end]],
-	["maxpp"] = [[function(parent)
-		return parent.currentMaxPower
-	end]],
-	["perpp"] = [[function(parent)
-		local perpp = 0
-		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
-			perpp = floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
-		end
-		return perpp
-	end]],
-	["pp:round"] = [[function(parent)
-		return T:short(parent.currentPower, 1)
-	end]],
-	["maxpp:round"] = [[function(parent)
-		return T:short(parent.currentMaxPower, 1)
-	end]],
-	["pp:deficit"] = [[function(parent)
-		return parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or ""
-	end]]
-}
-
 A.elements.shared[elementName] = Power
 
 function Power:Init(parent)
@@ -125,16 +100,22 @@ function Power:Update(...)
 
 		local tag = arg1
 
-		parent:Update(UnitEvent.UPDATE_POWER)
-
-		for key, func in next, tags do
-			local k = "%["..key.."%]"
-			local func, err = loadstring("return " .. func)
-			if(func) then
-				func = func()
-				tag.replaced = replaced:replace(k, func(parent))
-			end
+		if (not parent.currentPower) then
+			parent:Update(UnitEvent.UPDATE_POWER)
 		end
+
+		tag.replaced = tag.replaced:replace("[pp]", parent.currentPower)
+		tag.replaced = tag.replaced:replace("[maxpp]", parent.currentMaxPower)
+
+		local perpp = 0
+		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
+			perpp = floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
+		end
+		
+		tag.replaced = tag.replaced:replace("[perpp]", perpp)
+		tag.replaced = tag.replaced:replace("[pp:round]", T:short(parent.currentPower, 1))
+		tag.replaced = tag.replaced:replace("[maxpp:round]", T:short(parent.currentMaxPower, 1))
+		tag.replaced = tag.replaced:replace("[pp:deficit]", parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or "")
 
 	elseif (event == UnitEvent.UPDATE_DB) then
 

@@ -29,7 +29,7 @@ function Target:Init()
 
     frame:RegisterEvent("PLAYER_TARGET_CHANGED")
     frame:SetScript("OnEvent", function(self, ...)
-        self:Update("OnEvent")
+        self:Update("UpdateColors")
     end)
 
     Units:Add(frame, frame:GetDbName())
@@ -65,8 +65,8 @@ function Target:Update(...)
 
             U:CreateBackground(self, db)
 
-            for i = 1, #self.tags do
-                if (not db.tags.list[self.tags(i)) then
+            for i = 1, self.tags:len() do
+                if (not db.tags.list[self.tags(i)]) then
                     if (self.tags[i]) then
                         self.tags[i]:Hide()
                     end
@@ -80,17 +80,17 @@ function Target:Update(...)
 
             self:ForceTagUpdate()
 
-            for i = 1, #self.orderedElements do
+            for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event)
             end
-        elseif (event == "OnEvent") then
+        elseif (event == "UpdateColors") then
             self:ForceTagUpdate()
 
-            for i = 1, #self.orderedElements do
+            for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event)
             end
         end
     end
 end
 
-A.modules:set("target", Target)
+A.modules.target = Target
