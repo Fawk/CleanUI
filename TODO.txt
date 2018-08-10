@@ -1,19 +1,17 @@
-[o] Update minimap with grid based layout (Currencies, Item-level, ...)
 [x] Simple units and party & click2heal system
 [x] Raid
 [ ] Style all remaining blizzard frames
 [x] Actionbars
 [x] Chat
 [x] Quest log
-[ ] Create own damage and healing recorder
+[o] Create own damage and healing recorder
 
 ---
 
 [x] Update db with missing health bar
 [x] Implement blizzard default + custom + text role identifiers
 [x] Implement missing health text (hidden if at 100%) eg. -5k
-[x] Implement visual options (Check psd on drive) right click toggle between enabled or disabled for unitframe/element/group.
 [x] Implement custom states (text, icon, modify color/alpha for the frame) for out-of-range, dead, offline, ghost
-[ ] Implement new logic for all unit frames, already in place for player and target frame + health, power and healprediction, but other elements needed
-[ ] Implement custom health that can vary depending on the level of health, eg. red on <25%, orange on less than 50% and so on.. might be good to reuse gradient...
+[x] Implement new logic for all unit frames, already in place for player and target frame + health, power and healprediction, but other elements needed
+[x] Implement custom health that can vary depending on the level of health, eg. red on <25%, orange on less than 50% and so on.. might be good to reuse gradient...
 [x] Implement party/raid preview?

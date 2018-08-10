@@ -3,6 +3,8 @@ local media = LibStub("LibSharedMedia-3.0")
 
 local E = A.enum
 
+local rand = math.rand
+
 A:Debug("Loading tools")
 
 local GetScreenHeight = GetScreenHeight
@@ -53,6 +55,11 @@ function T:split(s, delimiter)
   end
   table.insert( result, string.sub( s, from  ) )
   return result
+end
+
+function T:rand(...)
+    local r = rand(1, select(#, ...))
+    return select(r, ...)
 end
 
 function string.explode(self, sep)

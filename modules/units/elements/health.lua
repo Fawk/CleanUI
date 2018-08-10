@@ -20,13 +20,6 @@ local Health = {}
 
 A.elements.shared[elementName] = Health
 
-local function Gradient(unit, class)
-	local r1, g1, b1 = unpack(A.colors.health.low)
-	local r2, g2, b2 = unpack(A.colors.health.medium)
-	local r3, g3, b3 = unpack(unit and A.colors.class[class or select(2, UnitClass(unit))] or A.colors.backdrop.light)
-	return r1, g1, b1, r2, g2, b2, r3, g3, b3
-end
-
 function Health:Init(parent)
 
 	local db = parent.db[elementName]
@@ -104,7 +97,7 @@ function Health:Update(...)
 	  	end
 
 	  	if (db.colorBy == "gradient") then
-			A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+			A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 		end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
@@ -150,10 +143,10 @@ function Health:Update(...)
 		end
 
 		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
-		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 	elseif (event == "UpdateColors") then
 		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
-		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, Gradient, parent.classOverride)
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 	end
 end
 

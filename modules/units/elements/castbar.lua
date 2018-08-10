@@ -22,6 +22,19 @@ local function CheckEnabled(e, db)
 	end
 end
 
+local function updateSafeZone(self)
+	local safeZone = self.safeZone
+	local width = self:GetWidth()
+	local _, _, _, ms = GetNetStats()
+
+	local safeZoneRatio = (ms / 1e3) / self.max
+	if(safeZoneRatio > 1) then
+		safeZoneRatio = 1
+	end
+
+	safeZone:SetWidth(width * safeZoneRatio)
+end
+
 function Castbar:Init(parent)
 	if true then return end
 	
@@ -41,6 +54,9 @@ function Castbar:Init(parent)
 		bar.bg = container:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
+		local safeZone = container:CreateTexture(nil, "OVERLAY")
+		safeZone:SetTexture(0.8, 0.3, 0.3, 0.5)
+
 		local name = buildText(container, db.name.size):shadow():enforceHeight():build()
 		name:SetText("")
 
@@ -48,6 +64,7 @@ function Castbar:Init(parent)
 		time:SetText("")
 
 		container.bar = bar
+		container.safeZone = safeZone
 		container.Text = name
 		container.Time = time
 		container.Icon = container:CreateTexture(nil, "OVERLAY")
@@ -78,16 +95,16 @@ function Castbar:Init(parent)
 			self.bar:SetStatusBarTexture(media:Fetch("statusbar", db.texture))
 			self.bar.bg:SetTexture(media:Fetch("statusbar", db.texture))
 
-			if ( parent.unit ) then
-				if ( self.casting ) then
-					local _, _, _, startTime = UnitCastingInfo(parent.unit);
-					if ( startTime ) then
-						self.value = (GetTime() - (startTime / 1000));
+			if (parent.unit) then
+				if (self.casting) then
+					local _,_,_,startTime = UnitCastingInfo(parent.unit)
+					if (startTime) then
+						self.value = (GetTime() - (startTime / 1000))
 					end
 				else
-					local _, _, _, _, endTime = UnitChannelInfo(parent.unit);
-					if ( endTime ) then
-						self.value = ((endTime / 1000) - GetTime());
+					local _,_,_,_,endTime = UnitChannelInfo(parent.unit)
+					if (endTime) then
+						self.value = ((endTime / 1000) - GetTime())
 					end
 				end
 			end
@@ -278,6 +295,12 @@ function Castbar:Update(...)
 			self.fadeOut = nil
             self.delay = 0
 
+			self.safeZone:ClearAllPoints()
+			self.safeZone:SetPoint(self.bar:GetReverseFill() and "RIGHT" or "LEFT")
+			self.safeZone:SetPoint("TOP")
+			self.safeZone:SetPoint("BOTTOM")
+			updateSafeZone(self.bar)
+
 			self:Show()
 
 		elseif (arg1 == 'UNIT_SPELLCAST_CHANNEL_START') then
@@ -301,6 +324,12 @@ function Castbar:Update(...)
 			self.channeling = true
 			self.fadeOut = nil
 	        self.delay = 0
+
+	        self.safeZone:ClearAllPoints()
+			self.safeZone:SetPoint(self.bar:GetReverseFill() and "RIGHT" or "LEFT")
+			self.safeZone:SetPoint("TOP")
+			self.safeZone:SetPoint("BOTTOM")
+			updateSafeZone(self.bar)
 
 	        self:Show()
 

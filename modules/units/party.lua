@@ -83,7 +83,7 @@ function Party:Simulate(players)
     fakeUnits:add(player)
 
     local relative = player
-    for i = 2, players do 
+    for i = 2, players do
         -- Create fake unit buttons
         local uf = CreateFrame("Button", T:frameName(frameName, "FakeUnitButton"..i), container, 'SecureUnitButtonTemplate')
         uf.db = db

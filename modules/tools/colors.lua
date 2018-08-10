@@ -3,6 +3,13 @@ local A, L = unpack(select(2, ...))
 local UnitClass = UnitClass
 local UnitIsPlayer = UnitIsPlayer
 
+local select = select
+local unpack = unpack
+local modf = math.modf
+local tonumber = tonumber
+local sub = string.sub
+local pairs = pairs
+
 --[[
 {
 	[Enum.PowerType.Mana] = MANA,
@@ -101,16 +108,16 @@ local function rgbToHex(rgb)
 	for key, value in pairs(rgb) do
 		local hex = ''
 
-		while(value > 0)do
-			local index = math.fmod(value, 16) + 1
-			value = math.floor(value / 16)
-			hex = string.sub('0123456789ABCDEF', index, index) .. hex			
+		while (value > 0) do
+			local index = fmod(value, 16) + 1
+			value = floor(value / 16)
+			hex = sub('0123456789ABCDEF', index, index) .. hex			
 		end
 
-		if(string.len(hex) == 0)then
+		if(len(hex) == 0)then
 			hex = '00'
 
-		elseif(string.len(hex) == 1)then
+		elseif(len(hex) == 1)then
 			hex = '0' .. hex
 		end
 
@@ -128,20 +135,10 @@ function A:AddColorReplaceLogicIfNeeded(tag, class, powerType)
 		tag.replaced = tag.replaced:replace(m, "|cFF"..m:match(colorPattern))
 	end
 
-	x, y = tag.replaced:find("%[color:class%]")
-	if (x and y) then
-		tag.replaced = tag.replaced:replace("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]))
-	end
-
-	x, y = tag.replaced:find("%[color:health%]")
-	if (x and y) then
-		tag.replaced = tag.replaced:replace("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard))
-	end
-
-	x, y = tag.replaced:find("%[color:power%]")
-	if (x and y) then
-		tag.replaced = tag.replaced:replace("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]))
-	end
+	tag.replaced = tag.replaced:replace("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]))
+	tag.replaced = tag.replaced:replace("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard))
+	tag.replaced = tag.replaced:replace("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]))
+	tag.replaced = tag.replaced:replace("[color:healthgradient]", "|cFF"..rgbToHex(A:ColorGradient(parent.currentHealth, parent.currentMaxHealth, A.HealthGradient)))
 end
 
 A.colors.class = { ["NPC"] = { .8, .8, .8, 1 } }
@@ -157,7 +154,7 @@ local function colorsAndPercent(a, b, ...)
 	end
 
 	local num = select('#', ...) / 3
-	local segment, relperc = math.modf((a / b) * (num - 1))
+	local segment, relperc = modf((a / b) * (num - 1))
 	return relperc, select((segment * 3) + 1, ...)
 end
 
@@ -168,6 +165,13 @@ function A:ColorGradient(...)
 	else
 		return r1, g1, b1
 	end
+end
+
+function A:HealthGradient()
+	local r1, g1, b1 = unpack(A.colors.health.low)
+	local r2, g2, b2 = unpack(A.colors.health.medium)
+	local r3, g3, b3 = unpack(A.colors.health.standard)
+	return r1, g1, b1, r2, g2, b2, r3, g3, b3
 end
 
 function A:ColorBar(bar, parent, min, max, gradient, classOverride)
@@ -190,7 +194,7 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 	elseif (colorType == "health") then
 		r, g, b = unpack(A.colors.health.standard)
 	elseif (colorType == "gradient") then
-		r, g, b = A:ColorGradient(min, max, gradient(parent.unit))
+		r, g, b = A:ColorGradient(min, max, gradient())
 	elseif (colorType == "custom") then
 		r = db.customColor.r
 		g = db.customColor.g

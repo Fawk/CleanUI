@@ -56,7 +56,7 @@ function Status:Init(parent)
 end
 
 local function performAction(status, frame, parent, db, key, shouldAct)
-    status[db.action](status, frame, parent, db, key, shouldAct)
+    status[db.action](status, frame, parent, db, key, not parent.unit and (function() return false end) or shouldAct)
 end
 
 function Status:Update(...)
@@ -65,16 +65,9 @@ function Status:Update(...)
 
     local self, event, arg1, arg2, arg3, arg4, arg5 = ...
     local parent = self:GetParent()
-    local db = self.db or arg2
+    local db = self.db
 
-    local outofrange = db.range
-    local dead = db.dead
-    local offline = db.offline
-    local ghost = db.ghost
-
-    performAction(this, self, parent, outofrange, "Out of range", function()
-        if (not parent.unit) then return false end
-
+    performAction(this, self, parent, db.range, "Out of range", function()
         if UnitName(parent.unit, true) == UnitName("player", true) then
             return false
         else
@@ -90,16 +83,13 @@ function Status:Update(...)
             end
         end
     end)
-    performAction(this, self, parent, dead, "Dead", function()
-        if (not parent.unit) then return false end
+    performAction(this, self, parent, db.dead, "Dead", function()
         return UnitIsDead(parent.unit)
     end)
-    performAction(this, self, parent, offline, "Offline", function()
-         if (not parent.unit) then return false end
+    performAction(this, self, parent, db.offline, "Offline", function()
         return not UnitIsConnected(parent.unit)
     end)
-    performAction(this, self, parent, ghost, "Ghost", function()
-         if (not parent.unit) then return false end
+    performAction(this, self, parent, db.ghost, "Ghost", function()
         if UnitIsDeadOrGhost(parent.unit) then 
             return not UnitIsDead(parent.unit)
         end
@@ -120,9 +110,7 @@ function Status:Simulate(parent)
         self.timer = self.timer + elapsed
         if (self.timer > 1) then
 
-            local randomBool = function()
-                return rand(1, 2) == 1 and true or false
-            end
+            local randomBool = T:rand(true, false)
 
             performAction(this, status, parent, db.range, "Out of range", randomBool)
             performAction(this, status, parent, db.dead, "Dead", randomBool)
