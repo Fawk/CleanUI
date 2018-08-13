@@ -167,8 +167,8 @@ function Addon:UpdateDb()
     end
 
     -- Units
-    for i = 1, self.modules:len() do
-        local module = self.modules[i]
+    for _,key in self.modules() do
+        local module = self.modules[key]
     	if (module.Update) then
         	local unit = Addon.Units:Get(key:fupper())
         	if (unit) then

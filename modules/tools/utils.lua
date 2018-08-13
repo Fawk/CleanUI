@@ -2281,20 +2281,14 @@ function Utils:CreateBackground(frame, db, useBackdrop)
 			local width = bg.matchWidth and frame:GetWidth() or bg.width
 			local height = bg.matchHeight and frame:GetHeight() or bg.height
 
-			local x = math.max(frame:GetWidth(), width) - math.min(frame:GetWidth(), width)
-			local y = math.max(frame:GetHeight(), height) - math.min(frame:GetHeight(), height)
-
-			x = x / 2
-			y = y / 2
-
 			if (frame:GetObjectType() == "Texture") then
 				ref = frame.Background or CreateFrame("Frame", nil, frame:GetParent())
 			else
 				ref = frame.Background or CreateFrame("Frame", nil, frame)
 			end
 
-			ref:SetPoint("TOPLEFT", frame, "TOPLEFT", -x, y)
-			ref:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", x, -y)
+			ref:SetSize(width, height)
+			ref:SetPoint("CENTER")
 			ref:SetFrameStrata("LOW")
 			ref:SetFrameLevel(1)
 			ref:Show()

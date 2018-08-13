@@ -4,7 +4,7 @@
     <Script file="health.lua"/>
     <Script file="power.lua"/>
     
-    <!--<Script file="healprediction.lua"/>
+    <Script file="healprediction.lua"/>
     <Script file="grouproleindicator.lua"/>
     <Script file="alternativepower.lua"/>
     <Script file="combatindicator.lua"/>
@@ -18,6 +18,7 @@
     <Script file="arcanecharges.lua"/>
     <Script file="holypower.lua"/>
     <Script file="stagger.lua"/>
-    <Script file="castbar.lua"/>-->
+    <Script file="castbar.lua"/>
+    <Script file="border.lua"/>
     <!--<Script file="groupbuffs.lua"/>-->
 </Ui>

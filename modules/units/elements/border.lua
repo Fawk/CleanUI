@@ -20,15 +20,17 @@ function Border:Init(parent)
 
 	local border = parent.orderedElements[elementName]
 	if (not border) then
-		border = CreateFrame("Frame")
+		border = CreateFrame("Frame", parent:GetName().."_"..elementName, parent)
 		border.db = db
 		border.noTags = true
 		border.Update = function(self, ...)
 			Border:Update(self, ...)
 		end
 
-		border:SetScript("OnUpdate", function(self, elapsed)
-			self:Update("OnUpdate", elapsed)
+		border:RegisterUnitEvent("UNIT_AURA", parent.unit)
+		border:RegisterEvent("PLAYER_TARGET_CHANGED")
+		border:SetScript("OnEvent", function(self, event, ...)
+			self:Update(event, ...)
 		end)
 	end
 
@@ -47,22 +49,33 @@ function Border:Update(...)
 		self:Show()
 	end
 
-	if (event == UnitEvent.UPDATE_DB) then
-		if (db.highlight) then
-			parent:SetBackdropBorderColor(unpack(db.targetColor))
-		end
+	if (not parent.Background or not parent.db.background.enabled) then
+		print("Background is needed to show target highlight and debuff border on ", parent:GetName())
+		return
+	end
 
+	if (event == "PLAYER_TARGET_CHANGED") then
+		if (db.highlight) then
+			if (parent.unit and UnitIsUnit("target", parent.unit)) then
+				parent.Background:SetBackdropBorderColor(T:unpackColor(db.targetColor))
+			else
+				parent.Background:SetBackdropBorderColor(T:unpackColor(parent.db.background.color))
+			end
+		end
+	elseif (event == "UNIT_AURA") then
 		if (db.debuff) then
+			if (arg1 ~= parent.unit) then return end
+
 			local debuffTypes = {}
 			for i = 1, 40 do
-				local debuffType = select(5, UnitDebuff(parent.unit, i))
+				local debuffType = select(4, UnitDebuff(parent.unit, i))
 				if (debuffType) then
 					debuffTypes[debuffType] = true
 				end
 			end
 
 			local color
-			for i = #db.debuffOrder, 1 do
+			for i = #db.debuffOrder, 1, -1 do
 				local debuff = db.debuffOrder[i]
 				if (debuffTypes[debuff]) then
 					color = A.colors.debuff[debuff]
@@ -70,11 +83,11 @@ function Border:Update(...)
 			end
 			
 			if (color) then
-				parent:SetBackdropBorderColor(unpack(color))
+				parent.Background:SetBackdropBorderColor(unpack(color))
+			else
+				parent.Background:SetBackdropBorderColor(T:unpackColor(parent.db.background.color))
 			end
 		end
-	else
-
 	end
 end
 

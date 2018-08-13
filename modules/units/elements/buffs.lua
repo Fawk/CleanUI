@@ -129,6 +129,15 @@ end
 local function CreateButton(parent, width, height)
 	local button = parent.pool:Acquire("AuraIconBarTemplate")
 	
+	if (parent:GetParent().unit == "player") then
+		button:RegisterForClicks("AnyUp")
+		button:SetScript("OnClick", function(self, b, down)
+			if (not down and b == "MiddleButton") then
+				CancelUnitBuff(parent:GetParent().unit, button.aura.index)
+			end
+		end)
+	end
+
 	button.icon:ClearAllPoints()
 	button.icon:SetPoint("LEFT")
 	button.icon:SetSize(height, height)
@@ -182,7 +191,6 @@ function Buffs:Init(parent)
 	end
 
 	buffs:Update(UnitEvent.UPDATE_DB)
-	buffs:Update(UnitEvent.UPDATE_BUFFS)
 
 	parent.orderedElements[elementName] = buffs
 end
@@ -211,7 +219,7 @@ function Buffs:Update(...)
 		if (db.style == "Bar") then
 			self:SetSize(width, height * self.limit)
 		else
-			self:SetSize(height * iconLimit, height * 40 / iconLimit)
+			self:SetSize(height * db.iconLimit, height * 40 / db.iconLimit)
 		end
 
 		if (db.attached) then
@@ -227,7 +235,7 @@ function Buffs:Update(...)
 
 		self:Update(UnitEvent.UPDATE_BUFFS)
 
-	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_BUFFS)) then
+	elseif (T:anyOf(event, "UNIT_AURA", UnitEvent.UPDATE_BUFFS, "UpdateColors")) then
 		if (event == "UNIT_AURA" and parent.unit ~= arg1) then return end
 
 		parent:Update(UnitEvent.UPDATE_BUFFS)
@@ -238,7 +246,7 @@ function Buffs:Update(...)
 		local last = 0
 
 		for i = 1, #parent.buffs do
-			if (i > tonumber(self.limit)) then
+			if (i > self.limit) then
 				tremove(parent.buffs, i)
 			else
 				last = i
@@ -263,7 +271,19 @@ function Buffs:Update(...)
 			bar:SetMinMaxValues(0, aura.duration)
 			bar:SetValue(aura.expires - GetTime())
 			bar.db = self.db
-			bar.name:SetText(aura.name..(hasCount and " ["..aura.count.."]" or ""))
+			bar.name:SetFormattedText("%s %s", aura.name, hasCount and "["..aura.count.."]" or "")
+
+			local textRatio = bar.name:GetWidth() / bar:GetWidth()
+			local sub = aura.name:len()
+			local text = aura.name
+			if (bar.name:GetWidth() > bar:GetWidth() or textRatio > 0.55) then
+				while (textRatio > 0.55) do
+					bar.name:SetText(aura.name:sub(1, sub))
+					textRatio = bar.name:GetWidth() / bar:GetWidth()
+					sub = sub - 1
+				end
+				bar.name:SetFormattedText("%s...%s", bar.name:GetText(), hasCount and " ["..aura.count.."]" or "")
+			end
 
 			button.icon:SetTexture(aura.icon)
 

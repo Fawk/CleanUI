@@ -4,11 +4,11 @@
     <Include file="elements\load_elements.xml"/>
     <Script file="player.lua"/>
     <Script file="target.lua"/>
-    <!--<Script file="targettarget.lua"/>
-    <Script file="focus.lua"/>
+    <Script file="targettarget.lua"/>
+    <!--<Script file="focus.lua"/>-->
     <Script file="boss.lua"/>
     <Script file="group.lua"/>
     <Script file="party.lua"/>
     <Script file="raid.lua"/>
-    <Script file="pet.lua"/>-->
+    <Script file="pet.lua"/>
 </Ui>

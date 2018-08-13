@@ -10,7 +10,7 @@ local UnitStagger = UnitStagger
 --[[ Locals ]]
 local elementName = "stagger"
 local Stagger = { isClassPower = true }
-local events = { "UNIT_POWER_FREQUENT", "PLAYER_ENTERING_WORLD", 'UNIT_DISPLAYPOWER' }
+local events = { "UNIT_POWER_UPDATE", "PLAYER_ENTERING_WORLD", 'UNIT_DISPLAYPOWER' }
 
 local function notValid(frame)
 	if (select(2, UnitClass("player")) ~= "MONK" or (GetSpecialization() ~= 1)) then
@@ -46,9 +46,8 @@ function Stagger:Init(parent)
 		stagger:SetStatusBarColor(r, g, b, a)
 		stagger.bg:SetVertexColor(r * mult, g * mult, b * mult, a)
 
-		local tagEventFrame = parent.tagEventFrame
-	   	if (tagEventFrame) then
-	   		Units:RegisterEvents(tagEventFrame, events)	
+	   	for _,event in next, events do
+	   		A:RegisterTagEvent(event)
 	   	end
 
 	   	Units:RegisterEvents(stagger, events, true)

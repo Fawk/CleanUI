@@ -26,12 +26,17 @@ local function updateButtons(parent)
 	for i = 1, #parent.buttons do
 		local button = parent.buttons[i]
 		if (button:IsVisible()) then
-			local value = button.aura.expires - now
+			if (button.aura.duration == 0) then
+				button.bar.time:SetText("")
+				button.iconText:SetText("")
+			else
+				local value = button.aura.expires - now
 
-			local time = T:timeShort(value)
-			button.bar.time:SetText(time)
-			button.bar:SetValue(value)
-			button.iconText:SetText(time)
+				local time = T:timeShort(value)
+				button.bar.time:SetText(time)
+				button.bar:SetValue(value)
+				button.iconText:SetText(time)
+			end
 		end
 	end
 end
@@ -174,7 +179,6 @@ function Debuffs:Init(parent)
 	end
 
 	debuffs:Update(UnitEvent.UPDATE_DB)
-	debuffs:Update(UnitEvent.UPDATE_DEBUFFS)
 
 	parent.orderedElements[elementName] = debuffs
 end
@@ -230,7 +234,7 @@ function Debuffs:Update(...)
 		local last = 0
 
 		for i = 1, #parent.debuffs do
-			if (i > tonumber(self.limit)) then
+			if (i > self.limit) then
 				tremove(parent.debuffs, i)
 			else
 				last = i
@@ -252,8 +256,14 @@ function Debuffs:Update(...)
 			button.aura = aura
 			local bar = button.bar
 
-			bar:SetMinMaxValues(0, aura.duration)
-			bar:SetValue(aura.expires - GetTime())
+			if (aura.duration > 0) then
+				bar:SetMinMaxValues(0, aura.duration)
+				bar:SetValue(aura.expires - GetTime())
+			else
+				bar:SetMinMaxValues(0, 1)
+				bar:SetValue(1)
+			end
+
 			bar.db = self.db
 			bar.name:SetText(aura.name..(hasCount and " ["..aura.count.."]" or ""))
 

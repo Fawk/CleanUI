@@ -73,11 +73,13 @@ end
 local CC = {}
 
 function CC:Setup(frame, db)
-	if (not db or not db.enabled) then return end
+	if (not db or not db.enabled or T:tcount(db.actions) == 0) then return end
 
 	for key, attribute in next, keyMap do
-		if (frame:GetAttribute(attribute)) then
-			frame:SetAttribute(attribute, nil)
+		if (db.actions[key] and db.actions[key] ~= "") then
+			if (frame:GetAttribute(attribute)) then
+				frame:SetAttribute(attribute, nil)
+			end
 		end
 	end
 
@@ -91,6 +93,7 @@ function CC:Setup(frame, db)
 	end
 
 	for key, action in next, db.actions do
+		if (not action) then break end
 
 		local mapped = keyMap[key]
 

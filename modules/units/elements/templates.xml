@@ -37,5 +37,19 @@
 				</Layers>
 			</StatusBar>
 		</Frames>
+		<Scripts>
+			<OnEnter>
+				if(self:IsVisible()) then
+					GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+					local parent = self:GetParent():GetParent()
+					if self.aura.index then
+						GameTooltip:SetUnitAura(parent.unit, self.aura.index, self.aura.filter)
+					end
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide()
+			</OnLeave>
+		</Scripts>
 	</Button>
 </Ui>

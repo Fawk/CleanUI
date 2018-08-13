@@ -57,7 +57,7 @@ end
 
 local function HealPredictionPostUpdate(self, my, all, absorb, healAbsorb)
 	local frame = self:GetParent()
-	local health = frame.orderedElements:get("health")
+	local health = frame.orderedElements["health"]
 	local previous = health:GetStatusBarTexture()
 
 	previous = Update(health, previous, self.myBar, my)
@@ -89,7 +89,7 @@ function HealPrediction:Init(parent)
 		absorb:Hide()
 		healAbsorb:Hide()
 		
-		local health = parent.orderedElements:get("health")
+		local health = parent.orderedElements["health"]
 		if health then
 			my:SetParent(health)
 			all:SetParent(health)
@@ -129,9 +129,8 @@ function HealPrediction:Init(parent)
 	    	HealPrediction:Update(self, event, ...)
 		end
 
-	   	local tagEventFrame = parent.tagEventFrame
-	   	if (tagEventFrame) then
-	   		Units:RegisterEvents(tagEventFrame, events)
+	   	for _,event in next, events do
+	   		A:RegisterTagEvent(event)
 	   	end
 
 	   	Units:RegisterEvents(healPrediction, events, true)
@@ -213,23 +212,47 @@ function HealPrediction:Update(...)
 			self.overHealAbsorb:Hide()
 		end
 
-		self.myBar:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.myBar:SetValue(parent.myIncomingHeal)
-		self.myBar:Show()
+		local hasValue = false
 
-		self.otherBar:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.otherBar:SetValue(parent.otherIncomingHeal)
-		self.otherBar:Show()
+		if (parent.myIncomingHeal > 0) then
+			hasValue = true
+			self.myBar:SetMinMaxValues(0, parent.currentMaxHealth)
+			self.myBar:SetValue(parent.myIncomingHeal)
+			self.myBar:Show()
+		else
+			self.myBar:Hide()
+		end
 
-		self.absorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.absorbBar:SetValue(parent.absorb)
-		self.absorbBar:Show()
+		if (parent.otherIncomingHeal > 0) then
+			hasValue = true
+			self.otherBar:SetMinMaxValues(0, parent.currentMaxHealth)
+			self.otherBar:SetValue(parent.otherIncomingHeal)
+			self.otherBar:Show()
+		else
+			self.otherBar:Hide()
+		end
 
-		self.healAbsorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
-		self.healAbsorbBar:SetValue(parent.healAbsorb)
-		self.healAbsorbBar:Show()
+		if (parent.absorb > 0) then
+			hasValue = true
+			self.absorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
+			self.absorbBar:SetValue(parent.absorb)
+			self.absorbBar:Show()
+		else
+			self.absorbBar:Hide()
+		end
 
-		HealPredictionPostUpdate(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
+		if (parent.healAbsorb > 0) then
+			hasValue = true
+			self.healAbsorbBar:SetMinMaxValues(0, parent.currentMaxHealth)
+			self.healAbsorbBar:SetValue(parent.healAbsorb)
+			self.healAbsorbBar:Show()
+		else
+			self.healAbsorbBar:Hide()
+		end
+
+		if (hasValue) then
+			HealPredictionPostUpdate(self, parent.myIncomingHeal, parent.otherIncomingHeal, parent.absorb, parent.healAbsorb)
+		end
 	end
 end
 

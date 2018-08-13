@@ -76,7 +76,7 @@ function Role:Update(...)
             self.text:SetShadowColor(0, 0, 0)
         end
         self.text:SetFont(media:Fetch("font", "Default"), db.textSize, textExtra)
-        self.text:SetText(style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
+        self.text:SetText(db.style == "Letter" and role:sub(1, 1) or role:sub(1, 1)..role:sub(2):lower())
         self.text:SetTextColor(T:unpackColor(db.color))
         self.text:SetAllPoints()
         self.text:Show()

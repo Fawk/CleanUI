@@ -1,15 +1,8 @@
 local A, L = unpack(select(2, ...))
 local E, T, U, Units, media = A.enum, A.Tools, A.Utils, A.Units, LibStub("LibSharedMedia-3.0")
-local CC = A.general:get("clickcast")
-local updateFrame = CreateFrame("Frame")
+local CC = A.general["clickcast"]
+local updateFrames = {}
 local UnitExists = UnitExists
-
-local directions = {
-	["Left"] = "RIGHT",
-	["Right"] = "LEFT",
-	["Upwards"] = "BOTTOM",
-	["Downwards"] = "TOP"
-}
 
 local Group = {}
 
@@ -59,44 +52,91 @@ function Group:Init(name, maxMembers, db)
 			A.modules[A.groupSimulating:lower()]:Simulate(self.maxMembers)
 		else
 			local this = self
-			if (not updateFrame.updating) then
-				updateFrame.updating = true
-				updateFrame:SetScript("OnUpdate", function(self, elapsed)
-					if (not self.start) then
-						self.start = GetTime()
-					end
-					if (not self.success) then
-						for i = 1, this.header:GetNumChildren() do
-				            local uf = select(i, this.header:GetChildren())
-				            if (uf) then
-				            	if (not uf.init and this.initFunc) then
-					            	uf.init = true
-					            	uf.db = db
-									uf:RegisterForClicks("AnyUp")
-				                	uf.unit = uf:GetAttribute("unit")
-					            	uf.GetDbName = function(self) 
-					            		return name 
-					            	end
 
-									Group:Update(uf, UnitEvent.UPDATE_DB, this, uf.unit)
+			local uf = select(1, this.header:GetChildren())
+			if (uf and uf.init) then
+				for i = 1, this.header:GetNumChildren() do
+		            local uf = select(i, this.header:GetChildren())
+		            if (uf and uf.init) then
+	            		uf:Update(event, this, uf.unit)
+	            	else
+	            		local updateFrame = updateFrames[i]
+	            		if (not updateFrame) then
+	            			updateFrame = CreateFrame("Frame")
+	            		end
 
-									this:initFunc(uf)
-					            else
-					            	if (uf and uf.Update) then
-					            		uf:Update(event, this, uf.unit)
-					            	end
-					            end
-					            self.success = true
-					            self.updating = false
-				            end
-				        end
-				    end
-				end)
+	            		if (not updateFrame.updating) then
+	            			updateFrame.updating = true
+			            	updateFrame:SetScript("OnUpdate", function(self, elapsed)
+			            		if (not self.success) then
+			            			local uf = select(i, this.header:GetChildren())
+			            			if (uf) then
+						            	if (not uf.init and this.initFunc) then
+							            	uf.init = true
+							            	uf.db = db
+											uf:RegisterForClicks("AnyUp")
+						                	uf.unit = uf:GetAttribute("unit")
+							            	uf.GetDbName = function(self)
+							            		return name 
+							            	end
+
+											Group:Update(uf, UnitEvent.UPDATE_DB, this, uf.unit)
+											Group:Update(uf, UnitEvent.UPDATE_TAGS, this, uf.unit)
+
+											this:initFunc(uf)
+							            end
+							            self.success = true
+							            self.updating = false
+							            updateFrame:SetScript("OnUpdate", nil)
+			            			end
+			            		end
+			            	end)
+			            end
+		           	end
+		        end
+			else
+				for i = 1, this.header:GetNumChildren() do
+		            local uf = select(i, this.header:GetChildren())
+				    
+				    if (not uf or not uf.init) then
+					    local updateFrame = updateFrames[i]
+		        		if (not updateFrame) then
+		        			updateFrame = CreateFrame("Frame")
+		        		end
+
+		        		if (not updateFrame.updating) then
+		        			updateFrame.updating = true
+			            	updateFrame:SetScript("OnUpdate", function(self, elapsed)
+			            		if (not self.success) then
+			            			local uf = select(i, this.header:GetChildren())
+			            			if (uf) then
+						            	if (not uf.init and this.initFunc) then
+							            	uf.init = true
+							            	uf.db = db
+											uf:RegisterForClicks("AnyUp")
+						                	uf.unit = uf:GetAttribute("unit")
+							            	uf.GetDbName = function(self)
+							            		return name 
+							            	end
+
+											Group:Update(uf, UnitEvent.UPDATE_DB, this, uf.unit)
+											Group:Update(uf, UnitEvent.UPDATE_TAGS, this, uf.unit)
+
+											this:initFunc(uf)
+							            end
+							            self.success = true
+							            self.updating = false
+							            updateFrame:SetScript("OnUpdate", nil)
+			            			end
+			            		end
+			            	end)
+			            end
+			        end
+		        end
 			end
 	    end
     end
     container.getMoverSize = function(self)
-    	if (not self.db) then error("wtf") end
         return Group:GetMoverSize(self, self.maxMembers, self.db)
     end
 
@@ -141,6 +181,13 @@ function Group:Init(name, maxMembers, db)
 
     return container
 end
+
+local directions = {
+	["Left"] = "RIGHT",
+	["Right"] = "LEFT",
+	["Upwards"] = "BOTTOM",
+	["Downwards"] = "TOP"
+}
 
 local points = {
 	["Down Then Right"] = { "LEFT", "TOP" },
@@ -207,6 +254,8 @@ function Group:UpdateHeader(container)
 			local frame = frames[i]
 			frame:SetWidth(%d)
 			frame:SetHeight(%d)
+			frame:SetAttribute('*type1', 'target')
+			frame:SetAttribute('*type2', 'togglemenu')
 			RegisterUnitWatch(frame)
 			%s
 		end
@@ -236,10 +285,10 @@ function Group:SimulateTags(frame)
     for i = 1, frame.tags:len() do 
         for x = 1, frame.orderedElements:len() do
             frame.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, frame.tags[i], "UNIT_HEALTH", "player")
-        end)
+        end
         A:FormatTag(tag)
         tag:SetText(tag.replaced)
-    end)
+    end
 end
 
 function Group:Update(...)
@@ -305,6 +354,8 @@ function Group:Update(...)
 		    end
     	end
 
+    	U:CreateBackground(self, db)
+
     	if (not simulating) then
             for i = 1, self.orderedElements:len() do
                 self.orderedElements[i]:Update(event, unit)
@@ -312,8 +363,6 @@ function Group:Update(...)
 
 			self:ForceTagUpdate()
 	    end
-
-    	U:CreateBackground(self, db)
     elseif (event == UnitEvent.UPDATE_GROUP) then
     	if (not simulating) then
 
@@ -323,6 +372,19 @@ function Group:Update(...)
 
 			self:ForceTagUpdate()
 	    end
+    elseif (event == UnitEvent.UPDATE_TAGS) then
+    	for i = 1, self.tags:len() do
+            if (self.tags[i]) then
+                self.tags[i].replaced = self.tags[i].format
+                for x = 1, self.orderedElements:len() do
+                    if (not self.orderedElements[x].noTags) then
+                        self.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, self.tags[i], event, unit)
+                    end
+                end
+                A:FormatTag(self.tags[i])
+                self.tags[i]:SetText(self.tags[i].replaced)
+            end
+        end
     end
 end
 

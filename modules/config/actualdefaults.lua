@@ -163,7 +163,7 @@ local defaults = {
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
-                    own = true,
+                    own = false,
                     colorBy = "Class",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
@@ -669,6 +669,10 @@ local defaults = {
                         y = -2
                     }
                 },
+                clickcast = {
+                    enabled = true,
+                    actions = {}
+                },
         		enabled = true
         	},
         	target = {
@@ -751,9 +755,12 @@ local defaults = {
                     style = "Bar",
                     barGrowth = "Upwards",
                     iconGrowth = "Right Then Down",
-                    x = 1,
-                    y = 1,
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
                     iconLimit = 5,
+                    iconTextSize = 10,
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
@@ -767,8 +774,26 @@ local defaults = {
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -779,10 +804,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -815,7 +840,7 @@ local defaults = {
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
-                    own = true,
+                    own = false,
                     colorBy = "Class",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
@@ -1007,9 +1032,17 @@ local defaults = {
                     x = 0,
                     y = 0
                 },
+                clickcast = {
+                    enabled = true,
+                    actions = {}
+                },
                 enabled = true
         	},
             targettarget = {
+                clickcast = {
+                    enabled = true,
+                    actions = {}
+                },
                 position = {
                     relative = "FrameParent",
                     point = "CENTER",
@@ -1188,9 +1221,12 @@ local defaults = {
                     style = "Bar",
                     barGrowth = "Upwards",
                     iconGrowth = "Right Then Down",
-                    x = 1,
-                    y = 1,
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
                     iconLimit = 5,
+                    iconTextSize = 10,
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
@@ -1204,8 +1240,26 @@ local defaults = {
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -1216,10 +1270,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -1252,7 +1306,7 @@ local defaults = {
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
-                    own = true,
+                    own = false,
                     colorBy = "Class",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
@@ -1342,6 +1396,10 @@ local defaults = {
                 enabled = true
             },
             pet = {
+                clickcast = {
+                    enabled = true,
+                    actions = {}
+                },
                 position = {
                     relative = "FrameParent",
                     point = "CENTER",
@@ -1416,9 +1474,12 @@ local defaults = {
                     style = "Bar",
                     barGrowth = "Upwards",
                     iconGrowth = "Right Then Down",
-                    x = 1,
-                    y = 1,
+                    x = 0,
+                    y = 0,
+                    spacingX = 1,
+                    spacingY = 1,
                     iconLimit = 5,
+                    iconTextSize = 10,
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
@@ -1432,8 +1493,26 @@ local defaults = {
                     size = {
                         matchWidth = true,
                         matchHeight = false,
-                        width = 16,
-                        height = 16
+                        width = 20,
+                        height = 20
+                    },
+                    name = {
+                        size = 10,
+                        position = {
+                            point = "LEFT",
+                            localPoint = "LEFT",
+                            x = 25,
+                            y = 0,
+                        }
+                    },
+                    time = {
+                        size = 10,
+                        position = {
+                            point = "RIGHT",
+                            localPoint = "RIGHT",
+                            x = -5,
+                            y = 0,
+                        }
                     },
                     background = {
                         color = { r = 0, g = 0, b = 0, a = 1 },
@@ -1444,10 +1523,10 @@ local defaults = {
                             right = 1
                         },
                         size = 3,
-                        matchWidth = true,
-                        width = 100,
-                        matchHeight = true,
-                        height = 100,
+                        matchWidth = false,
+                        width = 202,
+                        matchHeight = false,
+                        height = 52,
                         enabled = true
                     },
                     blacklist = {
@@ -1480,7 +1559,7 @@ local defaults = {
                     attached = true,
                     attachedPosition = "Above",
                     limit = 10,
-                    own = true,
+                    own = false,
                     colorBy = "Class",
                     customColor = { r = 1, g = 1, b = 1, a = 1 },
                     mult = 0.33,
@@ -1675,7 +1754,10 @@ local defaults = {
                 enabled = true
             },
             boss = {
-                clickcast = {},
+                clickcast = {
+                    enabled = true,
+                    actions = {}
+                },
                 position = {
                     relative = "FrameParent",
                     point = "TOPRIGHT",
@@ -2031,8 +2113,7 @@ local defaults = {
                         }
                     }
                 },
-                raidBuffs = {
-                    limit = 40,
+                groupbuffs = {
                     tracked = {
                     },
                     enabled = true
@@ -2087,7 +2168,9 @@ local defaults = {
                     enabled = true
                 },
                 border = {
+                    enabled = true,
                     highlight = true,
+                    targetColor = { r = 1, g = 1, b = 1, a = 1 },
                     debuff = true,
                     debuffOrder = { "Magic", "Disease", "Curse", "Poison" }
                 },
@@ -2257,7 +2340,7 @@ local defaults = {
                         hide = false
                     }
                 },
-                raidBuffs = {
+                groupbuffs = {
                     tracked = {},
                     enabled = true
                 },
@@ -2308,6 +2391,13 @@ local defaults = {
                     matchHeight = true,
                     height = 100,
                     enabled = true
+                },
+                border = {
+                    enabled = true,
+                    highlight = true,
+                    targetColor = { r = 1, g = 1, b = 1, a = 1 },
+                    debuff = true,
+                    debuffOrder = { "Magic", "Disease", "Curse", "Poison" }
                 },
                 enabled = true
             },

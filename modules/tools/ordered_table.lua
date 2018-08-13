@@ -237,7 +237,7 @@ end
   Assigning -> table[key] = value
   Iterate Keys -> table()
   Specific Key -> table(index)
-  Iterate values -> for i = 1, #table do local value = table[i] end
+  Iterate values -> for i = 1, table:len() do local value = table[i] end
   Specific value -> table[key] or table[index]
   Remove value -> table[key] = nil or table[index] = nil
 

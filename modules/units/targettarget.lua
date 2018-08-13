@@ -82,4 +82,4 @@ function TargetTarget:Update(...)
     end
 end
 
-A.modules:set("Target of Target", TargetTarget)
+A.modules[frameName] = TargetTarget

@@ -4,6 +4,20 @@ local media = LibStub("LibSharedMedia-3.0")
 local E = A.enum
 
 local rand = math.rand
+local fmod = math.fmod
+local floor = math.floor
+local ceil = math.ceil
+local pairs = pairs
+local unpack = unpack
+local select = select
+local sub = string.sub
+local len = string.len
+local find = string.find
+local gmatch = string.gmatch
+local tinsert = table.insert
+local format = string.format
+local type = type
+local next = next
 
 A:Debug("Loading tools")
 
@@ -14,7 +28,7 @@ local T = {}
 
 function T:getWords(input)
     local matches = {}
-    for m in input:gmatch("[a-zA-Z0-9%(%)]+") do table.insert(matches, m) end
+    for m in input:gmatch("[a-zA-Z0-9%(%)]+") do tinsert(matches, m) end
     return unpack(matches)
 end
 
@@ -26,15 +40,15 @@ function T:rgbToHex(rgb)
         local hex = ''
 
         while(value > 0)do
-            local index = math.fmod(value, 16) + 1
-            value = math.floor(value / 16)
-            hex = string.sub('0123456789ABCDEF', index, index) .. hex           
+            local index = fmod(value, 16) + 1
+            value = floor(value / 16)
+            hex = sub('0123456789ABCDEF', index, index) .. hex           
         end
 
-        if(string.len(hex) == 0)then
+        if(len(hex) == 0)then
             hex = '00'
 
-        elseif(string.len(hex) == 1)then
+        elseif(len(hex) == 1)then
             hex = '0' .. hex
         end
 
@@ -47,25 +61,25 @@ end
 function T:split(s, delimiter)
   local result = { }
   local from  = 1
-  local delim_from, delim_to = string.find( s, delimiter, from  )
+  local delim_from, delim_to = find( s, delimiter, from  )
   while delim_from do
-    table.insert( result, string.sub( s, from , delim_from-1 ) )
+    tinsert( result, sub( s, from , delim_from-1 ) )
     from  = delim_to + 1
-    delim_from, delim_to = string.find( s, delimiter, from  )
+    delim_from, delim_to = find( s, delimiter, from  )
   end
-  table.insert( result, string.sub( s, from  ) )
+  tinsert( result, sub( s, from  ) )
   return result
 end
 
 function T:rand(...)
-    local r = rand(1, select(#, ...))
+    local r = rand(1, select("#", ...))
     return select(r, ...)
 end
 
 function string.explode(self, sep)
    local t = {}
    local i = 1
-   for str in string.gmatch(self, "([^"..sep.."]+)") do
+   for str in gmatch(self, "([^"..sep.."]+)") do
       t[i] = str
       i = i + 1
    end
@@ -161,11 +175,11 @@ end
 
 function T:timeString(time)
 	if time > 3600 then
-		return string.format("%.0f%s", time/3600, "h")
+		return format("%.0f%s", time/3600, "h")
 	elseif time > 60 then
-		return string.format("%.0f%s", time/60, "m")
+		return format("%.0f%s", time/60, "m")
 	end
-	return string.format("%.1f%s", time, "s")
+	return format("%.1f%s", time, "s")
 end
 
 T.reversedPoints = {
@@ -392,27 +406,27 @@ end
 function T:short(value, decimals, hardSet)
     local decimals = decimals or 0
     if (value > 1e9) then
-        return string.format("%."..decimals.."f", value/1e9).."B"
+        return format("%."..decimals.."f", value/1e9).."B"
     elseif (value > 1e6) then
-        return string.format("%."..decimals.."f", value/1e6).."M"
+        return format("%."..decimals.."f", value/1e6).."M"
     elseif (value > 1e3) then
-        return string.format("%."..decimals.."f", value/1e3).."K"
+        return format("%."..decimals.."f", value/1e3).."K"
     else
     	decimals = hardSet and decimals or 0
-        return string.format("%."..decimals.."f", value)
+        return format("%."..decimals.."f", value)
     end
 end
 
 function T:timeShort(value)
     local decimals = decimals or 0
     if (value > 3600) then
-        return string.format("%.0f".."h", math.ceil(value / 3600))
+        return format("%.0f".."h", ceil(value / 3600))
     elseif (value > 120) then
-        return string.format("%.0f".."m", math.ceil(value / 60))
+        return format("%.0f".."m", ceil(value / 60))
     elseif (value > 60) then
-    	return string.format("%d:%d", math.ceil(value / 60), value - 60)
+    	return format("%d:%d", ceil(value / 60), value - 60)
     else
-        return string.format("%.1f", value)	
+        return format("%.1f", value)	
     end
 end
 

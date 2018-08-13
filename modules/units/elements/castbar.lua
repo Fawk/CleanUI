@@ -24,7 +24,7 @@ end
 
 local function updateSafeZone(self)
 	local safeZone = self.safeZone
-	local width = self:GetWidth()
+	local width = self.bar:GetWidth()
 	local _, _, _, ms = GetNetStats()
 
 	local safeZoneRatio = (ms / 1e3) / self.max
@@ -36,8 +36,6 @@ local function updateSafeZone(self)
 end
 
 function Castbar:Init(parent)
-	if true then return end
-	
 	local db = parent.db[elementName]
 
 	if (not db) then return end
@@ -54,8 +52,10 @@ function Castbar:Init(parent)
 		bar.bg = container:CreateTexture(nil, "BORDER")
 		bar.bg:SetAllPoints()
 
-		local safeZone = container:CreateTexture(nil, "OVERLAY")
-		safeZone:SetTexture(0.8, 0.3, 0.3, 0.5)
+		local safeZone = bar:CreateTexture(nil, "OVERLAY")
+		safeZone:SetTexture(A.enum.backdrops.editbox.bgFile)
+		safeZone:SetVertexColor(0.8, 0.3, 0.3, 0.5)
+		safeZone:SetDrawLayer("OVERLAY", 4)
 
 		local name = buildText(container, db.name.size):shadow():enforceHeight():build()
 		name:SetText("")
@@ -135,8 +135,6 @@ function Castbar:Init(parent)
 end
 
 function Castbar:Update(...)
-
-	if true then return end
 
 	local self, event, arg1, arg2, arg3, arg4, arg5 = ...
 	local parent = self:GetParent()
@@ -296,10 +294,10 @@ function Castbar:Update(...)
             self.delay = 0
 
 			self.safeZone:ClearAllPoints()
-			self.safeZone:SetPoint(self.bar:GetReverseFill() and "RIGHT" or "LEFT")
+			self.safeZone:SetPoint(self.bar:GetReverseFill() and "LEFT" or "RIGHT")
 			self.safeZone:SetPoint("TOP")
 			self.safeZone:SetPoint("BOTTOM")
-			updateSafeZone(self.bar)
+			updateSafeZone(self)
 
 			self:Show()
 
@@ -329,7 +327,7 @@ function Castbar:Update(...)
 			self.safeZone:SetPoint(self.bar:GetReverseFill() and "RIGHT" or "LEFT")
 			self.safeZone:SetPoint("TOP")
 			self.safeZone:SetPoint("BOTTOM")
-			updateSafeZone(self.bar)
+			updateSafeZone(self)
 
 	        self:Show()
 

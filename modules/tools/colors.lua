@@ -6,8 +6,10 @@ local UnitIsPlayer = UnitIsPlayer
 local select = select
 local unpack = unpack
 local modf = math.modf
+local fmod = math.fmod
 local tonumber = tonumber
 local sub = string.sub
+local len = string.len
 local pairs = pairs
 
 --[[
@@ -50,6 +52,7 @@ A.colors = {
 		["PAIN"] = { 255/255, 156/255, 0 },
 		["LUNAR_POWER"] = { 77/255, 133/255, 230/255 },
 		["INSANITY"] = { 102/255,	0, 204/255},
+		[Enum.PowerType.Mana] = { 80/255, 109/255, 155/255 },
 		[Enum.PowerType.ComboPoints] = { 255/255, 245/255, 105/255 },
 		[Enum.PowerType.SoulShards] = { 128/255, 82/255, 105/255 },
 		[Enum.PowerType.Chi] = { 181/255, 255/255, 235/255 },
@@ -128,7 +131,7 @@ local function rgbToHex(rgb)
 end
 
 local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
-function A:AddColorReplaceLogicIfNeeded(tag, class, powerType)
+function A:AddColorReplaceLogicIfNeeded(tag, class, powerType, currentHealth, currentMaxHealth)
 	local x, y = tag.replaced:find("%[color:"..colorPattern.."%]")
 	if (x and y) then
 		local m = tag.replaced:sub(x, y)
@@ -138,7 +141,13 @@ function A:AddColorReplaceLogicIfNeeded(tag, class, powerType)
 	tag.replaced = tag.replaced:replace("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]))
 	tag.replaced = tag.replaced:replace("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard))
 	tag.replaced = tag.replaced:replace("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]))
-	tag.replaced = tag.replaced:replace("[color:healthgradient]", "|cFF"..rgbToHex(A:ColorGradient(parent.currentHealth, parent.currentMaxHealth, A.HealthGradient)))
+
+	local x, y = tag.replaced:find("[color:healthgradient]")
+	if (x and y) then
+		local r1, g1, b1, r2, g2, b2, r3, g3, b3 = A:HealthGradient() 
+		local r, g, b = A:ColorGradient(currentHealth or 1, currentMaxHealth or 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
+		tag.replaced = tag.replaced:replace("[color:healthgradient]", "|cFF"..rgbToHex({ r, g, b }))
+	end
 end
 
 A.colors.class = { ["NPC"] = { .8, .8, .8, 1 } }

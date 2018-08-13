@@ -41,25 +41,19 @@ function Health:Init(parent)
 	    	Health:Update(self, event, ...)
 	   	end
 
-	   	local tagEventFrame = parent.tagEventFrame
-	   	if (tagEventFrame) then
-	   		if (db.frequentUpdates) then
-	   			tagEventFrame:UnregisterEvent("UNIT_HEALTH")
-	   			tagEventFrame:RegisterEvent("UNIT_HEALTH_FREQUENT")
-	   		else
-	   			tagEventFrame:RegisterEvent("UNIT_HEALTH")
-	   			tagEventFrame:UnregisterEvent("UNIT_HEALTH_FREQUENT")
-	   		end
-	   	end
-
 	   	if (db.frequentUpdates) then
    			health:UnregisterEvent("UNIT_HEALTH")
    			health:RegisterEvent("UNIT_HEALTH_FREQUENT")
+   			A:UnregisterTagEvent("UNIT_HEALTH")
+   			A:RegisterTagEvent("UNIT_HEALTH_FREQUENT")
    		else
-   			health:RegisterEvent("UNIT_HEALTH")
    			health:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+   			health:RegisterEvent("UNIT_HEALTH")
+   			A:UnregisterTagEvent("UNIT_HEALTH_FREQUENT")
+   			A:RegisterTagEvent("UNIT_HEALTH")
    		end
 
+   		A:RegisterTagEvent("UNIT_MAXHEALTH")
    		health:RegisterEvent("UNIT_MAXHEALTH")
 	    health:SetScript("OnEvent", function(self, event, ...)
 	    	self:Update(event, ...)
@@ -96,9 +90,7 @@ function Health:Update(...)
 	  		Units:UpdateMissingBar(self, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth)
 	  	end
 
-	  	if (db.colorBy == "gradient") then
-			A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
-		end
+		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
 		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "FORCED_TAG_UPDATE")) then
@@ -128,7 +120,7 @@ function Health:Update(...)
 
 		self:SetOrientation(db.orientation)
 		self:SetReverseFill(db.reversed)
-		self:SetStatusBarTexture(texture)
+		self:SetStatusBarTexture(texture) 
 		self:SetWidth(db.size.matchWidth and parent:GetWidth() or db.size.width)
 		self:SetHeight(db.size.matchHeight and parent:GetHeight() or db.size.height)
 		
@@ -142,10 +134,12 @@ function Health:Update(...)
 			self.bg:Show()
 		end
 
-		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 	elseif (event == "UpdateColors") then
-		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, Gradient, A.ColorBar)
+		parent:Update(UnitEvent.UPDATE_HEALTH)
+
+		Units:SetupMissingBar(self, db.missingBar, "missingHealthBar", parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
 	end
 end

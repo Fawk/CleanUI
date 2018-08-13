@@ -36,9 +36,8 @@ function Power:Init(parent)
 	    	Power:Update(self, event, ...)
 	   	end
 
-	   	local tagEventFrame = parent.tagEventFrame
-	   	if (tagEventFrame) then
-	   		Units:RegisterEvents(tagEventFrame, events)
+	   	for _,event in next, events do
+	   		A:RegisterTagEvent(event)
 	   	end
 
 	   	Units:RegisterEvents(power, events)
@@ -89,6 +88,8 @@ function Power:Update(...)
 		  	if (db.missingBar.enabled) then
 		  		Units:UpdateMissingBar(self, "missingPowerBar", parent.currentPower, parent.currentMaxPower)
 		  	end
+
+			A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	 	end
 	elseif (event == UnitEvent.UPDATE_TAGS) then
 
@@ -140,6 +141,11 @@ function Power:Update(...)
 		else
 			self.bg:Show()
 		end
+
+		Units:SetupMissingBar(self, self.db.missingBar, "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
+		A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
+	elseif (event == "UpdateColors") then
+		parent:Update(UnitEvent.UPDATE_POWER)
 
 		Units:SetupMissingBar(self, self.db.missingBar, "missingPowerBar", parent.currentPower, parent.currentMaxPower, A.noop, A.ColorBar)
 		A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
