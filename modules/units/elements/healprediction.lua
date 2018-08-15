@@ -115,10 +115,10 @@ function HealPrediction:Init(parent)
 			healPrediction.overHealAbsorb = overHealAbsorb
 	    end
 
-		my:SetFrameLevel(5)
-		all:SetFrameLevel(5)
-		absorb:SetFrameLevel(5)
-		healAbsorb:SetFrameLevel(5)
+		my:SetFrameLevel(6)
+		all:SetFrameLevel(6)
+		absorb:SetFrameLevel(6)
+		healAbsorb:SetFrameLevel(6)
 
 		healPrediction.myBar = my
 		healPrediction.otherBar = all
@@ -177,24 +177,6 @@ function HealPrediction:Update(...)
 		parent.maxOverflow = self.maxOverflow
 
 		parent:Update(UnitEvent.UPDATE_HEAL_PREDICTION)
-	elseif (event == UnitEvent.UPDATE_TAGS) then
-
-		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "UNIT_HEAL_PREDICTION", "UNIT_ABSORB_AMOUNT_CHANGED", "UNIT_HEAL_ABSORB_AMOUNT_CHANGED", "FORCED_TAG_UPDATE")) then
-			return
-		end
-
-		if (parent.unit ~= arg3) then return end
-
-		local tag = arg1
-		tag.replaced = tag.replaced:replace("[heal]", parent.myIncomingHeal)
-		tag.replaced = tag.replaced:replace("[heal:round]", T:short(parent.myIncomingHeal, 2))
-		tag.replaced = tag.replaced:replace("[allheal]", parent.otherIncomingHeal)
-		tag.replaced = tag.replaced:replace("[allheal:round]", T:short(parent.otherIncomingHeal, 2))
-		tag.replaced = tag.replaced:replace("[absorb]", parent.absorb)
-		tag.replaced = tag.replaced:replace("[absorb:round]", T:short(parent.absorb, 2))
-		tag.replaced = tag.replaced:replace("[healabsorb]", parent.healAbsorb)
-		tag.replaced = tag.replaced:replace("[healabsorb:round]", T:short(parent.healAbsorb, 2))
-		tag.replaced = tag.replaced:replace("[perabsorb]", floor(parent.absorb / parent.currentMaxHealth * 100 + .5))
 	else
 		if (parent.unit ~= arg1) then return end
 		

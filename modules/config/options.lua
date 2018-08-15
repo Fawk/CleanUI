@@ -1045,7 +1045,7 @@ local function castBarSetting(order)
 	        	set = "Set"
 	    	},
 	        missingBar = {
-	        	disabled = parentDisabled,
+	        	disabled = false,
 	        	type = "group",
 	        	order = 16,
 	        	name = "Missing Bar",
@@ -1197,7 +1197,9 @@ local function groupBuffSetting(order, db)
 			name = "Size",
 			min = 1,
 			max = 100,
-			step = 1
+			step = 1,
+			get = "Get",
+			set = "Set"
 		},
 		position = positionSetting(2),
 		hideNumbers = {
@@ -1212,6 +1214,8 @@ local function groupBuffSetting(order, db)
 			func = function(info)
 				print(info[#info - 1])
 			end,
+			get = "Get",
+			set = "Set"
 		}
 	}
 
@@ -1222,7 +1226,7 @@ local function groupBuffSetting(order, db)
 			type = "group",
 			order = o,
 			name = spellId,
-			args = arg
+			args = arg,
 		}
 		o = o + 1
 	end
@@ -1299,12 +1303,16 @@ local function groupRoleSetting(order)
 				type = "toggle",
 				order = 1,
 				name = "Enabled",
+				get = "Get",
+				set = "Set"
 			},
 			style = {
 	        	type = "select",
 	        	order = 2,
 	        	name = "Style",
-	        	values = createDropdownTable("Text", "Letter", "Blizzard")
+	        	values = createDropdownTable("Text", "Letter", "Blizzard"),
+				get = "Get",
+				set = "Set"
 	        },
 	        position = positionSetting(3),
 	        size = {
@@ -1313,6 +1321,8 @@ local function groupRoleSetting(order)
 	       		name = "Size",
 	       		min = 1,
 	       		max = 100,
+				get = "Get",
+				set = "Set"
 	        },
 	        textSize = {
 	        	disabled = function(info)
@@ -1324,6 +1334,8 @@ local function groupRoleSetting(order)
 	       		name = "Text Size",
 	       		min = 1,
 	       		max = 100,
+				get = "Get",
+				set = "Set"
 	        },
 	        color = {
 	        	disabled = function(info)
@@ -1332,7 +1344,9 @@ local function groupRoleSetting(order)
 	        	end,
 	        	type = "color",
 	        	order = 6,
-	        	name = "Text Color"
+	        	name = "Text Color",
+				get = "Get",
+				set = "Set"
 	    	},
 	        textStyle = {
 	        	disabled = function(info)
@@ -1342,7 +1356,9 @@ local function groupRoleSetting(order)
 	        	type = "select",
 	        	order = 7,
 	        	name = "Text Style",
-	        	values = createDropdownTable("None", "Outline", "Thick Outline", "Shadow")
+	        	values = createDropdownTable("None", "Outline", "Thick Outline", "Shadow"),
+				get = "Get",
+				set = "Set"
 	        },
 	    }
     }
@@ -1492,7 +1508,7 @@ local function standardUnit(name, db, order)
 						}
 					},
 		            missingBar = {
-		            	disabled = parentDisabled,
+		            	disabled = false,
 		            	type = "group",
 		            	order = 10,
 		            	name = "Missing Bar",
@@ -1659,7 +1675,7 @@ local function standardUnit(name, db, order)
 						}
 					},
 		            missingBar = {
-		            	disabled = parentDisabled,
+		            	disabled = false,
 		            	type = "group",
 		            	order = 10,
 		            	name = "Missing Bar",
@@ -2792,7 +2808,7 @@ function A:RegisterOptions()
 										}
 									},
 						            missingBar = {
-						            	disabled = parentDisabled,
+						            	disabled = false,
 						            	type = "group",
 						            	order = 10,
 						            	name = "Missing Bar",
@@ -2959,7 +2975,7 @@ function A:RegisterOptions()
 										}
 									},
 						            missingBar = {
-						            	disabled = parentDisabled,
+						            	disabled = false,
 						            	type = "group",
 						            	order = 10,
 						            	name = "Missing Bar",
@@ -3485,9 +3501,9 @@ function A:RegisterOptions()
 						            	end,
 						            	type = "range",
 						            	order = 8,
-						            	name = "Icon Limit",
+						            	name = "Icon Text Size",
 						            	min = 1,
-						            	max = 40,
+						            	max = 100,
 						            	step = 1,
 						            	get = "Get",
 						            	set = "Set"
@@ -4234,7 +4250,7 @@ function A:RegisterOptions()
 										}
 									},
 						            missingBar = {
-						            	disabled = parentDisabled,
+						            	disabled = false,
 						            	type = "group",
 						            	order = 10,
 						            	name = "Missing Bar",
@@ -4401,7 +4417,7 @@ function A:RegisterOptions()
 										}
 									},
 						            missingBar = {
-						            	disabled = parentDisabled,
+						            	disabled = false,
 						            	type = "group",
 						            	order = 10,
 						            	name = "Missing Bar",

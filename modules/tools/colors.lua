@@ -53,6 +53,9 @@ A.colors = {
 		["LUNAR_POWER"] = { 77/255, 133/255, 230/255 },
 		["INSANITY"] = { 102/255,	0, 204/255},
 		[Enum.PowerType.Mana] = { 80/255, 109/255, 155/255 },
+		[Enum.PowerType.Rage] = { 200/255, 33/255, 33/255 },
+		[Enum.PowerType.Focus] = { 255/255, 128/255, 64/255 },
+		[Enum.PowerType.Energy] = { 200/255,	200/255, 80/255 },
 		[Enum.PowerType.ComboPoints] = { 255/255, 245/255, 105/255 },
 		[Enum.PowerType.SoulShards] = { 128/255, 82/255, 105/255 },
 		[Enum.PowerType.Chi] = { 181/255, 255/255, 235/255 },
@@ -60,6 +63,11 @@ A.colors = {
 		[Enum.PowerType.ArcaneCharges] = { 26/255, 26/255, 250/255 },
 		[Enum.PowerType.LunarPower] = { 77/255, 133/255, 230/255 },
 		[Enum.PowerType.Insanity] = { 102/255,	0, 204/255 },
+		[Enum.PowerType.Pain] = { 255/255, 156/255, 0 },
+		[Enum.PowerType.Fury] = { 200/255, 33/255, 200/255 },
+		[Enum.PowerType.Runes] = { 200/255, 33/255, 200/255 },
+		[Enum.PowerType.RunicPower] = { 0, 209/255, 1 },
+		[Enum.PowerType.Maelstrom] = { 0, 128/255, 1 },
 		runes = {
 			[1] = { .67, .13, .13 },
 			[2] = { 0, .67, .99 },
@@ -103,7 +111,7 @@ A.colors = {
 	}
 }
 
-local function rgbToHex(rgb)
+function A:rgbToHex(rgb)
 
 	rgb = { rgb[1] * 255, rgb[2] * 255, rgb[3] * 255 }
 	local hexadecimal = ''
@@ -128,26 +136,6 @@ local function rgbToHex(rgb)
 	end
 
 	return hexadecimal
-end
-
-local colorPattern = "[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]"
-function A:AddColorReplaceLogicIfNeeded(tag, class, powerType, currentHealth, currentMaxHealth)
-	local x, y = tag.replaced:find("%[color:"..colorPattern.."%]")
-	if (x and y) then
-		local m = tag.replaced:sub(x, y)
-		tag.replaced = tag.replaced:replace(m, "|cFF"..m:match(colorPattern))
-	end
-
-	tag.replaced = tag.replaced:replace("[color:class]", "|cFF"..rgbToHex(A.colors.class[class]))
-	tag.replaced = tag.replaced:replace("[color:health]", "|cFF"..rgbToHex(A.colors.health.standard))
-	tag.replaced = tag.replaced:replace("[color:power]", "|cFF"..rgbToHex(A.colors.power[powerType]))
-
-	local x, y = tag.replaced:find("[color:healthgradient]")
-	if (x and y) then
-		local r1, g1, b1, r2, g2, b2, r3, g3, b3 = A:HealthGradient() 
-		local r, g, b = A:ColorGradient(currentHealth or 1, currentMaxHealth or 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
-		tag.replaced = tag.replaced:replace("[color:healthgradient]", "|cFF"..rgbToHex({ r, g, b }))
-	end
 end
 
 A.colors.class = { ["NPC"] = { .8, .8, .8, 1 } }
@@ -219,7 +207,7 @@ function A:ColorBar(bar, parent, min, max, gradient, classOverride)
 		bar:SetStatusBarColor(r, g, b, a or 1)
 
 		if (bar.bg) then
-			if (tonumber(mult) >= 0) then
+			if (mult >= 0) then
 				bar.bg:SetVertexColor(r * mult, g * mult, b * mult)
 			else
 				bar.bg:Hide()

@@ -47,6 +47,9 @@ function Group:Init(name, maxMembers, db)
     	self.initFunc = initFunc
         self:UpdateUnits()
 	end
+	container.GetUnits = function(self)
+		return { this.header:GetChildren() }
+	end
 	container.UpdateUnits = function(self, event, ...)
 		if (A.groupSimulating) then
 			A.modules[A.groupSimulating:lower()]:Simulate(self.maxMembers)
@@ -57,7 +60,7 @@ function Group:Init(name, maxMembers, db)
 			if (uf and uf.init) then
 				for i = 1, this.header:GetNumChildren() do
 		            local uf = select(i, this.header:GetChildren())
-		            if (uf and uf.init) then
+		            if (uf and uf.init and uf.Update) then
 	            		uf:Update(event, this, uf.unit)
 	            	else
 	            		local updateFrame = updateFrames[i]
@@ -131,6 +134,8 @@ function Group:Init(name, maxMembers, db)
 			            		end
 			            	end)
 			            end
+			        else
+			        	uf:Update(event, this, uf.unit)
 			        end
 		        end
 			end
@@ -160,6 +165,8 @@ function Group:Init(name, maxMembers, db)
 
     container:RegisterEvent("GROUP_ROSTER_UPDATE")
     container:RegisterEvent("UNIT_EXITED_VEHICLE")
+    container:RegisterEvent("PLAYER_ENTERING_WORLD")
+    container:RegisterEvent("PLAYER_LOGIN")
     container:SetScript("OnEvent", function(self, event) 
         Units:DisableBlizzardRaid()
         T:RunNowOrAfterCombat(function()
@@ -282,13 +289,13 @@ function Group:UpdateHeader(container)
 end
 
 function Group:SimulateTags(frame)
-    for i = 1, frame.tags:len() do 
-        for x = 1, frame.orderedElements:len() do
-            frame.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, frame.tags[i], "UNIT_HEALTH", "player")
-        end
-        A:FormatTag(tag)
-        tag:SetText(tag.replaced)
-    end
+    -- for i = 1, frame.tags:len() do 
+    --     for x = 1, frame.orderedElements:len() do
+    --         frame.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, frame.tags[i], "UNIT_HEALTH", "player")
+    --     end
+    --     A:FormatTag(tag)
+    --     tag:SetText(tag.replaced)
+    -- end
 end
 
 function Group:Update(...)
@@ -372,19 +379,6 @@ function Group:Update(...)
 
 			self:ForceTagUpdate()
 	    end
-    elseif (event == UnitEvent.UPDATE_TAGS) then
-    	for i = 1, self.tags:len() do
-            if (self.tags[i]) then
-                self.tags[i].replaced = self.tags[i].format
-                for x = 1, self.orderedElements:len() do
-                    if (not self.orderedElements[x].noTags) then
-                        self.orderedElements[x]:Update(UnitEvent.UPDATE_TAGS, self.tags[i], event, unit)
-                    end
-                end
-                A:FormatTag(self.tags[i])
-                self.tags[i]:SetText(self.tags[i].replaced)
-            end
-        end
     end
 end
 

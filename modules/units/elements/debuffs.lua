@@ -207,7 +207,7 @@ function Debuffs:Update(...)
 		if (db.style == "Bar") then
 			self:SetSize(width, height * self.limit)
 		else
-			self:SetSize(height * iconLimit, height * 40 / iconLimit)
+			self:SetSize(height * db.iconLimit, height * 40 / db.iconLimit)
 		end
 
 		if (db.attached) then
@@ -297,6 +297,17 @@ function Debuffs:Update(...)
 			end
 
 			U:CreateBackground(button, db, false)
+
+			if (db.style == "Icon" and button.Background) then
+				if (aura.dispelType) then
+					local color = A.colors.debuff[aura.dispelType]
+					if (color) then
+						button.Background:SetBackdropBorderColor(unpack(color))
+					else
+						button.Background:SetBackdropBorderColor(unpack(A.colors.debuff["Physical"]))
+					end
+				end
+			end
 
 			A:ColorBar(bar, parent, 0, duration, A.noop)
 			button:Show()

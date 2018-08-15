@@ -29,6 +29,7 @@ function Border:Init(parent)
 
 		border:RegisterUnitEvent("UNIT_AURA", parent.unit)
 		border:RegisterEvent("PLAYER_TARGET_CHANGED")
+		border:RegisterEvent("PLAYER_ENTERING_WORLD")
 		border:SetScript("OnEvent", function(self, event, ...)
 			self:Update(event, ...)
 		end)
@@ -54,7 +55,7 @@ function Border:Update(...)
 		return
 	end
 
-	if (event == "PLAYER_TARGET_CHANGED") then
+	if (event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_ENTERING_WORLD") then
 		if (db.highlight) then
 			if (parent.unit and UnitIsUnit("target", parent.unit)) then
 				parent.Background:SetBackdropBorderColor(T:unpackColor(db.targetColor))
@@ -81,11 +82,15 @@ function Border:Update(...)
 					color = A.colors.debuff[debuff]
 				end
 			end
-			
+
 			if (color) then
 				parent.Background:SetBackdropBorderColor(unpack(color))
 			else
-				parent.Background:SetBackdropBorderColor(T:unpackColor(parent.db.background.color))
+				if (parent.unit and UnitIsUnit("target", parent.unit)) then
+					parent.Background:SetBackdropBorderColor(T:unpackColor(db.targetColor))
+				else
+					parent.Background:SetBackdropBorderColor(T:unpackColor(parent.db.background.color))
+				end
 			end
 		end
 	end

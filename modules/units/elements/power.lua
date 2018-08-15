@@ -91,33 +91,6 @@ function Power:Update(...)
 
 			A:ColorBar(self, parent, parent.currentPower, parent.currentMaxPower, A.noop, parent.classOverride)
 	 	end
-	elseif (event == UnitEvent.UPDATE_TAGS) then
-
-		if (not T:anyOf(arg2, "UNIT_POWER_UPDATE", "UNIT_POWER", "UNIT_MAXPOWER", "UPDATE_SHAPESHIFT_FORM", "FORCED_TAG_UPDATE")) then
-			return
-		end
-
-		if (parent.unit ~= arg3) then return end
-
-		local tag = arg1
-
-		if (not parent.currentPower) then
-			parent:Update(UnitEvent.UPDATE_POWER)
-		end
-
-		tag.replaced = tag.replaced:replace("[pp]", parent.currentPower)
-		tag.replaced = tag.replaced:replace("[maxpp]", parent.currentMaxPower)
-
-		local perpp = 0
-		if (parent.currentPower ~= 0 and parent.currentMaxPower ~= 0) then
-			perpp = floor(parent.currentPower / parent.currentMaxPower * 100 + .5)
-		end
-		
-		tag.replaced = tag.replaced:replace("[perpp]", perpp)
-		tag.replaced = tag.replaced:replace("[pp:round]", T:short(parent.currentPower, 1))
-		tag.replaced = tag.replaced:replace("[maxpp:round]", T:short(parent.currentMaxPower, 1))
-		tag.replaced = tag.replaced:replace("[pp:deficit]", parent.deficitPower > 0 and string.format("-%s", T:short(parent.deficitPower, 0)) or "")
-
 	elseif (event == UnitEvent.UPDATE_DB) then
 
 		self:Update("UNIT_POWER_UPDATE", parent.unit)

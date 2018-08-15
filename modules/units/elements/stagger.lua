@@ -93,10 +93,7 @@ function Stagger:Update(...)
 
 	local staggerValue = UnitStagger("player")
 
-	if (event == UnitEvent.UPDATE_TAGS) then
-		local tag = arg1
-		tag.replaced = tag.replaced:replace("[stagger]", staggerValue)
-	elseif (event == UnitEvent.UPDATE_DB) then
+	if (event == UnitEvent.UPDATE_DB) then
 		local texture = media:Fetch("statusbar", db.texture)
 
 		self:SetOrientation(db.orientation)

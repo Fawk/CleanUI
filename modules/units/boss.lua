@@ -80,7 +80,7 @@ function Boss:Update(...)
             local db = self.db or arg2
 
             if (not InCombatLockdown()) then
-                Units:Position(self, position)
+                Units:Position(self, db.position)
                 self:SetSize(db.size.width, db.size.height)
                 self:SetAttribute("*type1", "target")
                 self:SetAttribute("*type2", "togglemenu")

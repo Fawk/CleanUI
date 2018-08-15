@@ -47,6 +47,10 @@ function Units:Translate(frame, relative)
 end
  
 function Units:Position(frame, db, overrideRelative)
+    if (not db) then
+        return print("could not find db to position for frame: ", frame:GetName())
+    end
+
     frame:ClearAllPoints()
     if (db.localPoint == "ALL") then
         frame:SetAllPoints()

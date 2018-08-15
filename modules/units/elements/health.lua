@@ -44,15 +44,12 @@ function Health:Init(parent)
 	   	if (db.frequentUpdates) then
    			health:UnregisterEvent("UNIT_HEALTH")
    			health:RegisterEvent("UNIT_HEALTH_FREQUENT")
-   			A:UnregisterTagEvent("UNIT_HEALTH")
-   			A:RegisterTagEvent("UNIT_HEALTH_FREQUENT")
    		else
    			health:UnregisterEvent("UNIT_HEALTH_FREQUENT")
    			health:RegisterEvent("UNIT_HEALTH")
-   			A:UnregisterTagEvent("UNIT_HEALTH_FREQUENT")
-   			A:RegisterTagEvent("UNIT_HEALTH")
    		end
 
+		A:UnregisterTagEvent("UNIT_HEALTH")
    		A:RegisterTagEvent("UNIT_MAXHEALTH")
    		health:RegisterEvent("UNIT_MAXHEALTH")
 	    health:SetScript("OnEvent", function(self, event, ...)
@@ -91,25 +88,6 @@ function Health:Update(...)
 	  	end
 
 		A:ColorBar(self, parent, parent.currentHealth, parent.currentMaxHealth, A.HealthGradient, parent.classOverride)
-	elseif (event == UnitEvent.UPDATE_TAGS) then
-
-		if (not T:anyOf(arg2, "UNIT_HEALTH_FREQUENT", "UNIT_HEALTH", "FORCED_TAG_UPDATE")) then
-			return
-		end
-
-		if (parent.unit ~= arg3) then return end
-
-		if (not parent.currentHealth) then
-			parent:Update(UnitEvent.UPDATE_HEALTH)
-		end
-
-		local tag = arg1
-		tag.replaced = tag.replaced:replace("[hp]", parent.currentHealth)
-		tag.replaced = tag.replaced:replace("[maxhp]", parent.currentMaxHealth)
-		tag.replaced = tag.replaced:replace("[perhp]", floor(parent.currentHealth / parent.currentMaxHealth * 100 + .5))
-		tag.replaced = tag.replaced:replace("[hp:round]", T:short(parent.currentHealth, 1))
-		tag.replaced = tag.replaced:replace("[maxhp:round]", T:short(parent.currentMaxHealth, 1))
-		tag.replaced = tag.replaced:replace("[hp:deficit]", parent.deficitHealth > 0 and format("-%s", T:short(parent.deficitHealth, 0)) or "")
 	elseif (event == UnitEvent.UPDATE_DB) then
 		
 		self:Update("UNIT_HEALTH_FREQUENT", parent.unit)
